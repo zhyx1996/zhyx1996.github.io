@@ -24,6 +24,7 @@
             --accent: #f59e0b;
             --border: #d8e2f0;
             --shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+            --gold-trend-position: 16%;
         }
 
         body {
@@ -311,7 +312,7 @@
         .trend-bar::after {
             content: "";
             position: absolute;
-            right: 16%;
+            right: var(--gold-trend-position);
             top: -5px;
             width: 16px;
             height: 24px;
@@ -403,7 +404,7 @@
                 <li><a href="#focus">今日焦点</a></li>
                 <li><a href="#briefing">资讯速览</a></li>
                 <li><a href="#gold">黄金观察</a></li>
-                <li><a href="#contact">继续阅读</a></li>
+                <li><a href="#continue-reading">继续阅读</a></li>
             </ul>
         </div>
     </nav>
@@ -574,7 +575,7 @@
             </div>
         </section>
 
-        <section id="contact">
+        <section id="continue-reading">
             <div class="section-heading">
                 <div>
                     <h2>继续阅读</h2>
