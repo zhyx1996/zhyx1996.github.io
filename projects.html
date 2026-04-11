@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZYX | 项目页</title>
+    <meta name="description" content="zhyx1996 的公开项目页，展示 lane2seq、PCL OMP、CUDA 与工具仓库。">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-inner">
+            <a class="brand" href="/index.html">ZYX · Homepage</a>
+            <ul class="nav-links">
+                <li><a href="/index.html">首页</a></li>
+                <li><a class="active" href="/projects.html">项目页</a></li>
+                <li><a href="#project-list-section">仓库卡片</a></li>
+                <li><a href="#project-links">直达链接</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container page-shell">
+        <section class="hero page-hero">
+            <div class="hero-copy">
+                <span class="kicker">📂 Multi-page view · Projects</span>
+                <h1><span id="hero-name">ZYX</span> 的公开项目索引</h1>
+                <p>
+                    这一页专门用来展开仓库内容：
+                    一方面保留静态项目摘要，另一方面在联网时用 GitHub API 刷新最近更新的公开仓库信息。
+                </p>
+                <div class="hero-badges">
+                    <span class="badge">lane2seq</span>
+                    <span class="badge">pcl-boundary_omp</span>
+                    <span class="badge">cuda_test</span>
+                    <span class="badge">utils</span>
+                </div>
+                <div class="button-row">
+                    <a class="button primary" href="https://github.com/zhyx1996?tab=repositories" target="_blank" rel="noreferrer">仓库总览</a>
+                    <a class="button secondary" href="/index.html">返回首页</a>
+                </div>
+                <p class="status" data-github-status>正在尝试连接 GitHub API...</p>
+            </div>
+            <aside class="hero-panel">
+                <h2>项目侧重点</h2>
+                <div class="stat-list">
+                    <div class="stat-item">
+                        <strong>车道线检测</strong>
+                        <span>lane2seq 将传统视觉方法和深度学习方法放在同一仓库做实验。</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>点云与并行</strong>
+                        <span>pcl-boundary_omp 聚焦 PCL BoundaryEstimation 的 OMP 加速实践。</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong>轻量工具</strong>
+                        <span>cuda_test 与 utils 用来承接日常实验和脚本积累。</span>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <section class="section" id="project-list-section">
+            <div class="section-heading">
+                <div>
+                    <h2>仓库卡片</h2>
+                    <p>下方内容默认使用静态摘要，成功联网后会自动刷新成实时公开数据。</p>
+                </div>
+                <span class="tag">Repository Cards</span>
+            </div>
+            <div class="repo-grid" id="project-list">
+                <article class="repo-card">
+                    <div class="inline-list">
+                        <span class="tag">Jupyter Notebook</span>
+                        <span class="pill">最近更新 2026年4月10日</span>
+                    </div>
+                    <h3>lane2seq</h3>
+                    <p>基于 OpenCV、ENet 与 Vision Transformer 的车道线检测实验项目。</p>
+                    <div class="button-row">
+                        <a class="button outline" href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">GitHub 详情</a>
+                    </div>
+                </article>
+            </div>
+            <p class="status-inline" data-github-status>正在尝试连接 GitHub API...</p>
+        </section>
+
+        <section class="section" id="project-links">
+            <div class="section-heading">
+                <div>
+                    <h2>直达链接</h2>
+                    <p>除了自动加载内容，也保留了稳定的外部跳转，方便直接查看原仓库。</p>
+                </div>
+                <span class="tag">Outbound Links</span>
+            </div>
+            <div class="grid-2">
+                <article class="contact-card">
+                    <span class="tag">Vision</span>
+                    <h3>lane2seq</h3>
+                    <p>聚焦传统车道线检测流程与 Lane2Seq 深度学习实验。</p>
+                    <div class="button-row">
+                        <a class="button outline" href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">打开仓库</a>
+                    </div>
+                </article>
+                <article class="contact-card">
+                    <span class="tag">Point Cloud</span>
+                    <h3>pcl-boundary_omp</h3>
+                    <p>围绕 PCL BoundaryEstimation 的 OMP 并行化处理实践。</p>
+                    <div class="button-row">
+                        <a class="button outline" href="https://github.com/zhyx1996/pcl-boundary_omp" target="_blank" rel="noreferrer">打开仓库</a>
+                    </div>
+                </article>
+                <article class="contact-card">
+                    <span class="tag">CUDA</span>
+                    <h3>cuda_test</h3>
+                    <p>面向 CUDA 环境与基础实验的轻量仓库。</p>
+                    <div class="button-row">
+                        <a class="button outline" href="https://github.com/zhyx1996/cuda_test" target="_blank" rel="noreferrer">打开仓库</a>
+                    </div>
+                </article>
+                <article class="contact-card">
+                    <span class="tag">Utility</span>
+                    <h3>utils</h3>
+                    <p>收纳日常脚本、小工具与便捷配置。</p>
+                    <div class="button-row">
+                        <a class="button outline" href="https://github.com/zhyx1996/utils" target="_blank" rel="noreferrer">打开仓库</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>项目页补充了首页内容，也保留了在无法联网时可继续访问的外部跳转。</p>
+            <p>Copilot 签名保留在整个站点中，作为这次改版的来源说明。</p>
+        </div>
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
+</html>

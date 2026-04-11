@@ -3,614 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>资讯观察站 | 首页</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Noto Sans CJK SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        :root {
-            color-scheme: light;
-            --bg: #f4f7fb;
-            --surface: #ffffff;
-            --surface-muted: #eef4ff;
-            --text: #1f2937;
-            --subtle: #5b6474;
-            --primary: #2563eb;
-            --primary-dark: #163ea8;
-            --accent: #f59e0b;
-            --border: #d8e2f0;
-            --shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
-            /* Indicator offset used to place the current gold trend marker near the stronger end of the scale. */
-            --gold-trend-position: 16%;
-        }
-
-        body {
-            line-height: 1.7;
-            color: var(--text);
-            background: linear-gradient(180deg, #f7faff 0%, #f4f7fb 100%);
-        }
-
-        a {
-            color: inherit;
-        }
-
-        .navbar {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(14px);
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-inner,
-        .container {
-            max-width: 1180px;
-            margin: 0 auto;
-        }
-
-        .nav-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .brand {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-            list-style: none;
-            flex-wrap: wrap;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            font-weight: 600;
-            color: var(--subtle);
-            transition: color 0.2s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .container {
-            padding: 2rem;
-        }
-
-        .hero {
-            display: grid;
-            grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
-            gap: 2rem;
-            padding: 2.5rem;
-            background: linear-gradient(135deg, #1d4ed8, #3b82f6 58%, #7dd3fc 100%);
-            color: #fff;
-            border-radius: 28px;
-            margin: 1.5rem 0 2rem;
-            box-shadow: var(--shadow);
-        }
-
-        .hero-copy h1 {
-            font-size: clamp(2.3rem, 4vw, 3.6rem);
-            line-height: 1.15;
-            margin-bottom: 1rem;
-        }
-
-        .hero-copy p {
-            max-width: 680px;
-            opacity: 0.95;
-        }
-
-        .hero-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            margin: 1.5rem 0;
-        }
-
-        .hero-badges span,
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.45rem 0.85rem;
-            border-radius: 999px;
-            font-size: 0.92rem;
-        }
-
-        .hero-badges span {
-            background: rgba(255, 255, 255, 0.18);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 1.25rem;
-        }
-
-        .hero-actions a {
-            text-decoration: none;
-            padding: 0.85rem 1.2rem;
-            border-radius: 12px;
-            font-weight: 700;
-        }
-
-        .hero-actions .primary-btn {
-            background: #fff;
-            color: var(--primary-dark);
-        }
-
-        .hero-actions .secondary-btn {
-            border: 1px solid rgba(255, 255, 255, 0.45);
-            color: #fff;
-        }
-
-        .hero-panel {
-            background: rgba(8, 20, 54, 0.18);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 22px;
-            padding: 1.5rem;
-        }
-
-        .hero-panel h2 {
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .brief-list {
-            display: grid;
-            gap: 0.9rem;
-        }
-
-        .brief-item {
-            padding: 0.95rem 1rem;
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 16px;
-        }
-
-        .brief-item strong {
-            display: block;
-            margin-bottom: 0.3rem;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card,
-        .section-card,
-        .feature-card,
-        .timeline-item,
-        .market-card,
-        .contact-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .stat-card {
-            padding: 1.35rem;
-        }
-
-        .stat-card small {
-            color: var(--subtle);
-            display: block;
-            margin-bottom: 0.6rem;
-        }
-
-        .stat-card strong {
-            font-size: 1.65rem;
-            color: var(--primary-dark);
-        }
-
-        .section-heading {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .section-heading h2 {
-            font-size: 1.8rem;
-        }
-
-        .section-heading p,
-        .muted {
-            color: var(--subtle);
-        }
-
-        .feature-grid,
-        .market-grid,
-        .contact-grid {
-            display: grid;
-            gap: 1.25rem;
-        }
-
-        .feature-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            margin-bottom: 2rem;
-        }
-
-        .feature-card {
-            padding: 1.5rem;
-        }
-
-        .feature-card h3,
-        .market-card h3,
-        .contact-card h3 {
-            margin: 0.8rem 0;
-        }
-
-        .tag {
-            background: var(--surface-muted);
-            color: var(--primary-dark);
-            font-weight: 700;
-        }
-
-        .timeline {
-            display: grid;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .timeline-item {
-            padding: 1.35rem 1.5rem;
-            display: grid;
-            grid-template-columns: 110px 1fr;
-            gap: 1.25rem;
-            align-items: start;
-        }
-
-        .timeline-date {
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
-        .timeline-item ul,
-        .feature-card ul,
-        .market-card ul {
-            padding-left: 1.15rem;
-            color: var(--subtle);
-        }
-
-        .market-grid {
-            grid-template-columns: 1.2fr 1fr;
-            margin-bottom: 2rem;
-        }
-
-        .market-card {
-            padding: 1.5rem;
-        }
-
-        .trend-bar {
-            margin: 1rem 0 1.1rem;
-            height: 14px;
-            border-radius: 999px;
-            background: linear-gradient(90deg, #e5e7eb 0%, #fde68a 40%, #f59e0b 78%, #b45309 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .trend-bar::after {
-            content: "";
-            position: absolute;
-            right: var(--gold-trend-position);
-            top: -5px;
-            width: 16px;
-            height: 24px;
-            border-radius: 999px;
-            background: #1f2937;
-            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.75);
-        }
-
-        .insight-banner {
-            margin: 1.5rem 0 2rem;
-            padding: 1.4rem 1.5rem;
-            border-radius: 18px;
-            background: linear-gradient(135deg, #fff7ed, #fffbeb);
-            border: 1px solid #fed7aa;
-            color: #9a3412;
-        }
-
-        .contact-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            margin-bottom: 2rem;
-        }
-
-        .contact-card {
-            padding: 1.4rem;
-        }
-
-        .footer {
-            background: #111827;
-            color: rgba(255, 255, 255, 0.88);
-            padding: 2.5rem 2rem;
-        }
-
-        .footer .container {
-            padding: 0;
-        }
-
-        .footer-note {
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        @media (max-width: 980px) {
-            .hero,
-            .market-grid,
-            .feature-grid,
-            .contact-grid,
-            .stats,
-            .timeline-item {
-                grid-template-columns: 1fr;
-            }
-
-            .timeline-item {
-                gap: 0.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .navbar,
-            .container,
-            .footer {
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
-
-            .nav-inner {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .hero {
-                padding: 1.5rem;
-            }
-
-            .section-heading {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    </style>
+    <title>ZYX | GitHub Pages 个人主页</title>
+    <meta name="description" content="由 Copilot 署名改版的 zhyx1996 个人主页，展示真实 GitHub 项目、公开资料与外部链接。">
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-inner">
-            <a class="brand" href="#home">资讯观察站</a>
+            <a class="brand" href="/index.html">ZYX · Homepage</a>
             <ul class="nav-links">
-                <li><a href="#home">首页</a></li>
-                <li><a href="#focus">今日焦点</a></li>
-                <li><a href="#briefing">资讯速览</a></li>
-                <li><a href="#gold">黄金观察</a></li>
-                <li><a href="#continue-reading">继续阅读</a></li>
+                <li><a class="active" href="/index.html">首页</a></li>
+                <li><a href="/projects.html">项目页</a></li>
+                <li><a href="#github-live">实时资料</a></li>
+                <li><a href="#links">外部链接</a></li>
             </ul>
         </div>
     </nav>
 
-    <div class="container">
-        <section class="hero" id="home">
+    <main class="container page-shell">
+        <section class="hero" id="top">
             <div class="hero-copy">
-                <p class="tag">每日更新视角 · 技术 / 时政 / 市场</p>
-                <h1>把首页升级成一个更有信息密度的内容入口</h1>
+                <span class="kicker">🤖 Copilot 署名改版 · GitHub Pages</span>
+                <h1>把占位页换成一张更真实的个人技术名片</h1>
                 <p>
-                    这里不再只是简单的个人主页占位，而是一个适合随手浏览的轻资讯页面：
-                    既能快速了解技术方向，也能看到时政关注点和黄金市场观察，适合每天花几分钟完成一次信息补给。
+                    这里改成了基于 <strong>zhyx1996</strong> 公开 GitHub 信息整理的个人主页：
+                    打开页面时会尝试读取 GitHub 实时资料，网络不可用时则保留静态摘要和直达仓库链接。
                 </p>
                 <div class="hero-badges">
-                    <span>⚙️ 技术动态</span>
-                    <span>📰 要闻速览</span>
-                    <span>🪙 黄金走势</span>
-                    <span>📌 实用观察</span>
+                    <span class="badge">🧠 计算机视觉</span>
+                    <span class="badge">🚗 车道线检测</span>
+                    <span class="badge">⚡ CUDA / 并行计算</span>
+                    <span class="badge">🔗 GitHub 公开仓库</span>
                 </div>
-                <div class="hero-actions">
-                    <a class="primary-btn" href="#focus">查看今日焦点</a>
-                    <a class="secondary-btn" href="#gold">阅读黄金观察</a>
+                <div class="button-row">
+                    <a class="button primary" href="#github-live">查看实时资料</a>
+                    <a class="button secondary" id="hero-link" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">打开 GitHub</a>
                 </div>
+                <p class="status" data-github-status>正在尝试连接 GitHub API...</p>
             </div>
-            <aside class="hero-panel" aria-label="今日摘要">
-                <h2>今日摘要</h2>
-                <div class="brief-list">
-                    <div class="brief-item">
-                        <strong>技术</strong>
-                        <span>AI Agent、开源模型与开发者工具仍是最值得跟踪的三条主线。</span>
+            <aside class="hero-panel" aria-label="主页摘要">
+                <h2>当前页面包含</h2>
+                <div class="stat-list">
+                    <div class="stat-item">
+                        <strong>真实仓库信息</strong>
+                        <span>以公开仓库 lane2seq、pcl-boundary_omp、cuda_test、utils 为核心。</span>
                     </div>
-                    <div class="brief-item">
-                        <strong>时政</strong>
-                        <span>政策执行、产业升级与全球供应链协同，依旧是理解宏观变化的关键线索。</span>
+                    <div class="stat-item">
+                        <strong>动态加载 + 静态兜底</strong>
+                        <span>能联网就拉 GitHub 数据，连不上也能继续浏览并跳转。</span>
                     </div>
-                    <div class="brief-item">
-                        <strong>黄金</strong>
-                        <span>金价通常受美元利率、避险情绪与央行购金行为共同驱动。</span>
+                    <div class="stat-item">
+                        <strong>多个页面</strong>
+                        <span>首页负责介绍，项目页负责展开，结构比单页更清晰。</span>
                     </div>
                 </div>
             </aside>
         </section>
 
-        <section class="stats" aria-label="页面概览">
-            <div class="stat-card">
-                <small>覆盖主题</small>
-                <strong>3 个核心栏目</strong>
-                <p class="muted">技术新闻、时政要闻、黄金走势观察一页直达。</p>
-            </div>
-            <div class="stat-card">
-                <small>阅读方式</small>
-                <strong>短阅读优先</strong>
-                <p class="muted">用卡片和速览结构降低信息噪音，提升浏览效率。</p>
-            </div>
-            <div class="stat-card">
-                <small>内容定位</small>
-                <strong>观察而非堆砌</strong>
-                <p class="muted">突出趋势、影响因素和行动建议，而不只是罗列标题。</p>
-            </div>
+        <section class="section metrics-grid" aria-label="GitHub 统计摘要">
+            <article class="metric-card">
+                <small>公开仓库</small>
+                <strong id="repo-count">4</strong>
+                <p class="muted">来自 GitHub 公开资料。</p>
+            </article>
+            <article class="metric-card">
+                <small>关注者</small>
+                <strong id="follower-count">0</strong>
+                <p class="muted">实时读取公开 profile 数据。</p>
+            </article>
+            <article class="metric-card">
+                <small>正在关注</small>
+                <strong id="following-count">0</strong>
+                <p class="muted">用来补全个人页信息密度。</p>
+            </article>
+            <article class="metric-card">
+                <small>最近公开更新时间</small>
+                <strong id="hero-updated">2026年4月11日</strong>
+                <p class="muted">若联网成功会刷新为最新接口返回值。</p>
+            </article>
         </section>
 
-        <section id="focus">
-            <div class="section-heading">
+        <section class="section grid-2" id="github-live">
+            <article class="profile-card card">
+                <img class="avatar" id="profile-avatar" src="https://avatars.githubusercontent.com/u/74281356?v=4" alt="zhyx1996 avatar">
                 <div>
-                    <h2>今日焦点</h2>
-                    <p>面向日常浏览者整理的三条主要观察方向。</p>
+                    <span class="tag">个人资料</span>
+                    <h2 id="profile-name">ZYX</h2>
+                    <p class="muted" id="profile-login">@zhyx1996</p>
+                    <p id="profile-bio">围绕计算机视觉、自动驾驶感知、并行计算与个人实验项目做持续实践。</p>
+                    <div class="button-row">
+                        <a class="button outline" id="profile-link" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">查看 GitHub Profile</a>
+                        <a class="button outline" href="/projects.html">进入项目页</a>
+                    </div>
+                    <div class="signature">
+                        <strong>Copilot 署名：</strong>
+                        本页由 GitHub Copilot 协助改版，目标是把原来的泛资讯首页替换成更贴近 zhyx1996 真实公开资料的个人主页。
+                    </div>
                 </div>
-                <span class="tag">Focus Board</span>
-            </div>
-            <div class="feature-grid">
-                <article class="feature-card">
-                    <span class="tag">技术新闻</span>
-                    <h3>AI 正从“可用”走向“可协作”</h3>
-                    <p>开发者正在把大模型从单次问答工具，升级成能串联检索、编码、测试和部署流程的 Agent 系统。</p>
-                    <ul>
-                        <li>代码助手从补全走向任务编排</li>
-                        <li>本地模型与云端模型混合部署更常见</li>
-                        <li>企业开始更关注安全、成本与可观测性</li>
-                    </ul>
-                </article>
-                <article class="feature-card">
-                    <span class="tag">时政要闻</span>
-                    <h3>宏观议题更关注“稳增长 + 新动能”</h3>
-                    <p>相比单点事件，值得持续观察的是政策落地节奏、消费修复力度，以及新质生产力相关行业的推进速度。</p>
-                    <ul>
-                        <li>数字经济与绿色转型仍是长期主线</li>
-                        <li>制造业升级直接影响就业与投资预期</li>
-                        <li>国际环境变化会放大产业链调整的重要性</li>
-                    </ul>
-                </article>
-                <article class="feature-card">
-                    <span class="tag">黄金走势</span>
-                    <h3>金价判断要看三组变量</h3>
-                    <p>黄金不只是避险工具，也是对真实利率、货币政策预期和全球风险偏好的综合映射。</p>
-                    <ul>
-                        <li>实际利率回落通常利多黄金</li>
-                        <li>地缘不确定性上升时避险需求增强</li>
-                        <li>央行持续购金会强化中长期支撑</li>
-                    </ul>
-                </article>
-            </div>
+            </article>
+            <article class="card">
+                <span class="tag">主页定位</span>
+                <h3>这次改版做了什么</h3>
+                <div class="timeline">
+                    <article class="timeline-item">
+                        <span class="timeline-label">01 · 内容改真</span>
+                        <p>不再使用泛化资讯文案，改成围绕账号、仓库、方向与链接的真实内容。</p>
+                    </article>
+                    <article class="timeline-item">
+                        <span class="timeline-label">02 · 联网拉取</span>
+                        <p>页面打开时尝试读取 GitHub 公共 API，能联网就展示实时资料。</p>
+                    </article>
+                    <article class="timeline-item">
+                        <span class="timeline-label">03 · 失败兜底</span>
+                        <p>即使接口访问失败，也会保留静态文案与直接跳转链接。</p>
+                    </article>
+                    <article class="timeline-item">
+                        <span class="timeline-label">04 · 多页结构</span>
+                        <p>新增项目页，把主页从单块内容扩展成更可继续维护的结构。</p>
+                    </article>
+                </div>
+            </article>
         </section>
 
-        <section id="briefing">
+        <section class="section" id="featured-projects">
             <div class="section-heading">
                 <div>
-                    <h2>资讯速览</h2>
-                    <p>适合快速浏览的一页式内容安排。</p>
+                    <h2>精选项目</h2>
+                    <p>优先展示 zhyx1996 账号下公开且有明确方向的仓库。</p>
                 </div>
-                <span class="tag">Daily Briefing</span>
+                <span class="tag">Featured Repositories</span>
             </div>
-            <div class="timeline">
-                <article class="timeline-item">
-                    <div class="timeline-date">09:00</div>
-                    <div>
-                        <h3>技术观察：开发工具链持续智能化</h3>
-                        <p>从 IDE 插件到 CI/CD 自动修复，越来越多工具开始直接承担“提出方案 + 执行修复”的角色。</p>
-                    </div>
-                </article>
-                <article class="timeline-item">
-                    <div class="timeline-date">12:30</div>
-                    <div>
-                        <h3>政策观察：关注扩大内需与产业协同</h3>
-                        <p>理解时政信息时，可优先留意消费、基建、产业扶持与区域协调发展的联动关系。</p>
-                    </div>
-                </article>
-                <article class="timeline-item">
-                    <div class="timeline-date">16:00</div>
-                    <div>
-                        <h3>市场观察：黄金更像“情绪与利率”的交叉口</h3>
-                        <p>若风险偏好下降，同时市场预期利率回落，黄金的关注度往往会同步提升。</p>
+            <div class="repo-grid" id="repo-list">
+                <article class="repo-card">
+                    <span class="tag">Jupyter Notebook</span>
+                    <h3>lane2seq</h3>
+                    <p>基于 OpenCV、ENet 与 Vision Transformer 的车道线检测实验项目。</p>
+                    <div class="repo-stats">
+                        <span>⭐ 1</span>
+                        <span>🕒 2026年4月10日</span>
                     </div>
                 </article>
             </div>
+            <p class="status-inline" data-github-status>正在尝试连接 GitHub API...</p>
         </section>
 
-        <section id="gold">
+        <section class="section" id="links">
             <div class="section-heading">
                 <div>
-                    <h2>黄金走势观察</h2>
-                    <p>不追逐噪音，重点看驱动因素和可跟踪信号。</p>
+                    <h2>外部链接</h2>
+                    <p>如果页面没法联网，下面这些链接仍然可以直接跳过去看原始资料。</p>
                 </div>
-                <span class="tag">Gold Watch</span>
+                <span class="tag">Links</span>
             </div>
-            <div class="market-grid">
-                <article class="market-card">
-                    <h3>当前阅读框架</h3>
-                    <p class="muted">可把黄金市场拆成“利率、美元、风险情绪、央行行为”四条线同时看。</p>
-                    <div class="trend-bar" aria-hidden="true"></div>
-                    <ul>
-                        <li><strong>短线：</strong>关注美元指数、美国国债收益率和突发风险事件。</li>
-                        <li><strong>中线：</strong>关注全球主要央行的政策转向与降息预期变化。</li>
-                        <li><strong>长线：</strong>关注储备资产配置、去美元化讨论与全球通胀韧性。</li>
-                    </ul>
+            <div class="links-grid">
+                <article class="link-card">
+                    <span class="tag">GitHub</span>
+                    <h3>个人主页</h3>
+                    <p>查看 zhyx1996 的公开头像、仓库列表与更新时间。</p>
+                    <div class="button-row">
+                        <a class="button outline" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">打开 GitHub Profile</a>
+                    </div>
                 </article>
-                <article class="market-card">
-                    <h3>值得跟踪的三个信号</h3>
-                    <ul>
-                        <li>美联储表态是否从“高利率更久”转向更平衡措辞</li>
-                        <li>全球地缘冲突是否推升避险配置需求</li>
-                        <li>ETF 资金流向和央行购金数据是否继续改善</li>
-                    </ul>
-                </article>
-            </div>
-            <div class="insight-banner">
-                <strong>小结：</strong>
-                黄金的强弱并不只取决于单日涨跌，更重要的是驱动它的核心变量有没有发生方向性变化。
-            </div>
-        </section>
-
-        <section id="continue-reading">
-            <div class="section-heading">
-                <div>
-                    <h2>继续阅读</h2>
-                    <p>如果你喜欢这种首页风格，还可以继续扩展成专题页、周报页或数据看板。</p>
-                </div>
-                <span class="tag">Next Step</span>
-            </div>
-            <div class="contact-grid">
-                <article class="contact-card">
-                    <span class="tag">专题方向</span>
-                    <h3>技术专题</h3>
-                    <p>可以继续加入 AI 工具榜、前端趋势、开源项目推荐等栏目，形成长期更新内容。</p>
-                </article>
-                <article class="contact-card">
-                    <span class="tag">专题方向</span>
-                    <h3>时政观察</h3>
-                    <p>可扩展为“政策影响解读”，用更贴近普通读者的方式解释宏观变化与产业联动。</p>
-                </article>
-                <article class="contact-card">
-                    <span class="tag">专题方向</span>
-                    <h3>市场看板</h3>
-                    <p>后续还可加入黄金、原油、汇率等观察模块，逐步形成一个综合资讯首页。</p>
+                <article class="link-card">
+                    <span class="tag">Projects</span>
+                    <h3>项目索引页</h3>
+                    <p>把车道线检测、PCL OMP 加速、CUDA 试验和工具仓库集中到第二页。</p>
+                    <div class="button-row">
+                        <a class="button outline" href="/projects.html">打开项目页</a>
+                    </div>
                 </article>
             </div>
         </section>
-    </div>
+    </main>
 
     <footer class="footer">
-        <div class="container">
-            <div class="footer-note">
-                <p>资讯观察站 · 让首页不止是占位，而是一个有内容、有节奏、有重点的入口页面。</p>
-                <p>适合继续扩展为个人内容站、资讯周报页或市场观察面板。</p>
-            </div>
+        <div class="footer-inner">
+            <p>ZYX · zhyx1996.github.io · 基于公开 GitHub 信息整理。</p>
+            <p>Copilot signed this refresh with dynamic GitHub loading and multi-page navigation.</p>
         </div>
     </footer>
+
+    <script src="/app.js"></script>
 </body>
 </html>
