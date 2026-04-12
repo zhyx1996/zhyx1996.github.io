@@ -161,4 +161,111 @@ async function hydrateGithubData() {
     }
 }
 
-window.addEventListener('DOMContentLoaded', hydrateGithubData);
+const marketFallback = {
+    usdcny: 7.28,
+    usdeur: 0.92,
+    usdjpy: 149.5,
+    btc: { usd: 83000, cny: 603240, change24h: null },
+    eth: { usd: 1600, cny: 11648, change24h: null }
+};
+
+function renderMarket(data) {
+    const container = document.getElementById('market-grid');
+    if (!container) return;
+
+    const fmtRate = (n, d = 4) => n != null ? Number(n).toFixed(d) : '—';
+    const fmtPrice = (n) => n != null ? Number(n).toLocaleString('zh-CN', { maximumFractionDigits: 0 }) : '—';
+    const changeHTML = (c) => {
+        if (c == null) return '<span class="market-change">—</span>';
+        const cls = c >= 0 ? 'up' : 'down';
+        const sign = c >= 0 ? '+' : '';
+        return `<span class="market-change ${cls}">${sign}${Number(c).toFixed(2)}%</span>`;
+    };
+
+    container.innerHTML = `
+        <article class="market-card">
+            <small>美元兑人民币</small>
+            <strong class="market-value">${fmtRate(data.usdcny)}</strong>
+            <p class="muted">USD / CNY 实时汇率</p>
+        </article>
+        <article class="market-card">
+            <small>美元兑欧元</small>
+            <strong class="market-value">${fmtRate(data.usdeur)}</strong>
+            <p class="muted">USD / EUR 实时汇率</p>
+        </article>
+        <article class="market-card">
+            <small>比特币 BTC</small>
+            <strong class="market-value">$${fmtPrice(data.btc.usd)}</strong>
+            ${changeHTML(data.btc.change24h)}
+            <p class="muted">≈ ¥${fmtPrice(data.btc.cny)} · 24h 涨跌</p>
+        </article>
+        <article class="market-card">
+            <small>以太坊 ETH</small>
+            <strong class="market-value">$${fmtPrice(data.eth.usd)}</strong>
+            ${changeHTML(data.eth.change24h)}
+            <p class="muted">≈ ¥${fmtPrice(data.eth.cny)} · 24h 涨跌</p>
+        </article>
+    `;
+}
+
+async function hydrateMarketData() {
+    const statusEl = document.querySelector('[data-market-status]');
+    const updateMarketStatus = (text) => { if (statusEl) statusEl.textContent = text; };
+
+    renderMarket(marketFallback);
+    updateMarketStatus('正在加载实时行情数据...');
+
+    try {
+        const [ratesRes, cryptoRes] = await Promise.all([
+            fetch('https://open.er-api.com/v6/latest/USD'),
+            fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,cny&include_24hr_change=true')
+        ]);
+
+        const marketData = {
+            usdcny: marketFallback.usdcny,
+            usdeur: marketFallback.usdeur,
+            usdjpy: marketFallback.usdjpy,
+            btc: { ...marketFallback.btc },
+            eth: { ...marketFallback.eth }
+        };
+
+        if (ratesRes.ok) {
+            const ratesData = await ratesRes.json();
+            if (ratesData.rates) {
+                if (ratesData.rates.CNY) marketData.usdcny = ratesData.rates.CNY;
+                if (ratesData.rates.EUR) marketData.usdeur = ratesData.rates.EUR;
+                if (ratesData.rates.JPY) marketData.usdjpy = ratesData.rates.JPY;
+            }
+        }
+
+        if (cryptoRes.ok) {
+            const cryptoData = await cryptoRes.json();
+            if (cryptoData.bitcoin) {
+                marketData.btc = {
+                    usd: cryptoData.bitcoin.usd,
+                    cny: cryptoData.bitcoin.cny,
+                    change24h: cryptoData.bitcoin.usd_24h_change ?? null
+                };
+            }
+            if (cryptoData.ethereum) {
+                marketData.eth = {
+                    usd: cryptoData.ethereum.usd,
+                    cny: cryptoData.ethereum.cny,
+                    change24h: cryptoData.ethereum.usd_24h_change ?? null
+                };
+            }
+        }
+
+        renderMarket(marketData);
+        const now = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
+        updateMarketStatus(`行情已更新 · ${now}`);
+    } catch (error) {
+        updateMarketStatus('行情接口暂时无法访问，已展示参考数据。');
+        console.warn('Failed to load market data', error);
+    }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    hydrateGithubData();
+    hydrateMarketData();
+});
