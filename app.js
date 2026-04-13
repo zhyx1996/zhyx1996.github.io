@@ -108,10 +108,17 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
-// 公开油价页里的 92# 汽油通常稳定落在这个区间，先用它过滤掉日期、年份和其他无关数字。
+// 公开油价页里的 92# 汽油通常以“人民币 / 升”展示，常见有效值大多落在 5-10 之间；
+// 先用这个区间过滤日期、年份和其他无关数字，避免把页面噪声当成油价。
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
 const GAS92_MIN_SAMPLE_COUNT = 3;
-const GAS92_ROW_HINT = /北京|上海|天津|重庆|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|内蒙古|广西|西藏|宁夏|新疆|香港|澳门|台湾|全国|平均|92|汽油/i;
+const GAS92_ROW_HINT_KEYWORDS = [
+    '北京', '上海', '天津', '重庆', '河北', '山西', '辽宁', '吉林', '黑龙江',
+    '江苏', '浙江', '安徽', '福建', '江西', '山东', '河南', '湖北', '湖南',
+    '广东', '海南', '四川', '贵州', '云南', '陕西', '甘肃', '青海', '内蒙古',
+    '广西', '西藏', '宁夏', '新疆', '香港', '澳门', '台湾', '全国', '平均', '92', '汽油'
+];
+const GAS92_ROW_HINT = new RegExp(GAS92_ROW_HINT_KEYWORDS.join('|'), 'i');
 const GAS92_VALUE_PATTERN = /(\d+(?:\.\d{1,3})?)/g;
 const GAS92_PRICE_WITH_UNIT_PATTERN = /(\d+(?:\.\d{1,3})?)\s*(?:元\/升|元每升|\/L|每升)/gi;
 const MAX_URL_LABEL_LENGTH = 96;
@@ -428,7 +435,7 @@ function normalizeWhitespace(value) {
 }
 
 function average(values) {
-    if (!values.length) return 0;
+    if (!values.length) return null;
     return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
@@ -451,6 +458,7 @@ function extractGas92PriceFromHtml(html) {
     }
 
     const text = normalizeWhitespace(doc.body?.textContent || html);
+    // 匹配“92# / 92号汽油 ... 7.98 元/升”这类最直接的正文描述。
     const directMatch = text.match(/92[#号]?(?:汽油)?[^0-9]{0,12}(\d+(?:\.\d{1,3})?)(?:\s*元)?\s*(?:\/|每)?\s*升/i);
     if (directMatch) return Number(directMatch[1]);
 
@@ -497,7 +505,7 @@ async function loadGas92Price() {
         for (const candidate of buildGas92Candidates(plan)) {
             try {
                 const response = await fetchWithTimeout(candidate.requestUrl, {
-                    headers: { Accept: 'text/html, text/plain;q=0.9, */*;q=0.8' }
+                    headers: { Accept: 'text/html, text/plain, */*' }
                 });
                 if (!response.ok) continue;
                 const html = await response.text();
