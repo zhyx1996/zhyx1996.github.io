@@ -101,7 +101,7 @@ function renderRepos(repos) {
         <article class="repo-card">
             <span class="tag">${safeText(repo.language, '未标注语言')}</span>
             <h3>${repo.name}</h3>
-            <p>${safeText(repo.description, '这个仓库暂时没有公开描述，可点击仓库链接查看详情。')}</p>
+            <p>${safeText(repo.description, '这个仓库暂未填写公开简介，可直接打开仓库查看 README 和代码。')}</p>
             <div class="repo-stats">
                 <span>⭐ ${repo.stargazers_count ?? 0}</span>
                 <span>🕒 ${fmtDate(repo.updated_at)}</span>
@@ -122,7 +122,7 @@ function renderRepos(repos) {
                     <span class="pill">最近更新 ${fmtDate(repo.updated_at)}</span>
                 </div>
                 <h3>${repo.name}</h3>
-                <p>${safeText(repo.description, '点击跳转到 GitHub 查看完整说明。')}</p>
+                <p>${safeText(repo.description, '可以直接跳转到 GitHub 查看完整说明、提交记录和后续更新。')}</p>
                 <div class="button-row">
                     <a class="button outline" href="${repo.html_url}" target="_blank" rel="noreferrer">GitHub 详情</a>
                 </div>
@@ -137,7 +137,7 @@ async function hydrateGithubData() {
 
     renderProfile(profileFallback);
     renderRepos(repoFallback);
-    updateStatus('已加载静态资料；若网络可用会自动刷新为 GitHub 实时数据。');
+    updateStatus('已先展示静态摘要，联网后会自动刷新为 GitHub 公开资料。');
 
     try {
         const [profileRes, reposRes] = await Promise.all([
@@ -154,17 +154,19 @@ async function hydrateGithubData() {
 
         renderProfile({ ...profileFallback, ...profile });
         renderRepos(Array.isArray(repos) && repos.length ? repos : repoFallback);
-        updateStatus('GitHub 实时数据已刷新；下方仓库卡片与统计数字来自公开接口。');
+        updateStatus('GitHub 公开资料已刷新，页面上的统计与仓库信息均来自实时接口。');
     } catch (error) {
-        updateStatus('当前未能连接 GitHub API，已保留静态资料与直达链接。');
+        updateStatus('暂时未能连接 GitHub API，页面已保留静态摘要与直达链接。');
         console.warn('Failed to load GitHub data', error);
     }
 }
 
 const marketFallback = {
-    usdcny: 7.28,
-    usdeur: 0.92,
-    usdjpy: 149.5,
+    cnyUsd: 0.1374,
+    cnyEur: 0.1264,
+    cnyJpy: 20.54,
+    cnySgd: 0.1854,
+    gold: { usdPerOunce: 2380, cnyPerOunce: 17322, cnyPerGram: 557, change24h: null },
     btc: { usd: 83000, cny: 603240, change24h: null },
     eth: { usd: 1600, cny: 11648, change24h: null }
 };
@@ -184,14 +186,30 @@ function renderMarket(data) {
 
     container.innerHTML = `
         <article class="market-card">
-            <small>美元兑人民币</small>
-            <strong class="market-value">${fmtRate(data.usdcny)}</strong>
-            <p class="muted">USD / CNY 实时汇率</p>
+            <small>人民币兑美元</small>
+            <strong class="market-value">$${fmtRate(data.cnyUsd, 4)}</strong>
+            <p class="muted">1 人民币 ≈ ${fmtRate(data.cnyUsd, 4)} 美元</p>
         </article>
         <article class="market-card">
-            <small>美元兑欧元</small>
-            <strong class="market-value">${fmtRate(data.usdeur)}</strong>
-            <p class="muted">USD / EUR 实时汇率</p>
+            <small>人民币兑欧元</small>
+            <strong class="market-value">€${fmtRate(data.cnyEur, 4)}</strong>
+            <p class="muted">1 人民币 ≈ ${fmtRate(data.cnyEur, 4)} 欧元</p>
+        </article>
+        <article class="market-card">
+            <small>人民币兑日元</small>
+            <strong class="market-value">JP¥${fmtRate(data.cnyJpy, 2)}</strong>
+            <p class="muted">1 人民币 ≈ ${fmtRate(data.cnyJpy, 2)} 日元</p>
+        </article>
+        <article class="market-card">
+            <small>人民币兑新加坡元</small>
+            <strong class="market-value">S$${fmtRate(data.cnySgd, 4)}</strong>
+            <p class="muted">1 人民币 ≈ ${fmtRate(data.cnySgd, 4)} 新加坡元</p>
+        </article>
+        <article class="market-card">
+            <small>黄金现货</small>
+            <strong class="market-value">¥${fmtPrice(data.gold.cnyPerOunce)}</strong>
+            ${changeHTML(data.gold.change24h)}
+            <p class="muted">≈ ¥${fmtPrice(data.gold.cnyPerGram)} / 克 · $${fmtPrice(data.gold.usdPerOunce)} / 盎司</p>
         </article>
         <article class="market-card">
             <small>比特币 BTC</small>
@@ -213,33 +231,41 @@ async function hydrateMarketData() {
     const updateMarketStatus = (text) => { if (statusEl) statusEl.textContent = text; };
 
     renderMarket(marketFallback);
-    updateMarketStatus('正在加载实时行情数据...');
+    updateMarketStatus('正在刷新汇率、黄金与加密资产价格...');
 
     try {
-        const [ratesRes, cryptoRes] = await Promise.all([
+        const [ratesResult, cryptoResult, goldResult] = await Promise.allSettled([
             fetch('https://open.er-api.com/v6/latest/USD'),
-            fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,cny&include_24hr_change=true')
+            fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,cny&include_24hr_change=true'),
+            fetch('https://api.gold-api.com/price/XAU')
         ]);
 
         const marketData = {
-            usdcny: marketFallback.usdcny,
-            usdeur: marketFallback.usdeur,
-            usdjpy: marketFallback.usdjpy,
+            cnyUsd: marketFallback.cnyUsd,
+            cnyEur: marketFallback.cnyEur,
+            cnyJpy: marketFallback.cnyJpy,
+            cnySgd: marketFallback.cnySgd,
+            gold: { ...marketFallback.gold },
             btc: { ...marketFallback.btc },
             eth: { ...marketFallback.eth }
         };
+        let hasLiveData = false;
 
-        if (ratesRes.ok) {
-            const ratesData = await ratesRes.json();
-            if (ratesData.rates) {
-                if (ratesData.rates.CNY) marketData.usdcny = ratesData.rates.CNY;
-                if (ratesData.rates.EUR) marketData.usdeur = ratesData.rates.EUR;
-                if (ratesData.rates.JPY) marketData.usdjpy = ratesData.rates.JPY;
+        if (ratesResult.status === 'fulfilled' && ratesResult.value.ok) {
+            const ratesData = await ratesResult.value.json();
+            const rates = ratesData.rates;
+            const cnyBase = Number(rates?.CNY);
+            if (cnyBase) {
+                marketData.cnyUsd = 1 / cnyBase;
+                if (rates.EUR) marketData.cnyEur = Number(rates.EUR) / cnyBase;
+                if (rates.JPY) marketData.cnyJpy = Number(rates.JPY) / cnyBase;
+                if (rates.SGD) marketData.cnySgd = Number(rates.SGD) / cnyBase;
+                hasLiveData = true;
             }
         }
 
-        if (cryptoRes.ok) {
-            const cryptoData = await cryptoRes.json();
+        if (cryptoResult.status === 'fulfilled' && cryptoResult.value.ok) {
+            const cryptoData = await cryptoResult.value.json();
             if (cryptoData.bitcoin) {
                 marketData.btc = {
                     usd: cryptoData.bitcoin.usd,
@@ -254,13 +280,39 @@ async function hydrateMarketData() {
                     change24h: cryptoData.ethereum.usd_24h_change ?? null
                 };
             }
+            hasLiveData = true;
+        }
+
+        if (goldResult.status === 'fulfilled' && goldResult.value.ok) {
+            const goldData = await goldResult.value.json();
+            const usdPerOunce = Number(
+                goldData.price ??
+                goldData.price_usd ??
+                goldData.price_ounce ??
+                goldData.price_per_ounce
+            );
+
+            if (Number.isFinite(usdPerOunce) && usdPerOunce > 0) {
+                const cnyPerOunce = usdPerOunce / marketData.cnyUsd;
+                marketData.gold = {
+                    usdPerOunce,
+                    cnyPerOunce,
+                    cnyPerGram: cnyPerOunce / 31.1034768,
+                    change24h: goldData.chg_percentage ?? goldData.change_percent ?? goldData.change_percentage ?? null
+                };
+                hasLiveData = true;
+            }
         }
 
         renderMarket(marketData);
-        const now = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
-        updateMarketStatus(`行情已更新 · ${now}`);
+        if (hasLiveData) {
+            const now = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
+            updateMarketStatus(`行情已更新 · ${now}`);
+        } else {
+            updateMarketStatus('行情接口暂时不可用，当前展示的是本地参考数据。');
+        }
     } catch (error) {
-        updateMarketStatus('行情接口暂时无法访问，已展示参考数据。');
+        updateMarketStatus('行情接口暂时不可用，当前展示的是本地参考数据。');
         console.warn('Failed to load market data', error);
     }
 }
