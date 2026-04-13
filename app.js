@@ -109,7 +109,9 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
+const GAS92_MIN_SAMPLE_COUNT = 3;
 const GAS92_ROW_HINT = /北京|上海|天津|重庆|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|内蒙古|广西|西藏|宁夏|新疆|香港|澳门|台湾|全国|平均|92|汽油/i;
+const GAS92_VALUE_PATTERN = /(\d+(?:\.\d{1,3})?)/g;
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
         if (source?.[key] != null) return source[key];
@@ -432,21 +434,21 @@ function extractGas92PriceFromHtml(html) {
     for (const row of rows) {
         const text = normalizeWhitespace(row.textContent);
         if (!text || !GAS92_ROW_HINT.test(text)) continue;
-        const matches = [...text.matchAll(/([5-9](?:\.\d{1,3})?)/g)]
+        const matches = [...text.matchAll(GAS92_VALUE_PATTERN)]
             .map((match) => Number(match[1]))
             .filter((value) => value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
         if (matches.length) values.push(matches[0]);
     }
 
-    if (values.length >= 3) {
+    if (values.length >= GAS92_MIN_SAMPLE_COUNT) {
         return Number(average(values).toFixed(2));
     }
 
     const text = normalizeWhitespace(doc.body?.textContent || html);
-    const directMatch = text.match(/92[#号]?(?:汽油)?[^0-9]{0,12}([5-9](?:\.\d{1,3})?)(?:\s*元)?\s*(?:\/|每)?\s*升/i);
+    const directMatch = text.match(/92[#号]?(?:汽油)?[^0-9]{0,12}(\d+(?:\.\d{1,3})?)(?:\s*元)?\s*(?:\/|每)?\s*升/i);
     if (directMatch) return Number(directMatch[1]);
 
-    const fallbackMatches = [...text.matchAll(/([5-9](?:\.\d{1,3})?)\s*(?:元\/升|元每升|\/L|每升)/gi)]
+    const fallbackMatches = [...text.matchAll(/(\d+(?:\.\d{1,3})?)\s*(?:元\/升|元每升|\/L|每升)/gi)]
         .map((match) => Number(match[1]))
         .filter((value) => value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
     if (fallbackMatches.length) return Number(average(fallbackMatches).toFixed(2));
@@ -480,7 +482,7 @@ function buildGas92Candidates(plan) {
     return [
         { ...plan, requestUrl: plan.url },
         { ...plan, requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}` },
-        { ...plan, requestUrl: `https://r.jina.ai/http://${plan.url.replace(/^https?:\/\//, '')}` }
+        { ...plan, requestUrl: `https://r.jina.ai/http://${plan.url}` }
     ];
 }
 
