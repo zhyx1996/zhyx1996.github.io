@@ -45,6 +45,49 @@ const repoFallback = [
     }
 ];
 
+const starredFallback = [
+    {
+        full_name: 'smallmain/vscode-unify-chat-provider',
+        html_url: 'https://github.com/smallmain/vscode-unify-chat-provider',
+        description: '把多个 LLM API 提供方接到 VS Code GitHub Copilot Chat 的聚合型扩展。',
+        language: 'TypeScript',
+        stargazers_count: 366,
+        updated_at: '2026-04-13T00:00:00Z'
+    },
+    {
+        full_name: 'al01cn/sillyTavern-launcher',
+        html_url: 'https://github.com/al01cn/sillyTavern-launcher',
+        description: '面向 SillyTavern 的启动器，方便统一管理桌面端和多平台使用体验。',
+        language: 'Vue',
+        stargazers_count: 52,
+        updated_at: '2026-04-10T00:00:00Z'
+    },
+    {
+        full_name: 'APKZCOM/shizuku-starter',
+        html_url: 'https://github.com/APKZCOM/shizuku-starter',
+        description: '直接通过浏览器中的 WebADB 启动 Shizuku，无需本地安装 ADB。',
+        language: 'JavaScript',
+        stargazers_count: 23,
+        updated_at: '2026-03-27T00:00:00Z'
+    },
+    {
+        full_name: 'guohuiyuan/go-novel-dl',
+        html_url: 'https://github.com/guohuiyuan/go-novel-dl',
+        description: '支持 CLI 和 Web 的多源小说下载器，适合并发搜索和一键导出。',
+        language: 'Go',
+        stargazers_count: 24,
+        updated_at: '2026-04-12T00:00:00Z'
+    }
+];
+
+const repoShowcaseOrder = ['lane2seq', 'pcl-boundary_omp', 'cuda_test', 'utils'];
+const repoShowcaseMeta = {
+    lane2seq: { label: 'Vision' },
+    'pcl-boundary_omp': { label: 'Point Cloud' },
+    cuda_test: { label: 'CUDA' },
+    utils: { label: 'Utility' }
+};
+
 const fmtDate = (value) => {
     if (!value) return '未知';
     try {
@@ -59,12 +102,27 @@ const fmtDate = (value) => {
 };
 
 const safeText = (value, fallback = '暂无') => value || fallback;
+const escapeHtml = (value) => String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
         if (source?.[key] != null) return source[key];
     }
     return null;
+};
+const totalRepoStars = (repos) => repos.reduce((sum, repo) => sum + Number(repo?.stargazers_count || 0), 0);
+const safeUrl = (value, fallback = '#') => {
+    try {
+        const parsed = new URL(value, window.location.origin);
+        return ['http:', 'https:'].includes(parsed.protocol) ? parsed.href : fallback;
+    } catch {
+        return fallback;
+    }
 };
 
 const setText = (id, value) => {
@@ -74,7 +132,7 @@ const setText = (id, value) => {
 
 const setHref = (id, value) => {
     const element = document.getElementById(id);
-    if (element && value) element.href = value;
+    if (element && value) element.href = safeUrl(value, element.href || '#');
 };
 
 const setImage = (id, value, alt) => {
@@ -85,7 +143,7 @@ const setImage = (id, value, alt) => {
     }
 };
 
-function renderProfile(profile) {
+function renderProfile(profile, repos = repoFallback) {
     setText('profile-name', safeText(profile.name, profile.login));
     setText('profile-login', `@${profile.login}`);
     setText('profile-bio', safeText(profile.bio, profileFallback.bio));
@@ -94,88 +152,170 @@ function renderProfile(profile) {
     setText('repo-count', String(profile.public_repos ?? profileFallback.public_repos));
     setText('follower-count', String(profile.followers ?? profileFallback.followers));
     setText('following-count', String(profile.following ?? profileFallback.following));
+    setText('total-stars', String(totalRepoStars(repos)));
     setHref('profile-link', profile.html_url || profileFallback.html_url);
     setHref('hero-link', profile.html_url || profileFallback.html_url);
     setImage('profile-avatar', profile.avatar_url || profileFallback.avatar_url, `${profile.login} avatar`);
 }
 
+function resolveShowcaseRepos(repos) {
+    const repoMap = new Map(repos.map((repo) => [repo.name, repo]));
+    const ordered = repoShowcaseOrder
+        .map((name) => (repoMap.has(name) ? { ...repoMap.get(name) } : repoFallback.find((repo) => repo.name === name)))
+        .filter(Boolean);
+    return ordered.slice(0, 4);
+}
+
+function renderMarkup(selector, markup) {
+    const container = document.getElementById(selector);
+    if (container) container.innerHTML = markup;
+}
+
 function renderRepos(repos) {
-    const repoContainer = document.getElementById('repo-list');
-    const projectContainer = document.getElementById('project-list');
     const items = repos.slice(0, 4);
 
-    const repoMarkup = items.map((repo) => `
+    renderMarkup('repo-list', items.map((repo) => `
         <article class="repo-card">
-            <span class="tag">${safeText(repo.language, '未标注语言')}</span>
-            <h3>${repo.name}</h3>
-            <p>${safeText(repo.description, '这个仓库暂未填写公开简介，可直接打开仓库查看 README 和代码。')}</p>
+            <span class="tag">${escapeHtml(safeText(repo.language, '未标注语言'))}</span>
+            <h3>${escapeHtml(repo.name)}</h3>
+            <p>${escapeHtml(safeText(repo.description, '这个仓库暂未填写公开简介，可直接打开仓库查看 README 和代码。'))}</p>
             <div class="repo-stats">
                 <span>⭐ ${repo.stargazers_count ?? 0}</span>
                 <span>🕒 ${fmtDate(repo.updated_at)}</span>
             </div>
             <div class="button-row">
-                <a class="button outline" href="${repo.html_url}" target="_blank" rel="noreferrer">打开仓库</a>
+                <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">打开仓库</a>
+            </div>
+        </article>
+    `).join(''));
+
+    renderMarkup('project-list', items.map((repo) => `
+        <article class="repo-card">
+            <div class="inline-list">
+                <span class="tag">${escapeHtml(safeText(repo.language, '项目'))}</span>
+                <span class="pill">最近更新 ${fmtDate(repo.updated_at)}</span>
+            </div>
+            <h3>${escapeHtml(repo.name)}</h3>
+            <p>${escapeHtml(safeText(repo.description, '可以直接跳转到 GitHub 查看完整说明、提交记录和后续更新。'))}</p>
+            <div class="button-row">
+                <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">GitHub 详情</a>
+            </div>
+        </article>
+    `).join(''));
+}
+
+function renderProjectLinks(repos) {
+    renderMarkup('project-links-grid', resolveShowcaseRepos(repos).map((repo) => `
+        <article class="contact-card">
+            <span class="tag">${escapeHtml(repoShowcaseMeta[repo.name]?.label || safeText(repo.language, '项目'))}</span>
+            <h3>${escapeHtml(repo.name)}</h3>
+            <p>${escapeHtml(safeText(repo.description, '可以直接跳转到仓库查看 README、代码和更新记录。'))}</p>
+            <div class="button-row">
+                <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">打开仓库</a>
+            </div>
+        </article>
+    `).join(''));
+}
+
+function renderStarred(starredRepos) {
+    const items = starredRepos.slice(0, 4);
+    const markup = items.map((repo) => `
+        <article class="repo-card star-card">
+            <span class="tag">${escapeHtml(safeText(repo.language, 'Starred Repo'))}</span>
+            <h3>${escapeHtml(repo.full_name || repo.name)}</h3>
+            <p>${escapeHtml(safeText(repo.description, '这是最近点过 Star 的仓库，可以直接打开查看完整项目说明。'))}</p>
+            <div class="repo-stats">
+                <span>⭐ ${repo.stargazers_count ?? 0}</span>
+                <span>🕒 ${fmtDate(repo.updated_at)}</span>
+            </div>
+            <div class="button-row">
+                <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">查看仓库</a>
             </div>
         </article>
     `).join('');
 
-    if (repoContainer) repoContainer.innerHTML = repoMarkup;
-
-    if (projectContainer) {
-        projectContainer.innerHTML = items.map((repo) => `
-            <article class="repo-card">
-                <div class="inline-list">
-                    <span class="tag">${safeText(repo.language, '项目')}</span>
-                    <span class="pill">最近更新 ${fmtDate(repo.updated_at)}</span>
-                </div>
-                <h3>${repo.name}</h3>
-                <p>${safeText(repo.description, '可以直接跳转到 GitHub 查看完整说明、提交记录和后续更新。')}</p>
-                <div class="button-row">
-                    <a class="button outline" href="${repo.html_url}" target="_blank" rel="noreferrer">GitHub 详情</a>
-                </div>
-            </article>
-        `).join('');
-    }
+    renderMarkup('star-list', markup);
+    renderMarkup('project-star-list', markup);
 }
 
 async function hydrateGithubData() {
     const status = document.querySelectorAll('[data-github-status]');
+    const starStatus = document.querySelectorAll('[data-star-status]');
     const updateStatus = (text) => status.forEach((node) => { node.textContent = text; });
+    const updateStarStatus = (text) => starStatus.forEach((node) => { node.textContent = text; });
 
-    renderProfile(profileFallback);
+    renderProfile(profileFallback, repoFallback);
     renderRepos(repoFallback);
+    renderProjectLinks(repoFallback);
+    renderStarred(starredFallback);
     updateStatus('已先展示静态摘要，联网后会自动刷新为 GitHub 公开资料。');
+    updateStarStatus('已先展示静态 Star 摘要，联网后会自动刷新。');
 
     try {
-        const [profileRes, reposRes] = await Promise.all([
+        const [profileRes, reposRes, starredRes] = await Promise.allSettled([
             fetch('https://api.github.com/users/zhyx1996', { headers: { Accept: 'application/vnd.github+json' } }),
-            fetch('https://api.github.com/users/zhyx1996/repos?sort=updated&per_page=4', { headers: { Accept: 'application/vnd.github+json' } })
+            fetch('https://api.github.com/users/zhyx1996/repos?sort=updated&per_page=20', { headers: { Accept: 'application/vnd.github+json' } }),
+            fetch('https://api.github.com/users/zhyx1996/starred?sort=updated&per_page=4', { headers: { Accept: 'application/vnd.github+json' } })
         ]);
 
-        if (!profileRes.ok || !reposRes.ok) {
-            throw new Error('GitHub API request failed');
+        let profile = profileFallback;
+        let repos = repoFallback;
+        let starredRepos = starredFallback;
+        let hasLiveProfile = false;
+        let hasLiveRepos = false;
+        let hasLiveStars = false;
+
+        if (profileRes.status === 'fulfilled' && profileRes.value.ok) {
+            profile = { ...profileFallback, ...(await profileRes.value.json()) };
+            hasLiveProfile = true;
         }
 
-        const profile = await profileRes.json();
-        const repos = await reposRes.json();
+        if (reposRes.status === 'fulfilled' && reposRes.value.ok) {
+            const repoData = await reposRes.value.json();
+            if (Array.isArray(repoData) && repoData.length) {
+                repos = repoData;
+                hasLiveRepos = true;
+            }
+        }
 
-        renderProfile({ ...profileFallback, ...profile });
-        renderRepos(Array.isArray(repos) && repos.length ? repos : repoFallback);
-        updateStatus('GitHub 公开资料已刷新，页面上的统计与仓库信息均来自实时接口。');
+        if (starredRes.status === 'fulfilled' && starredRes.value.ok) {
+            const starredData = await starredRes.value.json();
+            if (Array.isArray(starredData) && starredData.length) {
+                starredRepos = starredData;
+                hasLiveStars = true;
+            }
+        }
+
+        renderProfile(profile, repos);
+        renderRepos(repos);
+        renderProjectLinks(repos);
+        renderStarred(starredRepos);
+
+        if (hasLiveProfile || hasLiveRepos) {
+            updateStatus('GitHub 公开资料已刷新，统计和仓库信息来自实时接口。');
+        } else {
+            updateStatus('暂时未能连接 GitHub API，页面已保留静态摘要与直达链接。');
+        }
+
+        if (hasLiveStars) {
+            updateStarStatus('Star 列表已刷新，展示的是最近点过 Star 的公开仓库。');
+        } else {
+            updateStarStatus('暂时未能连接 GitHub Star 接口，页面已保留静态 Star 摘要。');
+        }
     } catch (error) {
         updateStatus('暂时未能连接 GitHub API，页面已保留静态摘要与直达链接。');
+        updateStarStatus('暂时未能连接 GitHub Star 接口，页面已保留静态 Star 摘要。');
         console.warn('Failed to load GitHub data', error);
     }
 }
 
 const marketFallback = {
     cnyUsd: 0.1374,
-    cnyEur: 0.1264,
-    cnyJpy: 20.54,
     cnySgd: 0.1854,
-    gold: { usdPerOunce: 2380, cnyPerOunce: 17322, cnyPerGram: 557, change24h: null },
-    btc: { usd: 83000, cny: 603240, change24h: null },
-    eth: { usd: 1600, cny: 11648, change24h: null }
+    jpyCny: 0.0487,
+    gold: { usdPerOunce: 2380, cnyPerGram: 557, change24h: null },
+    btc: { usd: 83000, cnyPerBtc: 603240, btcPerCny: 0.00000166, change24h: null },
+    gas92: { cnyPerLiter: 7.98, note: '全国参考价' }
 };
 
 function renderMarket(data) {
@@ -183,7 +323,7 @@ function renderMarket(data) {
     if (!container) return;
 
     const fmtRate = (n, d = 4) => n != null ? Number(n).toFixed(d) : '—';
-    const fmtPrice = (n) => n != null ? Number(n).toLocaleString('zh-CN', { maximumFractionDigits: 0 }) : '—';
+    const fmtPrice = (n, digits = 0) => n != null ? Number(n).toLocaleString('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits }) : '—';
     const changeHTML = (c) => {
         if (c == null) return '<span class="market-change">—</span>';
         const cls = c >= 0 ? 'up' : 'down';
@@ -193,42 +333,39 @@ function renderMarket(data) {
 
     container.innerHTML = `
         <article class="market-card">
-            <small>人民币兑美元</small>
+            <small>人民币 / 美元</small>
             <strong class="market-value">$${fmtRate(data.cnyUsd, 4)}</strong>
             <p class="muted">1 人民币 ≈ ${fmtRate(data.cnyUsd, 4)} 美元</p>
         </article>
         <article class="market-card">
-            <small>人民币兑欧元</small>
-            <strong class="market-value">€${fmtRate(data.cnyEur, 4)}</strong>
-            <p class="muted">1 人民币 ≈ ${fmtRate(data.cnyEur, 4)} 欧元</p>
-        </article>
-        <article class="market-card">
-            <small>人民币兑日元</small>
-            <strong class="market-value">JP¥${fmtRate(data.cnyJpy, 2)}</strong>
-            <p class="muted">1 人民币 ≈ ${fmtRate(data.cnyJpy, 2)} 日元</p>
-        </article>
-        <article class="market-card">
-            <small>人民币兑新加坡元</small>
+            <small>人民币 / 新币</small>
             <strong class="market-value">S$${fmtRate(data.cnySgd, 4)}</strong>
             <p class="muted">1 人民币 ≈ ${fmtRate(data.cnySgd, 4)} 新加坡元</p>
         </article>
         <article class="market-card">
-            <small>黄金现货</small>
-            <strong class="market-value">¥${fmtPrice(data.gold.cnyPerOunce)}</strong>
+            <small>日元 / 人民币</small>
+            <strong class="market-value">¥${fmtRate(data.jpyCny, 4)}</strong>
+            <p class="muted">1 日元 ≈ ${fmtRate(data.jpyCny, 4)} 人民币</p>
+        </article>
+        <article class="market-card">
+            <small>黄金 g / 人民币</small>
+            <strong class="market-value">¥${fmtPrice(data.gold.cnyPerGram, 2)}</strong>
             ${changeHTML(data.gold.change24h)}
-            <p class="muted">≈ ¥${fmtPrice(data.gold.cnyPerGram)} / 克 · $${fmtPrice(data.gold.usdPerOunce)} / 盎司</p>
+            <p class="muted">1 克 ≈ ${fmtPrice(data.gold.cnyPerGram, 2)} 人民币</p>
+            <p class="market-note">≈ $${fmtPrice(data.gold.usdPerOunce, 0)} / 盎司</p>
         </article>
         <article class="market-card">
-            <small>比特币 BTC</small>
-            <strong class="market-value">$${fmtPrice(data.btc.usd)}</strong>
+            <small>人民币 / 比特币</small>
+            <strong class="market-value">₿${fmtRate(data.btc.btcPerCny, 8)}</strong>
             ${changeHTML(data.btc.change24h)}
-            <p class="muted">≈ ¥${fmtPrice(data.btc.cny)} · 24h 涨跌</p>
+            <p class="muted">1 人民币 ≈ ${fmtRate(data.btc.btcPerCny, 8)} BTC</p>
+            <p class="market-note">≈ ¥${fmtPrice(data.btc.cnyPerBtc, 0)} / BTC</p>
         </article>
         <article class="market-card">
-            <small>以太坊 ETH</small>
-            <strong class="market-value">$${fmtPrice(data.eth.usd)}</strong>
-            ${changeHTML(data.eth.change24h)}
-            <p class="muted">≈ ¥${fmtPrice(data.eth.cny)} · 24h 涨跌</p>
+            <small>国内 92# 汽油</small>
+            <strong class="market-value">¥${fmtPrice(data.gas92.cnyPerLiter, 2)}</strong>
+            <span class="market-change">${escapeHtml(data.gas92.note)}</span>
+            <p class="muted">${fmtPrice(data.gas92.cnyPerLiter, 2)} 人民币 / 升</p>
         </article>
     `;
 }
@@ -251,12 +388,11 @@ async function hydrateMarketData() {
 
         const marketData = {
             cnyUsd: marketFallback.cnyUsd,
-            cnyEur: marketFallback.cnyEur,
-            cnyJpy: marketFallback.cnyJpy,
             cnySgd: marketFallback.cnySgd,
+            jpyCny: marketFallback.jpyCny,
             gold: { ...marketFallback.gold },
             btc: { ...marketFallback.btc },
-            eth: { ...marketFallback.eth }
+            gas92: { ...marketFallback.gas92 }
         };
         let hasLiveData = false;
 
@@ -266,9 +402,8 @@ async function hydrateMarketData() {
             const cnyBase = Number(rates?.CNY);
             if (cnyBase) {
                 marketData.cnyUsd = 1 / cnyBase;
-                if (rates.EUR) marketData.cnyEur = Number(rates.EUR) / cnyBase;
-                if (rates.JPY) marketData.cnyJpy = Number(rates.JPY) / cnyBase;
                 if (rates.SGD) marketData.cnySgd = Number(rates.SGD) / cnyBase;
+                if (rates.JPY) marketData.jpyCny = cnyBase / Number(rates.JPY);
                 hasLiveData = true;
             }
         }
@@ -278,15 +413,9 @@ async function hydrateMarketData() {
             if (cryptoData.bitcoin) {
                 marketData.btc = {
                     usd: cryptoData.bitcoin.usd,
-                    cny: cryptoData.bitcoin.cny,
+                    cnyPerBtc: cryptoData.bitcoin.cny,
+                    btcPerCny: cryptoData.bitcoin.cny ? 1 / cryptoData.bitcoin.cny : marketFallback.btc.btcPerCny,
                     change24h: cryptoData.bitcoin.usd_24h_change ?? null
-                };
-            }
-            if (cryptoData.ethereum) {
-                marketData.eth = {
-                    usd: cryptoData.ethereum.usd,
-                    cny: cryptoData.ethereum.cny,
-                    change24h: cryptoData.ethereum.usd_24h_change ?? null
                 };
             }
             hasLiveData = true;
@@ -297,12 +426,10 @@ async function hydrateMarketData() {
             const usdPerOunce = Number(pickFirstDefined(goldData, ['price', 'price_usd', 'price_ounce', 'price_per_ounce']));
 
             if (Number.isFinite(usdPerOunce) && usdPerOunce > 0) {
-                const cnyPerOunce = usdPerOunce / marketData.cnyUsd;
                 const goldChange24h = pickFirstDefined(goldData, ['chg_percentage', 'change_percent', 'change_percentage']);
                 marketData.gold = {
                     usdPerOunce,
-                    cnyPerOunce,
-                    cnyPerGram: cnyPerOunce / GOLD_TROY_OUNCE_GRAMS,
+                    cnyPerGram: (usdPerOunce / marketData.cnyUsd) / GOLD_TROY_OUNCE_GRAMS,
                     change24h: goldChange24h
                 };
                 hasLiveData = true;
@@ -312,7 +439,7 @@ async function hydrateMarketData() {
         renderMarket(marketData);
         if (hasLiveData) {
             const now = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
-            updateMarketStatus(`行情已更新 · ${now}`);
+            updateMarketStatus(`汇率、黄金和比特币已更新；92# 汽油保留本地参考价 · ${now}`);
         } else {
             updateMarketStatus('行情接口暂时不可用，当前展示的是本地参考数据。');
         }
