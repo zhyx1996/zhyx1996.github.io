@@ -113,6 +113,9 @@ const GAS92_PRICE_RANGE = { min: 5, max: 10 };
 const GAS92_MIN_SAMPLE_COUNT = 3;
 const GAS92_ROW_HINT = /北京|上海|天津|重庆|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|内蒙古|广西|西藏|宁夏|新疆|香港|澳门|台湾|全国|平均|92|汽油/i;
 const GAS92_VALUE_PATTERN = /(\d+(?:\.\d{1,3})?)/g;
+const GAS92_PRICE_WITH_UNIT_PATTERN = /(\d+(?:\.\d{1,3})?)\s*(?:元\/升|元每升|\/L|每升)/gi;
+const MAX_URL_LABEL_LENGTH = 96;
+const URL_TRUNCATE_LENGTH = 93;
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
         if (source?.[key] != null) return source[key];
@@ -406,7 +409,7 @@ function renderMarket(data) {
 
 function fetchWithTimeout(url, options = {}, timeout = 5000) {
     return new Promise((resolve, reject) => {
-        const label = String(url).length > 96 ? `${String(url).slice(0, 93)}...` : String(url);
+        const label = String(url).length > MAX_URL_LABEL_LENGTH ? `${String(url).slice(0, URL_TRUNCATE_LENGTH)}...` : String(url);
         const timer = window.setTimeout(() => reject(new Error(`Request timed out: ${label}`)), timeout);
         fetch(url, options)
             .then((response) => {
@@ -451,7 +454,7 @@ function extractGas92PriceFromHtml(html) {
     const directMatch = text.match(/92[#号]?(?:汽油)?[^0-9]{0,12}(\d+(?:\.\d{1,3})?)(?:\s*元)?\s*(?:\/|每)?\s*升/i);
     if (directMatch) return Number(directMatch[1]);
 
-    const fallbackMatches = [...text.matchAll(/(\d+(?:\.\d{1,3})?)\s*(?:元\/升|元每升|\/L|每升)/gi)]
+    const fallbackMatches = [...text.matchAll(GAS92_PRICE_WITH_UNIT_PATTERN)]
         .map((match) => Number(match[1]))
         .filter((value) => value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
     if (fallbackMatches.length) return Number(average(fallbackMatches).toFixed(2));
