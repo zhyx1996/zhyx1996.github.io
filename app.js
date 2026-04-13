@@ -60,6 +60,12 @@ const fmtDate = (value) => {
 
 const safeText = (value, fallback = '暂无') => value || fallback;
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
+const pickFirstDefined = (source, keys) => {
+    for (const key of keys) {
+        if (source?.[key] != null) return source[key];
+    }
+    return null;
+};
 
 const setText = (id, value) => {
     const element = document.getElementById(id);
@@ -288,16 +294,11 @@ async function hydrateMarketData() {
 
         if (goldResult.status === 'fulfilled' && goldResult.value.ok) {
             const goldData = await goldResult.value.json();
-            const usdPerOunce = Number(
-                goldData.price ??
-                goldData.price_usd ??
-                goldData.price_ounce ??
-                goldData.price_per_ounce
-            );
+            const usdPerOunce = Number(pickFirstDefined(goldData, ['price', 'price_usd', 'price_ounce', 'price_per_ounce']));
 
             if (Number.isFinite(usdPerOunce) && usdPerOunce > 0) {
                 const cnyPerOunce = usdPerOunce / marketData.cnyUsd;
-                const goldChange24h = goldData.chg_percentage ?? goldData.change_percent ?? goldData.change_percentage ?? null;
+                const goldChange24h = pickFirstDefined(goldData, ['chg_percentage', 'change_percent', 'change_percentage']);
                 marketData.gold = {
                     usdPerOunce,
                     cnyPerOunce,
