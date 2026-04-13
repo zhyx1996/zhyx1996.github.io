@@ -14,8 +14,9 @@
             <ul class="nav-links">
                 <li><a href="/index.html">首页</a></li>
                 <li><a class="active" href="/projects.html">项目页</a></li>
-                <li><a href="#project-list-section">最近更新</a></li>
-                <li><a href="#project-links">直达链接</a></li>
+                <li><a href="#stars">Star 展示</a></li>
+                <li><a href="/index.html#market">市场行情</a></li>
+                <li><a href="/index.html#links">外部链接</a></li>
             </ul>
         </div>
     </nav>
@@ -92,7 +93,7 @@
                 </div>
                 <span class="tag">Direct Links</span>
             </div>
-            <div class="grid-2">
+            <div class="grid-2" id="project-links-grid">
                 <article class="contact-card">
                     <span class="tag">Vision</span>
                     <h3>lane2seq</h3>
@@ -101,31 +102,29 @@
                         <a class="button outline" href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">打开仓库</a>
                     </div>
                 </article>
-                <article class="contact-card">
-                    <span class="tag">Point Cloud</span>
-                    <h3>pcl-boundary_omp</h3>
-                    <p>围绕 PCL BoundaryEstimation 的 OpenMP 并行化处理与性能优化实践。</p>
-                    <div class="button-row">
-                        <a class="button outline" href="https://github.com/zhyx1996/pcl-boundary_omp" target="_blank" rel="noreferrer">打开仓库</a>
-                    </div>
-                </article>
-                <article class="contact-card">
-                    <span class="tag">CUDA</span>
-                    <h3>cuda_test</h3>
-                    <p>用于 CUDA 环境验证、基础示例和轻量实验记录。</p>
-                    <div class="button-row">
-                        <a class="button outline" href="https://github.com/zhyx1996/cuda_test" target="_blank" rel="noreferrer">打开仓库</a>
-                    </div>
-                </article>
-                <article class="contact-card">
-                    <span class="tag">Utility</span>
-                    <h3>utils</h3>
-                    <p>收纳平时反复会用到的脚本、小工具和便捷配置。</p>
-                    <div class="button-row">
-                        <a class="button outline" href="https://github.com/zhyx1996/utils" target="_blank" rel="noreferrer">打开仓库</a>
+            </div>
+        </section>
+
+        <section class="section" id="stars">
+            <div class="section-heading">
+                <div>
+                    <h2>我 Star 的项目</h2>
+                    <p>保留最近点过 Star 的仓库，方便在项目页继续快速回看。</p>
+                </div>
+                <span class="tag">Starred Repositories</span>
+            </div>
+            <div class="repo-grid star-grid" id="project-star-list">
+                <article class="repo-card star-card">
+                    <span class="tag">TypeScript</span>
+                    <h3>smallmain / vscode-unify-chat-provider</h3>
+                    <p>把多个 LLM API 提供方接到 VS Code Copilot Chat 的聚合型扩展。</p>
+                    <div class="repo-stats">
+                        <span>⭐ 366</span>
+                        <span>🕒 2026年4月13日</span>
                     </div>
                 </article>
             </div>
+            <p class="status-inline" data-star-status>正在同步我的 Star 列表...</p>
         </section>
     </main>
 
