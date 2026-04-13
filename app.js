@@ -401,7 +401,7 @@ function renderMarket(data) {
     `;
 }
 
-function fetchWithTimeout(url, options = {}, timeout = 12000) {
+function fetchWithTimeout(url, options = {}, timeout = 5000) {
     return new Promise((resolve, reject) => {
         const timer = window.setTimeout(() => reject(new Error(`Request timed out: ${url}`)), timeout);
         fetch(url, options)
@@ -511,7 +511,9 @@ async function loadGas92Price() {
 }
 
 async function hydrateMarketData() {
+    const marketContainer = document.getElementById('market-grid');
     const statusEl = document.querySelector('[data-market-status]');
+    if (!marketContainer && !statusEl) return;
     const updateMarketStatus = (text) => { if (statusEl) statusEl.textContent = text; };
 
     renderMarket(marketFallback);
