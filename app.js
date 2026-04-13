@@ -237,6 +237,7 @@ async function hydrateMarketData() {
         const [ratesResult, cryptoResult, goldResult] = await Promise.allSettled([
             fetch('https://open.er-api.com/v6/latest/USD'),
             fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,cny&include_24hr_change=true'),
+            // gold-api.com 的 XAU 接口通常返回 price 与 chg_percentage，这里保留兼容字段以降低接口微调带来的风险。
             fetch('https://api.gold-api.com/price/XAU')
         ]);
 
