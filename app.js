@@ -59,6 +59,7 @@ const fmtDate = (value) => {
 };
 
 const safeText = (value, fallback = '暂无') => value || fallback;
+const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
 
 const setText = (id, value) => {
     const element = document.getElementById(id);
@@ -238,7 +239,7 @@ async function hydrateMarketData() {
             fetch('https://open.er-api.com/v6/latest/USD'),
             fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,cny&include_24hr_change=true'),
             // gold-api.com 的 XAU 接口通常返回 price 与 chg_percentage；
-            // 额外兼容 price_usd / price_ounce / price_per_ounce 这类常见镜像或旧字段命名，避免轻微字段变动直接导致页面空白。
+            // 额外兼容 price_usd / price_ounce / price_per_ounce 这类常见镜像或旧字段命名，避免轻微的字段变动直接导致页面空白。
             fetch('https://api.gold-api.com/price/XAU')
         ]);
 
@@ -296,11 +297,12 @@ async function hydrateMarketData() {
 
             if (Number.isFinite(usdPerOunce) && usdPerOunce > 0) {
                 const cnyPerOunce = usdPerOunce / marketData.cnyUsd;
+                const goldChange24h = goldData.chg_percentage ?? goldData.change_percent ?? goldData.change_percentage ?? null;
                 marketData.gold = {
                     usdPerOunce,
                     cnyPerOunce,
-                    cnyPerGram: cnyPerOunce / 31.1034768,
-                    change24h: goldData.chg_percentage ?? goldData.change_percent ?? goldData.change_percentage ?? null
+                    cnyPerGram: cnyPerOunce / GOLD_TROY_OUNCE_GRAMS,
+                    change24h: goldChange24h
                 };
                 hasLiveData = true;
             }
