@@ -80,7 +80,6 @@ const starredFallback = [
     }
 ];
 
-const repoShowcaseOrder = ['lane2seq', 'pcl-boundary_omp', 'cuda_test', 'utils'];
 const repoShowcaseMeta = {
     lane2seq: { label: 'Vision' },
     'pcl-boundary_omp': { label: 'Point Cloud' },
@@ -109,6 +108,8 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
+const GAS92_PRICE_RANGE = { min: 5, max: 10 };
+const GAS92_ROW_HINT = /北京|上海|天津|重庆|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|内蒙古|广西|西藏|宁夏|新疆|香港|澳门|台湾|全国|平均|92|汽油/i;
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
         if (source?.[key] != null) return source[key];
@@ -158,12 +159,10 @@ function renderProfile(profile, repos = repoFallback) {
     setImage('profile-avatar', profile.avatar_url || profileFallback.avatar_url, `${profile.login} avatar`);
 }
 
-function resolveShowcaseRepos(repos) {
-    const repoMap = new Map(repos.map((repo) => [repo.name, repo]));
-    const ordered = repoShowcaseOrder
-        .map((name) => (repoMap.has(name) ? { ...repoMap.get(name) } : repoFallback.find((repo) => repo.name === name)))
-        .filter(Boolean);
-    return ordered.slice(0, 4);
+function selectLatestRepos(repos, limit = 4) {
+    return [...repos]
+        .sort((left, right) => new Date(right?.updated_at || 0) - new Date(left?.updated_at || 0))
+        .slice(0, limit);
 }
 
 function renderMarkup(selector, markup) {
@@ -172,7 +171,7 @@ function renderMarkup(selector, markup) {
 }
 
 function renderRepos(repos) {
-    const items = repos.slice(0, 4);
+    const items = selectLatestRepos(repos);
 
     renderMarkup('repo-list', items.map((repo) => `
         <article class="repo-card">
@@ -205,7 +204,7 @@ function renderRepos(repos) {
 }
 
 function renderProjectLinks(repos) {
-    renderMarkup('project-links-grid', resolveShowcaseRepos(repos).map((repo) => `
+    renderMarkup('project-links-grid', selectLatestRepos(repos).map((repo) => `
         <article class="contact-card">
             <span class="tag">${escapeHtml(repoShowcaseMeta[repo.name]?.label || safeText(repo.language, '项目'))}</span>
             <h3>${escapeHtml(repo.name)}</h3>
@@ -310,64 +309,205 @@ async function hydrateGithubData() {
 }
 
 const marketFallback = {
-    cnyUsd: 0.1374,
-    cnySgd: 0.1854,
-    jpyCny: 0.0487,
+    usdCny: 7.278,
+    sgdCny: 5.394,
+    jpyPerCny: 20.53,
     gold: { usdPerOunce: 2380, cnyPerGram: 557, change24h: null },
-    btc: { usd: 83000, cnyPerBtc: 603240, btcPerCny: 0.00000166, change24h: null },
-    gas92: { cnyPerLiter: 7.98, note: '全国参考价' }
+    btc: { usd: 83000, cnyPerBtc: 603240, change24h: null },
+    gas92: { cnyPerLiter: 7.98, note: '当前展示全国参考价', source: '静态摘要' }
+};
+
+const fmtRate = (n, d = 4) => n != null ? Number(n).toFixed(d) : '暂无';
+const fmtPrice = (n, digits = 0) => n != null ? Number(n).toLocaleString('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits }) : '暂无';
+const renderMarketFacts = (items) => `
+    <dl class="market-facts">
+        ${items.map((item) => `
+            <div class="market-fact">
+                <dt>${escapeHtml(item.label)}</dt>
+                <dd>${escapeHtml(item.value)}</dd>
+            </div>
+        `).join('')}
+    </dl>
+`;
+const changeHTML = (c) => {
+    if (c == null) return '<span class="market-change">24h：暂无涨跌数据</span>';
+    const cls = c >= 0 ? 'up' : 'down';
+    const sign = c >= 0 ? '+' : '';
+    return `<span class="market-change ${cls}">24h：${sign}${Number(c).toFixed(2)}%</span>`;
 };
 
 function renderMarket(data) {
     const container = document.getElementById('market-grid');
     if (!container) return;
 
-    const fmtRate = (n, d = 4) => n != null ? Number(n).toFixed(d) : '—';
-    const fmtPrice = (n, digits = 0) => n != null ? Number(n).toLocaleString('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits }) : '—';
-    const changeHTML = (c) => {
-        if (c == null) return '<span class="market-change">—</span>';
-        const cls = c >= 0 ? 'up' : 'down';
-        const sign = c >= 0 ? '+' : '';
-        return `<span class="market-change ${cls}">${sign}${Number(c).toFixed(2)}%</span>`;
-    };
-
     container.innerHTML = `
         <article class="market-card">
             <small>人民币 / 美元</small>
-            <strong class="market-value">$${fmtRate(data.cnyUsd, 4)}</strong>
-            <p class="muted">1 人民币 ≈ ${fmtRate(data.cnyUsd, 4)} 美元</p>
+            <strong class="market-value">¥${fmtRate(data.usdCny, 4)} / $1</strong>
+            <p class="muted">1 美元 ≈ ${fmtRate(data.usdCny, 4)} 人民币</p>
+            ${renderMarketFacts([
+                { label: '反向换算', value: `1 人民币 ≈ $${fmtRate(data.usdCny ? 1 / data.usdCny : null, 4)}` },
+                { label: '展示规则', value: '优先显示大于 1 的汇率' }
+            ])}
         </article>
         <article class="market-card">
             <small>人民币 / 新币</small>
-            <strong class="market-value">S$${fmtRate(data.cnySgd, 4)}</strong>
-            <p class="muted">1 人民币 ≈ ${fmtRate(data.cnySgd, 4)} 新加坡元</p>
+            <strong class="market-value">¥${fmtRate(data.sgdCny, 4)} / S$1</strong>
+            <p class="muted">1 新加坡元 ≈ ${fmtRate(data.sgdCny, 4)} 人民币</p>
+            ${renderMarketFacts([
+                { label: '反向换算', value: `1 人民币 ≈ S$${fmtRate(data.sgdCny ? 1 / data.sgdCny : null, 4)}` },
+                { label: '显示说明', value: '新币更值钱，所以放在分母' }
+            ])}
         </article>
         <article class="market-card">
             <small>日元 / 人民币</small>
-            <strong class="market-value">¥${fmtRate(data.jpyCny, 4)}</strong>
-            <p class="muted">1 日元 ≈ ${fmtRate(data.jpyCny, 4)} 人民币</p>
+            <strong class="market-value">${fmtRate(data.jpyPerCny, 2)} 日元 / ¥1</strong>
+            <p class="muted">1 人民币 ≈ ${fmtRate(data.jpyPerCny, 2)} 日元</p>
+            ${renderMarketFacts([
+                { label: '反向换算', value: `1 日元 ≈ ¥${fmtRate(data.jpyPerCny ? 1 / data.jpyPerCny : null, 4)}` },
+                { label: '显示说明', value: '人民币更值钱，所以放在分母' }
+            ])}
         </article>
         <article class="market-card">
-            <small>黄金 g / 人民币</small>
-            <strong class="market-value">¥${fmtPrice(data.gold.cnyPerGram, 2)}</strong>
+            <small>黄金 / 人民币</small>
+            <strong class="market-value">¥${fmtPrice(data.gold.cnyPerGram, 2)} / 克</strong>
             ${changeHTML(data.gold.change24h)}
-            <p class="muted">1 克 ≈ ${fmtPrice(data.gold.cnyPerGram, 2)} 人民币</p>
-            <p class="market-note">≈ $${fmtPrice(data.gold.usdPerOunce, 0)} / 盎司</p>
+            <p class="muted">按 1 克黄金折算，约合 ¥${fmtPrice(data.gold.cnyPerGram, 2)}</p>
+            ${renderMarketFacts([
+                { label: '人民币口径', value: `约 ¥${fmtPrice(data.gold.cnyPerGram, 2)} / 克` },
+                { label: '国际金价', value: `约 $${fmtPrice(data.gold.usdPerOunce, 0)} / 盎司` }
+            ])}
         </article>
         <article class="market-card">
             <small>人民币 / 比特币</small>
-            <strong class="market-value">₿${fmtRate(data.btc.btcPerCny, 8)}</strong>
+            <strong class="market-value">¥${fmtPrice(data.btc.cnyPerBtc, 0)} / BTC</strong>
             ${changeHTML(data.btc.change24h)}
-            <p class="muted">1 人民币 ≈ ${fmtRate(data.btc.btcPerCny, 8)} BTC</p>
-            <p class="market-note">≈ ¥${fmtPrice(data.btc.cnyPerBtc, 0)} / BTC</p>
+            <p class="muted">1 BTC ≈ ¥${fmtPrice(data.btc.cnyPerBtc, 0)}</p>
+            ${renderMarketFacts([
+                { label: '美元口径', value: `约 $${fmtPrice(data.btc.usd, 0)} / BTC` },
+                { label: '反向换算', value: `1 人民币 ≈ ₿${fmtRate(data.btc.cnyPerBtc ? 1 / data.btc.cnyPerBtc : null, 8)}` }
+            ])}
         </article>
         <article class="market-card">
             <small>国内 92# 汽油</small>
-            <strong class="market-value">¥${fmtPrice(data.gas92.cnyPerLiter, 2)}</strong>
+            <strong class="market-value">¥${fmtPrice(data.gas92.cnyPerLiter, 2)} / 升</strong>
             <span class="market-change">${escapeHtml(data.gas92.note)}</span>
-            <p class="muted">${fmtPrice(data.gas92.cnyPerLiter, 2)} 人民币 / 升</p>
+            <p class="muted">按 1 升计算，约合 ¥${fmtPrice(data.gas92.cnyPerLiter, 2)}</p>
+            ${renderMarketFacts([
+                { label: '数据来源', value: data.gas92.source || '静态摘要' },
+                { label: '说明', value: '优先实时获取，失败后再尝试抓取公开油价页面' }
+            ])}
         </article>
     `;
+}
+
+function fetchWithTimeout(url, options = {}, timeout = 12000) {
+    return new Promise((resolve, reject) => {
+        const timer = window.setTimeout(() => reject(new Error(`Request timed out: ${url}`)), timeout);
+        fetch(url, options)
+            .then((response) => {
+                window.clearTimeout(timer);
+                resolve(response);
+            })
+            .catch((error) => {
+                window.clearTimeout(timer);
+                reject(error);
+            });
+    });
+}
+
+function normalizeWhitespace(value) {
+    return String(value ?? '').replace(/\s+/g, ' ').trim();
+}
+
+function average(values) {
+    return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function extractGas92PriceFromHtml(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const rows = [...doc.querySelectorAll('tr, li, p')];
+    const values = [];
+
+    for (const row of rows) {
+        const text = normalizeWhitespace(row.textContent);
+        if (!text || !GAS92_ROW_HINT.test(text)) continue;
+        const matches = [...text.matchAll(/([5-9](?:\.\d{1,3})?)/g)]
+            .map((match) => Number(match[1]))
+            .filter((value) => value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
+        if (matches.length) values.push(matches[0]);
+    }
+
+    if (values.length >= 3) {
+        return Number(average(values).toFixed(2));
+    }
+
+    const text = normalizeWhitespace(doc.body?.textContent || html);
+    const directMatch = text.match(/92[#号]?(?:汽油)?[^0-9]{0,12}([5-9](?:\.\d{1,3})?)(?:\s*元)?\s*(?:\/|每)?\s*升/i);
+    if (directMatch) return Number(directMatch[1]);
+
+    const fallbackMatches = [...text.matchAll(/([5-9](?:\.\d{1,3})?)\s*(?:元\/升|元每升|\/L|每升)/gi)]
+        .map((match) => Number(match[1]))
+        .filter((value) => value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
+    if (fallbackMatches.length) return Number(average(fallbackMatches).toFixed(2));
+
+    return null;
+}
+
+const gas92FetchPlans = [
+    {
+        label: '全球油价页',
+        source: '实时页面',
+        url: 'https://www.globalpetrolprices.com/China/gasoline_prices/',
+        parser: extractGas92PriceFromHtml
+    },
+    {
+        label: '车主手册 92# 油价',
+        source: '抓取公开页面',
+        url: 'https://www.icauto.com.cn/oil/price_0_2_1.html',
+        parser: extractGas92PriceFromHtml
+    },
+    {
+        label: '今日油价 92 号汽油',
+        source: '抓取公开页面',
+        url: 'https://www.chayoujia.net/gasoline92.html',
+        parser: extractGas92PriceFromHtml
+    }
+];
+
+function buildGas92Candidates(plan) {
+    const encodedUrl = encodeURIComponent(plan.url);
+    return [
+        { ...plan, requestUrl: plan.url },
+        { ...plan, requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}` },
+        { ...plan, requestUrl: `https://r.jina.ai/http://${plan.url.replace(/^https?:\/\//, '')}` }
+    ];
+}
+
+async function loadGas92Price() {
+    for (const plan of gas92FetchPlans) {
+        for (const candidate of buildGas92Candidates(plan)) {
+            try {
+                const response = await fetchWithTimeout(candidate.requestUrl, {
+                    headers: { Accept: 'text/html, text/plain;q=0.9, */*;q=0.8' }
+                });
+                if (!response.ok) continue;
+                const html = await response.text();
+                const price = candidate.parser(html);
+                if (price != null) {
+                    return {
+                        cnyPerLiter: price,
+                        note: `${candidate.source}已刷新`,
+                        source: candidate.label
+                    };
+                }
+            } catch (error) {
+                console.warn(`Failed to load 92# gas price from ${candidate.requestUrl}`, error);
+            }
+        }
+    }
+
+    return null;
 }
 
 async function hydrateMarketData() {
@@ -375,35 +515,37 @@ async function hydrateMarketData() {
     const updateMarketStatus = (text) => { if (statusEl) statusEl.textContent = text; };
 
     renderMarket(marketFallback);
-    updateMarketStatus('正在刷新汇率、黄金与加密资产价格...');
+    updateMarketStatus('正在刷新汇率、黄金、比特币与 92# 汽油...');
 
     try {
-        const [ratesResult, cryptoResult, goldResult] = await Promise.allSettled([
+        const [ratesResult, cryptoResult, goldResult, gas92Result] = await Promise.allSettled([
             fetch('https://open.er-api.com/v6/latest/USD'),
             fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,cny&include_24hr_change=true'),
             // gold-api.com 的 XAU 接口通常返回 price 与 chg_percentage；
             // 额外兼容 price_usd / price_ounce / price_per_ounce 这类常见镜像或旧字段命名，避免轻微的字段变动直接导致页面空白。
-            fetch('https://api.gold-api.com/price/XAU')
+            fetch('https://api.gold-api.com/price/XAU'),
+            loadGas92Price()
         ]);
 
         const marketData = {
-            cnyUsd: marketFallback.cnyUsd,
-            cnySgd: marketFallback.cnySgd,
-            jpyCny: marketFallback.jpyCny,
+            usdCny: marketFallback.usdCny,
+            sgdCny: marketFallback.sgdCny,
+            jpyPerCny: marketFallback.jpyPerCny,
             gold: { ...marketFallback.gold },
             btc: { ...marketFallback.btc },
             gas92: { ...marketFallback.gas92 }
         };
         let hasLiveData = false;
+        let hasLiveGas92 = false;
 
         if (ratesResult.status === 'fulfilled' && ratesResult.value.ok) {
             const ratesData = await ratesResult.value.json();
             const rates = ratesData.rates;
             const cnyBase = Number(rates?.CNY);
             if (cnyBase) {
-                marketData.cnyUsd = 1 / cnyBase;
-                if (rates.SGD) marketData.cnySgd = Number(rates.SGD) / cnyBase;
-                if (rates.JPY) marketData.jpyCny = cnyBase / Number(rates.JPY);
+                marketData.usdCny = cnyBase;
+                if (rates.SGD) marketData.sgdCny = cnyBase / Number(rates.SGD);
+                if (rates.JPY) marketData.jpyPerCny = Number(rates.JPY) / cnyBase;
                 hasLiveData = true;
             }
         }
@@ -414,7 +556,6 @@ async function hydrateMarketData() {
                 marketData.btc = {
                     usd: cryptoData.bitcoin.usd,
                     cnyPerBtc: cryptoData.bitcoin.cny,
-                    btcPerCny: cryptoData.bitcoin.cny ? 1 / cryptoData.bitcoin.cny : marketFallback.btc.btcPerCny,
                     change24h: cryptoData.bitcoin.usd_24h_change ?? null
                 };
             }
@@ -429,17 +570,23 @@ async function hydrateMarketData() {
                 const goldChange24h = pickFirstDefined(goldData, ['chg_percentage', 'change_percent', 'change_percentage']);
                 marketData.gold = {
                     usdPerOunce,
-                    cnyPerGram: (usdPerOunce / marketData.cnyUsd) / GOLD_TROY_OUNCE_GRAMS,
+                    cnyPerGram: (usdPerOunce * marketData.usdCny) / GOLD_TROY_OUNCE_GRAMS,
                     change24h: goldChange24h
                 };
                 hasLiveData = true;
             }
         }
 
+        if (gas92Result.status === 'fulfilled' && gas92Result.value) {
+            marketData.gas92 = gas92Result.value;
+            hasLiveGas92 = true;
+        }
+
         renderMarket(marketData);
-        if (hasLiveData) {
+        if (hasLiveData || hasLiveGas92) {
             const now = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
-            updateMarketStatus(`汇率、黄金和比特币已更新；92# 汽油保留本地参考价 · ${now}`);
+            const gasText = hasLiveGas92 ? '92# 汽油也已刷新' : '92# 汽油暂未刷新，仍显示本地参考价';
+            updateMarketStatus(`汇率、黄金和比特币已更新；${gasText}（${now}）`);
         } else {
             updateMarketStatus('行情接口暂时不可用，当前展示的是本地参考数据。');
         }

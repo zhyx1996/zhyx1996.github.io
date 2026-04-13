@@ -14,7 +14,6 @@
             <ul class="nav-links">
                 <li><a class="active" href="/index.html">首页</a></li>
                 <li><a href="/projects.html">项目页</a></li>
-                <li><a href="#stars">Star 展示</a></li>
                 <li><a href="#market">市场行情</a></li>
                 <li><a href="#links">外部链接</a></li>
             </ul>
@@ -175,7 +174,7 @@
             <div class="section-heading">
                 <div>
                     <h2>市场行情</h2>
-                    <p>按人民币视角查看美元、新币、日元、黄金、比特币和国内 92# 汽油参考价。</p>
+                    <p>汇率统一按“大数值优先”展示；92# 汽油会优先实时获取，失败时再尝试抓取公开页面。</p>
                 </div>
                 <span class="tag">Market</span>
             </div>
@@ -216,7 +215,7 @@
     <footer class="footer">
         <div class="footer-inner">
             <p>ZYX · zhyx1996.github.io · 计算机视觉 & 并行计算</p>
-            <p>数据来自 GitHub 公开 API 与开放金融接口；92# 汽油保留本地参考价，无法联网时会回退到静态摘要。</p>
+            <p>数据来自 GitHub 公开 API、开放金融接口与公开油价页面；92# 汽油会按“实时接口 → 页面抓取 → 本地参考价”顺序回退。</p>
         </div>
     </footer>
 
