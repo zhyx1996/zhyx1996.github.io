@@ -416,7 +416,8 @@ function renderMarket(data) {
 
 function fetchWithTimeout(url, options = {}, timeout = 5000) {
     return new Promise((resolve, reject) => {
-        const label = String(url).length > MAX_URL_LABEL_LENGTH ? `${String(url).slice(0, URL_TRUNCATE_LENGTH)}...` : String(url);
+        const urlText = String(url);
+        const label = urlText.length > MAX_URL_LABEL_LENGTH ? `${urlText.slice(0, URL_TRUNCATE_LENGTH)}...` : urlText;
         const timer = window.setTimeout(() => reject(new Error(`Request timed out: ${label}`)), timeout);
         fetch(url, options)
             .then((response) => {
@@ -458,7 +459,8 @@ function extractGas92PriceFromHtml(html) {
     }
 
     const text = normalizeWhitespace(doc.body?.textContent || html);
-    // 匹配“92# / 92号汽油 ... 7.98 元/升”这类最直接的正文描述。
+    // 匹配“92# / 92号汽油 ... 7.98 元/升”这类最直接的正文描述；
+    // 中间允许最多 12 个非数字字符，用来兼容空格、括号或少量解释文字。
     const directMatch = text.match(/92[#号]?(?:汽油)?[^0-9]{0,12}(\d+(?:\.\d{1,3})?)(?:\s*元)?\s*(?:\/|每)?\s*升/i);
     if (directMatch) return Number(directMatch[1]);
 
@@ -495,6 +497,8 @@ function buildGas92Candidates(plan) {
     const encodedUrl = encodeURIComponent(plan.url);
     return [
         { ...plan, requestUrl: plan.url },
+        // 静态站点无法自建后端代理时，只能把公开代理作为抓取回退方案；
+        // 如果这些服务失效或不可用，会继续回退到本地参考价，不阻塞页面展示。
         { ...plan, requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}` },
         { ...plan, requestUrl: `https://r.jina.ai/http/${plan.url}` }
     ];
@@ -555,6 +559,7 @@ async function hydrateMarketData() {
         };
         let hasLiveData = false;
         let hasLiveGas92 = false;
+        let hasLiveUsdCny = false;
 
         if (ratesResult.status === 'fulfilled' && ratesResult.value.ok) {
             const ratesData = await ratesResult.value.json();
@@ -565,6 +570,7 @@ async function hydrateMarketData() {
                 if (rates.SGD) marketData.sgdCny = cnyBase / Number(rates.SGD);
                 if (rates.JPY) marketData.jpyPerCny = Number(rates.JPY) / cnyBase;
                 hasLiveData = true;
+                hasLiveUsdCny = true;
             }
         }
 
@@ -580,7 +586,7 @@ async function hydrateMarketData() {
             hasLiveData = true;
         }
 
-        if (goldResult.status === 'fulfilled' && goldResult.value.ok) {
+        if (goldResult.status === 'fulfilled' && goldResult.value.ok && hasLiveUsdCny) {
             const goldData = await goldResult.value.json();
             const usdPerOunce = Number(pickFirstDefined(goldData, ['price', 'price_usd', 'price_ounce', 'price_per_ounce']));
 
