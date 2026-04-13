@@ -108,6 +108,7 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
+// 公开油价页里的 92# 汽油通常稳定落在这个区间，先用它过滤掉日期、年份和其他无关数字。
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
 const GAS92_MIN_SAMPLE_COUNT = 3;
 const GAS92_ROW_HINT = /北京|上海|天津|重庆|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|内蒙古|广西|西藏|宁夏|新疆|香港|澳门|台湾|全国|平均|92|汽油/i;
@@ -405,7 +406,8 @@ function renderMarket(data) {
 
 function fetchWithTimeout(url, options = {}, timeout = 5000) {
     return new Promise((resolve, reject) => {
-        const timer = window.setTimeout(() => reject(new Error(`Request timed out: ${url}`)), timeout);
+        const label = String(url).length > 96 ? `${String(url).slice(0, 93)}...` : String(url);
+        const timer = window.setTimeout(() => reject(new Error(`Request timed out: ${label}`)), timeout);
         fetch(url, options)
             .then((response) => {
                 window.clearTimeout(timer);
@@ -423,6 +425,7 @@ function normalizeWhitespace(value) {
 }
 
 function average(values) {
+    if (!values.length) return 0;
     return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
@@ -482,7 +485,7 @@ function buildGas92Candidates(plan) {
     return [
         { ...plan, requestUrl: plan.url },
         { ...plan, requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}` },
-        { ...plan, requestUrl: `https://r.jina.ai/http://${plan.url}` }
+        { ...plan, requestUrl: `https://r.jina.ai/http/${plan.url}` }
     ];
 }
 
