@@ -444,6 +444,12 @@ a {
     }
 }
 
+@media (max-width: 640px) {
+    .market-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .footer {
     padding: 2rem 0 2.4rem;
     background: #111827;
