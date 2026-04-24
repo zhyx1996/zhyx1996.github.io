@@ -334,6 +334,18 @@ a {
     font-size: 0.94rem;
 }
 
+.market-static-notice {
+    margin: 0 0 1rem;
+    padding: 0.9rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(191, 135, 0, 0.28);
+    background: linear-gradient(135deg, rgba(255, 248, 220, 0.95), rgba(255, 241, 204, 0.88));
+    color: #8a5a00;
+    font-size: 0.95rem;
+    font-weight: 700;
+    box-shadow: 0 16px 36px rgba(191, 135, 0, 0.12);
+}
+
 .profile-layout {
     display: grid;
     grid-template-columns: minmax(260px, 312px) minmax(0, 1fr);
