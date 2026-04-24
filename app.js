@@ -84,11 +84,13 @@ const starredFallback = [
     }
 ];
 
+const CNBLOGS_HOME_URL = 'https://www.cnblogs.com/fix-me';
+
 const articleFallback = [
     {
-        title: '博客园文章列表',
-        link: 'https://www.cnblogs.com/fix-me/my-articles',
-        summary: '这里会展示最近同步到的博客园文章；如果外部站点暂时不可用，至少保留一个直达入口，避免页面留白。',
+        title: '博客园主页',
+        link: CNBLOGS_HOME_URL,
+        summary: '这里会展示最近从博客园主页获取到的文章；如果外部站点暂时不可用，至少保留一个直达主页入口，避免页面留白。',
         published_at: null,
         source: '博客园',
         isFallbackHub: true
@@ -142,7 +144,9 @@ const MAX_URL_LABEL_LENGTH = 96;
 const URL_TRUNCATE_LENGTH = 93;
 const ARTICLE_SUMMARY_TRUNCATE_LENGTH = 120;
 const ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO = 0.6;
-const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, .postTitle2 a, #myposts .titlelnk, a.entrylistItemTitle, a[href*="/p/"]';
+const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"]';
+const CNBLOGS_HOME_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_HOME_URL)}`;
+const CNBLOGS_RSS_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${CNBLOGS_HOME_URL}/rss`)}`;
 const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
 const GOLD_CHANGE_KEYS = ['chg_percentage', 'change_percent', 'change_percentage', 'changePercentage'];
 const GOLD_PREVIOUS_PRICE_KEYS = ['previous_close_price', 'prev_close_price', 'open_price'];
@@ -358,8 +362,8 @@ function renderArticleSummary(articles) {
     setTextAll('[data-article-count]', placeholderOnly ? '待刷新' : String(items.length));
     setTextAll('[data-article-last-updated]', placeholderOnly ? '待刷新' : fmtDate(latestDate));
     setTextAll('[data-article-last-updated-hero]', placeholderOnly ? '待刷新' : fmtDate(latestDate));
-    setTextAll('[data-article-latest-title]', placeholderOnly ? '博客园文章列表' : safeText(latestArticle?.title, '暂无'));
-    setTextAll('[data-article-source]', placeholderOnly ? '博客园入口' : safeText(latestArticle?.source, '博客园'));
+    setTextAll('[data-article-latest-title]', placeholderOnly ? '博客园主页' : safeText(latestArticle?.title, '暂无'));
+    setTextAll('[data-article-source]', placeholderOnly ? '博客园主页' : safeText(latestArticle?.source, '博客园'));
 }
 
 function buildArticleMarkup(articles, limit = articles.length) {
@@ -368,10 +372,10 @@ function buildArticleMarkup(articles, limit = articles.length) {
         const summary = safeText(
             article.summary,
             article.isFallbackHub
-                ? '直接打开博客园文章列表，查看全部公开文章。'
+                ? '直接打开博客园主页，查看最新公开文章。'
                 : '文章摘要暂时不可用，可以直接打开原文继续阅读。'
         );
-        const actionLabel = article.isFallbackHub ? '打开文章列表' : '阅读原文';
+        const actionLabel = article.isFallbackHub ? '打开博客园主页' : '阅读原文';
         const publishedText = article.published_at ? fmtDate(article.published_at) : '待同步';
 
         return `
@@ -451,34 +455,34 @@ function parseCnblogsArticleList(html, source) {
 
 const cnblogsArticleCandidates = [
     {
+        source: '博客园主页',
+        requestUrl: CNBLOGS_HOME_URL,
+        parser: parseCnblogsArticleList,
+        accept: 'text/html,application/xhtml+xml'
+    },
+    {
+        source: '博客园主页 / allorigins',
+        requestUrl: CNBLOGS_HOME_PROXY_URL,
+        parser: parseCnblogsArticleList,
+        accept: 'text/html,application/xhtml+xml'
+    },
+    {
         source: '博客园 RSS',
-        requestUrl: 'https://www.cnblogs.com/fix-me/rss',
+        requestUrl: `${CNBLOGS_HOME_URL}/rss`,
         parser: parseCnblogsRss,
         accept: 'application/rss+xml,application/xml,text/xml'
     },
     {
         source: '博客园 RSS / rss.xml',
-        requestUrl: 'https://www.cnblogs.com/fix-me/rss.xml',
+        requestUrl: `${CNBLOGS_HOME_URL}/rss.xml`,
         parser: parseCnblogsRss,
         accept: 'application/rss+xml,application/xml,text/xml'
     },
     {
         source: '博客园 RSS / allorigins',
-        requestUrl: 'https://api.allorigins.win/raw?url=https%3A%2F%2Fwww.cnblogs.com%2Ffix-me%2Frss',
+        requestUrl: CNBLOGS_RSS_PROXY_URL,
         parser: parseCnblogsRss,
         accept: 'application/rss+xml,application/xml,text/xml'
-    },
-    {
-        source: '博客园文章页',
-        requestUrl: 'https://www.cnblogs.com/fix-me/my-articles',
-        parser: parseCnblogsArticleList,
-        accept: 'text/html,application/xhtml+xml'
-    },
-    {
-        source: '博客园文章页 / allorigins',
-        requestUrl: 'https://api.allorigins.win/raw?url=https%3A%2F%2Fwww.cnblogs.com%2Ffix-me%2Fmy-articles',
-        parser: parseCnblogsArticleList,
-        accept: 'text/html,application/xhtml+xml'
     }
 ];
 
@@ -514,7 +518,7 @@ async function hydrateArticles() {
     if (!hasArticleTargets) return;
 
     renderArticles(articleFallback);
-    updateArticleStatus('已先展示博客园文章入口，联网后会自动刷新为最近文章。');
+    updateArticleStatus('已先展示博客园主页入口，联网后会自动刷新为最近文章。');
 
     try {
         const articles = await loadCnblogsArticles();
@@ -522,10 +526,10 @@ async function hydrateArticles() {
             renderArticles(articles);
             updateArticleStatus('博客园文章已刷新，展示的是最近获取到的公开文章。');
         } else {
-            updateArticleStatus('暂时未能连接博客园，页面已保留文章入口。');
+            updateArticleStatus('暂时未能连接博客园，页面已保留主页入口。');
         }
     } catch (error) {
-        updateArticleStatus('暂时未能连接博客园，页面已保留文章入口。');
+        updateArticleStatus('暂时未能连接博客园，页面已保留主页入口。');
         console.warn('Failed to load cnblogs articles', error);
     }
 }
