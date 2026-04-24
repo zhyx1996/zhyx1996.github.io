@@ -646,16 +646,18 @@ const changeHTML = (c) => {
 function renderMarket(data) {
     const container = document.getElementById('market-grid');
     if (!container) return;
+    const fxFacts = [
+        { label: 'USD / CNY', value: fmtFxLine('1', '美元', data.usdCny, '人民币') },
+        { label: 'SGD / CNY', value: fmtFxLine('1', '新币', data.sgdCny, '人民币') },
+        { label: 'CNY / JPY', value: fmtFxLine('1', '人民币', data.jpyPerCny, '日元', 2) }
+    ];
 
     container.innerHTML = `
         <article class="market-card glass-card">
             <small>外汇汇率</small>
-            <strong class="market-value">${fmtRate(data.usdCny)}</strong>
-            <span class="market-change">${fmtFxLine('1', '美元', data.usdCny, '人民币')}</span>
-            ${renderMarketFacts([
-                { label: 'SGD / CNY', value: fmtFxLine('1', '新币', data.sgdCny, '人民币') },
-                { label: 'CNY / JPY', value: fmtFxLine('1', '人民币', data.jpyPerCny, '日元', 2) }
-            ])}
+            <strong class="market-value">3 组常看汇率</strong>
+            <span class="market-change">按 1 单位基准货币换算</span>
+            ${renderMarketFacts(fxFacts)}
         </article>
         <article class="market-card glass-card">
             <small>现货黄金</small>
