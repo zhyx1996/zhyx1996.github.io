@@ -124,7 +124,7 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
 const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
-const GOLD_HISTORY_LOOKBACK_DAYS = [1, 2, 3, 4];
+const GOLD_HISTORY_LOOKBACK_DAYS = [1, 2, 3];
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
 const GAS92_MIN_SAMPLE_COUNT = 3;
 const GAS92_ROW_HINT_KEYWORDS = [
@@ -152,8 +152,7 @@ const pickFirstDefined = (source, keys) => {
     return null;
 };
 const isoDateDaysAgo = (days) => {
-    const date = new Date();
-    date.setUTCDate(date.getUTCDate() - days);
+    const date = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     return date.toISOString().slice(0, 10);
 };
 
@@ -817,7 +816,10 @@ async function loadGoldPriceSnapshot() {
         previousUsdPerOunce = null;
     }
 
-    let historySource = previousUsdPerOunce ? 'Gold-API（当日开盘/前收参考）' : '历史接口暂不可用';
+    let historySource = '历史接口暂不可用';
+    if (previousUsdPerOunce) {
+        historySource = 'Gold-API（当日开盘/前收参考）';
+    }
     for (let index = 0; index < historyResults.length; index += 1) {
         const historyResult = historyResults[index];
         if (historyResult.status !== 'fulfilled' || !historyResult.value.ok) continue;
