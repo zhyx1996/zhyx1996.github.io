@@ -134,7 +134,6 @@ const pickFirstDefined = (source, keys) => {
 };
 
 const totalRepoStars = (repos) => repos.reduce((sum, repo) => sum + Number(repo?.stargazers_count || 0), 0);
-const totalRepoForks = (repos) => repos.reduce((sum, repo) => sum + Number(repo?.forks_count || 0), 0);
 const sortByUpdated = (items) => [...items].sort((left, right) => new Date(right?.updated_at || 0) - new Date(left?.updated_at || 0));
 const collectLanguages = (items) => [...new Set(items.map((item) => safeText(item?.language, '')).filter(Boolean))];
 const getLatestUpdated = (items) => sortByUpdated(items)[0]?.updated_at || null;
@@ -202,6 +201,18 @@ function renderRepoSummary(repos) {
 
 function renderRepos(repos) {
     const items = sortByUpdated(repos);
+    if (!items.length) {
+        renderMarkup('project-list', `
+            <article class="repo-card glass-card">
+                <span class="tag">Repositories</span>
+                <h3>暂时没有可展示的公开仓库</h3>
+                <p class="repo-description">GitHub 接口没有返回公开仓库时，这里会保留一个空态提示，避免页面直接留白。</p>
+            </article>
+        `);
+        renderRepoSummary(repoFallback);
+        return;
+    }
+
     const markup = items.map((repo) => {
         const tag = repoShowcaseMeta[repo.name]?.label || safeText(repo.language, 'Repository');
         const homepageUrl = repo.homepage ? safeUrl(repo.homepage, '') : '';
@@ -236,6 +247,21 @@ function renderRepos(repos) {
 
 function renderStarred(starredRepos) {
     const items = sortByUpdated(starredRepos);
+    if (!items.length) {
+        renderMarkup('star-list', `
+            <article class="repo-card star-card glass-card">
+                <span class="tag">Stars</span>
+                <h3>暂时没有可展示的收藏项目</h3>
+                <p class="repo-description">如果 GitHub Star 接口暂时不可用，页面会继续保留静态收藏摘要而不是出现空白区域。</p>
+            </article>
+        `);
+        setText('star-count', '0');
+        setText('star-language-count', '0');
+        setText('star-top-name', '暂无');
+        setText('star-last-updated', '未知');
+        return;
+    }
+
     const topStar = getMostStarred(items);
     const markup = items.map((repo) => `
         <article class="repo-card star-card glass-card">
@@ -296,8 +322,11 @@ async function hydrateGithubData() {
         if (reposRes.status === 'fulfilled' && reposRes.value.ok) {
             const repoData = await reposRes.value.json();
             if (Array.isArray(repoData) && repoData.length) {
-                repos = repoData.filter((repo) => !repo.private);
-                hasLiveRepos = repos.length > 0;
+                const publicRepos = repoData.filter((repo) => !repo.private);
+                if (publicRepos.length) {
+                    repos = publicRepos;
+                    hasLiveRepos = true;
+                }
             }
         }
 
