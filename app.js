@@ -125,6 +125,7 @@ const escapeHtml = (value) => String(value ?? '')
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
 const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
 const GOLD_HISTORY_LOOKBACK_DAY_OFFSETS = [1, 2, 3];
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
 const GAS92_MIN_SAMPLE_COUNT = 3;
 const GAS92_ROW_HINT_KEYWORDS = [
@@ -152,7 +153,7 @@ const pickFirstDefined = (source, keys) => {
     return null;
 };
 const isoDateDaysAgo = (days) => {
-    const date = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const date = new Date(Date.now() - days * MILLISECONDS_PER_DAY);
     return date.toISOString().slice(0, 10);
 };
 
@@ -661,8 +662,9 @@ function renderMarket(data) {
                     label: '历史价格',
                     value: data.gold.previousUsdPerOunce != null
                         ? `$${fmtPrice(data.gold.previousUsdPerOunce, 2)}`
-                        : safeText(data.gold.historySource, '历史接口暂不可用')
+                        : '暂无'
                 },
+                { label: '历史来源', value: safeText(data.gold.historySource, '历史接口暂不可用') },
                 { label: '数据来源', value: safeText(data.gold.source, '静态摘要') }
             ])}
         </article>
