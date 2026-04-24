@@ -190,7 +190,7 @@ function renderRepos(repos) {
         <article class="repo-card">
             <div class="repo-title-row">
                 <span class="tag">${escapeHtml(safeText(repo.language, '未标注语言'))}</span>
-                <span class="pill">Pinned</span>
+                <span class="pill">Featured</span>
             </div>
             <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">${escapeHtml(repo.name)}</a></h3>
             <p class="repo-description">${escapeHtml(safeText(repo.description, '这个仓库暂未填写公开简介，可直接打开仓库查看 README 和代码。'))}</p>
