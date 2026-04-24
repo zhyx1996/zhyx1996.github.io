@@ -84,6 +84,17 @@ const starredFallback = [
     }
 ];
 
+const articleFallback = [
+    {
+        title: '博客园文章列表',
+        link: 'https://www.cnblogs.com/fix-me/my-articles',
+        summary: '这里会展示最近同步到的博客园文章；如果外部站点暂时不可用，至少保留一个直达入口，避免页面留白。',
+        published_at: null,
+        source: '博客园',
+        isFallbackHub: true
+    }
+];
+
 const repoShowcaseMeta = {
     lane2seq: { label: 'Vision' },
     'pcl-boundary_omp': { label: 'Point Cloud' },
@@ -125,6 +136,10 @@ const GAS92_VALUE_PATTERN = /(\d+(?:\.\d{1,3})?)/g;
 const GAS92_PRICE_WITH_UNIT_PATTERN = /(\d+(?:\.\d{1,3})?)\s*(?:元\/升|元每升|\/L|每升)/gi;
 const MAX_URL_LABEL_LENGTH = 96;
 const URL_TRUNCATE_LENGTH = 93;
+const ARTICLE_SUMMARY_TRUNCATE_LENGTH = 120;
+const ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO = 0.6;
+const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, .postTitle2 a, #myposts .titlelnk, a.entrylistItemTitle, a[href*="/p/"]';
+const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
 
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
@@ -138,6 +153,11 @@ const sortByUpdated = (items) => [...items].sort((left, right) => new Date(right
 const collectLanguages = (items) => [...new Set(items.map((item) => safeText(item?.language, '')).filter(Boolean))];
 const getLatestUpdated = (items) => sortByUpdated(items)[0]?.updated_at || null;
 const getMostStarred = (items) => [...items].sort((left, right) => Number(right?.stargazers_count || 0) - Number(left?.stargazers_count || 0))[0] || null;
+const toTimestamp = (value) => {
+    const time = new Date(value || 0).getTime();
+    return Number.isFinite(time) ? time : 0;
+};
+const sortArticles = (items) => [...items].sort((left, right) => toTimestamp(right?.published_at || right?.updated_at) - toTimestamp(left?.published_at || left?.updated_at));
 
 const safeUrl = (value, fallback = '#') => {
     try {
@@ -151,6 +171,12 @@ const safeUrl = (value, fallback = '#') => {
 const setText = (id, value) => {
     const element = document.getElementById(id);
     if (element) element.textContent = value;
+};
+
+const setTextAll = (selector, value) => {
+    document.querySelectorAll(selector).forEach((element) => {
+        element.textContent = value;
+    });
 };
 
 const setHref = (id, value) => {
@@ -286,6 +312,212 @@ function renderStarred(starredRepos) {
     setText('star-top-name', safeText(topStar?.full_name || topStar?.name, '暂无'));
     setText('star-last-updated', fmtDate(getLatestUpdated(items)));
     renderMarkup('star-list', markup);
+}
+
+const stripHtmlTags = (value) => {
+    const doc = new DOMParser().parseFromString(`<body>${String(value ?? '')}</body>`, 'text/html');
+    return normalizeWhitespace(doc.body?.textContent || '');
+};
+
+const normalizeArticle = (item) => ({
+    title: normalizeWhitespace(item?.title),
+    link: safeUrl(item?.link, ''),
+    summary: normalizeWhitespace(item?.summary || item?.description || ''),
+    published_at: item?.published_at || item?.pubDate || item?.date || null,
+    source: safeText(item?.source, '博客园'),
+    isFallbackHub: Boolean(item?.isFallbackHub)
+});
+
+function buildSummaryExcerpt(value, maxLength = ARTICLE_SUMMARY_TRUNCATE_LENGTH) {
+    const text = normalizeWhitespace(value);
+    if (!text || text.length <= maxLength) return text;
+
+    const slice = text.slice(0, maxLength + 1);
+    const boundary = slice.lastIndexOf(' ');
+    const hasUsefulBoundary = boundary !== -1 && boundary > Math.floor(maxLength * ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO);
+    const end = hasUsefulBoundary ? boundary : maxLength;
+    return `${slice.slice(0, end).trimEnd()}…`;
+}
+
+function renderArticleSummary(articles) {
+    const items = sortArticles(articles);
+    const placeholderOnly = items.length === 1 && items[0]?.isFallbackHub;
+    const latestArticle = items[0] || null;
+    const latestDate = latestArticle?.published_at || latestArticle?.updated_at || null;
+
+    setTextAll('[data-article-count]', placeholderOnly ? '待刷新' : String(items.length));
+    setTextAll('[data-article-last-updated]', placeholderOnly ? '待刷新' : fmtDate(latestDate));
+    setTextAll('[data-article-last-updated-hero]', placeholderOnly ? '待刷新' : fmtDate(latestDate));
+    setTextAll('[data-article-latest-title]', placeholderOnly ? '博客园文章列表' : safeText(latestArticle?.title, '暂无'));
+    setTextAll('[data-article-source]', placeholderOnly ? '博客园入口' : safeText(latestArticle?.source, '博客园'));
+}
+
+function buildArticleMarkup(articles, limit = articles.length) {
+    return sortArticles(articles).slice(0, limit).map((article) => {
+        const title = safeText(article.title, '未命名文章');
+        const summary = safeText(
+            article.summary,
+            article.isFallbackHub
+                ? '直接打开博客园文章列表，查看全部公开文章。'
+                : '文章摘要暂时不可用，可以直接打开原文继续阅读。'
+        );
+        const actionLabel = article.isFallbackHub ? '打开文章列表' : '阅读原文';
+        const publishedText = article.published_at ? fmtDate(article.published_at) : '待同步';
+
+        return `
+            <article class="repo-card article-card glass-card">
+                <div class="repo-title-row">
+                    <span class="tag">${escapeHtml(safeText(article.source, '博客园'))}</span>
+                    <span class="pill">${escapeHtml(article.isFallbackHub ? '入口' : 'Article')}</span>
+                </div>
+                <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(article.link))}" target="_blank" rel="noreferrer">${escapeHtml(title)}</a></h3>
+                <p class="repo-description">${escapeHtml(summary)}</p>
+                <div class="repo-stats">
+                    <span>🕒 ${publishedText}</span>
+                </div>
+                <div class="repo-actions">
+                    <a class="button outline" href="${escapeHtml(safeUrl(article.link))}" target="_blank" rel="noreferrer">${actionLabel}</a>
+                </div>
+            </article>
+        `;
+    }).join('');
+}
+
+function renderArticles(rawArticles) {
+    const normalizedArticles = rawArticles.map(normalizeArticle).filter((article) => article.title && article.link);
+    const items = normalizedArticles.length ? normalizedArticles : articleFallback;
+
+    renderMarkup('article-list', buildArticleMarkup(items));
+    renderMarkup('article-highlight-list', buildArticleMarkup(items, 3));
+    renderArticleSummary(items);
+}
+
+function parseCnblogsRss(text, source) {
+    const xml = new DOMParser().parseFromString(text, 'application/xml');
+    if (xml.querySelector('parsererror')) return [];
+
+    return [...xml.querySelectorAll('item')].map((item) => ({
+        title: normalizeWhitespace(item.querySelector('title')?.textContent),
+        link: item.querySelector('link')?.textContent?.trim(),
+        summary: stripHtmlTags(item.querySelector('description')?.textContent),
+        published_at: item.querySelector('pubDate')?.textContent?.trim() || null,
+        source
+    })).filter((item) => item.title && item.link);
+}
+
+function parseCnblogsArticleList(html, source) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const anchors = [
+        ...doc.querySelectorAll(CNBLOGS_ARTICLE_SELECTORS)
+    ];
+    const seen = new Set();
+
+    return anchors.map((anchor) => {
+        const link = safeUrl(anchor.getAttribute('href') || anchor.href || '', '');
+        const title = normalizeWhitespace(anchor.textContent);
+        if (!title || !link || link === '#' || seen.has(link)) return null;
+        seen.add(link);
+
+        const container = anchor.closest('article, li, section, div');
+        const summaryNode = container?.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
+        const timeNode = container?.querySelector('time, .postDesc, .entrylistItemPostDesc + div, .article_manage');
+        const text = normalizeWhitespace(container?.textContent || '');
+        const timeText = timeNode?.getAttribute('datetime') || timeNode?.textContent?.trim() || '';
+        const timeMatch = timeText.match(CNBLOGS_DATE_PATTERN);
+        const dateMatch = timeMatch || text.slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH).match(CNBLOGS_DATE_PATTERN);
+        const summarySeed = summaryNode?.textContent
+            || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
+        const summary = buildSummaryExcerpt(summarySeed);
+
+        return {
+            title,
+            link,
+            summary,
+            published_at: timeText || dateMatch?.[0] || null,
+            source
+        };
+    }).filter(Boolean);
+}
+
+const cnblogsArticleCandidates = [
+    {
+        source: '博客园 RSS',
+        requestUrl: 'https://www.cnblogs.com/fix-me/rss',
+        parser: parseCnblogsRss,
+        accept: 'application/rss+xml,application/xml,text/xml'
+    },
+    {
+        source: '博客园 RSS / rss.xml',
+        requestUrl: 'https://www.cnblogs.com/fix-me/rss.xml',
+        parser: parseCnblogsRss,
+        accept: 'application/rss+xml,application/xml,text/xml'
+    },
+    {
+        source: '博客园 RSS / allorigins',
+        requestUrl: 'https://api.allorigins.win/raw?url=https%3A%2F%2Fwww.cnblogs.com%2Ffix-me%2Frss',
+        parser: parseCnblogsRss,
+        accept: 'application/rss+xml,application/xml,text/xml'
+    },
+    {
+        source: '博客园文章页',
+        requestUrl: 'https://www.cnblogs.com/fix-me/my-articles',
+        parser: parseCnblogsArticleList,
+        accept: 'text/html,application/xhtml+xml'
+    },
+    {
+        source: '博客园文章页 / allorigins',
+        requestUrl: 'https://api.allorigins.win/raw?url=https%3A%2F%2Fwww.cnblogs.com%2Ffix-me%2Fmy-articles',
+        parser: parseCnblogsArticleList,
+        accept: 'text/html,application/xhtml+xml'
+    }
+];
+
+async function loadCnblogsArticles() {
+    for (const candidate of cnblogsArticleCandidates) {
+        try {
+            const response = await fetchWithTimeout(candidate.requestUrl, {
+                headers: { Accept: candidate.accept }
+            }, 5000);
+            if (!response.ok) {
+                console.warn(`Failed to load cnblogs articles from ${candidate.source}: HTTP ${response.status}`, candidate.requestUrl);
+                continue;
+            }
+            const text = await response.text();
+            const articles = candidate.parser(text, candidate.source);
+            if (Array.isArray(articles) && articles.length) return articles;
+        } catch (error) {
+            console.warn(`Failed to load cnblogs articles from ${candidate.source}`, candidate.requestUrl, error);
+        }
+    }
+
+    return null;
+}
+
+async function hydrateArticles() {
+    const articleStatus = document.querySelectorAll('[data-article-status]');
+    const updateArticleStatus = (text) => articleStatus.forEach((node) => { node.textContent = text; });
+    const hasArticleTargets = Boolean(
+        articleStatus.length
+        || document.getElementById('article-list')
+        || document.getElementById('article-highlight-list')
+    );
+    if (!hasArticleTargets) return;
+
+    renderArticles(articleFallback);
+    updateArticleStatus('已先展示博客园文章入口，联网后会自动刷新为最近文章。');
+
+    try {
+        const articles = await loadCnblogsArticles();
+        if (articles?.length) {
+            renderArticles(articles);
+            updateArticleStatus('博客园文章已刷新，展示的是最近获取到的公开文章。');
+        } else {
+            updateArticleStatus('暂时未能连接博客园，页面已保留文章入口。');
+        }
+    } catch (error) {
+        updateArticleStatus('暂时未能连接博客园，页面已保留文章入口。');
+        console.warn('Failed to load cnblogs articles', error);
+    }
 }
 
 async function hydrateGithubData() {
@@ -644,5 +876,6 @@ async function hydrateMarketData() {
 
 window.addEventListener('DOMContentLoaded', () => {
     hydrateGithubData();
+    hydrateArticles();
     hydrateMarketData();
 });

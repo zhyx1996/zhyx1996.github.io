@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZYX | Cnblogs Articles</title>
+    <meta name="description" content="zhyx1996 的博客园文章展示页，集中展示最近同步到的网站文章与博客园原始入口。">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-inner">
+            <a class="brand" href="/index.html">
+                <span class="brand-mark">◉</span>
+                <span>zhyx1996</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/index.html">Overview</a></li>
+                <li><a href="/projects.html">Repositories</a></li>
+                <li><a href="/stars.html">Stars</a></li>
+                <li><a class="active" href="/articles.html">Articles</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="container page-shell">
+        <section class="page-banner compact-banner article-banner">
+            <div>
+                <span class="kicker">Articles</span>
+                <p class="page-eyebrow">Published portfolio / Cnblogs articles</p>
+                <h1>博客园文章展示</h1>
+                <p>
+                    这一页集中展示博客园文章入口与最近同步到的网站文章列表，方便把代码输出之外的文字内容也纳入统一展示。
+                    如果外部站点暂时不可用，这里仍会保留博客园文章列表的直达入口。
+                </p>
+                <div class="page-local-nav" aria-label="Article sections">
+                    <a href="#article-snapshot">Snapshot</a>
+                    <a href="#article-list-section">Recent articles</a>
+                    <a href="#article-notes">Reading notes</a>
+                </div>
+                <p class="status-banner" data-article-status>正在同步博客园文章...</p>
+            </div>
+            <div class="page-banner-meta hero-meta-stack">
+                <div class="banner-meta-card glass-card">
+                    <small>最近更新</small>
+                    <strong data-article-last-updated-hero>待刷新</strong>
+                    <span class="meta-note">按最近同步到的文章时间统计</span>
+                </div>
+                <div class="banner-meta-card glass-card">
+                    <small>来源</small>
+                    <strong data-article-source>博客园入口</strong>
+                    <span class="meta-note">优先读取博客园 RSS 或文章页</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="profile-layout projects-layout">
+            <aside class="sidebar-column">
+                <article class="profile-summary compact-profile glass-card">
+                    <h2>Article snapshot</h2>
+                    <p class="profile-bio">文章页聚焦文字输出本身：适合查看最近写了什么，以及快速跳回博客园原始页面继续阅读。</p>
+                    <div class="sidebar-meta">
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">文章数量</span>
+                            <strong data-article-count>待刷新</strong>
+                        </div>
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">最新文章</span>
+                            <strong data-article-latest-title>博客园文章列表</strong>
+                        </div>
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">入口</span>
+                            <strong>https://www.cnblogs.com/fix-me/my-articles</strong>
+                        </div>
+                    </div>
+                    <div class="button-row full-width">
+                        <a class="button primary full-width" href="https://www.cnblogs.com/fix-me/my-articles" target="_blank" rel="noreferrer">博客园文章列表</a>
+                        <a class="button secondary full-width" href="/index.html#articles">返回首页文章区</a>
+                    </div>
+                </article>
+            </aside>
+
+            <div class="content-column">
+                <section class="section" id="article-snapshot">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Article overview</h2>
+                            <p>用简洁指标先看博客园文章同步状态与最近更新时间。</p>
+                        </div>
+                        <span class="tag">Snapshot</span>
+                    </div>
+                    <div class="metrics-grid">
+                        <article class="metric-card glass-card">
+                            <small>同步文章</small>
+                            <strong data-article-count>待刷新</strong>
+                            <p class="muted">页面当前展示的文章数量。</p>
+                        </article>
+                        <article class="metric-card glass-card">
+                            <small>最近更新</small>
+                            <strong data-article-last-updated>待刷新</strong>
+                            <p class="muted">取最近同步到的网站文章时间。</p>
+                        </article>
+                        <article class="metric-card glass-card">
+                            <small>来源</small>
+                            <strong data-article-source>博客园入口</strong>
+                            <p class="muted">优先尝试 RSS，再回退到文章页解析。</p>
+                        </article>
+                        <article class="metric-card glass-card">
+                            <small>平台</small>
+                            <strong>博客园</strong>
+                            <p class="muted">用于集中展示个人公开文章输出。</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="section" id="article-list-section">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Recent articles</h2>
+                            <p>展示最近同步到的网站文章；如果暂时无法同步，也会保留博客园文章列表入口。</p>
+                        </div>
+                        <span class="tag">Articles</span>
+                    </div>
+                    <div class="repo-grid repo-grid-expanded" id="article-list">
+                        <article class="repo-card article-card glass-card">
+                            <span class="tag">博客园</span>
+                            <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/my-articles" target="_blank" rel="noreferrer">博客园文章列表</a></h3>
+                            <p class="repo-description">这里会展示最近同步到的博客园文章；如果暂时无法联网，也会保留直达文章列表的入口。</p>
+                            <div class="repo-actions">
+                                <a class="button outline" href="https://www.cnblogs.com/fix-me/my-articles" target="_blank" rel="noreferrer">打开文章列表</a>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="section" id="article-notes">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Reading notes</h2>
+                            <p>把博客文章纳入站点展示后，浏览路径会更完整。</p>
+                        </div>
+                        <span class="tag">Guide</span>
+                    </div>
+                    <div class="grid-3 info-grid">
+                        <article class="card glass-card">
+                            <span class="badge">01</span>
+                            <h3>先看最近同步</h3>
+                            <p>优先查看最近同步到本站的文章，快速了解最近在输出什么主题。</p>
+                        </article>
+                        <article class="card glass-card">
+                            <span class="badge">02</span>
+                            <h3>再跳回博客园</h3>
+                            <p>需要完整目录、评论或原始排版时，可直接跳回博客园文章页继续阅读。</p>
+                        </article>
+                        <article class="card glass-card">
+                            <span class="badge">03</span>
+                            <h3>和仓库页互补</h3>
+                            <p>仓库页展示代码资产，文章页展示文字总结，两者共同构成更完整的公开输出。</p>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>ZYX · zhyx1996.github.io · Cnblogs articles</p>
+            <p>文章数据优先来自博客园公开 RSS / 页面；接口不可用时保留文章列表入口。</p>
+        </div>
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
+</html>
