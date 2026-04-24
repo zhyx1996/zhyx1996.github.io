@@ -421,16 +421,17 @@ function parseCnblogsArticleList(html, source) {
         const summaryNode = container?.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
         const timeNode = container?.querySelector('time, .postDesc, .entrylistItemPostDesc + div, .article_manage');
         const text = normalizeWhitespace(container?.textContent || '');
-        const dateMatch = text.match(CNBLOGS_DATE_PATTERN);
+        const timeText = timeNode?.getAttribute('datetime') || timeNode?.textContent?.trim() || '';
+        const dateMatch = timeText.match(CNBLOGS_DATE_PATTERN) || text.slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH).match(CNBLOGS_DATE_PATTERN);
         const summarySeed = summaryNode?.textContent
-            || (text.startsWith(title) ? text.slice(title.length).trim() : text.split(title).join('').trim());
+            || (text.startsWith(title) ? text.slice(title.length).trim() : text.replaceAll(title, '').trim());
         const summary = buildSummaryExcerpt(summarySeed);
 
         return {
             title,
             link,
             summary,
-            published_at: timeNode?.getAttribute('datetime') || timeNode?.textContent?.trim() || dateMatch?.[0] || null,
+            published_at: timeText || dateMatch?.[0] || null,
             source
         };
     }).filter(Boolean);
@@ -466,12 +467,6 @@ const cnblogsArticleCandidates = [
         requestUrl: 'https://api.allorigins.win/raw?url=https%3A%2F%2Fwww.cnblogs.com%2Ffix-me%2Fmy-articles',
         parser: parseCnblogsArticleList,
         accept: 'text/html,application/xhtml+xml'
-    },
-    {
-        source: '博客园文章页 / jina',
-        requestUrl: 'https://r.jina.ai/http://www.cnblogs.com/fix-me/my-articles',
-        parser: parseCnblogsArticleList,
-        accept: 'text/plain,text/html'
     }
 ];
 
