@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZYX | GitHub 风格个人主页</title>
-    <meta name="description" content="zhyx1996 个人主页，采用 GitHub 风格布局展示计算机视觉、并行计算、公开项目与实时行情。">
+    <title>ZYX | 计算机视觉与并行计算主页</title>
+    <meta name="description" content="zhyx1996 的正式个人主页，聚焦计算机视觉、并行计算、公开仓库索引与实时市场快照。">
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -14,11 +14,11 @@
                 <span class="brand-mark">◉</span>
                 <span>zhyx1996</span>
             </a>
-            <div class="nav-context">GitHub 风格 · Overview</div>
+            <div class="nav-context">Published portfolio · Overview</div>
             <ul class="nav-links">
                 <li><a class="active" href="/index.html">Overview</a></li>
                 <li><a href="/projects.html">Repositories</a></li>
-                <li><a href="#stars">Stars</a></li>
+                <li><a href="/stars.html">Stars</a></li>
                 <li><a href="#market">Market</a></li>
                 <li><a href="#links">Links</a></li>
             </ul>
@@ -28,27 +28,37 @@
     <div class="subnav">
         <div class="subnav-inner">
             <a class="active" href="/index.html">Overview</a>
-            <a href="/projects.html">Repositories</a>
-            <a href="#featured-projects">Pinned</a>
-            <a href="#stars">Stars</a>
+            <a href="#focus">Focus</a>
             <a href="#market">Insights</a>
+            <a href="#links">Quick links</a>
         </div>
     </div>
 
     <main class="container page-shell">
-        <section class="page-banner">
+        <section class="page-banner hero-banner">
             <div>
-                <span class="kicker">Personal README</span>
-                <h1>把主页整理成更像 GitHub Profile 的样子</h1>
+                <span class="kicker">Overview</span>
+                <h1>计算机视觉与并行计算的长期实验记录</h1>
                 <p>
-                    这页保留公开仓库、Star、市场快照和常用入口，但整体布局切到更克制的 GitHub 风格：
-                    左侧看个人信息，右侧直接看 pinned repo、动态摘要和常用链接。
+                    这里是 zhyx1996 的正式个人主页：用更稳定、可发布的方式整理个人方向、GitHub 概览、实时市场快照与常用入口。
+                    仓库展示与 Stars 已拆分到独立页面，首页专注介绍我在做什么，以及你可以从哪里快速进入。
                 </p>
+                <div class="button-row banner-actions">
+                    <a class="button primary" id="profile-link" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">访问 GitHub</a>
+                    <a class="button secondary" href="/projects.html">查看仓库</a>
+                    <a class="button secondary" href="/stars.html">查看 Stars</a>
+                </div>
             </div>
-            <div class="page-banner-meta">
-                <div class="banner-meta-card">
+            <div class="page-banner-meta hero-meta-stack">
+                <div class="banner-meta-card glass-card">
                     <small>资料最近更新</small>
                     <strong id="hero-updated">2026年4月11日</strong>
+                    <span class="meta-note">同步 GitHub 公开资料</span>
+                </div>
+                <div class="banner-meta-card glass-card">
+                    <small>当前定位</small>
+                    <strong>Computer Vision · Parallel Computing</strong>
+                    <span class="meta-note">Lane Detection · CUDA · OpenMP</span>
                 </div>
                 <p class="status-banner" data-github-status>正在同步 GitHub 公开资料...</p>
             </div>
@@ -56,50 +66,27 @@
 
         <div class="profile-layout">
             <aside class="sidebar-column">
-                <article class="profile-summary">
+                <article class="profile-summary glass-card">
                     <img class="avatar avatar-xl" id="profile-avatar" src="https://avatars.githubusercontent.com/u/74281356?v=4" alt="zhyx1996 avatar">
                     <h2 id="profile-name">ZYX</h2>
                     <p class="profile-login" id="profile-login">@zhyx1996</p>
                     <p class="profile-bio" id="profile-bio">围绕计算机视觉、自动驾驶感知、并行计算与个人实验项目做持续实践。</p>
                     <div class="button-row full-width">
-                        <a class="button primary full-width" id="profile-link" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">查看 GitHub Profile</a>
-                        <a class="button secondary full-width" href="/projects.html">进入项目页</a>
+                        <a class="button primary full-width" href="/projects.html">浏览全部仓库</a>
+                        <a class="button secondary full-width" href="/stars.html">浏览 Stars 页面</a>
                     </div>
                     <div class="sidebar-meta">
-                        <div class="sidebar-meta-item">
-                            <span class="meta-label">定位</span>
-                            <strong>计算机视觉 / 并行计算</strong>
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">Research</span>
+                            <strong>视觉感知 / 传统方法 + 深度学习</strong>
                         </div>
-                        <div class="sidebar-meta-item">
-                            <span class="meta-label">方向</span>
-                            <strong>Lane Detection · CUDA · OpenMP</strong>
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">Engineering</span>
+                            <strong>CUDA / OpenMP / 数据处理效率优化</strong>
                         </div>
-                        <div class="sidebar-meta-item">
-                            <span class="meta-label">风格</span>
-                            <strong>GitHub-like · 简洁卡片 · 数据驱动</strong>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="card sidebar-card">
-                    <div class="section-heading compact">
-                        <div>
-                            <h2>当前关注</h2>
-                            <p>把主页左栏做成类似 GitHub profile summary。</p>
-                        </div>
-                    </div>
-                    <div class="stat-list">
-                        <div class="stat-item">
-                            <strong>🧠 视觉感知</strong>
-                            <span>继续整理车道线检测、目标感知相关实验，把传统方法与深度学习结果放在同一条线上对照。</span>
-                        </div>
-                        <div class="stat-item">
-                            <strong>⚡ 性能优化</strong>
-                            <span>围绕 CUDA 与 OpenMP 做热点流程加速，重点放在图像和点云处理的效率提升。</span>
-                        </div>
-                        <div class="stat-item">
-                            <strong>☁️ 开源记录</strong>
-                            <span>用 GitHub 公开仓库保存阶段性成果，也把常用入口和资料索引集中到这张主页里。</span>
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">Open Source</span>
+                            <strong>公开仓库、实验记录与脚本沉淀</strong>
                         </div>
                     </div>
                 </article>
@@ -109,28 +96,28 @@
                 <section class="section" aria-label="GitHub 统计摘要">
                     <div class="section-heading">
                         <div>
-                            <h2>Overview</h2>
-                            <p>用 GitHub profile 一样的摘要卡片先看整体数据。</p>
+                            <h2>Live overview</h2>
+                            <p>首页只保留整体概览，让访问者先快速理解方向、活跃度和公开信息。</p>
                         </div>
-                        <span class="tag">Live Summary</span>
+                        <span class="tag">Snapshot</span>
                     </div>
                     <div class="metrics-grid">
-                        <article class="metric-card">
+                        <article class="metric-card glass-card">
                             <small>公开仓库</small>
                             <strong id="repo-count">4</strong>
-                            <p class="muted">按 GitHub 公开资料统计。</p>
+                            <p class="muted">所有公开仓库数量。</p>
                         </article>
-                        <article class="metric-card">
+                        <article class="metric-card glass-card">
                             <small>关注者</small>
                             <strong id="follower-count">0</strong>
-                            <p class="muted">同步自 GitHub 个人主页。</p>
+                            <p class="muted">来自 GitHub 公开资料。</p>
                         </article>
-                        <article class="metric-card">
+                        <article class="metric-card glass-card">
                             <small>正在关注</small>
                             <strong id="following-count">0</strong>
-                            <p class="muted">保留社交侧信息。</p>
+                            <p class="muted">保留个人社交侧信息。</p>
                         </article>
-                        <article class="metric-card">
+                        <article class="metric-card glass-card">
                             <small>累计 Stars</small>
                             <strong id="total-stars">1</strong>
                             <p class="muted">统计公开仓库收到的星标。</p>
@@ -138,91 +125,38 @@
                     </div>
                 </section>
 
-                <section class="section" id="featured-projects">
+                <section class="section" id="focus">
                     <div class="section-heading">
                         <div>
-                            <h2>Featured repositories</h2>
-                            <p>优先把最近值得看的公开仓库排成 GitHub 风格卡片。</p>
+                            <h2>Current focus</h2>
+                            <p>把首页作为对外简介，重点说明方向，而不是重复列出仓库与 Stars。</p>
                         </div>
-                        <span class="tag">Featured</span>
-                    </div>
-                    <div class="repo-grid" id="repo-list">
-                        <article class="repo-card">
-                            <span class="tag">Jupyter Notebook</span>
-                            <h3>lane2seq</h3>
-                            <p>基于 OpenCV、ENet 与 Vision Transformer 的车道线检测实验项目。</p>
-                            <div class="repo-stats">
-                                <span>⭐ 1</span>
-                                <span>🕒 2026年4月10日</span>
-                            </div>
-                        </article>
-                    </div>
-                    <p class="status-inline" data-github-status>正在同步 GitHub 公开资料...</p>
-                </section>
-
-                <section class="section grid-2" id="github-live">
-                    <article class="profile-card card">
-                        <div>
-                            <span class="tag">Profile snapshot</span>
-                            <h3><span id="hero-name">ZYX</span> 的主页摘要</h3>
-                            <p class="muted">主页不再是大块横幅，而是更接近 GitHub Overview 的信息面板布局。</p>
-                            <div class="button-row">
-                                <a class="button outline" id="hero-link" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">打开 GitHub</a>
-                                <a class="button outline" href="/projects.html">浏览仓库列表</a>
-                            </div>
-                        </div>
-                    </article>
-                    <article class="card">
                         <span class="tag">Focus</span>
-                        <h3>最近在做什么</h3>
-                        <div class="timeline">
-                            <article class="timeline-item">
-                                <span class="timeline-label">🧪 车道线检测实验</span>
-                                <p>整理传统视觉流程与 Lane2Seq 相关实验的输入、输出和效果对比。</p>
-                            </article>
-                            <article class="timeline-item">
-                                <span class="timeline-label">⚡ 并行优化</span>
-                                <p>把图像与点云处理中的耗时环节拆出来，尝试用 CUDA / OpenMP 提升吞吐。</p>
-                            </article>
-                            <article class="timeline-item">
-                                <span class="timeline-label">🤖 模型复现</span>
-                                <p>围绕 ENet、Vision Transformer 等模型做感知任务复现，并记录可重复的配置。</p>
-                            </article>
-                            <article class="timeline-item">
-                                <span class="timeline-label">🛠 工具沉淀</span>
-                                <p>把平时会反复用到的脚本和环境测试代码拆出去，减少实验时的重复劳动。</p>
-                            </article>
-                        </div>
-                    </article>
-                </section>
-
-                <section class="section" id="stars">
-                    <div class="section-heading">
-                        <div>
-                            <h2>Star 展示</h2>
-                            <p>继续同步最近点过 Star 的项目，但展示方式统一到同一套卡片语言。</p>
-                        </div>
-                        <span class="tag">Stars</span>
                     </div>
-                    <div class="repo-grid star-grid" id="star-list">
-                        <article class="repo-card star-card">
-                            <span class="tag">TypeScript</span>
-                            <h3>smallmain / vscode-unify-chat-provider</h3>
-                            <p>把多个 LLM API 提供方接到 VS Code Copilot Chat 的聚合型扩展。</p>
-                            <div class="repo-stats">
-                                <span>⭐ 366</span>
-                                <span>🕒 2026年4月13日</span>
-                            </div>
+                    <div class="grid-3 info-grid">
+                        <article class="card glass-card">
+                            <span class="badge">Vision</span>
+                            <h3>车道线与感知实验</h3>
+                            <p>持续整理传统视觉流程、Lane2Seq 相关实验，以及不同方法在场景感知中的对照结果。</p>
+                        </article>
+                        <article class="card glass-card">
+                            <span class="badge">Performance</span>
+                            <h3>并行计算与性能优化</h3>
+                            <p>围绕 CUDA、OpenMP 和图像/点云处理热点流程做性能优化，把实验结果沉淀为可复用工程片段。</p>
+                        </article>
+                        <article class="card glass-card">
+                            <span class="badge">Documentation</span>
+                            <h3>实验沉淀与对外展示</h3>
+                            <p>把公开仓库、收藏项目和常用链接拆成更清晰的页面结构，提升浏览体验与可维护性。</p>
                         </article>
                     </div>
-                    <p class="status-inline" data-star-status>正在同步我的 Star 列表...</p>
                 </section>
 
                 <section class="section" id="market">
                     <div class="section-heading">
                         <div>
-                            <h2>市场行情</h2>
-                            <p>行情模块保留，但换成和整站统一的中性色卡片样式。</p>
+                            <h2>Market snapshot</h2>
+                            <p>保留常看的行情参考，作为技术工作之外的轻量信息面板。</p>
                         </div>
                         <span class="tag">Insights</span>
                     </div>
@@ -233,26 +167,34 @@
                 <section class="section" id="links">
                     <div class="section-heading">
                         <div>
-                            <h2>常用入口</h2>
-                            <p>像 GitHub profile 右侧资源区一样，保留最常访问的跳转入口。</p>
+                            <h2>Quick links</h2>
+                            <p>把核心入口集中到首页，便于快速进入 GitHub、仓库页和 Stars 页。</p>
                         </div>
-                        <span class="tag">Quick links</span>
+                        <span class="tag">Links</span>
                     </div>
                     <div class="links-grid">
-                        <article class="link-card">
+                        <article class="link-card glass-card">
                             <span class="tag">GitHub</span>
                             <h3>个人主页</h3>
-                            <p>查看 zhyx1996 的公开资料、仓库列表和最近更新时间。</p>
+                            <p>查看 zhyx1996 的公开资料、仓库列表与最近活动。</p>
                             <div class="button-row">
-                                <a class="button outline" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">打开 GitHub Profile</a>
+                                <a class="button outline" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">打开 GitHub</a>
                             </div>
                         </article>
-                        <article class="link-card">
-                            <span class="tag">Projects</span>
-                            <h3>项目索引页</h3>
-                            <p>把视觉、点云并行优化、CUDA 测试和常用工具仓库整理成一页，便于快速跳转。</p>
+                        <article class="link-card glass-card">
+                            <span class="tag">Repositories</span>
+                            <h3>全部公开仓库</h3>
+                            <p>进入独立仓库页，按更新时间浏览所有公开项目与技术方向。</p>
                             <div class="button-row">
-                                <a class="button outline" href="/projects.html">打开项目页</a>
+                                <a class="button outline" href="/projects.html">打开仓库页</a>
+                            </div>
+                        </article>
+                        <article class="link-card glass-card">
+                            <span class="tag">Stars</span>
+                            <h3>收藏项目清单</h3>
+                            <p>单独查看最近收藏的公开项目，了解灵感来源与关注方向。</p>
+                            <div class="button-row">
+                                <a class="button outline" href="/stars.html">打开 Stars 页</a>
                             </div>
                         </article>
                     </div>
@@ -263,7 +205,7 @@
 
     <footer class="footer">
         <div class="footer-inner">
-            <p>ZYX · zhyx1996.github.io · GitHub 风格个人主页</p>
+            <p>ZYX · zhyx1996.github.io · Published portfolio</p>
             <p>数据来自 GitHub 公开 API、开放金融接口与公开油价页面；无法联网时自动回退到静态摘要。</p>
         </div>
     </footer>
