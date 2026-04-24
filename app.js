@@ -124,7 +124,7 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
 const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
-const GOLD_HISTORY_LOOKBACK_DAYS = [1, 2, 3];
+const GOLD_HISTORY_LOOKBACK_DAY_OFFSETS = [1, 2, 3];
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
 const GAS92_MIN_SAMPLE_COUNT = 3;
 const GAS92_ROW_HINT_KEYWORDS = [
@@ -658,7 +658,7 @@ function renderMarket(data) {
             ${renderMarketFacts([
                 { label: '美元 / 盎司', value: `$${fmtPrice(data.gold.usdPerOunce, 2)}` },
                 {
-                    label: '昨日参考',
+                    label: '历史价格',
                     value: data.gold.previousUsdPerOunce != null
                         ? `$${fmtPrice(data.gold.previousUsdPerOunce, 2)}`
                         : safeText(data.gold.historySource, '历史接口暂不可用')
@@ -795,7 +795,7 @@ async function loadGas92Price() {
 }
 
 async function loadGoldPriceSnapshot() {
-    const historyDates = GOLD_HISTORY_LOOKBACK_DAYS.map((days) => isoDateDaysAgo(days));
+    const historyDates = GOLD_HISTORY_LOOKBACK_DAY_OFFSETS.map((days) => isoDateDaysAgo(days));
     const [currentResult, ...historyResults] = await Promise.allSettled([
         fetchWithTimeout(GOLD_API_BASE_URL, {
             headers: { Accept: 'application/json' }
@@ -820,7 +820,7 @@ async function loadGoldPriceSnapshot() {
     if (previousUsdPerOunce) {
         historySource = 'Gold-API（当日开盘/前收参考）';
     }
-    for (let index = 0; index < historyResults.length; index += 1) {
+    for (let index = 0; index < historyResults.length; index++) {
         const historyResult = historyResults[index];
         if (historyResult.status !== 'fulfilled' || !historyResult.value.ok) continue;
         const historyData = await historyResult.value.json();
