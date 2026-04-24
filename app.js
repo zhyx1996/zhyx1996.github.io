@@ -148,8 +148,8 @@ const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTit
 const CNBLOGS_HOME_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_HOME_URL)}`;
 const CNBLOGS_RSS_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${CNBLOGS_HOME_URL}/rss`)}`;
 const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
-const GOLD_CHANGE_KEYS = ['chg_percentage', 'change_percent', 'change_percentage', 'changePercentage'];
-const GOLD_PREVIOUS_PRICE_KEYS = ['previous_close_price', 'prev_close_price', 'open_price'];
+const GOLD_CHANGE_KEYS = ['chg_percentage', 'change_percent', 'change_percentage', 'changePercentage', 'changePercent', 'chp'];
+const GOLD_PREVIOUS_PRICE_KEYS = ['previous_close_price', 'prev_close_price', 'previous_close', 'prev_close', 'open_price', 'open'];
 
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
@@ -160,6 +160,13 @@ const pickFirstDefined = (source, keys) => {
 const isoDateDaysAgo = (days) => {
     const date = new Date(Date.now() - days * MILLISECONDS_PER_DAY);
     return date.toISOString().slice(0, 10);
+};
+const buildGoldHistoryCandidates = (historyDate) => {
+    const compactDate = historyDate.replaceAll('-', '');
+    return [
+        { historyDate, requestUrl: `${GOLD_API_BASE_URL}/${historyDate}` },
+        ...(compactDate === historyDate ? [] : [{ historyDate, requestUrl: `${GOLD_API_BASE_URL}/${compactDate}` }])
+    ];
 };
 
 const totalRepoStars = (repos) => repos.reduce((sum, repo) => sum + Number(repo?.stargazers_count || 0), 0);
@@ -803,6 +810,7 @@ async function loadGas92Price() {
 
 async function loadGoldPriceSnapshot() {
     const historyDates = GOLD_HISTORY_LOOKBACK_DAY_OFFSETS.map((days) => isoDateDaysAgo(days));
+    const historyCandidates = historyDates.flatMap((historyDate) => buildGoldHistoryCandidates(historyDate));
     const [currentPrimaryResult, currentLegacyResult, ...historyResults] = await Promise.allSettled([
         fetchWithTimeout(GOLD_API_BASE_URL, {
             headers: { Accept: 'application/json' }
@@ -810,7 +818,7 @@ async function loadGoldPriceSnapshot() {
         fetchWithTimeout(GOLD_LEGACY_API_URL, {
             headers: { Accept: 'application/json' }
         }, 5000),
-        ...historyDates.map((historyDate) => fetchWithTimeout(`${GOLD_API_BASE_URL}/${historyDate}`, {
+        ...historyCandidates.map((candidate) => fetchWithTimeout(candidate.requestUrl, {
             headers: { Accept: 'application/json' }
         }, 5000))
     ]);
@@ -844,12 +852,13 @@ async function loadGoldPriceSnapshot() {
     }
     for (let index = 0; index < historyResults.length; index++) {
         const historyResult = historyResults[index];
+        const candidate = historyCandidates[index];
         if (historyResult.status !== 'fulfilled' || !historyResult.value.ok) continue;
         const historyData = await historyResult.value.json();
         const historyPrice = Number(pickFirstDefined(historyData, ['price', 'price_usd', 'price_ounce', 'price_per_ounce']));
         if (Number.isFinite(historyPrice) && historyPrice > 0) {
             previousUsdPerOunce = historyPrice;
-            historySource = `Gold-API（${historyDates[index]}）`;
+            historySource = `Gold-API（${candidate.historyDate}）`;
             break;
         }
     }
