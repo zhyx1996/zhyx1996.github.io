@@ -361,12 +361,13 @@ async function hydrateGithubData() {
 }
 
 const marketFallback = {
-    usdCny: 7.278,
-    sgdCny: 5.394,
-    jpyPerCny: 20.53,
-    gold: { usdPerOunce: 2380, cnyPerGram: 557, change24h: null },
-    btc: { usd: 83000, cnyPerBtc: 603240, change24h: null },
-    gas92: { cnyPerLiter: 7.98, note: '当前展示全国参考价', source: '静态摘要' }
+    asOf: '2026-04-24T00:00:00Z',
+    usdCny: 6.836,
+    sgdCny: 5.35,
+    jpyPerCny: 23.31,
+    gold: { usdPerOunce: 4710, cnyPerGram: 1035.18, change24h: null },
+    btc: { usd: 65800, cnyPerBtc: 449809, change24h: null },
+    gas92: { cnyPerLiter: 8.29, note: '当前展示全国 92# 汽油参考价', source: '静态快照（2026-04-24）' }
 };
 
 const fmtRate = (n, d = 4) => n != null ? Number(n).toFixed(d) : '暂无';
@@ -537,10 +538,18 @@ async function loadGas92Price() {
 async function hydrateMarketData() {
     const marketContainer = document.getElementById('market-grid');
     const statusEl = document.querySelector('[data-market-status]');
-    if (!marketContainer && !statusEl) return;
+    const fallbackNoticeEl = document.querySelector('[data-market-fallback-note]');
+    if (!marketContainer && !statusEl && !fallbackNoticeEl) return;
     const updateMarketStatus = (text) => { if (statusEl) statusEl.textContent = text; };
+    const fallbackDateText = fmtDate(marketFallback.asOf);
+    const updateFallbackNotice = (text, visible = true) => {
+        if (!fallbackNoticeEl) return;
+        fallbackNoticeEl.textContent = text;
+        fallbackNoticeEl.hidden = !visible;
+    };
 
     renderMarket(marketFallback);
+    updateFallbackNotice(`当前展示静态行情参考（快照日期：${fallbackDateText}），联网成功后会自动刷新。`);
     updateMarketStatus('正在刷新汇率、黄金、比特币与 92# 汽油...');
 
     try {
@@ -562,6 +571,8 @@ async function hydrateMarketData() {
         let hasLiveData = false;
         let hasLiveGas92 = false;
         let hasLiveUsdCny = false;
+        let hasLiveCrypto = false;
+        let hasLiveGold = false;
 
         if (ratesResult.status === 'fulfilled' && ratesResult.value.ok) {
             const ratesData = await ratesResult.value.json();
@@ -584,6 +595,7 @@ async function hydrateMarketData() {
                     cnyPerBtc: cryptoData.bitcoin.cny,
                     change24h: cryptoData.bitcoin.usd_24h_change ?? null
                 };
+                hasLiveCrypto = true;
             }
             hasLiveData = true;
         }
@@ -599,6 +611,7 @@ async function hydrateMarketData() {
                     cnyPerGram: (usdPerOunce * marketData.usdCny) / GOLD_TROY_OUNCE_GRAMS,
                     change24h: goldChange24h
                 };
+                hasLiveGold = true;
                 hasLiveData = true;
             }
         }
@@ -609,6 +622,12 @@ async function hydrateMarketData() {
         }
 
         renderMarket(marketData);
+        const fullyLive = hasLiveUsdCny && hasLiveCrypto && hasLiveGold && hasLiveGas92;
+        if (fullyLive) {
+            updateFallbackNotice('', false);
+        } else {
+            updateFallbackNotice(`当前仍含静态行情参考（静态快照日期：${fallbackDateText}）；待接口补齐后会自动替换。`);
+        }
         if (hasLiveData || hasLiveGas92) {
             const now = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
             const gasText = hasLiveGas92 ? '92# 汽油也已刷新' : '92# 汽油暂未刷新，仍显示本地参考价';
