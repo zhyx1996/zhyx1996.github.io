@@ -84,7 +84,8 @@ const starredFallback = [
     }
 ];
 
-const CNBLOGS_HOME_URL = 'https://www.cnblogs.com/fix-me';
+const CNBLOGS_BLOG_APP = 'zhyx1996';
+const CNBLOGS_HOME_URL = `https://www.cnblogs.com/${CNBLOGS_BLOG_APP}`;
 
 const articleFallback = [
     {
@@ -145,6 +146,10 @@ const URL_TRUNCATE_LENGTH = 93;
 const ARTICLE_SUMMARY_TRUNCATE_LENGTH = 120;
 const ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO = 0.6;
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"]';
+const CNBLOGS_OPEN_API_POSTS_URL = `https://api.cnblogs.com/api/blog/posts/@${CNBLOGS_BLOG_APP}?pageIndex=1&pageSize=10`;
+const CNBLOGS_OPEN_API_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_OPEN_API_POSTS_URL)}`;
+const CNBLOGS_WCF_POSTS_URL = `https://wcf.open.cnblogs.com/blog/u/${CNBLOGS_BLOG_APP}/posts/1/10`;
+const CNBLOGS_WCF_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_WCF_POSTS_URL)}`;
 const CNBLOGS_HOME_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_HOME_URL)}`;
 const CNBLOGS_RSS_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${CNBLOGS_HOME_URL}/rss`)}`;
 const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
@@ -419,6 +424,51 @@ function parseCnblogsRss(text, source) {
     })).filter((item) => item.title && item.link);
 }
 
+function parseCnblogsOpenApiPosts(text, source) {
+    try {
+        const payload = JSON.parse(text);
+        const items = Array.isArray(payload) ? payload : payload?.items;
+        if (!Array.isArray(items)) return [];
+
+        return items.map((item) => ({
+            title: normalizeWhitespace(item?.title),
+            link: item?.url?.trim() || item?.link?.trim() || '',
+            summary: buildSummaryExcerpt(stripHtmlTags(item?.summary || item?.description || item?.excerpt || '')),
+            published_at: item?.postDate || item?.dateAdded || item?.published_at || null,
+            source
+        })).filter((item) => item.title && item.link);
+    } catch {
+        return [];
+    }
+}
+
+function parseCnblogsWcfPosts(text, source) {
+    const xml = new DOMParser().parseFromString(text, 'application/xml');
+    if (xml.querySelector('parsererror')) return [];
+
+    return [...xml.querySelectorAll('entry, post')].map((item) => ({
+        title: normalizeWhitespace(
+            item.querySelector('title')?.textContent
+            || item.querySelector('Title')?.textContent
+        ),
+        link: item.querySelector('id')?.textContent?.trim()
+            || item.querySelector('link')?.getAttribute('href')
+            || item.querySelector('Url')?.textContent?.trim()
+            || '',
+        summary: buildSummaryExcerpt(stripHtmlTags(
+            item.querySelector('summary')?.textContent
+            || item.querySelector('content')?.textContent
+            || item.querySelector('Summary')?.textContent
+            || ''
+        )),
+        published_at: item.querySelector('published')?.textContent?.trim()
+            || item.querySelector('updated')?.textContent?.trim()
+            || item.querySelector('PublishDate')?.textContent?.trim()
+            || null,
+        source
+    })).filter((item) => item.title && item.link);
+}
+
 function parseCnblogsArticleList(html, source) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const anchors = [
@@ -454,6 +504,30 @@ function parseCnblogsArticleList(html, source) {
 }
 
 const cnblogsArticleCandidates = [
+    {
+        source: '博客园开放 API',
+        requestUrl: CNBLOGS_OPEN_API_POSTS_URL,
+        parser: parseCnblogsOpenApiPosts,
+        accept: 'application/json,text/plain'
+    },
+    {
+        source: '博客园开放 API / allorigins',
+        requestUrl: CNBLOGS_OPEN_API_PROXY_URL,
+        parser: parseCnblogsOpenApiPosts,
+        accept: 'application/json,text/plain'
+    },
+    {
+        source: '博客园开放 API / WCF',
+        requestUrl: CNBLOGS_WCF_POSTS_URL,
+        parser: parseCnblogsWcfPosts,
+        accept: 'application/atom+xml,application/xml,text/xml'
+    },
+    {
+        source: '博客园开放 API / WCF / allorigins',
+        requestUrl: CNBLOGS_WCF_PROXY_URL,
+        parser: parseCnblogsWcfPosts,
+        accept: 'application/atom+xml,application/xml,text/xml'
+    },
     {
         source: '博客园主页',
         requestUrl: CNBLOGS_HOME_URL,
