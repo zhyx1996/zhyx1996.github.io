@@ -251,7 +251,8 @@ a {
 }
 
 .hero-grid {
-    inset: auto -8% -16% auto;
+    right: -8%;
+    bottom: -16%;
     width: min(48vw, 520px);
     height: min(34vw, 340px);
     border-radius: 36px;
@@ -922,10 +923,6 @@ a {
         width: 100%;
     }
 
-    .hero-grid,
-    .hero-beam {
-        display: none;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -939,7 +936,9 @@ a {
         opacity: 0.46;
         transform: none;
     }
+}
 
+@media (max-width: 640px), (prefers-reduced-motion: reduce) {
     .hero-grid,
     .hero-beam {
         display: none;
