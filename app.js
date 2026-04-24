@@ -325,6 +325,16 @@ const normalizeArticle = (item) => ({
     isFallbackHub: Boolean(item?.isFallbackHub)
 });
 
+function buildSummaryExcerpt(value, maxLength = ARTICLE_SUMMARY_TRUNCATE_LENGTH) {
+    const text = normalizeWhitespace(value);
+    if (!text || text.length <= maxLength) return text;
+
+    const slice = text.slice(0, maxLength + 1);
+    const boundary = slice.lastIndexOf(' ');
+    const end = boundary > Math.floor(maxLength * 0.6) ? boundary : maxLength;
+    return `${slice.slice(0, end).trimEnd()}…`;
+}
+
 function renderArticleSummary(articles) {
     const items = sortArticles(articles);
     const placeholderOnly = items.length === 1 && items[0]?.isFallbackHub;
@@ -409,10 +419,9 @@ function parseCnblogsArticleList(html, source) {
         const timeNode = container?.querySelector('time, .postDesc, .entrylistItemPostDesc + div, .article_manage');
         const text = normalizeWhitespace(container?.textContent || '');
         const dateMatch = text.match(/\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/);
-        const summary = normalizeWhitespace(
-            summaryNode?.textContent
-            || text.replace(title, '').slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH)
-        );
+        const summarySeed = summaryNode?.textContent
+            || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
+        const summary = buildSummaryExcerpt(summarySeed);
 
         return {
             title,
@@ -474,7 +483,7 @@ async function loadCnblogsArticles() {
             const articles = candidate.parser(text, candidate.source);
             if (Array.isArray(articles) && articles.length) return articles;
         } catch (error) {
-            console.warn('Failed to load cnblogs articles', candidate.requestUrl, error);
+            console.warn(`Failed to load cnblogs articles from ${candidate.source}`, candidate.requestUrl, error);
         }
     }
 
