@@ -211,7 +211,6 @@ function renderRepos(repos) {
             <p class="repo-description">${escapeHtml(safeText(repo.description, '可以直接跳转到 GitHub 查看完整说明、提交记录和后续更新。'))}</p>
             <div class="repo-stats">
                 <span>⭐ ${repo.stargazers_count ?? 0}</span>
-                <span>🕒 ${fmtDate(repo.updated_at)}</span>
             </div>
             <div class="repo-actions">
                 <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">GitHub 详情</a>
