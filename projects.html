@@ -3,134 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZYX | 项目页</title>
-    <meta name="description" content="zhyx1996 的公开项目页，展示 lane2seq、PCL OMP、CUDA 与工具仓库。">
+    <title>ZYX | GitHub 风格项目页</title>
+    <meta name="description" content="zhyx1996 的 GitHub 风格项目页，集中展示公开仓库、Star 项目与直达链接。">
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <nav class="navbar">
+    <header class="site-header">
         <div class="nav-inner">
-            <a class="brand" href="/index.html">ZYX · Homepage</a>
+            <a class="brand" href="/index.html">
+                <span class="brand-mark">◉</span>
+                <span>zhyx1996</span>
+            </a>
+            <div class="nav-search">GitHub 风格 · Repositories</div>
             <ul class="nav-links">
-                <li><a href="/index.html">首页</a></li>
-                <li><a class="active" href="/projects.html">项目页</a></li>
-                <li><a href="#project-list-section">最近更新</a></li>
-                <li><a href="#project-links">直达链接</a></li>
+                <li><a href="/index.html">Overview</a></li>
+                <li><a class="active" href="/projects.html">Repositories</a></li>
+                <li><a href="#project-links">Direct links</a></li>
+                <li><a href="#stars">Stars</a></li>
             </ul>
         </div>
-    </nav>
+    </header>
+
+    <div class="subnav">
+        <div class="subnav-inner">
+            <a href="/index.html">Overview</a>
+            <a class="active" href="/projects.html">Repositories</a>
+            <a href="#project-list-section">Latest</a>
+            <a href="#project-links">Direct links</a>
+            <a href="#stars">Stars</a>
+        </div>
+    </div>
 
     <main class="container page-shell">
-        <section class="hero page-hero">
-            <div class="hero-copy">
-                <span class="kicker">📂 zhyx1996 · 公开项目</span>
+        <section class="page-banner compact-banner">
+            <div>
+                <span class="kicker">Repositories</span>
                 <h1><span id="hero-name">ZYX</span> 的公开项目索引</h1>
                 <p>
-                    这里集中放置视觉算法、点云处理、CUDA 试验和日常工具仓库，
-                    方便快速了解最近公开出来的内容，也便于从主页继续往下展开看细节。
+                    这一页专门看仓库：列表、直达链接、最近 Star 项目都改成更像 GitHub repository overview 的排版，
+                    减少花里胡哨的装饰，重点突出仓库信息本身。
                 </p>
-                <div class="hero-badges">
-                    <span class="badge">lane2seq</span>
-                    <span class="badge">pcl-boundary_omp</span>
-                    <span class="badge">cuda_test</span>
-                    <span class="badge">utils</span>
-                </div>
-                <div class="button-row">
-                    <a class="button primary" href="https://github.com/zhyx1996?tab=repositories" target="_blank" rel="noreferrer">仓库总览</a>
-                    <a class="button secondary" href="/index.html">返回首页</a>
-                </div>
-                <p class="status" data-github-status>正在同步 GitHub 公开资料...</p>
+                <p class="status-banner" data-github-status>正在同步 GitHub 公开资料...</p>
             </div>
-            <aside class="hero-panel">
-                <h2>项目画像</h2>
-                <div class="stat-list">
-                    <div class="stat-item">
-                        <strong>车道线检测</strong>
-                        <span>lane2seq 主要承接传统视觉方法与深度学习方案的对照实验。</span>
-                    </div>
-                    <div class="stat-item">
-                        <strong>点云与并行</strong>
-                        <span>pcl-boundary_omp 聚焦 PCL BoundaryEstimation 的 OpenMP 加速与工程化实现。</span>
-                    </div>
-                    <div class="stat-item">
-                        <strong>轻量工具</strong>
-                        <span>cuda_test 和 utils 更偏向日常验证、环境测试以及小工具沉淀。</span>
-                    </div>
+            <div class="page-banner-meta">
+                <div class="banner-meta-card">
+                    <small>展示方式</small>
+                    <strong>Repository-first</strong>
                 </div>
+                <div class="banner-meta-card">
+                    <small>视觉风格</small>
+                    <strong>GitHub-like</strong>
+                </div>
+            </div>
+        </section>
+
+        <div class="profile-layout projects-layout">
+            <aside class="sidebar-column">
+                <article class="profile-summary compact-profile">
+                    <h2>项目画像</h2>
+                    <p class="profile-bio">
+                        这里集中放视觉算法、点云处理、CUDA 试验和常用工具仓库，方便直接进入 README、代码和提交记录。
+                    </p>
+                    <div class="sidebar-meta">
+                        <div class="sidebar-meta-item">
+                            <span class="meta-label">Vision</span>
+                            <strong>lane2seq / 感知实验</strong>
+                        </div>
+                        <div class="sidebar-meta-item">
+                            <span class="meta-label">Parallel</span>
+                            <strong>pcl-boundary_omp / CUDA Test</strong>
+                        </div>
+                        <div class="sidebar-meta-item">
+                            <span class="meta-label">Utility</span>
+                            <strong>utils / 环境与脚本沉淀</strong>
+                        </div>
+                    </div>
+                    <div class="button-row full-width">
+                        <a class="button primary full-width" href="https://github.com/zhyx1996?tab=repositories" target="_blank" rel="noreferrer">仓库总览</a>
+                        <a class="button secondary full-width" href="/index.html">返回首页</a>
+                    </div>
+                </article>
             </aside>
-        </section>
 
-        <section class="section" id="project-list-section">
-            <div class="section-heading">
-                <div>
-                    <h2>最近更新仓库</h2>
-                    <p>优先展示最近公开更新的项目，方便从这一页直接进入对应仓库。</p>
-                </div>
-                <span class="tag">Latest Repos</span>
-            </div>
-            <div class="repo-grid" id="project-list">
-                <article class="repo-card">
-                    <div class="inline-list">
-                        <span class="tag">Jupyter Notebook</span>
-                        <span class="pill">最近更新 2026年4月10日</span>
+            <div class="content-column">
+                <section class="section" id="project-list-section">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Latest repositories</h2>
+                            <p>优先显示最近更新的仓库，方便直接查看最近活跃内容。</p>
+                        </div>
+                        <span class="tag">Latest</span>
                     </div>
-                    <h3>lane2seq</h3>
-                    <p>基于 OpenCV、ENet 与 Vision Transformer 的车道线检测实验项目。</p>
-                    <div class="button-row">
-                        <a class="button outline" href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">GitHub 详情</a>
+                    <div class="repo-grid" id="project-list">
+                        <article class="repo-card">
+                            <div class="inline-list">
+                                <span class="tag">Jupyter Notebook</span>
+                                <span class="pill">最近更新 2026年4月10日</span>
+                            </div>
+                            <h3>lane2seq</h3>
+                            <p>基于 OpenCV、ENet 与 Vision Transformer 的车道线检测实验项目。</p>
+                            <div class="button-row">
+                                <a class="button outline" href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">GitHub 详情</a>
+                            </div>
+                        </article>
                     </div>
-                </article>
-            </div>
-            <p class="status-inline" data-github-status>正在同步 GitHub 公开资料...</p>
-        </section>
+                    <p class="status-inline" data-github-status>正在同步 GitHub 公开资料...</p>
+                </section>
 
-        <section class="section" id="project-links">
-            <div class="section-heading">
-                <div>
-                    <h2>直达链接</h2>
-                    <p>下面保留固定入口，适合在想直接看 README、代码或提交记录时快速跳转。</p>
-                </div>
-                <span class="tag">Direct Links</span>
-            </div>
-            <div class="grid-2" id="project-links-grid">
-                <article class="contact-card">
-                    <span class="tag">Vision</span>
-                    <h3>lane2seq</h3>
-                    <p>聚焦车道线检测流程整理，以及 Lane2Seq 相关深度学习实验。</p>
-                    <div class="button-row">
-                        <a class="button outline" href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">打开仓库</a>
+                <section class="section" id="project-links">
+                    <div class="section-heading">
+                        <div>
+                            <h2>直达链接</h2>
+                            <p>保留固定入口，适合想直接打开 README、代码或提交记录时快速跳转。</p>
+                        </div>
+                        <span class="tag">Direct links</span>
                     </div>
-                </article>
-            </div>
-        </section>
+                    <div class="grid-2" id="project-links-grid">
+                        <article class="contact-card">
+                            <span class="tag">Vision</span>
+                            <h3>lane2seq</h3>
+                            <p>聚焦车道线检测流程整理，以及 Lane2Seq 相关深度学习实验。</p>
+                            <div class="button-row">
+                                <a class="button outline" href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">打开仓库</a>
+                            </div>
+                        </article>
+                    </div>
+                </section>
 
-        <section class="section" id="stars">
-            <div class="section-heading">
-                <div>
-                    <h2>我 Star 的项目</h2>
-                    <p>保留最近点过 Star 的仓库，方便在项目页继续快速回看。</p>
-                </div>
-                <span class="tag">Starred Repositories</span>
-            </div>
-            <div class="repo-grid star-grid" id="project-star-list">
-                <article class="repo-card star-card">
-                    <span class="tag">TypeScript</span>
-                    <h3>smallmain / vscode-unify-chat-provider</h3>
-                    <p>把多个 LLM API 提供方接到 VS Code Copilot Chat 的聚合型扩展。</p>
-                    <div class="repo-stats">
-                        <span>⭐ 366</span>
-                        <span>🕒 2026年4月13日</span>
+                <section class="section" id="stars">
+                    <div class="section-heading">
+                        <div>
+                            <h2>我 Star 的项目</h2>
+                            <p>继续保留最近点过 Star 的仓库，方便在项目页快速回看灵感来源。</p>
+                        </div>
+                        <span class="tag">Stars</span>
                     </div>
-                </article>
+                    <div class="repo-grid star-grid" id="project-star-list">
+                        <article class="repo-card star-card">
+                            <span class="tag">TypeScript</span>
+                            <h3>smallmain / vscode-unify-chat-provider</h3>
+                            <p>把多个 LLM API 提供方接到 VS Code Copilot Chat 的聚合型扩展。</p>
+                            <div class="repo-stats">
+                                <span>⭐ 366</span>
+                                <span>🕒 2026年4月13日</span>
+                            </div>
+                        </article>
+                    </div>
+                    <p class="status-inline" data-star-status>正在同步我的 Star 列表...</p>
+                </section>
             </div>
-            <p class="status-inline" data-star-status>正在同步我的 Star 列表...</p>
-        </section>
+        </div>
     </main>
 
     <footer class="footer">
         <div class="footer-inner">
-            <p>ZYX · zhyx1996.github.io · 公开项目索引</p>
-            <p>页面优先展示 GitHub 公开数据，无法联网时会保留稳定的静态摘要与直达链接。</p>
+            <p>ZYX · zhyx1996.github.io · GitHub 风格项目索引</p>
+            <p>页面优先展示 GitHub 公开数据，无法联网时保留稳定静态摘要与直达链接。</p>
         </div>
     </footer>
 
