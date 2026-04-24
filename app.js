@@ -450,10 +450,11 @@ function fetchWithTimeout(url, options = {}, timeout = 5000) {
 }
 
 function normalizeWhitespace(value) {
-    return String(value || '').replace(/\s+/g, ' ').trim();
+    return String(value ?? '').replace(/\s+/g, ' ').trim();
 }
 
 function average(values) {
+    if (!values.length) return null;
     return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
