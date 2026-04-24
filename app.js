@@ -136,6 +136,7 @@ const GAS92_VALUE_PATTERN = /(\d+(?:\.\d{1,3})?)/g;
 const GAS92_PRICE_WITH_UNIT_PATTERN = /(\d+(?:\.\d{1,3})?)\s*(?:元\/升|元每升|\/L|每升)/gi;
 const MAX_URL_LABEL_LENGTH = 96;
 const URL_TRUNCATE_LENGTH = 93;
+const ARTICLE_SUMMARY_TRUNCATE_LENGTH = 120;
 
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
@@ -393,7 +394,7 @@ function parseCnblogsRss(text, source) {
 function parseCnblogsArticleList(html, source) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const anchors = [
-        ...doc.querySelectorAll('.entrylistPosttitle a, .postTitle2 a, .postTitl2 a, #myposts .titlelnk, a.entrylistItemTitle, a[href*="/p/"]')
+        ...doc.querySelectorAll('.entrylistPosttitle a, .postTitle2 a, #myposts .titlelnk, a.entrylistItemTitle, a[href*="/p/"]')
     ];
     const seen = new Set();
 
@@ -410,7 +411,7 @@ function parseCnblogsArticleList(html, source) {
         const dateMatch = text.match(/\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/);
         const summary = normalizeWhitespace(
             summaryNode?.textContent
-            || text.replace(title, '').slice(0, 120)
+            || text.replace(title, '').slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH)
         );
 
         return {
