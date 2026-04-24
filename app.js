@@ -140,7 +140,9 @@ const MAX_URL_LABEL_LENGTH = 96;
 const URL_TRUNCATE_LENGTH = 93;
 const ARTICLE_SUMMARY_TRUNCATE_LENGTH = 120;
 const ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO = 0.6;
-const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle a, #myposts .titlelnk, a.entrylistItemTitle, #mainContent a[href*="/p/"]';
+const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"]';
+const CNBLOGS_HOME_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_HOME_URL)}`;
+const CNBLOGS_RSS_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${CNBLOGS_HOME_URL}/rss`)}`;
 const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
 
 const pickFirstDefined = (source, keys) => {
@@ -450,7 +452,7 @@ const cnblogsArticleCandidates = [
     },
     {
         source: '博客园主页 / allorigins',
-        requestUrl: 'https://api.allorigins.win/raw?url=https%3A%2F%2Fwww.cnblogs.com%2Ffix-me',
+        requestUrl: CNBLOGS_HOME_PROXY_URL,
         parser: parseCnblogsArticleList,
         accept: 'text/html,application/xhtml+xml'
     },
@@ -468,7 +470,7 @@ const cnblogsArticleCandidates = [
     },
     {
         source: '博客园 RSS / allorigins',
-        requestUrl: 'https://api.allorigins.win/raw?url=https%3A%2F%2Fwww.cnblogs.com%2Ffix-me%2Frss',
+        requestUrl: CNBLOGS_RSS_PROXY_URL,
         parser: parseCnblogsRss,
         accept: 'application/rss+xml,application/xml,text/xml'
     }
