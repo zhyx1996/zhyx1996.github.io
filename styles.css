@@ -933,4 +933,15 @@ a {
     .hero-beam {
         animation: none;
     }
+
+    .hero-orb {
+        filter: blur(10px);
+        opacity: 0.46;
+        transform: none;
+    }
+
+    .hero-grid,
+    .hero-beam {
+        display: none;
+    }
 }
