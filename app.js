@@ -123,6 +123,10 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
+const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
+const GOLD_LEGACY_API_URL = 'https://api.gold-api.com/price/XAU';
+const GOLD_HISTORY_LOOKBACK_DAY_OFFSETS = [1, 2, 3];
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
 const GAS92_MIN_SAMPLE_COUNT = 3;
 const GAS92_ROW_HINT_KEYWORDS = [
@@ -140,12 +144,18 @@ const ARTICLE_SUMMARY_TRUNCATE_LENGTH = 120;
 const ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO = 0.6;
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, .postTitle2 a, #myposts .titlelnk, a.entrylistItemTitle, a[href*="/p/"]';
 const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
+const GOLD_CHANGE_KEYS = ['chg_percentage', 'change_percent', 'change_percentage', 'changePercentage'];
+const GOLD_PREVIOUS_PRICE_KEYS = ['previous_close_price', 'prev_close_price', 'open_price'];
 
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
         if (source?.[key] != null) return source[key];
     }
     return null;
+};
+const isoDateDaysAgo = (days) => {
+    const date = new Date(Date.now() - days * MILLISECONDS_PER_DAY);
+    return date.toISOString().slice(0, 10);
 };
 
 const totalRepoStars = (repos) => repos.reduce((sum, repo) => sum + Number(repo?.stargazers_count || 0), 0);
@@ -597,7 +607,14 @@ const marketFallback = {
     usdCny: 6.836,
     sgdCny: 5.35,
     jpyPerCny: 23.31,
-    gold: { usdPerOunce: 4710, cnyPerGram: 1035.18, change24h: null },
+    gold: {
+        usdPerOunce: 4710,
+        cnyPerGram: 1035.18,
+        change24h: null,
+        previousUsdPerOunce: null,
+        source: '静态快照（2026-04-24）',
+        historySource: '静态快照'
+    },
     btc: { usd: 65800, cnyPerBtc: 449809, change24h: null },
     gas92: { cnyPerLiter: 8.29, note: '当前展示全国 92# 汽油参考价', source: '静态快照（2026-04-24）' }
 };
@@ -642,7 +659,14 @@ function renderMarket(data) {
             ${changeHTML(data.gold.change24h)}
             ${renderMarketFacts([
                 { label: '美元 / 盎司', value: `$${fmtPrice(data.gold.usdPerOunce, 2)}` },
-                { label: '换算说明', value: '按金衡盎司换算人民币克价' }
+                {
+                    label: '历史价格',
+                    value: data.gold.previousUsdPerOunce != null
+                        ? `$${fmtPrice(data.gold.previousUsdPerOunce, 2)}`
+                        : '暂无'
+                },
+                { label: '历史来源', value: safeText(data.gold.historySource, '历史接口暂不可用') },
+                { label: '数据来源', value: safeText(data.gold.source, '静态摘要') }
             ])}
         </article>
         <article class="market-card glass-card">
@@ -730,6 +754,11 @@ const gas92FetchPlans = [
         label: '金投网',
         url: 'https://gas.cngold.org/',
         parser: extractGas92PriceFromHtml
+    },
+    {
+        label: '汽油价格网',
+        url: 'https://www.qiyoujiage.com/',
+        parser: extractGas92PriceFromHtml
     }
 ];
 
@@ -768,6 +797,73 @@ async function loadGas92Price() {
     return null;
 }
 
+async function loadGoldPriceSnapshot() {
+    const historyDates = GOLD_HISTORY_LOOKBACK_DAY_OFFSETS.map((days) => isoDateDaysAgo(days));
+    const [currentPrimaryResult, currentLegacyResult, ...historyResults] = await Promise.allSettled([
+        fetchWithTimeout(GOLD_API_BASE_URL, {
+            headers: { Accept: 'application/json' }
+        }, 5000),
+        fetchWithTimeout(GOLD_LEGACY_API_URL, {
+            headers: { Accept: 'application/json' }
+        }, 5000),
+        ...historyDates.map((historyDate) => fetchWithTimeout(`${GOLD_API_BASE_URL}/${historyDate}`, {
+            headers: { Accept: 'application/json' }
+        }, 5000))
+    ]);
+
+    let currentData = null;
+    let source = null;
+    const currentCandidates = [
+        { result: currentPrimaryResult, source: 'Gold-API' },
+        { result: currentLegacyResult, source: 'Gold-API legacy' }
+    ];
+    for (const candidate of currentCandidates) {
+        if (candidate.result.status !== 'fulfilled' || !candidate.result.value.ok) continue;
+        currentData = await candidate.result.value.json();
+        source = candidate.source;
+        break;
+    }
+
+    if (!currentData) return null;
+
+    const usdPerOunce = Number(pickFirstDefined(currentData, ['price', 'price_usd', 'price_ounce', 'price_per_ounce']));
+    if (!Number.isFinite(usdPerOunce) || usdPerOunce <= 0) return null;
+
+    let previousUsdPerOunce = Number(pickFirstDefined(currentData, GOLD_PREVIOUS_PRICE_KEYS));
+    if (!Number.isFinite(previousUsdPerOunce) || previousUsdPerOunce <= 0) {
+        previousUsdPerOunce = null;
+    }
+
+    let historySource = '历史接口暂不可用';
+    if (previousUsdPerOunce) {
+        historySource = 'Gold-API（当日开盘/前收参考）';
+    }
+    for (let index = 0; index < historyResults.length; index++) {
+        const historyResult = historyResults[index];
+        if (historyResult.status !== 'fulfilled' || !historyResult.value.ok) continue;
+        const historyData = await historyResult.value.json();
+        const historyPrice = Number(pickFirstDefined(historyData, ['price', 'price_usd', 'price_ounce', 'price_per_ounce']));
+        if (Number.isFinite(historyPrice) && historyPrice > 0) {
+            previousUsdPerOunce = historyPrice;
+            historySource = `Gold-API（${historyDates[index]}）`;
+            break;
+        }
+    }
+
+    let change24h = pickFirstDefined(currentData, GOLD_CHANGE_KEYS);
+    if (change24h == null && previousUsdPerOunce) {
+        change24h = ((usdPerOunce - previousUsdPerOunce) / previousUsdPerOunce) * 100;
+    }
+
+    return {
+        usdPerOunce,
+        previousUsdPerOunce,
+        change24h,
+        source: source || 'Gold-API',
+        historySource
+    };
+}
+
 async function hydrateMarketData() {
     const marketContainer = document.getElementById('market-grid');
     const statusEl = document.querySelector('[data-market-status]');
@@ -782,14 +878,14 @@ async function hydrateMarketData() {
     };
 
     renderMarket(marketFallback);
-    updateFallbackNotice(`当前展示静态行情参考（快照日期：${fallbackDateText}），联网成功后会自动刷新。`);
+    updateFallbackNotice(`当前先展示静态行情参考（快照日期：${fallbackDateText}），联网后会按可用接口逐项刷新。`);
     updateMarketStatus('正在刷新汇率、黄金、比特币与 92# 汽油...');
 
     try {
         const [ratesResult, cryptoResult, goldResult, gas92Result] = await Promise.allSettled([
             fetch('https://open.er-api.com/v6/latest/USD'),
             fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,cny&include_24hr_change=true'),
-            fetch('https://api.gold-api.com/price/XAU'),
+            loadGoldPriceSnapshot(),
             loadGas92Price()
         ]);
 
@@ -833,20 +929,17 @@ async function hydrateMarketData() {
             hasLiveData = true;
         }
 
-        if (goldResult.status === 'fulfilled' && goldResult.value.ok && hasLiveUsdCny) {
-            const goldData = await goldResult.value.json();
-            const usdPerOunce = Number(pickFirstDefined(goldData, ['price', 'price_usd', 'price_ounce', 'price_per_ounce']));
-
-            if (Number.isFinite(usdPerOunce) && usdPerOunce > 0) {
-                const goldChange24h = pickFirstDefined(goldData, ['chg_percentage', 'change_percent', 'change_percentage']);
-                marketData.gold = {
-                    usdPerOunce,
-                    cnyPerGram: (usdPerOunce * marketData.usdCny) / GOLD_TROY_OUNCE_GRAMS,
-                    change24h: goldChange24h
-                };
-                hasLiveGold = true;
-                hasLiveData = true;
-            }
+        if (goldResult.status === 'fulfilled' && goldResult.value && hasLiveUsdCny) {
+            marketData.gold = {
+                usdPerOunce: goldResult.value.usdPerOunce,
+                previousUsdPerOunce: goldResult.value.previousUsdPerOunce,
+                cnyPerGram: (goldResult.value.usdPerOunce * marketData.usdCny) / GOLD_TROY_OUNCE_GRAMS,
+                change24h: goldResult.value.change24h,
+                source: goldResult.value.source,
+                historySource: goldResult.value.historySource
+            };
+            hasLiveGold = true;
+            hasLiveData = true;
         }
 
         if (gas92Result.status === 'fulfilled' && gas92Result.value) {
@@ -856,15 +949,27 @@ async function hydrateMarketData() {
 
         renderMarket(marketData);
         const fullyLive = hasLiveUsdCny && hasLiveCrypto && hasLiveGold && hasLiveGas92;
+        const refreshedItems = [
+            hasLiveUsdCny ? '汇率' : null,
+            hasLiveGold ? '黄金' : null,
+            hasLiveCrypto ? '比特币' : null,
+            hasLiveGas92 ? '92# 汽油' : null
+        ].filter(Boolean);
+        const fallbackItems = [
+            hasLiveUsdCny ? null : '汇率',
+            hasLiveGold ? null : '黄金',
+            hasLiveCrypto ? null : '比特币',
+            hasLiveGas92 ? null : '92# 汽油'
+        ].filter(Boolean);
         if (fullyLive) {
             updateFallbackNotice('', false);
         } else {
-            updateFallbackNotice(`当前仍含静态行情参考（静态快照日期：${fallbackDateText}）；待接口补齐后会自动替换。`);
+            updateFallbackNotice(`当前仍含静态行情参考（静态快照日期：${fallbackDateText}）：${fallbackItems.join('、')}仍为本地参考。`);
         }
         if (hasLiveData || hasLiveGas92) {
             const now = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
-            const gasText = hasLiveGas92 ? '92# 汽油也已刷新' : '92# 汽油暂未刷新，仍显示本地参考价';
-            updateMarketStatus(`汇率、黄金和比特币已更新；${gasText}（${now}）`);
+            const fallbackText = fallbackItems.length ? `；未刷新：${fallbackItems.join('、')}` : '';
+            updateMarketStatus(`已刷新：${refreshedItems.join('、')}${fallbackText}（${now}）`);
         } else {
             updateMarketStatus('行情接口暂时不可用，当前展示的是本地参考数据。');
         }
