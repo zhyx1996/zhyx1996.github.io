@@ -1,7 +1,7 @@
 const profileFallback = {
     name: 'ZYX',
     login: 'zhyx1996',
-    bio: '围绕计算机视觉、自动驾驶感知、并行计算与个人实验项目做持续实践。',
+    bio: '围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。',
     html_url: 'https://github.com/zhyx1996',
     avatar_url: 'https://avatars.githubusercontent.com/u/74281356?v=4',
     public_repos: 4,
