@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZYX | GitHub 风格项目页</title>
-    <meta name="description" content="zhyx1996 的 GitHub 风格项目页，集中展示公开仓库、Star 项目与直达链接。">
+    <title>ZYX | Public Repositories</title>
+    <meta name="description" content="zhyx1996 的公开仓库页面，集中展示所有公开 Repositories、技术方向与最新更新时间。">
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -14,12 +14,12 @@
                 <span class="brand-mark">◉</span>
                 <span>zhyx1996</span>
             </a>
-            <div class="nav-context">GitHub 风格 · Repositories</div>
+            <div class="nav-context">Published portfolio · Repositories</div>
             <ul class="nav-links">
                 <li><a href="/index.html">Overview</a></li>
                 <li><a class="active" href="/projects.html">Repositories</a></li>
-                <li><a href="#project-links">Direct links</a></li>
-                <li><a href="#stars">Stars</a></li>
+                <li><a href="/stars.html">Stars</a></li>
+                <li><a href="#project-list-section">All repos</a></li>
             </ul>
         </div>
     </header>
@@ -28,128 +28,142 @@
         <div class="subnav-inner">
             <a href="/index.html">Overview</a>
             <a class="active" href="/projects.html">Repositories</a>
-            <a href="#project-list-section">Latest</a>
-            <a href="#project-links">Direct links</a>
-            <a href="#stars">Stars</a>
+            <a href="#repo-snapshot">Snapshot</a>
+            <a href="#project-list-section">All repositories</a>
+            <a href="#repo-notes">How to browse</a>
         </div>
     </div>
 
     <main class="container page-shell">
-        <section class="page-banner compact-banner">
+        <section class="page-banner compact-banner repository-banner">
             <div>
                 <span class="kicker">Repositories</span>
-                <h1><span id="hero-name">ZYX</span> 的公开项目索引</h1>
+                <h1><span id="hero-name">ZYX</span> 的全部公开仓库</h1>
                 <p>
-                    这一页专门看仓库：列表、直达链接、最近 Star 项目都改成更像 GitHub repository overview 的排版，
-                    减少花里胡哨的装饰，重点突出仓库信息本身。
+                    这一页专注展示所有公开 Repositories：按最近更新时间排序，直接查看简介、语言、星标与仓库入口。
+                    首页与 Stars 页的重复内容已移除，仓库浏览体验集中在这里完成。
                 </p>
                 <p class="status-banner" data-github-status>正在同步 GitHub 公开资料...</p>
             </div>
-            <div class="page-banner-meta">
-                <div class="banner-meta-card">
-                    <small>展示方式</small>
-                    <strong>Repository-first</strong>
+            <div class="page-banner-meta hero-meta-stack">
+                <div class="banner-meta-card glass-card">
+                    <small>最近更新</small>
+                    <strong id="repo-last-updated">2026年4月10日</strong>
+                    <span class="meta-note">按所有公开仓库计算</span>
                 </div>
-                <div class="banner-meta-card">
-                    <small>视觉风格</small>
-                    <strong>GitHub-like</strong>
+                <div class="banner-meta-card glass-card">
+                    <small>覆盖语言</small>
+                    <strong id="repo-language-count">4</strong>
+                    <span class="meta-note">根据公开仓库语言统计</span>
                 </div>
             </div>
         </section>
 
         <div class="profile-layout projects-layout">
             <aside class="sidebar-column">
-                <article class="profile-summary compact-profile">
-                    <h2>项目画像</h2>
-                    <p class="profile-bio">
-                        这里集中放视觉算法、点云处理、CUDA 试验和常用工具仓库，方便直接进入 README、代码和提交记录。
-                    </p>
+                <article class="profile-summary compact-profile glass-card">
+                    <h2>Repository snapshot</h2>
+                    <p class="profile-bio">仓库页聚焦代码资产本身：适合直接查看最近在维护什么、用了哪些语言，以及哪些项目更值得先点开。</p>
                     <div class="sidebar-meta">
-                        <div class="sidebar-meta-item">
-                            <span class="meta-label">Vision</span>
-                            <strong>lane2seq / 感知实验</strong>
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">Total stars</span>
+                            <strong id="repo-total-stars">1</strong>
                         </div>
-                        <div class="sidebar-meta-item">
-                            <span class="meta-label">Parallel</span>
-                            <strong>pcl-boundary_omp / CUDA Test</strong>
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">Top project</span>
+                            <strong id="repo-top-project">lane2seq</strong>
                         </div>
-                        <div class="sidebar-meta-item">
-                            <span class="meta-label">Utility</span>
-                            <strong>utils / 环境与脚本沉淀</strong>
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">Browse order</span>
+                            <strong>按最近更新时间从新到旧</strong>
                         </div>
                     </div>
                     <div class="button-row full-width">
-                        <a class="button primary full-width" href="https://github.com/zhyx1996?tab=repositories" target="_blank" rel="noreferrer">仓库总览</a>
-                        <a class="button secondary full-width" href="/index.html">返回首页</a>
+                        <a class="button primary full-width" href="https://github.com/zhyx1996?tab=repositories" target="_blank" rel="noreferrer">GitHub 仓库页</a>
+                        <a class="button secondary full-width" href="/stars.html">转到 Stars 页</a>
                     </div>
                 </article>
             </aside>
 
             <div class="content-column">
+                <section class="section" id="repo-snapshot">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Repository overview</h2>
+                            <p>用更直观的指标先看公开仓库整体情况。</p>
+                        </div>
+                        <span class="tag">Snapshot</span>
+                    </div>
+                    <div class="metrics-grid">
+                        <article class="metric-card glass-card">
+                            <small>公开仓库</small>
+                            <strong id="repo-count">4</strong>
+                            <p class="muted">全部公开 Repositories。</p>
+                        </article>
+                        <article class="metric-card glass-card">
+                            <small>累计 Stars</small>
+                            <strong id="total-stars">1</strong>
+                            <p class="muted">全部公开仓库获得的星标。</p>
+                        </article>
+                        <article class="metric-card glass-card">
+                            <small>覆盖语言</small>
+                            <strong id="repo-language-count-metric">4</strong>
+                            <p class="muted">按公开仓库语言统计。</p>
+                        </article>
+                        <article class="metric-card glass-card">
+                            <small>最近活跃</small>
+                            <strong id="repo-latest-label">2026年4月10日</strong>
+                            <p class="muted">最近一次仓库更新时间。</p>
+                        </article>
+                    </div>
+                </section>
+
                 <section class="section" id="project-list-section">
                     <div class="section-heading">
                         <div>
-                            <h2>Latest repositories</h2>
-                            <p>优先显示最近更新的仓库，方便直接查看最近活跃内容。</p>
+                            <h2>All public repositories</h2>
+                            <p>完整展示所有公开仓库，卡片保留最关键的浏览信息与直达入口。</p>
                         </div>
-                        <span class="tag">Latest</span>
+                        <span class="tag">All repos</span>
                     </div>
-                    <div class="repo-grid" id="project-list">
-                        <article class="repo-card">
-                            <div class="inline-list">
-                                <span class="tag">Jupyter Notebook</span>
-                                <span class="pill">最近更新 2026年4月10日</span>
-                            </div>
+                    <div class="repo-grid repo-grid-expanded" id="project-list">
+                        <article class="repo-card glass-card">
+                            <span class="tag">Jupyter Notebook</span>
                             <h3>lane2seq</h3>
                             <p>基于 OpenCV、ENet 与 Vision Transformer 的车道线检测实验项目。</p>
-                            <div class="button-row">
-                                <a class="button outline" href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">GitHub 详情</a>
-                            </div>
-                        </article>
-                    </div>
-                    <p class="status-inline" data-github-status>正在同步 GitHub 公开资料...</p>
-                </section>
-
-                <section class="section" id="project-links">
-                    <div class="section-heading">
-                        <div>
-                            <h2>直达链接</h2>
-                            <p>保留固定入口，适合想直接打开 README、代码或提交记录时快速跳转。</p>
-                        </div>
-                        <span class="tag">Direct links</span>
-                    </div>
-                    <div class="grid-2" id="project-links-grid">
-                        <article class="contact-card">
-                            <span class="tag">Vision</span>
-                            <h3>lane2seq</h3>
-                            <p>聚焦车道线检测流程整理，以及 Lane2Seq 相关深度学习实验。</p>
-                            <div class="button-row">
-                                <a class="button outline" href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">打开仓库</a>
-                            </div>
-                        </article>
-                    </div>
-                </section>
-
-                <section class="section" id="stars">
-                    <div class="section-heading">
-                        <div>
-                            <h2>我 Star 的项目</h2>
-                            <p>继续保留最近点过 Star 的仓库，方便在项目页快速回看灵感来源。</p>
-                        </div>
-                        <span class="tag">Stars</span>
-                    </div>
-                    <div class="repo-grid star-grid" id="project-star-list">
-                        <article class="repo-card star-card">
-                            <span class="tag">TypeScript</span>
-                            <h3>smallmain / vscode-unify-chat-provider</h3>
-                            <p>把多个 LLM API 提供方接到 VS Code Copilot Chat 的聚合型扩展。</p>
                             <div class="repo-stats">
-                                <span>⭐ 366</span>
-                                <span>🕒 2026年4月13日</span>
+                                <span>⭐ 1</span>
+                                <span>🕒 2026年4月10日</span>
                             </div>
                         </article>
                     </div>
-                    <p class="status-inline" data-star-status>正在同步我的 Star 列表...</p>
+                </section>
+
+                <section class="section" id="repo-notes">
+                    <div class="section-heading">
+                        <div>
+                            <h2>How to browse</h2>
+                            <p>如果你是第一次来，可以按这个顺序快速了解整个仓库集合。</p>
+                        </div>
+                        <span class="tag">Guide</span>
+                    </div>
+                    <div class="grid-3 info-grid">
+                        <article class="card glass-card">
+                            <span class="badge">01</span>
+                            <h3>先看最近更新</h3>
+                            <p>仓库默认按更新时间排序，适合优先了解当前仍在维护或最近刚整理过的项目。</p>
+                        </article>
+                        <article class="card glass-card">
+                            <span class="badge">02</span>
+                            <h3>按语言与方向筛读</h3>
+                            <p>从语言标签和简介快速判断项目属于视觉实验、点云处理、CUDA 测试还是通用工具。</p>
+                        </article>
+                        <article class="card glass-card">
+                            <span class="badge">03</span>
+                            <h3>需要灵感时切到 Stars</h3>
+                            <p>收藏项目已经独立成页，可以继续查看我关注的开源项目与最近收藏的方向。</p>
+                        </article>
+                    </div>
                 </section>
             </div>
         </div>
@@ -157,8 +171,8 @@
 
     <footer class="footer">
         <div class="footer-inner">
-            <p>ZYX · zhyx1996.github.io · GitHub 风格项目索引</p>
-            <p>页面优先展示 GitHub 公开数据，无法联网时保留稳定静态摘要与直达链接。</p>
+            <p>ZYX · zhyx1996.github.io · Public repositories</p>
+            <p>实时数据优先来自 GitHub 公开 API；如果接口不可用，会回退到静态仓库摘要。</p>
         </div>
     </footer>
 

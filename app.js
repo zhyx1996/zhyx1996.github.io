@@ -17,6 +17,7 @@ const repoFallback = [
         description: '基于 OpenCV、ENet 与 Vision Transformer 的车道线检测实验项目。',
         language: 'Jupyter Notebook',
         stargazers_count: 1,
+        forks_count: 0,
         updated_at: '2026-04-10T00:00:00Z'
     },
     {
@@ -25,6 +26,7 @@ const repoFallback = [
         description: '对 PCL BoundaryEstimation 做 OMP 加速的点云处理实践。',
         language: 'C++',
         stargazers_count: 0,
+        forks_count: 0,
         updated_at: '2024-08-27T09:17:24Z'
     },
     {
@@ -33,6 +35,7 @@ const repoFallback = [
         description: '围绕 CUDA 环境与基础实验的轻量测试仓库。',
         language: 'Cuda',
         stargazers_count: 0,
+        forks_count: 0,
         updated_at: '2024-09-12T08:56:10Z'
     },
     {
@@ -41,6 +44,7 @@ const repoFallback = [
         description: '日常使用脚本与小工具的集合。',
         language: 'Batchfile',
         stargazers_count: 0,
+        forks_count: 0,
         updated_at: '2026-02-09T02:14:44Z'
     }
 ];
@@ -108,8 +112,6 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
-// 公开油价页里的 92# 汽油通常以“人民币 / 升”展示，常见有效值大多落在 5-10 之间；
-// 先用这个区间过滤日期、年份和其他无关数字，避免把页面噪声当成油价。
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
 const GAS92_MIN_SAMPLE_COUNT = 3;
 const GAS92_ROW_HINT_KEYWORDS = [
@@ -123,13 +125,20 @@ const GAS92_VALUE_PATTERN = /(\d+(?:\.\d{1,3})?)/g;
 const GAS92_PRICE_WITH_UNIT_PATTERN = /(\d+(?:\.\d{1,3})?)\s*(?:元\/升|元每升|\/L|每升)/gi;
 const MAX_URL_LABEL_LENGTH = 96;
 const URL_TRUNCATE_LENGTH = 93;
+
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
         if (source?.[key] != null) return source[key];
     }
     return null;
 };
+
 const totalRepoStars = (repos) => repos.reduce((sum, repo) => sum + Number(repo?.stargazers_count || 0), 0);
+const sortByUpdated = (items) => [...items].sort((left, right) => new Date(right?.updated_at || 0) - new Date(left?.updated_at || 0));
+const collectLanguages = (items) => [...new Set(items.map((item) => safeText(item?.language, '')).filter(Boolean))];
+const getLatestUpdated = (items) => sortByUpdated(items)[0]?.updated_at || null;
+const getMostStarred = (items) => [...items].sort((left, right) => Number(right?.stargazers_count || 0) - Number(left?.stargazers_count || 0))[0] || null;
+
 const safeUrl = (value, fallback = '#') => {
     try {
         const parsed = new URL(value, window.location.origin);
@@ -168,14 +177,7 @@ function renderProfile(profile, repos = repoFallback) {
     setText('following-count', String(profile.following ?? profileFallback.following));
     setText('total-stars', String(totalRepoStars(repos)));
     setHref('profile-link', profile.html_url || profileFallback.html_url);
-    setHref('hero-link', profile.html_url || profileFallback.html_url);
     setImage('profile-avatar', profile.avatar_url || profileFallback.avatar_url, `${profile.login} avatar`);
-}
-
-function selectLatestRepos(repos, limit = 4) {
-    return [...repos]
-        .sort((left, right) => new Date(right?.updated_at || 0) - new Date(left?.updated_at || 0))
-        .slice(0, limit);
 }
 
 function renderMarkup(selector, markup) {
@@ -183,61 +185,86 @@ function renderMarkup(selector, markup) {
     if (container) container.innerHTML = markup;
 }
 
-function renderRepos(repos) {
-    const items = selectLatestRepos(repos);
+function renderRepoSummary(repos) {
+    const allRepos = sortByUpdated(repos);
+    const languageCount = collectLanguages(allRepos).length;
+    const latestUpdated = fmtDate(getLatestUpdated(allRepos));
+    const topProject = getMostStarred(allRepos);
 
-    renderMarkup('repo-list', items.map((repo) => `
-        <article class="repo-card">
-            <span class="tag">${escapeHtml(safeText(repo.language, '未标注语言'))}</span>
-            <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">${escapeHtml(repo.name)}</a></h3>
-            <p class="repo-description">${escapeHtml(safeText(repo.description, '这个仓库暂未填写公开简介，可直接打开仓库查看 README 和代码。'))}</p>
-            <div class="repo-stats">
-                <span>⭐ ${repo.stargazers_count ?? 0}</span>
-                <span>🕒 ${fmtDate(repo.updated_at)}</span>
-            </div>
-            <div class="repo-actions">
-                <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">打开仓库</a>
-            </div>
-        </article>
-    `).join(''));
-
-    renderMarkup('project-list', items.map((repo) => `
-        <article class="repo-card">
-            <div class="repo-title-row">
-                <span class="tag">${escapeHtml(safeText(repo.language, '项目'))}</span>
-                <span class="pill">最近更新 ${fmtDate(repo.updated_at)}</span>
-            </div>
-            <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">${escapeHtml(repo.name)}</a></h3>
-            <p class="repo-description">${escapeHtml(safeText(repo.description, '可以直接跳转到 GitHub 查看完整说明、提交记录和后续更新。'))}</p>
-            <div class="repo-stats">
-                <span>⭐ ${repo.stargazers_count ?? 0}</span>
-            </div>
-            <div class="repo-actions">
-                <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">GitHub 详情</a>
-            </div>
-        </article>
-    `).join(''));
+    setText('repo-total-stars', String(totalRepoStars(allRepos)));
+    setText('repo-language-count', String(languageCount || 0));
+    setText('repo-language-count-metric', String(languageCount || 0));
+    setText('repo-last-updated', latestUpdated);
+    setText('repo-latest-label', latestUpdated);
+    setText('repo-top-project', safeText(topProject?.name, '暂无'));
 }
 
-function renderProjectLinks(repos) {
-    renderMarkup('project-links-grid', selectLatestRepos(repos).map((repo) => `
-        <article class="contact-card">
-            <div class="repo-title-row">
-                <span class="tag">${escapeHtml(repoShowcaseMeta[repo.name]?.label || safeText(repo.language, '项目'))}</span>
-            </div>
-            <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">${escapeHtml(repo.name)}</a></h3>
-            <p>${escapeHtml(safeText(repo.description, '可以直接跳转到仓库查看 README、代码和更新记录。'))}</p>
-            <div class="repo-actions">
-                <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">打开仓库</a>
-            </div>
-        </article>
-    `).join(''));
+function renderRepos(repos) {
+    const items = sortByUpdated(repos);
+    if (!items.length) {
+        renderMarkup('project-list', `
+            <article class="repo-card glass-card">
+                <span class="tag">Repositories</span>
+                <h3>暂时没有可展示的公开仓库</h3>
+                <p class="repo-description">GitHub 接口没有返回公开仓库时，这里会保留一个空态提示，避免页面直接留白。</p>
+            </article>
+        `);
+        renderRepoSummary(repoFallback);
+        return;
+    }
+
+    const markup = items.map((repo) => {
+        const tag = repoShowcaseMeta[repo.name]?.label || safeText(repo.language, 'Repository');
+        const homepageUrl = repo.homepage ? safeUrl(repo.homepage, '') : '';
+        const homepageAction = homepageUrl && homepageUrl !== '#'
+            ? `<a class="button outline" href="${escapeHtml(homepageUrl)}" target="_blank" rel="noreferrer">项目主页</a>`
+            : '';
+
+        return `
+            <article class="repo-card glass-card">
+                <div class="repo-title-row">
+                    <span class="tag">${escapeHtml(tag)}</span>
+                    <span class="pill">${escapeHtml(safeText(repo.language, '未标注语言'))}</span>
+                </div>
+                <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">${escapeHtml(repo.name)}</a></h3>
+                <p class="repo-description">${escapeHtml(safeText(repo.description, '这个仓库暂未填写公开简介，可直接打开仓库查看 README 和代码。'))}</p>
+                <div class="repo-stats">
+                    <span>⭐ ${repo.stargazers_count ?? 0}</span>
+                    <span>🍴 ${repo.forks_count ?? 0}</span>
+                    <span>🕒 ${fmtDate(repo.updated_at)}</span>
+                </div>
+                <div class="repo-actions">
+                    <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">打开仓库</a>
+                    ${homepageAction}
+                </div>
+            </article>
+        `;
+    }).join('');
+
+    renderMarkup('project-list', markup);
+    renderRepoSummary(items);
 }
 
 function renderStarred(starredRepos) {
-    const items = starredRepos.slice(0, 4);
+    const items = sortByUpdated(starredRepos);
+    if (!items.length) {
+        renderMarkup('star-list', `
+            <article class="repo-card star-card glass-card">
+                <span class="tag">Stars</span>
+                <h3>暂时没有可展示的收藏项目</h3>
+                <p class="repo-description">如果 GitHub Star 接口暂时不可用，页面会继续保留静态收藏摘要而不是出现空白区域。</p>
+            </article>
+        `);
+        setText('star-count', '0');
+        setText('star-language-count', '0');
+        setText('star-top-name', '暂无');
+        setText('star-last-updated', '未知');
+        return;
+    }
+
+    const topStar = getMostStarred(items);
     const markup = items.map((repo) => `
-        <article class="repo-card star-card">
+        <article class="repo-card star-card glass-card">
             <div class="repo-title-row">
                 <span class="tag">${escapeHtml(safeText(repo.language, 'Starred Repo'))}</span>
                 <span class="pill">Starred</span>
@@ -254,8 +281,11 @@ function renderStarred(starredRepos) {
         </article>
     `).join('');
 
+    setText('star-count', String(items.length));
+    setText('star-language-count', String(collectLanguages(items).length || 0));
+    setText('star-top-name', safeText(topStar?.full_name || topStar?.name, '暂无'));
+    setText('star-last-updated', fmtDate(getLatestUpdated(items)));
     renderMarkup('star-list', markup);
-    renderMarkup('project-star-list', markup);
 }
 
 async function hydrateGithubData() {
@@ -266,7 +296,6 @@ async function hydrateGithubData() {
 
     renderProfile(profileFallback, repoFallback);
     renderRepos(repoFallback);
-    renderProjectLinks(repoFallback);
     renderStarred(starredFallback);
     updateStatus('已先展示静态摘要，联网后会自动刷新为 GitHub 公开资料。');
     updateStarStatus('已先展示静态 Star 摘要，联网后会自动刷新。');
@@ -274,8 +303,8 @@ async function hydrateGithubData() {
     try {
         const [profileRes, reposRes, starredRes] = await Promise.allSettled([
             fetch('https://api.github.com/users/zhyx1996', { headers: { Accept: 'application/vnd.github+json' } }),
-            fetch('https://api.github.com/users/zhyx1996/repos?sort=updated&per_page=20', { headers: { Accept: 'application/vnd.github+json' } }),
-            fetch('https://api.github.com/users/zhyx1996/starred?sort=updated&per_page=4', { headers: { Accept: 'application/vnd.github+json' } })
+            fetch('https://api.github.com/users/zhyx1996/repos?sort=updated&per_page=100', { headers: { Accept: 'application/vnd.github+json' } }),
+            fetch('https://api.github.com/users/zhyx1996/starred?sort=updated&per_page=100', { headers: { Accept: 'application/vnd.github+json' } })
         ]);
 
         let profile = profileFallback;
@@ -293,8 +322,11 @@ async function hydrateGithubData() {
         if (reposRes.status === 'fulfilled' && reposRes.value.ok) {
             const repoData = await reposRes.value.json();
             if (Array.isArray(repoData) && repoData.length) {
-                repos = repoData;
-                hasLiveRepos = true;
+                const publicRepos = repoData.filter((repo) => !repo.private);
+                if (publicRepos.length) {
+                    repos = publicRepos;
+                    hasLiveRepos = true;
+                }
             }
         }
 
@@ -308,22 +340,21 @@ async function hydrateGithubData() {
 
         renderProfile(profile, repos);
         renderRepos(repos);
-        renderProjectLinks(repos);
         renderStarred(starredRepos);
 
         if (hasLiveProfile || hasLiveRepos) {
-            updateStatus('GitHub 公开资料已刷新，统计和仓库信息来自实时接口。');
+            updateStatus('GitHub 公开资料已刷新，首页与仓库页展示的是实时接口数据。');
         } else {
-            updateStatus('暂时未能连接 GitHub API，页面已保留静态摘要与直达链接。');
+            updateStatus('暂时未能连接 GitHub API，页面已保留静态摘要与仓库信息。');
         }
 
         if (hasLiveStars) {
-            updateStarStatus('Star 列表已刷新，展示的是最近点过 Star 的公开仓库。');
+            updateStarStatus('Star 列表已刷新，展示的是最近获取到的公开收藏项目。');
         } else {
             updateStarStatus('暂时未能连接 GitHub Star 接口，页面已保留静态 Star 摘要。');
         }
     } catch (error) {
-        updateStatus('暂时未能连接 GitHub API，页面已保留静态摘要与直达链接。');
+        updateStatus('暂时未能连接 GitHub API，页面已保留静态摘要与仓库信息。');
         updateStarStatus('暂时未能连接 GitHub Star 接口，页面已保留静态 Star 摘要。');
         console.warn('Failed to load GitHub data', error);
     }
@@ -362,61 +393,40 @@ function renderMarket(data) {
     if (!container) return;
 
     container.innerHTML = `
-        <article class="market-card">
-            <small>人民币 / 美元</small>
-            <strong class="market-value">¥${fmtRate(data.usdCny, 4)} / $1</strong>
-            <p class="muted">1 美元 ≈ ${fmtRate(data.usdCny, 4)} 人民币</p>
+        <article class="market-card glass-card">
+            <small>USD / CNY</small>
+            <strong class="market-value">${fmtRate(data.usdCny)}</strong>
+            <span class="market-change">1 美元 ≈ ${fmtRate(data.usdCny)} 人民币</span>
             ${renderMarketFacts([
-                { label: '反向换算', value: `1 人民币 ≈ $${fmtRate(data.usdCny ? 1 / data.usdCny : null, 4)}` },
-                { label: '展示规则', value: '优先显示大于 1 的汇率' }
+                { label: 'SGD / CNY', value: fmtRate(data.sgdCny) },
+                { label: 'JPY / CNY', value: fmtRate(data.jpyPerCny, 2) }
             ])}
         </article>
-        <article class="market-card">
-            <small>人民币 / 新币</small>
-            <strong class="market-value">¥${fmtRate(data.sgdCny, 4)} / S$1</strong>
-            <p class="muted">1 新加坡元 ≈ ${fmtRate(data.sgdCny, 4)} 人民币</p>
-            ${renderMarketFacts([
-                { label: '反向换算', value: `1 人民币 ≈ S$${fmtRate(data.sgdCny ? 1 / data.sgdCny : null, 4)}` },
-                { label: '显示说明', value: '新币更值钱，所以放在分母' }
-            ])}
-        </article>
-        <article class="market-card">
-            <small>日元 / 人民币</small>
-            <strong class="market-value">${fmtRate(data.jpyPerCny, 2)} 日元 / ¥1</strong>
-            <p class="muted">1 人民币 ≈ ${fmtRate(data.jpyPerCny, 2)} 日元</p>
-            ${renderMarketFacts([
-                { label: '反向换算', value: `1 日元 ≈ ¥${fmtRate(data.jpyPerCny ? 1 / data.jpyPerCny : null, 4)}` },
-                { label: '显示说明', value: '人民币更值钱，所以放在分母' }
-            ])}
-        </article>
-        <article class="market-card">
-            <small>黄金 / 人民币</small>
-            <strong class="market-value">¥${fmtPrice(data.gold.cnyPerGram, 2)} / 克</strong>
+        <article class="market-card glass-card">
+            <small>现货黄金</small>
+            <strong class="market-value">¥${fmtPrice(data.gold.cnyPerGram, 2)} / g</strong>
             ${changeHTML(data.gold.change24h)}
-            <p class="muted">按 1 克黄金折算，约合 ¥${fmtPrice(data.gold.cnyPerGram, 2)}</p>
             ${renderMarketFacts([
-                { label: '人民币口径', value: `约 ¥${fmtPrice(data.gold.cnyPerGram, 2)} / 克` },
-                { label: '国际金价', value: `约 $${fmtPrice(data.gold.usdPerOunce, 0)} / 盎司` }
+                { label: '美元 / 盎司', value: `$${fmtPrice(data.gold.usdPerOunce, 2)}` },
+                { label: '换算说明', value: '按金衡盎司换算人民币克价' }
             ])}
         </article>
-        <article class="market-card">
-            <small>人民币 / 比特币</small>
-            <strong class="market-value">¥${fmtPrice(data.btc.cnyPerBtc, 0)} / BTC</strong>
+        <article class="market-card glass-card">
+            <small>Bitcoin</small>
+            <strong class="market-value">¥${fmtPrice(data.btc.cnyPerBtc)} / BTC</strong>
             ${changeHTML(data.btc.change24h)}
-            <p class="muted">1 BTC ≈ ¥${fmtPrice(data.btc.cnyPerBtc, 0)}</p>
             ${renderMarketFacts([
-                { label: '美元口径', value: `约 $${fmtPrice(data.btc.usd, 0)} / BTC` },
-                { label: '反向换算', value: `1 人民币 ≈ ₿${fmtRate(data.btc.cnyPerBtc ? 1 / data.btc.cnyPerBtc : null, 8)}` }
+                { label: '美元价格', value: `$${fmtPrice(data.btc.usd, 2)}` },
+                { label: '用途', value: '作为高波动资产参考' }
             ])}
         </article>
-        <article class="market-card">
-            <small>国内 92# 汽油</small>
-            <strong class="market-value">¥${fmtPrice(data.gas92.cnyPerLiter, 2)} / 升</strong>
-            <span class="market-change">${escapeHtml(data.gas92.note)}</span>
-            <p class="muted">按 1 升计算，约合 ¥${fmtPrice(data.gas92.cnyPerLiter, 2)}</p>
+        <article class="market-card glass-card">
+            <small>92# 汽油</small>
+            <strong class="market-value">¥${fmtPrice(data.gas92.cnyPerLiter, 2)} / L</strong>
+            <span class="market-change">${escapeHtml(data.gas92.note || '当前展示全国参考价')}</span>
             ${renderMarketFacts([
-                { label: '数据来源', value: data.gas92.source || '静态摘要' },
-                { label: '说明', value: '优先实时获取，失败后再尝试抓取公开油价页面' }
+                { label: '数据来源', value: safeText(data.gas92.source, '静态摘要') },
+                { label: '说明', value: '优先读取公开油价页面' }
             ])}
         </article>
     `;
@@ -458,45 +468,33 @@ function extractGas92PriceFromHtml(html) {
         if (!text || !GAS92_ROW_HINT.test(text)) continue;
         const matches = [...text.matchAll(GAS92_VALUE_PATTERN)]
             .map((match) => Number(match[1]))
-            .filter((value) => value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
-        if (matches.length) values.push(matches[0]);
+            .filter((value) => Number.isFinite(value) && value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
+        values.push(...matches);
     }
 
-    if (values.length >= GAS92_MIN_SAMPLE_COUNT) {
-        return Number(average(values).toFixed(2));
-    }
+    if (values.length >= GAS92_MIN_SAMPLE_COUNT) return average(values);
 
     const text = normalizeWhitespace(doc.body?.textContent || html);
-    // 匹配“92# / 92号汽油 ... 7.98 元/升”这类最直接的正文描述；
-    // 中间允许最多 12 个非数字字符，用来兼容空格、括号或少量解释文字。
     const directMatch = text.match(/92[#号]?(?:汽油)?[^0-9]{0,12}(\d+(?:\.\d{1,3})?)(?:\s*元)?\s*(?:\/|每)?\s*升/i);
     if (directMatch) return Number(directMatch[1]);
 
     const fallbackMatches = [...text.matchAll(GAS92_PRICE_WITH_UNIT_PATTERN)]
         .map((match) => Number(match[1]))
-        .filter((value) => value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
-    if (fallbackMatches.length) return Number(average(fallbackMatches).toFixed(2));
+        .filter((value) => Number.isFinite(value) && value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
 
+    if (fallbackMatches.length) return average(fallbackMatches);
     return null;
 }
 
 const gas92FetchPlans = [
     {
-        label: '全球油价页',
-        source: '实时页面',
-        url: 'https://www.globalpetrolprices.com/China/gasoline_prices/',
+        label: '油价网',
+        url: 'https://youjia.chemcp.com/',
         parser: extractGas92PriceFromHtml
     },
     {
-        label: '车主手册 92# 油价',
-        source: '抓取公开页面',
-        url: 'https://www.icauto.com.cn/oil/price_0_2_1.html',
-        parser: extractGas92PriceFromHtml
-    },
-    {
-        label: '今日油价 92 号汽油',
-        source: '抓取公开页面',
-        url: 'https://www.chayoujia.net/gasoline92.html',
+        label: '金投网',
+        url: 'https://gas.cngold.org/',
         parser: extractGas92PriceFromHtml
     }
 ];
@@ -504,11 +502,9 @@ const gas92FetchPlans = [
 function buildGas92Candidates(plan) {
     const encodedUrl = encodeURIComponent(plan.url);
     return [
-        { ...plan, requestUrl: plan.url },
-        // 静态站点无法自建后端代理时，只能把公开代理作为抓取回退方案；
-        // 如果这些服务失效或不可用，会继续回退到本地参考价，不阻塞页面展示。
-        { ...plan, requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}` },
-        { ...plan, requestUrl: `https://r.jina.ai/http/${plan.url}` }
+        { requestUrl: plan.url, parser: plan.parser, source: plan.label },
+        { requestUrl: `https://r.jina.ai/http://${plan.url.replace(/^https?:\/\//, '')}`, parser: plan.parser, source: `${plan.label} / jina` },
+        { requestUrl: `https://r.jina.ai/http://r.jina.ai/http://${encodedUrl}`, parser: plan.parser, source: `${plan.label} / mirror` }
     ];
 }
 
@@ -517,20 +513,20 @@ async function loadGas92Price() {
         for (const candidate of buildGas92Candidates(plan)) {
             try {
                 const response = await fetchWithTimeout(candidate.requestUrl, {
-                    headers: { Accept: 'text/html, text/plain, */*' }
-                });
+                    headers: { Accept: 'text/html,application/xhtml+xml' }
+                }, 5000);
                 if (!response.ok) continue;
                 const html = await response.text();
                 const price = candidate.parser(html);
-                if (price != null) {
+                if (Number.isFinite(price) && price > 0) {
                     return {
                         cnyPerLiter: price,
-                        note: `${candidate.source}已刷新`,
-                        source: candidate.label
+                        note: '基于公开油价页面估算全国 92# 参考价',
+                        source: candidate.source
                     };
                 }
             } catch (error) {
-                console.warn(`Failed to load 92# gas price from ${candidate.requestUrl}`, error);
+                console.warn('Failed to load gas92 candidate', candidate.requestUrl, error);
             }
         }
     }
@@ -551,8 +547,6 @@ async function hydrateMarketData() {
         const [ratesResult, cryptoResult, goldResult, gas92Result] = await Promise.allSettled([
             fetch('https://open.er-api.com/v6/latest/USD'),
             fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd,cny&include_24hr_change=true'),
-            // gold-api.com 的 XAU 接口通常返回 price 与 chg_percentage；
-            // 额外兼容 price_usd / price_ounce / price_per_ounce 这类常见镜像或旧字段命名，避免轻微的字段变动直接导致页面空白。
             fetch('https://api.gold-api.com/price/XAU'),
             loadGas92Price()
         ]);

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZYX | Starred Projects</title>
+    <meta name="description" content="zhyx1996 的 Stars 页面，集中展示最近收藏的公开项目、语言分布与关注方向。">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-inner">
+            <a class="brand" href="/index.html">
+                <span class="brand-mark">◉</span>
+                <span>zhyx1996</span>
+            </a>
+            <div class="nav-context">Published portfolio · Stars</div>
+            <ul class="nav-links">
+                <li><a href="/index.html">Overview</a></li>
+                <li><a href="/projects.html">Repositories</a></li>
+                <li><a class="active" href="/stars.html">Stars</a></li>
+                <li><a href="#star-list-section">Star list</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="subnav">
+        <div class="subnav-inner">
+            <a href="/index.html">Overview</a>
+            <a href="/projects.html">Repositories</a>
+            <a class="active" href="/stars.html">Stars</a>
+            <a href="#star-list-section">Star list</a>
+            <a href="#star-notes">Preferences</a>
+        </div>
+    </div>
+
+    <main class="container page-shell">
+        <section class="page-banner compact-banner star-banner">
+            <div>
+                <span class="kicker">Stars</span>
+                <h1>最近收藏的公开项目</h1>
+                <p>
+                    收藏页专门展示我最近关注的开源项目，适合查看灵感来源、工具偏好与值得继续跟进的方向。
+                    这样首页不再堆叠重复内容，仓库页与 Stars 页也能够形成清晰分工。
+                </p>
+                <p class="status-banner" data-star-status>正在同步我的 Star 列表...</p>
+            </div>
+            <div class="page-banner-meta hero-meta-stack">
+                <div class="banner-meta-card glass-card">
+                    <small>最近更新</small>
+                    <strong id="star-last-updated">2026年4月13日</strong>
+                    <span class="meta-note">按收藏项目更新时间统计</span>
+                </div>
+                <div class="banner-meta-card glass-card">
+                    <small>覆盖语言</small>
+                    <strong id="star-language-count">4</strong>
+                    <span class="meta-note">反映近期关注的技术范围</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="profile-layout projects-layout">
+            <aside class="sidebar-column">
+                <article class="profile-summary compact-profile glass-card">
+                    <h2>Star snapshot</h2>
+                    <p class="profile-bio">这里展示的是最近收藏的公开项目，用来追踪值得继续学习、参考或借鉴的实现方式。</p>
+                    <div class="sidebar-meta">
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">收藏数量</span>
+                            <strong id="star-count">4</strong>
+                        </div>
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">Most starred</span>
+                            <strong id="star-top-name">smallmain/vscode-unify-chat-provider</strong>
+                        </div>
+                        <div class="sidebar-meta-item glass-panel">
+                            <span class="meta-label">用途</span>
+                            <strong>寻找工具、交互与工程实现灵感</strong>
+                        </div>
+                    </div>
+                    <div class="button-row full-width">
+                        <a class="button primary full-width" href="https://github.com/zhyx1996?tab=stars" target="_blank" rel="noreferrer">GitHub Stars</a>
+                        <a class="button secondary full-width" href="/projects.html">查看仓库页</a>
+                    </div>
+                </article>
+            </aside>
+
+            <div class="content-column">
+                <section class="section" id="star-list-section">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Starred repositories</h2>
+                            <p>完整展示最近获取到的收藏项目，方便集中回看。</p>
+                        </div>
+                        <span class="tag">Star list</span>
+                    </div>
+                    <div class="repo-grid repo-grid-expanded star-grid" id="star-list">
+                        <article class="repo-card star-card glass-card">
+                            <span class="tag">TypeScript</span>
+                            <h3>smallmain / vscode-unify-chat-provider</h3>
+                            <p>把多个 LLM API 提供方接到 VS Code Copilot Chat 的聚合型扩展。</p>
+                            <div class="repo-stats">
+                                <span>⭐ 366</span>
+                                <span>🕒 2026年4月13日</span>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="section" id="star-notes">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Preference notes</h2>
+                            <p>这些收藏项目大致反映我近期更常关注的开源方向。</p>
+                        </div>
+                        <span class="tag">Preferences</span>
+                    </div>
+                    <div class="grid-3 info-grid">
+                        <article class="card glass-card">
+                            <span class="badge">Tools</span>
+                            <h3>效率工具</h3>
+                            <p>优先关注能提升开发效率、交互体验或日常工作流的工具型仓库。</p>
+                        </article>
+                        <article class="card glass-card">
+                            <span class="badge">AI</span>
+                            <h3>模型与交互整合</h3>
+                            <p>会持续留意把多种模型能力接入 IDE、浏览器或桌面端的工程实践。</p>
+                        </article>
+                        <article class="card glass-card">
+                            <span class="badge">Implementation</span>
+                            <h3>可借鉴的工程细节</h3>
+                            <p>收藏不仅用于记录，也用于回看优秀项目的组织方式、接口设计和落地细节。</p>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>ZYX · zhyx1996.github.io · Starred projects</p>
+            <p>Star 列表优先来自 GitHub 公开 API；接口不可用时保留静态收藏摘要。</p>
+        </div>
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
+</html>
