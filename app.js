@@ -124,6 +124,7 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
 const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
+const GOLD_HISTORY_LOOKBACK_DAYS = [1, 2, 3, 4];
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
 const GAS92_MIN_SAMPLE_COUNT = 3;
 const GAS92_ROW_HINT_KEYWORDS = [
@@ -744,12 +745,17 @@ function extractGas92PriceFromHtml(html) {
 const gas92FetchPlans = [
     {
         label: '油价网',
-        url: 'http://youjia.chemcp.com/',
+        url: 'https://youjia.chemcp.com/',
         parser: extractGas92PriceFromHtml
     },
     {
         label: '金投网',
         url: 'https://gas.cngold.org/',
+        parser: extractGas92PriceFromHtml
+    },
+    {
+        label: '汽油价格网',
+        url: 'https://www.qiyoujiage.com/',
         parser: extractGas92PriceFromHtml
     }
 ];
@@ -790,14 +796,14 @@ async function loadGas92Price() {
 }
 
 async function loadGoldPriceSnapshot() {
-    const historyDate = isoDateDaysAgo(1);
-    const [currentResult, historyResult] = await Promise.allSettled([
+    const historyDates = GOLD_HISTORY_LOOKBACK_DAYS.map((days) => isoDateDaysAgo(days));
+    const [currentResult, ...historyResults] = await Promise.allSettled([
         fetchWithTimeout(GOLD_API_BASE_URL, {
             headers: { Accept: 'application/json' }
         }, 5000),
-        fetchWithTimeout(`${GOLD_API_BASE_URL}/${historyDate}`, {
+        ...historyDates.map((historyDate) => fetchWithTimeout(`${GOLD_API_BASE_URL}/${historyDate}`, {
             headers: { Accept: 'application/json' }
-        }, 5000)
+        }, 5000))
     ]);
 
     if (currentResult.status !== 'fulfilled' || !currentResult.value.ok) return null;
@@ -811,11 +817,16 @@ async function loadGoldPriceSnapshot() {
         previousUsdPerOunce = null;
     }
 
-    if (historyResult.status === 'fulfilled' && historyResult.value.ok) {
+    let historySource = previousUsdPerOunce ? 'Gold-API（当日开盘/前收参考）' : '历史接口暂不可用';
+    for (let index = 0; index < historyResults.length; index += 1) {
+        const historyResult = historyResults[index];
+        if (historyResult.status !== 'fulfilled' || !historyResult.value.ok) continue;
         const historyData = await historyResult.value.json();
         const historyPrice = Number(pickFirstDefined(historyData, ['price', 'price_usd', 'price_ounce', 'price_per_ounce']));
         if (Number.isFinite(historyPrice) && historyPrice > 0) {
             previousUsdPerOunce = historyPrice;
+            historySource = `Gold-API（${historyDates[index]}）`;
+            break;
         }
     }
 
@@ -829,7 +840,7 @@ async function loadGoldPriceSnapshot() {
         previousUsdPerOunce,
         change24h,
         source: 'Gold-API',
-        historySource: previousUsdPerOunce ? `Gold-API（${historyDate}）` : '历史接口暂不可用'
+        historySource
     };
 }
 
