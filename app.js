@@ -137,6 +137,9 @@ const GAS92_PRICE_WITH_UNIT_PATTERN = /(\d+(?:\.\d{1,3})?)\s*(?:元\/升|元每�
 const MAX_URL_LABEL_LENGTH = 96;
 const URL_TRUNCATE_LENGTH = 93;
 const ARTICLE_SUMMARY_TRUNCATE_LENGTH = 120;
+const ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO = 0.6;
+const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, .postTitle2 a, #myposts .titlelnk, a.entrylistItemTitle, a[href*="/p/"]';
+const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
 
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
@@ -331,7 +334,7 @@ function buildSummaryExcerpt(value, maxLength = ARTICLE_SUMMARY_TRUNCATE_LENGTH)
 
     const slice = text.slice(0, maxLength + 1);
     const boundary = slice.lastIndexOf(' ');
-    const end = boundary > Math.floor(maxLength * 0.6) ? boundary : maxLength;
+    const end = boundary > Math.floor(maxLength * ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO) ? boundary : maxLength;
     return `${slice.slice(0, end).trimEnd()}…`;
 }
 
@@ -404,7 +407,7 @@ function parseCnblogsRss(text, source) {
 function parseCnblogsArticleList(html, source) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const anchors = [
-        ...doc.querySelectorAll('.entrylistPosttitle a, .postTitle2 a, #myposts .titlelnk, a.entrylistItemTitle, a[href*="/p/"]')
+        ...doc.querySelectorAll(CNBLOGS_ARTICLE_SELECTORS)
     ];
     const seen = new Set();
 
@@ -418,9 +421,9 @@ function parseCnblogsArticleList(html, source) {
         const summaryNode = container?.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
         const timeNode = container?.querySelector('time, .postDesc, .entrylistItemPostDesc + div, .article_manage');
         const text = normalizeWhitespace(container?.textContent || '');
-        const dateMatch = text.match(/\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/);
+        const dateMatch = text.match(CNBLOGS_DATE_PATTERN);
         const summarySeed = summaryNode?.textContent
-            || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
+            || (text.startsWith(title) ? text.slice(title.length).trim() : text.split(title).join('').trim());
         const summary = buildSummaryExcerpt(summarySeed);
 
         return {
