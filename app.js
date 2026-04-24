@@ -504,7 +504,7 @@ function buildGas92Candidates(plan) {
     const encodedUrl = encodeURIComponent(plan.url);
     return [
         { requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}`, parser: plan.parser, source: `${plan.label} / allorigins` },
-        { requestUrl: `https://api.codetabs.com/v1/proxy/?quest=${encodedUrl}`, parser: plan.parser, source: `${plan.label} / codetabs` },
+        { requestUrl: `https://api.codetabs.com/v1/proxy?url=${encodedUrl}`, parser: plan.parser, source: `${plan.label} / codetabs` },
         { requestUrl: `https://corsproxy.io/?${encodedUrl}`, parser: plan.parser, source: `${plan.label} / corsproxy` }
     ];
 }
