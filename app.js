@@ -737,7 +737,7 @@ function extractGas92PriceFromApiPayload(payload) {
         return null;
     }
 
-    if (data?.code != null && !GAS92_SUCCESS_CODES.has(data.code) && !GAS92_SUCCESS_CODES.has(String(data.code))) {
+    if (data?.code != null && !GAS92_SUCCESS_CODES.has(data.code)) {
         return null;
     }
 
@@ -753,7 +753,7 @@ function extractGas92PriceFromApiPayload(payload) {
         entry?.province,
         entry?.region,
         entry?.city
-    ].some((label) => normalizeGas92RegionName(label) === GAS92_TARGET_REGION));
+    ].filter(Boolean).some((label) => normalizeGas92RegionName(label) === GAS92_TARGET_REGION));
     if (!beijingEntry) return null;
 
     const price = [
@@ -763,7 +763,7 @@ function extractGas92PriceFromApiPayload(payload) {
         beijingEntry?.oil?.p92
     ].map((value) => Number(value))
         .find((value) => Number.isFinite(value) && value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
-    if (!Number.isFinite(price)) return null;
+    if (price == null) return null;
 
     return {
         cnyPerLiter: price,
