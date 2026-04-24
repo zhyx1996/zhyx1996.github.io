@@ -189,13 +189,13 @@ function renderRepos(repos) {
     renderMarkup('repo-list', items.map((repo) => `
         <article class="repo-card">
             <span class="tag">${escapeHtml(safeText(repo.language, '未标注语言'))}</span>
-            <h3>${escapeHtml(repo.name)}</h3>
-            <p>${escapeHtml(safeText(repo.description, '这个仓库暂未填写公开简介，可直接打开仓库查看 README 和代码。'))}</p>
+            <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">${escapeHtml(repo.name)}</a></h3>
+            <p class="repo-description">${escapeHtml(safeText(repo.description, '这个仓库暂未填写公开简介，可直接打开仓库查看 README 和代码。'))}</p>
             <div class="repo-stats">
                 <span>⭐ ${repo.stargazers_count ?? 0}</span>
                 <span>🕒 ${fmtDate(repo.updated_at)}</span>
             </div>
-            <div class="button-row">
+            <div class="repo-actions">
                 <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">打开仓库</a>
             </div>
         </article>
@@ -203,13 +203,16 @@ function renderRepos(repos) {
 
     renderMarkup('project-list', items.map((repo) => `
         <article class="repo-card">
-            <div class="inline-list">
+            <div class="repo-title-row">
                 <span class="tag">${escapeHtml(safeText(repo.language, '项目'))}</span>
                 <span class="pill">最近更新 ${fmtDate(repo.updated_at)}</span>
             </div>
-            <h3>${escapeHtml(repo.name)}</h3>
-            <p>${escapeHtml(safeText(repo.description, '可以直接跳转到 GitHub 查看完整说明、提交记录和后续更新。'))}</p>
-            <div class="button-row">
+            <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">${escapeHtml(repo.name)}</a></h3>
+            <p class="repo-description">${escapeHtml(safeText(repo.description, '可以直接跳转到 GitHub 查看完整说明、提交记录和后续更新。'))}</p>
+            <div class="repo-stats">
+                <span>⭐ ${repo.stargazers_count ?? 0}</span>
+            </div>
+            <div class="repo-actions">
                 <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">GitHub 详情</a>
             </div>
         </article>
@@ -219,10 +222,12 @@ function renderRepos(repos) {
 function renderProjectLinks(repos) {
     renderMarkup('project-links-grid', selectLatestRepos(repos).map((repo) => `
         <article class="contact-card">
-            <span class="tag">${escapeHtml(repoShowcaseMeta[repo.name]?.label || safeText(repo.language, '项目'))}</span>
-            <h3>${escapeHtml(repo.name)}</h3>
+            <div class="repo-title-row">
+                <span class="tag">${escapeHtml(repoShowcaseMeta[repo.name]?.label || safeText(repo.language, '项目'))}</span>
+            </div>
+            <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">${escapeHtml(repo.name)}</a></h3>
             <p>${escapeHtml(safeText(repo.description, '可以直接跳转到仓库查看 README、代码和更新记录。'))}</p>
-            <div class="button-row">
+            <div class="repo-actions">
                 <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">打开仓库</a>
             </div>
         </article>
@@ -233,14 +238,17 @@ function renderStarred(starredRepos) {
     const items = starredRepos.slice(0, 4);
     const markup = items.map((repo) => `
         <article class="repo-card star-card">
-            <span class="tag">${escapeHtml(safeText(repo.language, 'Starred Repo'))}</span>
-            <h3>${escapeHtml(repo.full_name || repo.name)}</h3>
-            <p>${escapeHtml(safeText(repo.description, '这是最近点过 Star 的仓库，可以直接打开查看完整项目说明。'))}</p>
+            <div class="repo-title-row">
+                <span class="tag">${escapeHtml(safeText(repo.language, 'Starred Repo'))}</span>
+                <span class="pill">Starred</span>
+            </div>
+            <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">${escapeHtml(repo.full_name || repo.name)}</a></h3>
+            <p class="repo-description">${escapeHtml(safeText(repo.description, '这是最近点过 Star 的仓库，可以直接打开查看完整项目说明。'))}</p>
             <div class="repo-stats">
                 <span>⭐ ${repo.stargazers_count ?? 0}</span>
                 <span>🕒 ${fmtDate(repo.updated_at)}</span>
             </div>
-            <div class="button-row">
+            <div class="repo-actions">
                 <a class="button outline" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">查看仓库</a>
             </div>
         </article>
