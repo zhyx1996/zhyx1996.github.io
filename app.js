@@ -371,6 +371,7 @@ const marketFallback = {
 
 const fmtRate = (n, d = 4) => n != null ? Number(n).toFixed(d) : '暂无';
 const fmtPrice = (n, digits = 0) => n != null ? Number(n).toLocaleString('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits }) : '暂无';
+const fmtFxLine = (baseAmount, baseUnit, quoteAmount, quoteUnit, digits = 4) => `${baseAmount} ${baseUnit} ≈ ${fmtRate(quoteAmount, digits)} ${quoteUnit}`;
 const renderMarketFacts = (items) => `
     <dl class="market-facts">
         ${items.map((item) => `
@@ -394,12 +395,12 @@ function renderMarket(data) {
 
     container.innerHTML = `
         <article class="market-card glass-card">
-            <small>USD / CNY</small>
+            <small>外汇汇率</small>
             <strong class="market-value">${fmtRate(data.usdCny)}</strong>
-            <span class="market-change">1 美元 ≈ ${fmtRate(data.usdCny)} 人民币</span>
+            <span class="market-change">${fmtFxLine('1', '美元', data.usdCny, '人民币')}</span>
             ${renderMarketFacts([
-                { label: 'SGD / CNY', value: fmtRate(data.sgdCny) },
-                { label: 'JPY / CNY', value: fmtRate(data.jpyPerCny, 2) }
+                { label: 'SGD / CNY', value: fmtFxLine('1', '新币', data.sgdCny, '人民币') },
+                { label: 'CNY / JPY', value: fmtFxLine('1', '人民币', data.jpyPerCny, '日元', 2) }
             ])}
         </article>
         <article class="market-card glass-card">
@@ -502,9 +503,9 @@ const gas92FetchPlans = [
 function buildGas92Candidates(plan) {
     const encodedUrl = encodeURIComponent(plan.url);
     return [
-        { requestUrl: plan.url, parser: plan.parser, source: plan.label },
-        { requestUrl: `https://r.jina.ai/http://${plan.url.replace(/^https?:\/\//, '')}`, parser: plan.parser, source: `${plan.label} / jina` },
-        { requestUrl: `https://r.jina.ai/http://r.jina.ai/http://${encodedUrl}`, parser: plan.parser, source: `${plan.label} / mirror` }
+        { requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}`, parser: plan.parser, source: `${plan.label} / allorigins` },
+        { requestUrl: `https://api.codetabs.com/v1/proxy?url=${encodedUrl}`, parser: plan.parser, source: `${plan.label} / codetabs` },
+        { requestUrl: `https://corsproxy.io/?${encodedUrl}`, parser: plan.parser, source: `${plan.label} / corsproxy` }
     ];
 }
 
