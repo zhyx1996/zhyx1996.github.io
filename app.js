@@ -124,6 +124,7 @@ const escapeHtml = (value) => String(value ?? '')
     .replaceAll("'", '&#39;');
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
 const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
+const GOLD_LEGACY_API_URL = 'https://api.gold-api.com/price/XAU';
 const GOLD_HISTORY_LOOKBACK_DAY_OFFSETS = [1, 2, 3];
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
@@ -798,8 +799,11 @@ async function loadGas92Price() {
 
 async function loadGoldPriceSnapshot() {
     const historyDates = GOLD_HISTORY_LOOKBACK_DAY_OFFSETS.map((days) => isoDateDaysAgo(days));
-    const [currentResult, ...historyResults] = await Promise.allSettled([
+    const [currentPrimaryResult, currentLegacyResult, ...historyResults] = await Promise.allSettled([
         fetchWithTimeout(GOLD_API_BASE_URL, {
+            headers: { Accept: 'application/json' }
+        }, 5000),
+        fetchWithTimeout(GOLD_LEGACY_API_URL, {
             headers: { Accept: 'application/json' }
         }, 5000),
         ...historyDates.map((historyDate) => fetchWithTimeout(`${GOLD_API_BASE_URL}/${historyDate}`, {
@@ -807,9 +811,21 @@ async function loadGoldPriceSnapshot() {
         }, 5000))
     ]);
 
-    if (currentResult.status !== 'fulfilled' || !currentResult.value.ok) return null;
+    let currentData = null;
+    let source = null;
+    const currentCandidates = [
+        { result: currentPrimaryResult, source: 'Gold-API' },
+        { result: currentLegacyResult, source: 'Gold-API legacy' }
+    ];
+    for (const candidate of currentCandidates) {
+        if (candidate.result.status !== 'fulfilled' || !candidate.result.value.ok) continue;
+        currentData = await candidate.result.value.json();
+        source = candidate.source;
+        break;
+    }
 
-    const currentData = await currentResult.value.json();
+    if (!currentData) return null;
+
     const usdPerOunce = Number(pickFirstDefined(currentData, ['price', 'price_usd', 'price_ounce', 'price_per_ounce']));
     if (!Number.isFinite(usdPerOunce) || usdPerOunce <= 0) return null;
 
@@ -843,7 +859,7 @@ async function loadGoldPriceSnapshot() {
         usdPerOunce,
         previousUsdPerOunce,
         change24h,
-        source: 'Gold-API',
+        source: source || 'Gold-API',
         historySource
     };
 }
