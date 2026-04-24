@@ -18,6 +18,7 @@
                 <li><a class="active" href="/index.html">Overview</a></li>
                 <li><a href="/projects.html">Repositories</a></li>
                 <li><a href="/stars.html">Stars</a></li>
+                <li><a href="/articles.html">Articles</a></li>
             </ul>
         </div>
     </header>
@@ -34,6 +35,7 @@
                 </p>
                 <div class="page-local-nav" aria-label="Overview sections">
                     <a href="#focus">Current focus</a>
+                    <a href="#articles">Blog articles</a>
                     <a href="#market">Market snapshot</a>
                     <a href="#links">Quick links</a>
                 </div>
@@ -41,6 +43,7 @@
                     <a class="button primary" id="profile-link" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">访问 GitHub</a>
                     <a class="button secondary" href="/projects.html">查看仓库</a>
                     <a class="button secondary" href="/stars.html">查看 Stars</a>
+                    <a class="button secondary" href="/articles.html">查看文章</a>
                 </div>
             </div>
             <div class="page-banner-meta hero-meta-stack">
@@ -68,6 +71,7 @@
                     <div class="button-row full-width">
                         <a class="button primary full-width" href="/projects.html">浏览全部仓库</a>
                         <a class="button secondary full-width" href="/stars.html">浏览 Stars 页面</a>
+                        <a class="button secondary full-width" href="/articles.html">浏览博客文章</a>
                     </div>
                     <div class="sidebar-meta">
                         <div class="sidebar-meta-item glass-panel">
@@ -146,6 +150,30 @@
                     </div>
                 </section>
 
+                <section class="section" id="articles">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Blog articles</h2>
+                            <p>把博客园文章也纳入主页入口，方便直接浏览最近公开发布的内容。</p>
+                        </div>
+                        <span class="tag">Cnblogs</span>
+                    </div>
+                    <div class="repo-grid" id="article-highlight-list">
+                        <article class="repo-card article-card glass-card">
+                            <span class="tag">博客园</span>
+                            <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/my-articles" target="_blank" rel="noreferrer">博客园文章列表</a></h3>
+                            <p class="repo-description">这里会展示最近同步到的博客园文章；如果暂时无法联网，也会保留直达文章列表的入口。</p>
+                            <div class="repo-actions">
+                                <a class="button outline" href="/articles.html">打开文章页</a>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="button-row">
+                        <a class="button outline" href="/articles.html">查看全部文章展示</a>
+                    </div>
+                    <p class="status-inline" data-article-status>正在同步博客园文章...</p>
+                </section>
+
                 <section class="section" id="market">
                     <div class="section-heading">
                         <div>
@@ -191,6 +219,14 @@
                                 <a class="button outline" href="/stars.html">打开 Stars 页</a>
                             </div>
                         </article>
+                        <article class="link-card glass-card">
+                            <span class="tag">Cnblogs</span>
+                            <h3>博客文章展示</h3>
+                            <p>单独查看博客园文章列表与最近同步到的网站文章摘要。</p>
+                            <div class="button-row">
+                                <a class="button outline" href="/articles.html">打开文章页</a>
+                            </div>
+                        </article>
                     </div>
                 </section>
             </div>
@@ -200,7 +236,7 @@
     <footer class="footer">
         <div class="footer-inner">
             <p>ZYX · zhyx1996.github.io · Published portfolio</p>
-            <p>数据来自 GitHub 公开 API、开放金融接口与公开油价页面；无法联网时自动回退到静态摘要。</p>
+            <p>数据来自 GitHub 公开 API、博客园公开页面、开放金融接口与公开油价页面；无法联网时自动回退到静态摘要。</p>
         </div>
     </footer>
 
