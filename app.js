@@ -334,7 +334,8 @@ function buildSummaryExcerpt(value, maxLength = ARTICLE_SUMMARY_TRUNCATE_LENGTH)
 
     const slice = text.slice(0, maxLength + 1);
     const boundary = slice.lastIndexOf(' ');
-    const end = boundary > Math.floor(maxLength * ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO) ? boundary : maxLength;
+    const hasUsefulBoundary = boundary !== -1 && boundary > Math.floor(maxLength * ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO);
+    const end = hasUsefulBoundary ? boundary : maxLength;
     return `${slice.slice(0, end).trimEnd()}…`;
 }
 
@@ -422,9 +423,10 @@ function parseCnblogsArticleList(html, source) {
         const timeNode = container?.querySelector('time, .postDesc, .entrylistItemPostDesc + div, .article_manage');
         const text = normalizeWhitespace(container?.textContent || '');
         const timeText = timeNode?.getAttribute('datetime') || timeNode?.textContent?.trim() || '';
-        const dateMatch = timeText.match(CNBLOGS_DATE_PATTERN) || text.slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH).match(CNBLOGS_DATE_PATTERN);
+        const timeMatch = timeText.match(CNBLOGS_DATE_PATTERN);
+        const dateMatch = timeMatch || text.slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH).match(CNBLOGS_DATE_PATTERN);
         const summarySeed = summaryNode?.textContent
-            || (text.startsWith(title) ? text.slice(title.length).trim() : text.replaceAll(title, '').trim());
+            || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
         const summary = buildSummaryExcerpt(summarySeed);
 
         return {
@@ -476,7 +478,10 @@ async function loadCnblogsArticles() {
             const response = await fetchWithTimeout(candidate.requestUrl, {
                 headers: { Accept: candidate.accept }
             }, 5000);
-            if (!response.ok) continue;
+            if (!response.ok) {
+                console.warn(`Failed to load cnblogs articles from ${candidate.source}: HTTP ${response.status}`, candidate.requestUrl);
+                continue;
+            }
             const text = await response.text();
             const articles = candidate.parser(text, candidate.source);
             if (Array.isArray(articles) && articles.length) return articles;
