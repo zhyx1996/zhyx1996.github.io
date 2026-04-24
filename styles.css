@@ -87,7 +87,7 @@ a {
     font-size: 0.9rem;
 }
 
-.nav-search {
+.nav-context {
     flex: 1;
     min-width: 220px;
     padding: 0.65rem 0.9rem;
@@ -664,7 +664,7 @@ a {
         align-items: flex-start;
     }
 
-    .nav-search {
+    .nav-context {
         width: 100%;
     }
 
