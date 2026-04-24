@@ -168,7 +168,7 @@ a {
 }
 
 .compact-banner {
-    align-items: start;
+    align-items: flex-start;
 }
 
 .page-banner h1 {
@@ -365,12 +365,12 @@ a {
 .section-heading {
     display: flex;
     justify-content: space-between;
-    align-items: end;
+    align-items: flex-end;
     gap: 1rem;
 }
 
 .section-heading.compact {
-    align-items: start;
+    align-items: flex-start;
 }
 
 .section-heading h2,
