@@ -227,7 +227,6 @@ function renderProjectLinks(repos) {
         <article class="contact-card">
             <div class="repo-title-row">
                 <span class="tag">${escapeHtml(repoShowcaseMeta[repo.name]?.label || safeText(repo.language, '项目'))}</span>
-                <span class="pill">Direct link</span>
             </div>
             <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(repo.html_url))}" target="_blank" rel="noreferrer">${escapeHtml(repo.name)}</a></h3>
             <p>${escapeHtml(safeText(repo.description, '可以直接跳转到仓库查看 README、代码和更新记录。'))}</p>
