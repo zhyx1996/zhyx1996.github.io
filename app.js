@@ -162,11 +162,12 @@ const isoDateDaysAgo = (days) => {
     return date.toISOString().slice(0, 10);
 };
 const buildGoldHistoryCandidates = (historyDate) => {
-    const compactDate = historyDate.replaceAll('-', '');
-    return [
-        { historyDate, requestUrl: `${GOLD_API_BASE_URL}/${historyDate}` },
-        ...(compactDate === historyDate ? [] : [{ historyDate, requestUrl: `${GOLD_API_BASE_URL}/${compactDate}` }])
-    ];
+    const compactDate = historyDate.replace(/-/g, '');
+    const candidates = [{ historyDate, requestUrl: `${GOLD_API_BASE_URL}/${historyDate}` }];
+    if (compactDate !== historyDate) {
+        candidates.push({ historyDate, requestUrl: `${GOLD_API_BASE_URL}/${compactDate}` });
+    }
+    return candidates;
 };
 
 const totalRepoStars = (repos) => repos.reduce((sum, repo) => sum + Number(repo?.stargazers_count || 0), 0);
