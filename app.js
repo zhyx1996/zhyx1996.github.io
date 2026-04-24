@@ -395,7 +395,7 @@ function renderMarket(data) {
 
     container.innerHTML = `
         <article class="market-card glass-card">
-            <small>FX / 人民币</small>
+            <small>外汇汇率</small>
             <strong class="market-value">${fmtRate(data.usdCny)}</strong>
             <span class="market-change">${fmtFxLine('1', '美元', data.usdCny, '人民币')}</span>
             ${renderMarketFacts([
@@ -502,12 +502,10 @@ const gas92FetchPlans = [
 
 function buildGas92Candidates(plan) {
     const encodedUrl = encodeURIComponent(plan.url);
-    const jinaUrl = `https://r.jina.ai/http://${plan.url.replace(/^https?:\/\//, '')}`;
     return [
         { requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}`, parser: plan.parser, source: `${plan.label} / allorigins` },
         { requestUrl: `https://api.codetabs.com/v1/proxy/?quest=${encodedUrl}`, parser: plan.parser, source: `${plan.label} / codetabs` },
-        { requestUrl: `https://corsproxy.io/?${encodedUrl}`, parser: plan.parser, source: `${plan.label} / corsproxy` },
-        { requestUrl: jinaUrl, parser: plan.parser, source: `${plan.label} / jina` }
+        { requestUrl: `https://corsproxy.io/?${encodedUrl}`, parser: plan.parser, source: `${plan.label} / corsproxy` }
     ];
 }
 
