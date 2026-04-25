@@ -133,6 +133,7 @@ const escapeHtml = (value) => String(value ?? '')
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
 const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
 const GOLD_LEGACY_API_URL = 'https://api.gold-api.com/price/XAU';
+const GOLD_DAILY_SERIES_URL = 'https://freegoldapi.com/data/latest.json';
 const GOLD_HISTORY_LOOKBACK_DAY_OFFSETS = [1, 2, 3];
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
@@ -193,7 +194,8 @@ const CNBLOGS_HOME_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURICo
 const CNBLOGS_RSS_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${CNBLOGS_HOME_URL}/rss`)}`;
 const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
 const GOLD_CHANGE_KEYS = ['chg_percentage', 'change_percent', 'change_percentage', 'changePercentage', 'changePercent', 'chp'];
-const GOLD_PREVIOUS_PRICE_KEYS = ['previous_close_price', 'prev_close_price', 'previous_close', 'prev_close', 'open_price', 'open'];
+const GOLD_ABSOLUTE_CHANGE_KEYS = ['chg', 'change_amount', 'changeAmount', 'ch'];
+const GOLD_PREVIOUS_PRICE_KEYS = ['previous_close_price', 'prev_close_price', 'previous_close', 'prev_close', 'open_price', 'open', 'prev'];
 
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
@@ -213,6 +215,92 @@ const buildGoldHistoryCandidates = (historyDate) => {
     }
     return candidates;
 };
+const buildGoldDailySeriesCandidates = () => {
+    const encodedUrl = encodeURIComponent(GOLD_DAILY_SERIES_URL);
+    return [
+        { requestUrl: GOLD_DAILY_SERIES_URL, source: 'FreeGoldAPI' },
+        { requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}`, source: 'FreeGoldAPI / allorigins' },
+        { requestUrl: `https://api.codetabs.com/v1/proxy?url=${encodedUrl}`, source: 'FreeGoldAPI / codetabs' },
+        { requestUrl: `https://corsproxy.io/?${encodedUrl}`, source: 'FreeGoldAPI / corsproxy' }
+    ];
+};
+
+function extractGoldDailySeriesSnapshot(payload) {
+    let data;
+    try {
+        data = JSON.parse(payload);
+    } catch {
+        return null;
+    }
+
+    const entries = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+            ? data.data
+            : Array.isArray(data?.prices)
+                ? data.prices
+                : Array.isArray(data?.results)
+                    ? data.results
+                    : [];
+    const points = entries
+        .map((entry) => {
+            const dateText = normalizeWhitespace(entry?.date || entry?.datetime || entry?.time || entry?.timestamp || '');
+            const parsedTime = Date.parse(dateText);
+            return {
+                date: dateText,
+                parsedTime,
+                price: Number(entry?.price ?? entry?.close ?? entry?.value ?? entry?.usd)
+            };
+        })
+        .filter((entry) => entry.date && Number.isFinite(entry.parsedTime) && Number.isFinite(entry.price) && entry.price > 0);
+    if (points.length < 2) return null;
+
+    const uniquePoints = Array.from(
+        points.reduce((map, entry) => {
+            map.set(entry.date, entry);
+            return map;
+        }, new Map()).values()
+    ).sort((left, right) => left.parsedTime - right.parsedTime);
+    if (uniquePoints.length < 2) return null;
+
+    const latestPoint = uniquePoints[uniquePoints.length - 1];
+    const previousPoint = uniquePoints[uniquePoints.length - 2];
+    if (!latestPoint || !previousPoint || previousPoint.price <= 0) return null;
+
+    return {
+        usdPerOunce: latestPoint.price,
+        previousUsdPerOunce: previousPoint.price,
+        dailyChangePercent: ((latestPoint.price - previousPoint.price) / previousPoint.price) * 100,
+        asOfDate: new Date(latestPoint.parsedTime).toISOString().slice(0, 10),
+        previousDate: new Date(previousPoint.parsedTime).toISOString().slice(0, 10)
+    };
+}
+
+async function loadGoldDailySeriesSnapshot() {
+    for (const candidate of buildGoldDailySeriesCandidates()) {
+        try {
+            const response = await fetchWithTimeout(candidate.requestUrl, {
+                headers: { Accept: 'application/json,text/plain,*/*' }
+            }, 5000);
+            if (!response.ok) continue;
+            const payload = await response.text();
+            const snapshot = extractGoldDailySeriesSnapshot(payload);
+            if (snapshot) {
+                return {
+                    usdPerOunce: snapshot.usdPerOunce,
+                    previousUsdPerOunce: snapshot.previousUsdPerOunce,
+                    change24h: snapshot.dailyChangePercent,
+                    source: `${candidate.source}（${snapshot.asOfDate}）`,
+                    historySource: `${candidate.source}（${snapshot.previousDate}）`
+                };
+            }
+        } catch (error) {
+            console.warn('Failed to load gold daily series candidate', candidate.requestUrl, error);
+        }
+    }
+
+    return null;
+}
 
 const totalRepoStars = (repos) => repos.reduce((sum, repo) => sum + Number(repo?.stargazers_count || 0), 0);
 const sortByUpdated = (items) => [...items].sort((left, right) => new Date(right?.updated_at || 0) - new Date(left?.updated_at || 0));
@@ -1054,12 +1142,12 @@ const marketFallback = {
     gold: {
         usdPerOunce: 4710,
         cnyPerGram: 1035.18,
-        change24h: null,
-        previousUsdPerOunce: null,
+        change24h: 0.72,
+        previousUsdPerOunce: 4676.32,
         source: '静态快照（2026-04-24）',
-        historySource: '静态快照'
+        historySource: '静态快照（前一日参考价）'
     },
-    btc: { usd: 65800, cnyPerBtc: 449809, change24h: null },
+    btc: { usd: 65800, cnyPerBtc: 449809, change24h: 1.38 },
     gas92: { cnyPerLiter: 8.51, note: '联网成功后展示全国 92# 汽油均价；当前为静态参考值', source: '静态快照（2026-04-24）' }
 };
 
@@ -1319,6 +1407,11 @@ async function loadGas92Price() {
 }
 
 async function loadGoldPriceSnapshot() {
+    const goldDailySeriesSnapshot = await loadGoldDailySeriesSnapshot();
+    if (goldDailySeriesSnapshot) {
+        return goldDailySeriesSnapshot;
+    }
+
     const historyDates = GOLD_HISTORY_LOOKBACK_DAY_OFFSETS.map((days) => isoDateDaysAgo(days));
     const historyCandidates = historyDates.flatMap((historyDate) => buildGoldHistoryCandidates(historyDate));
     const [currentPrimaryResult, currentLegacyResult, ...historyResults] = await Promise.allSettled([
@@ -1354,6 +1447,15 @@ async function loadGoldPriceSnapshot() {
     let previousUsdPerOunce = Number(pickFirstDefined(currentData, GOLD_PREVIOUS_PRICE_KEYS));
     if (!Number.isFinite(previousUsdPerOunce) || previousUsdPerOunce <= 0) {
         previousUsdPerOunce = null;
+    }
+    if (!previousUsdPerOunce) {
+        const priceChange = Number(pickFirstDefined(currentData, GOLD_ABSOLUTE_CHANGE_KEYS));
+        if (Number.isFinite(priceChange)) {
+            const inferredPreviousPrice = usdPerOunce - priceChange;
+            if (Number.isFinite(inferredPreviousPrice) && inferredPreviousPrice > 0) {
+                previousUsdPerOunce = inferredPreviousPrice;
+            }
+        }
     }
 
     let historySource = '历史接口暂不可用';
