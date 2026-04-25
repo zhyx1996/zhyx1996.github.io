@@ -147,7 +147,7 @@ const ARTICLE_DIGEST_LIST_LIMIT = 6;
 const ARTICLE_HIGHLIGHT_DIGEST_LIMIT = 3;
 const ARTICLE_EXCERPT_MIN_LENGTH = 48;
 const ARTICLE_READABLE_TEXT_MIN_LENGTH = 12;
-const ARTICLE_DETAIL_FETCH_TIMEOUT_MS = 5000;
+const ARTICLE_DETAIL_FETCH_TIMEOUT_MS = 3000;
 const ARTICLE_DETAIL_BATCH_SIZE = 3;
 const ARTICLE_PENDING_SYNC_TEXT = '待同步';
 const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
@@ -452,7 +452,7 @@ function removeTitlePrefix(text, title) {
     const normalizedText = normalizeWhitespace(text);
     const normalizedTitle = normalizeWhitespace(title);
     if (!normalizedText || !normalizedTitle) return normalizedText;
-    return normalizedText.toLocaleLowerCase().startsWith(normalizedTitle.toLocaleLowerCase())
+    return normalizedText.toLowerCase().startsWith(normalizedTitle.toLowerCase())
         ? normalizedText.slice(normalizedTitle.length).replace(ARTICLE_DIGEST_TRIM_PREFIX_PATTERN, '').trim()
         : normalizedText;
 }
