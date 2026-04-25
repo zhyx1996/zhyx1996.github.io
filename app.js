@@ -700,14 +700,13 @@ function normalizeCnblogsArticleLink(value) {
     }
 }
 
-function extractCnblogsArticleFromContainer(container, source, seen) {
+function extractCnblogsArticleFromContainer(container, source) {
     if (!container) return null;
 
     const titleAnchor = container.querySelector(CNBLOGS_HOME_TITLE_SELECTORS);
     const title = normalizeWhitespace(titleAnchor?.textContent);
     const link = normalizeCnblogsArticleLink(titleAnchor?.getAttribute('href') || titleAnchor?.href || '');
-    const identity = link;
-    if (!title || !link || seen.has(identity)) return null;
+    if (!title || !link) return null;
 
     const summaryNode = container.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
     const timeNode = container.querySelector('time, .postDesc, .entrylistItemPostDesc + div, .article_manage');
@@ -718,8 +717,6 @@ function extractCnblogsArticleFromContainer(container, source, seen) {
     const summarySeed = summaryNode?.textContent
         || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
     const summary = buildSummaryExcerpt(summarySeed);
-
-    seen.add(identity);
 
     return {
         title,
@@ -733,9 +730,14 @@ function extractCnblogsArticleFromContainer(container, source, seen) {
 function parseCnblogsArticleList(html, source) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const seen = new Set();
-    const entryArticles = [...doc.querySelectorAll(CNBLOGS_HOME_ENTRY_SELECTORS)]
-        .map((container) => extractCnblogsArticleFromContainer(container, source, seen))
-        .filter(Boolean);
+    const entryArticles = [];
+
+    [...doc.querySelectorAll(CNBLOGS_HOME_ENTRY_SELECTORS)].forEach((container) => {
+        const article = extractCnblogsArticleFromContainer(container, source);
+        if (!article || seen.has(article.link)) return;
+        seen.add(article.link);
+        entryArticles.push(article);
+    });
 
     if (entryArticles.length) return entryArticles;
 
@@ -744,8 +746,7 @@ function parseCnblogsArticleList(html, source) {
     return anchors.map((anchor) => {
         const link = normalizeCnblogsArticleLink(anchor.getAttribute('href') || anchor.href || '');
         const title = normalizeWhitespace(anchor.textContent);
-        const identity = link;
-        if (!title || !link || link === '#' || seen.has(identity)) return null;
+        if (!title || !link || link === '#' || seen.has(link)) return null;
 
         const container = anchor.closest('article, li, section, div');
         const summaryNode = container?.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
@@ -757,7 +758,7 @@ function parseCnblogsArticleList(html, source) {
         const summarySeed = summaryNode?.textContent
             || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
         const summary = buildSummaryExcerpt(summarySeed);
-        seen.add(identity);
+        seen.add(link);
 
         return {
             title,
