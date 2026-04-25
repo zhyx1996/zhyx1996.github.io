@@ -96,7 +96,7 @@ const articleFallback = [
     {
         title: '博客园主页',
         link: CNBLOGS_HOME_URL,
-        summary: '正在尝试直接从博客园主页读取最近随笔；如果外部站点暂时不可用，这里至少保留博客园主页入口，避免页面留白。',
+        summary: '当外部站点暂时不可用时，这里至少保留博客园主页入口，避免页面留白；接口恢复后会自动刷新为最近随笔。',
         published_at: null,
         source: '博客园主页',
         isFallbackHub: true
