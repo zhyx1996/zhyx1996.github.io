@@ -679,7 +679,7 @@ const changeHTML = (c) => {
     const sign = c >= 0 ? '+' : '';
     return `<span class="market-change ${cls}">24h：${sign}${Number(c).toFixed(2)}%</span>`;
 };
-const buildFxFacts = (data) => [
+const buildForexFacts = (data) => [
     { label: 'USD / CNY', value: fmtFxLine('1', '美元', data.usdCny, '人民币') },
     { label: 'SGD / CNY', value: fmtFxLine('1', '新币', data.sgdCny, '人民币') },
     { label: 'CNY / JPY', value: fmtFxLine('1', '人民币', data.jpyPerCny, '日元', 2) }
@@ -689,7 +689,7 @@ function renderMarket(data, statuses = {}) {
     const container = document.getElementById('market-grid');
     if (!container) return;
     const marketStatuses = normalizeMarketStatuses(statuses);
-    const fxFacts = buildFxFacts(data);
+    const fxFacts = buildForexFacts(data);
 
     container.innerHTML = `
         <article class="market-card glass-card">
