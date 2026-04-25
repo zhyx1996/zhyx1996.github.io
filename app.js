@@ -85,8 +85,8 @@ const starredFallback = [
 ];
 
 const sponsorFallback = {
-    count: 2,
-    entities: ['LizardByte', 'glenn-jocher']
+    current: ['LizardByte', 'glenn-jocher'],
+    past: ['ncw']
 };
 
 const CNBLOGS_BLOG_APP = 'fix-me';
@@ -281,7 +281,27 @@ function renderAboutSummary(profile = profileFallback, repos = repoFallback, sta
     const starCount = Array.isArray(starredRepos) ? starredRepos.length : 0;
     const starLanguageCount = collectLanguages(starredRepos).length;
     const topStar = getMostStarred(starredRepos);
-    const sponsorNames = joinNames(sponsors?.entities || sponsorFallback.entities);
+    const currentSponsors = Array.isArray(sponsors?.current) ? sponsors.current : sponsorFallback.current;
+    const pastSponsors = Array.isArray(sponsors?.past) ? sponsors.past : sponsorFallback.past;
+    const currentSponsorNames = joinNames(currentSponsors);
+    const pastSponsorNames = joinNames(pastSponsors);
+    let sponsorSummary = '当前没有可展示的公开 Sponsoring 信息。';
+
+    if (currentSponsors.length || pastSponsors.length) {
+        const summaryParts = [];
+
+        summaryParts.push(
+            currentSponsors.length
+                ? `当前公开显示正在赞助 ${currentSponsors.length} 个开发者/组织：${safeText(currentSponsorNames, '暂无公开赞助对象')}。`
+                : '当前公开没有正在赞助的开发者/组织。'
+        );
+
+        if (pastSponsors.length) {
+            summaryParts.push(`历史上还赞助过 ${pastSponsors.length} 个开发者/组织：${safeText(pastSponsorNames, '暂无公开历史赞助对象')}。`);
+        }
+
+        sponsorSummary = summaryParts.join('');
+    }
 
     setText(
         'about-repo-summary',
@@ -297,9 +317,7 @@ function renderAboutSummary(profile = profileFallback, repos = repoFallback, sta
     );
     setText(
         'about-sponsor-summary',
-        sponsors?.count
-            ? `当前公开显示正在赞助 ${sponsors.count} 个开发者/组织：${safeText(sponsorNames, '暂无公开赞助对象')}。`
-            : '当前没有可展示的公开 Sponsoring 信息。'
+        sponsorSummary
     );
 }
 
