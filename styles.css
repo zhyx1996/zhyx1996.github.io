@@ -87,6 +87,7 @@ a {
 }
 
 .site-header,
+.site-notice,
 .page-shell,
 .footer {
     position: relative;
@@ -95,6 +96,32 @@ a {
 
 .site-header {
     padding-top: 0.8rem;
+}
+
+.site-notice {
+    margin-top: 0.85rem;
+}
+
+.site-notice-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.95rem 1.15rem;
+    border-radius: 18px;
+    border: 1px solid rgba(11, 101, 216, 0.18);
+    background: linear-gradient(135deg, rgba(11, 101, 216, 0.16), rgba(255, 255, 255, 0.9));
+    box-shadow: var(--shadow-soft);
+    color: var(--text);
+    font-weight: 600;
+}
+
+.site-notice-inner strong {
+    color: var(--primary-strong);
+    white-space: nowrap;
+}
+
+.site-notice-inner span {
+    color: var(--text);
 }
 
 .nav-inner {
@@ -885,6 +912,7 @@ a {
 
 @media (max-width: 820px) {
     .nav-inner,
+    .site-notice-inner,
     .section-heading,
     .footer-inner {
         flex-direction: column;
