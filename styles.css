@@ -1209,11 +1209,6 @@ a {
         opacity: 0.4;
         transform: none;
     }
-
-    .site-ambient-grid,
-    .site-ambient-beam {
-        display: none;
-    }
 }
 
 @media (max-width: 640px), (prefers-reduced-motion: reduce) {
