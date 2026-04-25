@@ -98,7 +98,7 @@ const articleFallback = [
         link: CNBLOGS_HOME_URL,
         summary: '当外部站点暂时不可用时，这里至少保留博客园主页入口，避免页面留白；接口恢复后会自动刷新为最近随笔。',
         published_at: null,
-        source: '博客园主页',
+        source: '博客园',
         isFallbackHub: true
     }
 ];
