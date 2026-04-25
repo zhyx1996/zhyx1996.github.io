@@ -152,6 +152,8 @@ const ARTICLE_DETAIL_BATCH_SIZE = 3;
 const ARTICLE_PENDING_SYNC_TEXT = '待同步';
 const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
 const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g;
+const CNBLOGS_HOME_ENTRY_SELECTORS = '.forFlow .day, .forFlow .postItem, .forFlow .entrylistItem, #post_list .post-item, #post_list .entrylistItem';
+const CNBLOGS_HOME_TITLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle2 a, a.postTitle, .postTitle a, a.entrylistItemTitle';
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle2 a, a.postTitle, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"], #mainContent a[href*="/articles/"]';
 const CNBLOGS_ARTICLE_BODY_SELECTORS = [
     '#cnblogs_post_body',
@@ -684,18 +686,64 @@ function parseCnblogsWcfPosts(text, source) {
     }).filter((item) => item.title && item.link);
 }
 
+function normalizeCnblogsArticleLink(value) {
+    try {
+        const parsed = new URL(String(value ?? ''), CNBLOGS_HOME_URL);
+        const path = parsed.pathname.replace(/\/+$/, '');
+        if (parsed.hostname !== 'www.cnblogs.com') return '';
+        if (!/^\/[^/]+\/(?:p|articles)\/[^/]+$/i.test(path)) return '';
+        return `${parsed.origin}${path}`;
+    } catch {
+        return '';
+    }
+}
+
+function extractCnblogsArticleFromContainer(container, source, seen) {
+    if (!container) return null;
+
+    const titleAnchor = container.querySelector(CNBLOGS_HOME_TITLE_SELECTORS);
+    const title = normalizeWhitespace(titleAnchor?.textContent);
+    const link = normalizeCnblogsArticleLink(titleAnchor?.getAttribute('href') || titleAnchor?.href || '');
+    const identity = `${title.toLocaleLowerCase()}|${link}`;
+    if (!title || !link || seen.has(identity)) return null;
+
+    const summaryNode = container.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
+    const timeNode = container.querySelector('time, .postDesc, .entrylistItemPostDesc + div, .article_manage');
+    const text = normalizeWhitespace(container.textContent || '');
+    const timeText = timeNode?.getAttribute('datetime') || timeNode?.textContent?.trim() || '';
+    const timeMatch = timeText.match(CNBLOGS_DATE_PATTERN);
+    const dateMatch = timeMatch || text.slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH).match(CNBLOGS_DATE_PATTERN);
+    const summarySeed = summaryNode?.textContent
+        || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
+    const summary = buildSummaryExcerpt(summarySeed);
+
+    seen.add(identity);
+
+    return {
+        title,
+        link,
+        summary,
+        published_at: timeText || dateMatch?.[0] || null,
+        source
+    };
+}
+
 function parseCnblogsArticleList(html, source) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    const anchors = [
-        ...doc.querySelectorAll(CNBLOGS_ARTICLE_SELECTORS)
-    ];
     const seen = new Set();
+    const entryArticles = [...doc.querySelectorAll(CNBLOGS_HOME_ENTRY_SELECTORS)]
+        .map((container) => extractCnblogsArticleFromContainer(container, source, seen))
+        .filter(Boolean);
+
+    if (entryArticles.length) return entryArticles;
+
+    const anchors = [...doc.querySelectorAll(CNBLOGS_ARTICLE_SELECTORS)];
 
     return anchors.map((anchor) => {
-        const link = safeUrl(anchor.getAttribute('href') || anchor.href || '', '');
+        const link = normalizeCnblogsArticleLink(anchor.getAttribute('href') || anchor.href || '');
         const title = normalizeWhitespace(anchor.textContent);
-        if (!title || !link || link === '#' || seen.has(link)) return null;
-        seen.add(link);
+        const identity = `${title.toLocaleLowerCase()}|${link}`;
+        if (!title || !link || link === '#' || seen.has(identity)) return null;
 
         const container = anchor.closest('article, li, section, div');
         const summaryNode = container?.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
@@ -707,6 +755,7 @@ function parseCnblogsArticleList(html, source) {
         const summarySeed = summaryNode?.textContent
             || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
         const summary = buildSummaryExcerpt(summarySeed);
+        seen.add(identity);
 
         return {
             title,
@@ -798,6 +847,18 @@ async function enrichCnblogsArticles(rawArticles) {
 
 const cnblogsArticleCandidates = [
     {
+        source: '博客园主页',
+        requestUrl: CNBLOGS_HOME_URL,
+        parser: parseCnblogsArticleList,
+        accept: 'text/html,application/xhtml+xml'
+    },
+    {
+        source: '博客园主页 / allorigins',
+        requestUrl: CNBLOGS_HOME_PROXY_URL,
+        parser: parseCnblogsArticleList,
+        accept: 'text/html,application/xhtml+xml'
+    },
+    {
         source: '博客园开放 API',
         requestUrl: CNBLOGS_OPEN_API_POSTS_URL,
         parser: parseCnblogsOpenApiPosts,
@@ -820,18 +881,6 @@ const cnblogsArticleCandidates = [
         requestUrl: CNBLOGS_WCF_PROXY_URL,
         parser: parseCnblogsWcfPosts,
         accept: 'application/atom+xml,application/xml,text/xml'
-    },
-    {
-        source: '博客园主页',
-        requestUrl: CNBLOGS_HOME_URL,
-        parser: parseCnblogsArticleList,
-        accept: 'text/html,application/xhtml+xml'
-    },
-    {
-        source: '博客园主页 / allorigins',
-        requestUrl: CNBLOGS_HOME_PROXY_URL,
-        parser: parseCnblogsArticleList,
-        accept: 'text/html,application/xhtml+xml'
     },
     {
         source: '博客园 RSS',
