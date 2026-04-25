@@ -145,6 +145,9 @@ const ARTICLE_DIGEST_TRUNCATE_LENGTH = 96;
 const ARTICLE_DIGEST_MIN_LENGTH = 36;
 const ARTICLE_DIGEST_LIST_LIMIT = 6;
 const ARTICLE_HIGHLIGHT_DIGEST_LIMIT = 3;
+const ARTICLE_EXCERPT_MIN_LENGTH = 48;
+const ARTICLE_READABLE_TEXT_MIN_LENGTH = 12;
+const ARTICLE_DETAIL_FETCH_TIMEOUT_MS = 5000;
 const ARTICLE_PENDING_SYNC_TEXT = '待同步';
 const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
 const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g;
@@ -432,7 +435,7 @@ function buildSentenceExcerpt(value, maxLength = ARTICLE_SUMMARY_TRUNCATE_LENGTH
         const nextExcerpt = excerpt ? `${excerpt} ${sentence}` : sentence;
         if (nextExcerpt.length > maxLength) break;
         excerpt = nextExcerpt;
-        if (excerpt.length >= Math.min(48, maxLength)) break;
+        if (excerpt.length >= Math.min(ARTICLE_EXCERPT_MIN_LENGTH, maxLength)) break;
     }
 
     return excerpt || buildSummaryExcerpt(text, maxLength);
@@ -456,7 +459,7 @@ function extractReadableTextSegments(node, title = '') {
     const paragraphTexts = [...clone.querySelectorAll('p, li, blockquote')]
         .map((element) => removeTitlePrefix(element.textContent, title))
         .map(normalizeWhitespace)
-        .filter((text) => text.length >= 12);
+        .filter((text) => text.length >= ARTICLE_READABLE_TEXT_MIN_LENGTH);
 
     if (paragraphTexts.length) return paragraphTexts;
 
@@ -706,7 +709,7 @@ async function loadCnblogsArticleDetail(article) {
         try {
             const response = await fetchWithTimeout(candidate.requestUrl, {
                 headers: { Accept: 'text/html,application/xhtml+xml' }
-            }, 5000);
+            }, ARTICLE_DETAIL_FETCH_TIMEOUT_MS);
             if (!response.ok) {
                 console.warn(`Failed to load cnblogs article detail from ${candidate.source}: HTTP ${response.status}`, candidate.requestUrl);
                 continue;
