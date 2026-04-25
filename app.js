@@ -94,12 +94,18 @@ const CNBLOGS_HOME_URL = `https://www.cnblogs.com/${CNBLOGS_BLOG_APP}`;
 
 const articleFallback = [
     {
-        title: '博客园主页',
-        link: CNBLOGS_HOME_URL,
-        summary: '这里会展示最近从博客园主页获取到的文章；如果外部站点暂时不可用，至少保留一个直达主页入口，避免页面留白。',
-        published_at: null,
-        source: '博客园',
-        isFallbackHub: true
+        title: '记录 GStreamer 打开 JPEG 编码的视频时出现错误的原因',
+        link: 'https://www.cnblogs.com/fix-me/p/archive/2026/04/23',
+        summary: '在 C++ 中使用 gst_parse_launch 创建 GStreamer 管道，并通过 decodebin 解码 JPEG 编码的 avi 视频时，程序会在没有明显报错信息的情况下崩溃。排查后确认根因不是管道本身，而是进程里同时使用了 OpenCV 的 VideoCapture / VideoWriter，触发了 videoio 相关库冲突。',
+        published_at: '2026-04-23T11:47:00+08:00',
+        source: '博客园静态整理'
+    },
+    {
+        title: 'CARLA 中的坐标系与标准车辆坐标系转换',
+        link: 'https://www.cnblogs.com/fix-me/p/19882892',
+        summary: '梳理 CARLA 左手坐标系与标准车辆右手坐标系的差异：CARLA 采用 X 前、Y 右、Z 上，标准车辆坐标系通常为 X 前、Y 左、Z 上。文中给出了位置与姿态的转换规则，核心是 y、yaw、pitch 取反，便于仿真数据和实车/算法坐标定义对齐。',
+        published_at: '2026-04-17T13:47:00+08:00',
+        source: '博客园静态整理'
     }
 ];
 
@@ -946,7 +952,7 @@ async function hydrateArticles() {
     if (!hasArticleTargets) return;
 
     renderArticles(articleFallback);
-    updateArticleStatus('已先展示博客园主页入口，联网后会自动刷新为最近文章。');
+    updateArticleStatus('已先展示根据博客园主页整理的两篇最新随笔，联网后会自动刷新为实时文章列表。');
 
     try {
         const articles = await loadCnblogsArticles();
@@ -964,10 +970,10 @@ async function hydrateArticles() {
                 updateArticleStatus('博客园文章已刷新，展示的是最近获取到的公开文章。');
             }
         } else {
-            updateArticleStatus('暂时未能连接博客园，页面已保留主页入口。');
+            updateArticleStatus('暂时未能连接博客园，页面仍展示静态整理的两篇最新随笔。');
         }
     } catch (error) {
-        updateArticleStatus('暂时未能连接博客园，页面已保留主页入口。');
+        updateArticleStatus('暂时未能连接博客园，页面仍展示静态整理的两篇最新随笔。');
         console.warn('Failed to load cnblogs articles', error);
     }
 }
