@@ -690,7 +690,9 @@ function normalizeCnblogsArticleLink(value) {
     try {
         const parsed = new URL(String(value ?? ''), CNBLOGS_HOME_URL);
         const path = parsed.pathname.replace(/\/+$/, '');
+        const [, blogApp = ''] = path.split('/');
         if (parsed.hostname !== 'www.cnblogs.com') return '';
+        if (blogApp.toLocaleLowerCase() !== CNBLOGS_BLOG_APP.toLocaleLowerCase()) return '';
         if (!/^\/[^/]+\/(?:p|articles)\/[^/]+$/i.test(path)) return '';
         return `${parsed.origin}${path}`;
     } catch {
@@ -704,7 +706,7 @@ function extractCnblogsArticleFromContainer(container, source, seen) {
     const titleAnchor = container.querySelector(CNBLOGS_HOME_TITLE_SELECTORS);
     const title = normalizeWhitespace(titleAnchor?.textContent);
     const link = normalizeCnblogsArticleLink(titleAnchor?.getAttribute('href') || titleAnchor?.href || '');
-    const identity = `${title.toLocaleLowerCase()}|${link}`;
+    const identity = link;
     if (!title || !link || seen.has(identity)) return null;
 
     const summaryNode = container.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
@@ -742,7 +744,7 @@ function parseCnblogsArticleList(html, source) {
     return anchors.map((anchor) => {
         const link = normalizeCnblogsArticleLink(anchor.getAttribute('href') || anchor.href || '');
         const title = normalizeWhitespace(anchor.textContent);
-        const identity = `${title.toLocaleLowerCase()}|${link}`;
+        const identity = link;
         if (!title || !link || link === '#' || seen.has(identity)) return null;
 
         const container = anchor.closest('article, li, section, div');
