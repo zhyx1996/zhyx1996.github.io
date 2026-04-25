@@ -152,7 +152,7 @@ const ARTICLE_DETAIL_BATCH_SIZE = 3;
 const ARTICLE_PENDING_SYNC_TEXT = '待同步';
 const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
 const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g;
-const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"]';
+const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle2 a, a.postTitle, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"], #mainContent a[href*="/articles/"]';
 const CNBLOGS_ARTICLE_BODY_SELECTORS = [
     '#cnblogs_post_body',
     '.postBody',
@@ -604,7 +604,10 @@ function parseCnblogsRss(text, source) {
 
     return [...xml.querySelectorAll('item')].map((item) => ({
         title: normalizeWhitespace(item.querySelector('title')?.textContent),
-        link: item.querySelector('link')?.textContent?.trim(),
+        link: item.querySelector('link')?.textContent?.trim()
+            || item.querySelector('link')?.getAttribute('href')?.trim()
+            || item.querySelector('guid')?.textContent?.trim()
+            || '',
         summary: stripHtmlTags(item.querySelector('description')?.textContent),
         published_at: item.querySelector('pubDate')?.textContent?.trim() || null,
         source
@@ -633,27 +636,32 @@ function parseCnblogsWcfPosts(text, source) {
     const xml = new DOMParser().parseFromString(text, 'application/xml');
     if (xml.querySelector('parsererror')) return [];
 
-    return [...xml.querySelectorAll('entry, post')].map((item) => ({
-        title: normalizeWhitespace(
-            item.querySelector('title')?.textContent
-            || item.querySelector('Title')?.textContent
-        ),
-        link: item.querySelector('id')?.textContent?.trim()
-            || item.querySelector('link')?.getAttribute('href')
-            || item.querySelector('Url')?.textContent?.trim()
-            || '',
-        summary: buildSummaryExcerpt(stripHtmlTags(
-            item.querySelector('summary')?.textContent
-            || item.querySelector('content')?.textContent
-            || item.querySelector('Summary')?.textContent
-            || ''
-        )),
-        published_at: item.querySelector('published')?.textContent?.trim()
-            || item.querySelector('updated')?.textContent?.trim()
-            || item.querySelector('PublishDate')?.textContent?.trim()
-            || null,
-        source
-    })).filter((item) => item.title && item.link);
+    return [...xml.querySelectorAll('entry, post')].map((item) => {
+        const idText = item.querySelector('id')?.textContent?.trim() || '';
+        const idIsHttpUrl = idText.startsWith('http://') || idText.startsWith('https://');
+        return {
+            title: normalizeWhitespace(
+                item.querySelector('title')?.textContent
+                || item.querySelector('Title')?.textContent
+            ),
+            link: item.querySelector('link')?.getAttribute('href')?.trim()
+                || (idIsHttpUrl ? idText : '')
+                || item.querySelector('link')?.textContent?.trim()
+                || item.querySelector('Url')?.textContent?.trim()
+                || '',
+            summary: buildSummaryExcerpt(stripHtmlTags(
+                item.querySelector('summary')?.textContent
+                || item.querySelector('content')?.textContent
+                || item.querySelector('Summary')?.textContent
+                || ''
+            )),
+            published_at: item.querySelector('published')?.textContent?.trim()
+                || item.querySelector('updated')?.textContent?.trim()
+                || item.querySelector('PublishDate')?.textContent?.trim()
+                || null,
+            source
+        };
+    }).filter((item) => item.title && item.link);
 }
 
 function parseCnblogsArticleList(html, source) {
