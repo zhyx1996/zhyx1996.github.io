@@ -181,17 +181,12 @@ const CNBLOGS_ARTICLE_CONTENT_SKIP_SELECTORS = [
     '.under-post-card'
 ].join(', ');
 const CNBLOGS_ARTICLE_DETAIL_PROXY_BUILDERS = [
-    { label: '博客园正文', buildUrl: (articleUrl) => articleUrl },
     { label: '博客园正文 / allorigins', buildUrl: (articleUrl) => `https://api.allorigins.win/raw?url=${encodeURIComponent(articleUrl)}` },
     { label: '博客园正文 / codetabs', buildUrl: (articleUrl) => `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(articleUrl)}` },
     { label: '博客园正文 / corsproxy', buildUrl: (articleUrl) => `https://corsproxy.io/?${encodeURIComponent(articleUrl)}` }
 ];
 const CNBLOGS_OPEN_API_POSTS_URL = `https://api.cnblogs.com/api/blog/posts/@${CNBLOGS_BLOG_APP}?pageIndex=1&pageSize=10`;
-const CNBLOGS_OPEN_API_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_OPEN_API_POSTS_URL)}`;
 const CNBLOGS_WCF_POSTS_URL = `https://wcf.open.cnblogs.com/blog/u/${CNBLOGS_BLOG_APP}/posts/1/10`;
-const CNBLOGS_WCF_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_WCF_POSTS_URL)}`;
-const CNBLOGS_HOME_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_HOME_URL)}`;
-const CNBLOGS_RSS_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${CNBLOGS_HOME_URL}/rss`)}`;
 const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
 const GOLD_CHANGE_KEYS = ['chg_percentage', 'change_percent', 'change_percentage', 'changePercentage', 'changePercent', 'chp'];
 const GOLD_ABSOLUTE_CHANGE_KEYS = ['chg', 'change_amount', 'changeAmount', 'ch'];
@@ -945,61 +940,21 @@ async function enrichCnblogsArticles(rawArticles) {
     return detailedArticles;
 }
 
+function buildCnblogsProxyRequestPlans(source, requestUrl, parser, accept) {
+    const encodedUrl = encodeURIComponent(requestUrl);
+    return [
+        { source: `${source} / allorigins`, requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}`, parser, accept },
+        { source: `${source} / codetabs`, requestUrl: `https://api.codetabs.com/v1/proxy?url=${encodedUrl}`, parser, accept },
+        { source: `${source} / corsproxy`, requestUrl: `https://corsproxy.io/?${encodedUrl}`, parser, accept }
+    ];
+}
+
 const cnblogsArticleCandidates = [
-    {
-        source: '博客园主页',
-        requestUrl: CNBLOGS_HOME_URL,
-        parser: parseCnblogsArticleList,
-        accept: 'text/html,application/xhtml+xml'
-    },
-    {
-        source: '博客园主页 / allorigins',
-        requestUrl: CNBLOGS_HOME_PROXY_URL,
-        parser: parseCnblogsArticleList,
-        accept: 'text/html,application/xhtml+xml'
-    },
-    {
-        source: '博客园开放 API',
-        requestUrl: CNBLOGS_OPEN_API_POSTS_URL,
-        parser: parseCnblogsOpenApiPosts,
-        accept: 'application/json,text/plain'
-    },
-    {
-        source: '博客园开放 API / allorigins',
-        requestUrl: CNBLOGS_OPEN_API_PROXY_URL,
-        parser: parseCnblogsOpenApiPosts,
-        accept: 'application/json,text/plain'
-    },
-    {
-        source: '博客园开放 API / WCF',
-        requestUrl: CNBLOGS_WCF_POSTS_URL,
-        parser: parseCnblogsWcfPosts,
-        accept: 'application/atom+xml,application/xml,text/xml'
-    },
-    {
-        source: '博客园开放 API / WCF / allorigins',
-        requestUrl: CNBLOGS_WCF_PROXY_URL,
-        parser: parseCnblogsWcfPosts,
-        accept: 'application/atom+xml,application/xml,text/xml'
-    },
-    {
-        source: '博客园 RSS',
-        requestUrl: `${CNBLOGS_HOME_URL}/rss`,
-        parser: parseCnblogsRss,
-        accept: 'application/rss+xml,application/xml,text/xml'
-    },
-    {
-        source: '博客园 RSS / rss.xml',
-        requestUrl: `${CNBLOGS_HOME_URL}/rss.xml`,
-        parser: parseCnblogsRss,
-        accept: 'application/rss+xml,application/xml,text/xml'
-    },
-    {
-        source: '博客园 RSS / allorigins',
-        requestUrl: CNBLOGS_RSS_PROXY_URL,
-        parser: parseCnblogsRss,
-        accept: 'application/rss+xml,application/xml,text/xml'
-    }
+    ...buildCnblogsProxyRequestPlans('博客园开放 API', CNBLOGS_OPEN_API_POSTS_URL, parseCnblogsOpenApiPosts, 'application/json,text/plain'),
+    ...buildCnblogsProxyRequestPlans('博客园开放 API / WCF', CNBLOGS_WCF_POSTS_URL, parseCnblogsWcfPosts, 'application/atom+xml,application/xml,text/xml'),
+    ...buildCnblogsProxyRequestPlans('博客园 RSS', `${CNBLOGS_HOME_URL}/rss`, parseCnblogsRss, 'application/rss+xml,application/xml,text/xml'),
+    ...buildCnblogsProxyRequestPlans('博客园 RSS / rss.xml', `${CNBLOGS_HOME_URL}/rss.xml`, parseCnblogsRss, 'application/rss+xml,application/xml,text/xml'),
+    ...buildCnblogsProxyRequestPlans('博客园主页', CNBLOGS_HOME_URL, parseCnblogsArticleList, 'text/html,application/xhtml+xml')
 ];
 
 async function loadCnblogsArticles() {
