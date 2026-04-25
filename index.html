@@ -172,11 +172,28 @@
                         <article class="repo-card article-card glass-card">
                             <span class="tag">博客园</span>
                             <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me" target="_blank" rel="noreferrer">博客园主页</a></h3>
-                            <p class="repo-description">这里会展示最近直接从博客园主页获取到的文章；如果暂时无法联网，也会保留直达主页的入口。</p>
+                            <p class="repo-description">这里会展示最近通过博客园开放 API / RSS / 主页解析获取到的文章；如果暂时无法联网，也会保留直达主页的入口。</p>
                             <div class="repo-actions">
                                 <a class="button outline" href="/articles.html">打开文章页</a>
                             </div>
                         </article>
+                    </div>
+                    <div class="article-digest-block">
+                        <div class="section-heading section-subheading">
+                            <div>
+                                <h3>内容摘要</h3>
+                                <p>把最近同步到的文章说明进一步压缩成更短的提要，便于在首页快速扫读。</p>
+                            </div>
+                            <span class="tag">Digest</span>
+                        </div>
+                        <div class="grid-3 info-grid article-digest-list" id="article-highlight-digest-list">
+                            <article class="card glass-card article-digest-card">
+                                <span class="badge">入口</span>
+                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me" target="_blank" rel="noreferrer">博客园主页</a></h3>
+                                <p class="article-digest-text">当前先保留博客园主页入口，待网络可用后会自动替换为最近文章与对应内容提要。</p>
+                                <p class="article-digest-meta">基于已同步文章信息生成 · 博客园</p>
+                            </article>
+                        </div>
                     </div>
                     <div class="button-row">
                         <a class="button outline" href="/articles.html">查看全部文章展示</a>
