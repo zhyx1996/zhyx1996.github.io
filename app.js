@@ -855,6 +855,7 @@ async function enrichCnblogsArticles(rawArticles) {
     return detailedArticles;
 }
 
+// 为同一博客园数据源补充多个只读代理，尽量提升浏览器端跨域读取成功率。
 function buildCnblogsFetchCandidates(requestUrl, source, parser, accept) {
     const encodedUrl = encodeURIComponent(requestUrl);
     return [
