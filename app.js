@@ -1357,9 +1357,9 @@ async function loadGoldPriceSnapshot() {
         previousUsdPerOunce = null;
     }
     if (!previousUsdPerOunce) {
-        const signedAbsoluteChange = Number(pickFirstDefined(currentData, GOLD_ABSOLUTE_CHANGE_KEYS));
-        const inferredPreviousPrice = usdPerOunce - signedAbsoluteChange;
-        if (Number.isFinite(signedAbsoluteChange) && Number.isFinite(inferredPreviousPrice) && inferredPreviousPrice > 0) {
+        const priceChange = Number(pickFirstDefined(currentData, GOLD_ABSOLUTE_CHANGE_KEYS));
+        const inferredPreviousPrice = usdPerOunce - priceChange;
+        if (Number.isFinite(priceChange) && Number.isFinite(inferredPreviousPrice) && inferredPreviousPrice > 0) {
             previousUsdPerOunce = inferredPreviousPrice;
         }
     }
