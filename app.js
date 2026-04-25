@@ -84,7 +84,8 @@ const starredFallback = [
     }
 ];
 
-const CNBLOGS_HOME_URL = 'https://www.cnblogs.com/fix-me';
+const CNBLOGS_BLOG_APP = 'fix-me';
+const CNBLOGS_HOME_URL = `https://www.cnblogs.com/${CNBLOGS_BLOG_APP}`;
 
 const articleFallback = [
     {
@@ -135,12 +136,23 @@ const MAX_URL_LABEL_LENGTH = 96;
 const URL_TRUNCATE_LENGTH = 93;
 const ARTICLE_SUMMARY_TRUNCATE_LENGTH = 120;
 const ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO = 0.6;
+const ARTICLE_DIGEST_TRUNCATE_LENGTH = 96;
+const ARTICLE_DIGEST_MIN_LENGTH = 36;
+const ARTICLE_DIGEST_LIST_LIMIT = 6;
+const ARTICLE_HIGHLIGHT_DIGEST_LIMIT = 3;
+const ARTICLE_PENDING_SYNC_TEXT = '待同步';
+const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
+const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g;
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"]';
+const CNBLOGS_OPEN_API_POSTS_URL = `https://api.cnblogs.com/api/blog/posts/@${CNBLOGS_BLOG_APP}?pageIndex=1&pageSize=10`;
+const CNBLOGS_OPEN_API_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_OPEN_API_POSTS_URL)}`;
+const CNBLOGS_WCF_POSTS_URL = `https://wcf.open.cnblogs.com/blog/u/${CNBLOGS_BLOG_APP}/posts/1/10`;
+const CNBLOGS_WCF_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_WCF_POSTS_URL)}`;
 const CNBLOGS_HOME_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_HOME_URL)}`;
 const CNBLOGS_RSS_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${CNBLOGS_HOME_URL}/rss`)}`;
 const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
-const GOLD_CHANGE_KEYS = ['chg_percentage', 'change_percent', 'change_percentage', 'changePercentage'];
-const GOLD_PREVIOUS_PRICE_KEYS = ['previous_close_price', 'prev_close_price', 'open_price'];
+const GOLD_CHANGE_KEYS = ['chg_percentage', 'change_percent', 'change_percentage', 'changePercentage', 'changePercent', 'chp'];
+const GOLD_PREVIOUS_PRICE_KEYS = ['previous_close_price', 'prev_close_price', 'previous_close', 'prev_close', 'open_price', 'open'];
 
 const pickFirstDefined = (source, keys) => {
     for (const key of keys) {
@@ -151,6 +163,14 @@ const pickFirstDefined = (source, keys) => {
 const isoDateDaysAgo = (days) => {
     const date = new Date(Date.now() - days * MILLISECONDS_PER_DAY);
     return date.toISOString().slice(0, 10);
+};
+const buildGoldHistoryCandidates = (historyDate) => {
+    const compactDate = historyDate.replace(/-/g, '');
+    const candidates = [{ historyDate, requestUrl: `${GOLD_API_BASE_URL}/${historyDate}` }];
+    if (compactDate !== historyDate) {
+        candidates.push({ historyDate, requestUrl: `${GOLD_API_BASE_URL}/${compactDate}` });
+    }
+    return candidates;
 };
 
 const totalRepoStars = (repos) => repos.reduce((sum, repo) => sum + Number(repo?.stargazers_count || 0), 0);
@@ -357,6 +377,58 @@ function renderArticleSummary(articles) {
     setTextAll('[data-article-source]', placeholderOnly ? '博客园主页' : safeText(latestArticle?.source, '博客园'));
 }
 
+function buildArticleDigest(article) {
+    const fallback = article.isFallbackHub
+        ? '当前先保留博客园主页入口，待网络可用后会自动替换为最近文章与对应内容提要。'
+        : '摘要源暂时没有返回更多正文信息，可以直接打开原文继续阅读。';
+    const summary = normalizeWhitespace(article.summary);
+    const normalizedTitle = normalizeWhitespace(article.title);
+    const summaryStartsWithTitle = normalizedTitle
+        && summary.toLocaleLowerCase().startsWith(normalizedTitle.toLocaleLowerCase());
+    const withoutTitle = summaryStartsWithTitle
+        ? summary.slice(normalizedTitle.length).replace(ARTICLE_DIGEST_TRIM_PREFIX_PATTERN, '').trim()
+        : summary;
+    const candidate = withoutTitle || summary;
+    if (!candidate) return fallback;
+
+    const sentences = candidate.match(ARTICLE_DIGEST_SENTENCE_PATTERN)?.map((sentence) => sentence.trim()).filter(Boolean) || [];
+    let digest = '';
+
+    for (const sentence of sentences) {
+        const nextDigest = digest ? `${digest} ${sentence}` : sentence;
+        if (nextDigest.length > ARTICLE_DIGEST_TRUNCATE_LENGTH) break;
+        digest = nextDigest;
+        if (digest.length >= ARTICLE_DIGEST_MIN_LENGTH) break;
+    }
+
+    return digest || buildSummaryExcerpt(candidate, ARTICLE_DIGEST_TRUNCATE_LENGTH) || fallback;
+}
+
+function buildArticleDigestMarkup(articles, limit = ARTICLE_DIGEST_LIST_LIMIT) {
+    return sortArticles(articles).slice(0, limit).map((article, index) => {
+        const publishedText = article.published_at ? fmtDate(article.published_at) : ARTICLE_PENDING_SYNC_TEXT;
+        const digest = buildArticleDigest(article);
+        const badgeLabel = article.isFallbackHub ? '入口' : `摘要 ${String(index + 1).padStart(2, '0')}`;
+
+        return `
+            <article class="card glass-card article-digest-card">
+                <div class="repo-title-row">
+                    <span class="badge">${escapeHtml(badgeLabel)}</span>
+                    <span class="pill">${escapeHtml(publishedText)}</span>
+                </div>
+                <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(article.link))}" target="_blank" rel="noreferrer">${escapeHtml(safeText(article.title, '未命名文章'))}</a></h3>
+                <p class="article-digest-text">${escapeHtml(digest)}</p>
+                <p class="article-digest-meta">基于已同步文章信息生成 · ${escapeHtml(safeText(article.source, '博客园'))}</p>
+            </article>
+        `;
+    }).join('');
+}
+
+function renderArticleDigests(articles) {
+    renderMarkup('article-digest-list', buildArticleDigestMarkup(articles, ARTICLE_DIGEST_LIST_LIMIT));
+    renderMarkup('article-highlight-digest-list', buildArticleDigestMarkup(articles, ARTICLE_HIGHLIGHT_DIGEST_LIMIT));
+}
+
 function buildArticleMarkup(articles, limit = articles.length) {
     return sortArticles(articles).slice(0, limit).map((article) => {
         const title = safeText(article.title, '未命名文章');
@@ -367,7 +439,7 @@ function buildArticleMarkup(articles, limit = articles.length) {
                 : '文章摘要暂时不可用，可以直接打开原文继续阅读。'
         );
         const actionLabel = article.isFallbackHub ? '打开博客园主页' : '阅读原文';
-        const publishedText = article.published_at ? fmtDate(article.published_at) : '待同步';
+        const publishedText = article.published_at ? fmtDate(article.published_at) : ARTICLE_PENDING_SYNC_TEXT;
 
         return `
             <article class="repo-card article-card glass-card">
@@ -394,6 +466,7 @@ function renderArticles(rawArticles) {
 
     renderMarkup('article-list', buildArticleMarkup(items));
     renderMarkup('article-highlight-list', buildArticleMarkup(items, 3));
+    renderArticleDigests(items);
     renderArticleSummary(items);
 }
 
@@ -406,6 +479,51 @@ function parseCnblogsRss(text, source) {
         link: item.querySelector('link')?.textContent?.trim(),
         summary: stripHtmlTags(item.querySelector('description')?.textContent),
         published_at: item.querySelector('pubDate')?.textContent?.trim() || null,
+        source
+    })).filter((item) => item.title && item.link);
+}
+
+function parseCnblogsOpenApiPosts(text, source) {
+    try {
+        const payload = JSON.parse(text);
+        const items = Array.isArray(payload) ? payload : payload?.items;
+        if (!Array.isArray(items)) return [];
+
+        return items.map((item) => ({
+            title: normalizeWhitespace(item?.title),
+            link: item?.url?.trim() || item?.link?.trim() || '',
+            summary: buildSummaryExcerpt(stripHtmlTags(item?.summary || item?.description || item?.excerpt || '')),
+            published_at: item?.postDate || item?.dateAdded || item?.published_at || null,
+            source
+        })).filter((item) => item.title && item.link);
+    } catch {
+        return [];
+    }
+}
+
+function parseCnblogsWcfPosts(text, source) {
+    const xml = new DOMParser().parseFromString(text, 'application/xml');
+    if (xml.querySelector('parsererror')) return [];
+
+    return [...xml.querySelectorAll('entry, post')].map((item) => ({
+        title: normalizeWhitespace(
+            item.querySelector('title')?.textContent
+            || item.querySelector('Title')?.textContent
+        ),
+        link: item.querySelector('id')?.textContent?.trim()
+            || item.querySelector('link')?.getAttribute('href')
+            || item.querySelector('Url')?.textContent?.trim()
+            || '',
+        summary: buildSummaryExcerpt(stripHtmlTags(
+            item.querySelector('summary')?.textContent
+            || item.querySelector('content')?.textContent
+            || item.querySelector('Summary')?.textContent
+            || ''
+        )),
+        published_at: item.querySelector('published')?.textContent?.trim()
+            || item.querySelector('updated')?.textContent?.trim()
+            || item.querySelector('PublishDate')?.textContent?.trim()
+            || null,
         source
     })).filter((item) => item.title && item.link);
 }
@@ -445,6 +563,30 @@ function parseCnblogsArticleList(html, source) {
 }
 
 const cnblogsArticleCandidates = [
+    {
+        source: '博客园开放 API',
+        requestUrl: CNBLOGS_OPEN_API_POSTS_URL,
+        parser: parseCnblogsOpenApiPosts,
+        accept: 'application/json,text/plain'
+    },
+    {
+        source: '博客园开放 API / allorigins',
+        requestUrl: CNBLOGS_OPEN_API_PROXY_URL,
+        parser: parseCnblogsOpenApiPosts,
+        accept: 'application/json,text/plain'
+    },
+    {
+        source: '博客园开放 API / WCF',
+        requestUrl: CNBLOGS_WCF_POSTS_URL,
+        parser: parseCnblogsWcfPosts,
+        accept: 'application/atom+xml,application/xml,text/xml'
+    },
+    {
+        source: '博客园开放 API / WCF / allorigins',
+        requestUrl: CNBLOGS_WCF_PROXY_URL,
+        parser: parseCnblogsWcfPosts,
+        accept: 'application/atom+xml,application/xml,text/xml'
+    },
     {
         source: '博客园主页',
         requestUrl: CNBLOGS_HOME_URL,
@@ -617,6 +759,35 @@ const marketFallback = {
 const fmtRate = (n, d = 4) => n != null ? Number(n).toFixed(d) : '暂无';
 const fmtPrice = (n, digits = 0) => n != null ? Number(n).toLocaleString('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits }) : '暂无';
 const fmtFxLine = (baseAmount, baseUnit, quoteAmount, quoteUnit, digits = 4) => `${baseAmount} ${baseUnit} ≈ ${fmtRate(quoteAmount, digits)} ${quoteUnit}`;
+const marketItemLabels = {
+    fx: '汇率',
+    gold: '黄金',
+    btc: '比特币',
+    gas92: '全国 92# 均价'
+};
+const normalizeMarketStatuses = (statuses = {}) => Object.fromEntries(
+    Object.entries(marketItemLabels).map(([key, label]) => {
+        const status = statuses[key] || {};
+        return [key, {
+            label,
+            live: Boolean(status.live)
+        }];
+    })
+);
+const summarizeMarketStatuses = (statuses = {}) => {
+    const normalized = normalizeMarketStatuses(statuses);
+    return Object.values(normalized).reduce((summary, item) => {
+        if (item.live) {
+            summary.liveItems.push(item.label);
+        } else {
+            summary.fallbackItems.push(item.label);
+        }
+        return summary;
+    }, { liveItems: [], fallbackItems: [] });
+};
+const marketStatusBadgeHTML = (status) => `
+    <span class="market-status-badge ${status.live ? 'is-live' : 'is-fallback'}">${status.live ? '实时数据' : '静态快照'}</span>
+`;
 const renderMarketFacts = (items) => `
     <dl class="market-facts">
         ${items.map((item) => `
@@ -633,23 +804,33 @@ const changeHTML = (c) => {
     const sign = c >= 0 ? '+' : '';
     return `<span class="market-change ${cls}">24h：${sign}${Number(c).toFixed(2)}%</span>`;
 };
+const buildForexFacts = (data) => [
+    { label: 'USD / CNY', value: fmtFxLine('1', '美元', data.usdCny, '人民币') },
+    { label: 'SGD / CNY', value: fmtFxLine('1', '新币', data.sgdCny, '人民币') },
+    { label: 'CNY / JPY', value: fmtFxLine('1', '人民币', data.jpyPerCny, '日元', 2) }
+];
 
-function renderMarket(data) {
+function renderMarket(data, statuses = {}) {
     const container = document.getElementById('market-grid');
     if (!container) return;
+    const marketStatuses = normalizeMarketStatuses(statuses);
+    const fxFacts = buildForexFacts(data);
 
     container.innerHTML = `
         <article class="market-card glass-card">
-            <small>外汇汇率</small>
-            <strong class="market-value">${fmtRate(data.usdCny)}</strong>
-            <span class="market-change">${fmtFxLine('1', '美元', data.usdCny, '人民币')}</span>
-            ${renderMarketFacts([
-                { label: 'SGD / CNY', value: fmtFxLine('1', '新币', data.sgdCny, '人民币') },
-                { label: 'CNY / JPY', value: fmtFxLine('1', '人民币', data.jpyPerCny, '日元', 2) }
-            ])}
+            <div class="market-card-head">
+                <small>外汇汇率</small>
+                ${marketStatusBadgeHTML(marketStatuses.fx)}
+            </div>
+            <strong class="market-value">3 组常看汇率</strong>
+            <span class="market-change">按 1 单位基准货币换算</span>
+            ${renderMarketFacts(fxFacts)}
         </article>
         <article class="market-card glass-card">
-            <small>现货黄金</small>
+            <div class="market-card-head">
+                <small>现货黄金</small>
+                ${marketStatusBadgeHTML(marketStatuses.gold)}
+            </div>
             <strong class="market-value">¥${fmtPrice(data.gold.cnyPerGram, 2)} / g</strong>
             ${changeHTML(data.gold.change24h)}
             ${renderMarketFacts([
@@ -665,7 +846,10 @@ function renderMarket(data) {
             ])}
         </article>
         <article class="market-card glass-card">
-            <small>Bitcoin</small>
+            <div class="market-card-head">
+                <small>Bitcoin</small>
+                ${marketStatusBadgeHTML(marketStatuses.btc)}
+            </div>
             <strong class="market-value">¥${fmtPrice(data.btc.cnyPerBtc)} / BTC</strong>
             ${changeHTML(data.btc.change24h)}
             ${renderMarketFacts([
@@ -674,7 +858,10 @@ function renderMarket(data) {
             ])}
         </article>
         <article class="market-card glass-card">
-            <small>全国 92# 均价</small>
+            <div class="market-card-head">
+                <small>全国 92# 均价</small>
+                ${marketStatusBadgeHTML(marketStatuses.gas92)}
+            </div>
             <strong class="market-value">¥${fmtPrice(data.gas92.cnyPerLiter, 2)} / L</strong>
             <span class="market-change">${escapeHtml(data.gas92.note || '当前展示全国 92# 汽油均价')}</span>
             ${renderMarketFacts([
@@ -826,6 +1013,7 @@ async function loadGas92Price() {
 
 async function loadGoldPriceSnapshot() {
     const historyDates = GOLD_HISTORY_LOOKBACK_DAY_OFFSETS.map((days) => isoDateDaysAgo(days));
+    const historyCandidates = historyDates.flatMap((historyDate) => buildGoldHistoryCandidates(historyDate));
     const [currentPrimaryResult, currentLegacyResult, ...historyResults] = await Promise.allSettled([
         fetchWithTimeout(GOLD_API_BASE_URL, {
             headers: { Accept: 'application/json' }
@@ -833,7 +1021,7 @@ async function loadGoldPriceSnapshot() {
         fetchWithTimeout(GOLD_LEGACY_API_URL, {
             headers: { Accept: 'application/json' }
         }, 5000),
-        ...historyDates.map((historyDate) => fetchWithTimeout(`${GOLD_API_BASE_URL}/${historyDate}`, {
+        ...historyCandidates.map((candidate) => fetchWithTimeout(candidate.requestUrl, {
             headers: { Accept: 'application/json' }
         }, 5000))
     ]);
@@ -867,12 +1055,13 @@ async function loadGoldPriceSnapshot() {
     }
     for (let index = 0; index < historyResults.length; index++) {
         const historyResult = historyResults[index];
+        const candidate = historyCandidates[index];
         if (historyResult.status !== 'fulfilled' || !historyResult.value.ok) continue;
         const historyData = await historyResult.value.json();
         const historyPrice = Number(pickFirstDefined(historyData, ['price', 'price_usd', 'price_ounce', 'price_per_ounce']));
         if (Number.isFinite(historyPrice) && historyPrice > 0) {
             previousUsdPerOunce = historyPrice;
-            historySource = `Gold-API（${historyDates[index]}）`;
+            historySource = `Gold-API（${candidate.historyDate}）`;
             break;
         }
     }
@@ -904,9 +1093,10 @@ async function hydrateMarketData() {
         fallbackNoticeEl.hidden = !visible;
     };
 
-    renderMarket(marketFallback);
-    updateFallbackNotice(`当前先展示静态行情参考（快照日期：${fallbackDateText}），联网后会按可用接口逐项刷新。`);
-    updateMarketStatus('正在刷新汇率、黄金、比特币与 92# 汽油...');
+    const initialMarketStatuses = normalizeMarketStatuses();
+    renderMarket(marketFallback, initialMarketStatuses);
+    updateFallbackNotice(`当前先展示静态行情参考（快照日期：${fallbackDateText}）：汇率、黄金、比特币、全国 92# 均价当前均为静态数据；联网后会按可用接口逐项刷新。`);
+    updateMarketStatus('正在刷新行情数据；当前四项均为静态参考。');
 
     try {
         const [ratesResult, cryptoResult, goldResult, gas92Result] = await Promise.allSettled([
@@ -974,29 +1164,25 @@ async function hydrateMarketData() {
             hasLiveGas92 = true;
         }
 
-        renderMarket(marketData);
-        const fullyLive = hasLiveUsdCny && hasLiveCrypto && hasLiveGold && hasLiveGas92;
-        const refreshedItems = [
-            hasLiveUsdCny ? '汇率' : null,
-            hasLiveGold ? '黄金' : null,
-            hasLiveCrypto ? '比特币' : null,
-            hasLiveGas92 ? '92# 汽油' : null
-        ].filter(Boolean);
-        const fallbackItems = [
-            hasLiveUsdCny ? null : '汇率',
-            hasLiveGold ? null : '黄金',
-            hasLiveCrypto ? null : '比特币',
-            hasLiveGas92 ? null : '92# 汽油'
-        ].filter(Boolean);
+        const marketStatuses = normalizeMarketStatuses({
+            fx: { live: hasLiveUsdCny },
+            gold: { live: hasLiveGold },
+            btc: { live: hasLiveCrypto },
+            gas92: { live: hasLiveGas92 }
+        });
+        const { liveItems, fallbackItems } = summarizeMarketStatuses(marketStatuses);
+        renderMarket(marketData, marketStatuses);
+        const fullyLive = liveItems.length === Object.keys(marketItemLabels).length;
         if (fullyLive) {
             updateFallbackNotice('', false);
         } else {
-            updateFallbackNotice(`当前仍含静态行情参考（静态快照日期：${fallbackDateText}）：${fallbackItems.join('、')}仍为本地参考。`);
+            updateFallbackNotice(`当前仍含静态行情参考（静态快照日期：${fallbackDateText}）：${fallbackItems.join('、')}仍为静态数据；其余项目已刷新。`);
         }
         if (hasLiveData || hasLiveGas92) {
             const now = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
-            const fallbackText = fallbackItems.length ? `；未刷新：${fallbackItems.join('、')}` : '';
-            updateMarketStatus(`已刷新：${refreshedItems.join('、')}${fallbackText}（${now}）`);
+            const liveText = liveItems.length ? `已刷新：${liveItems.join('、')}` : '已刷新：暂无';
+            const fallbackText = fallbackItems.length ? `；静态：${fallbackItems.join('、')}` : '；静态：无';
+            updateMarketStatus(`${liveText}${fallbackText}（${now}）`);
         } else {
             updateMarketStatus('行情接口暂时不可用，当前展示的是本地参考数据。');
         }
