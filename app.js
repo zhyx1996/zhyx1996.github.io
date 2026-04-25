@@ -193,7 +193,7 @@ const CNBLOGS_HOME_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURICo
 const CNBLOGS_RSS_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${CNBLOGS_HOME_URL}/rss`)}`;
 const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
 const GOLD_CHANGE_KEYS = ['chg_percentage', 'change_percent', 'change_percentage', 'changePercentage', 'changePercent', 'chp'];
-const GOLD_ABSOLUTE_CHANGE_KEYS = ['chg', 'change', 'change_amount', 'changeAmount', 'ch'];
+const GOLD_ABSOLUTE_CHANGE_KEYS = ['chg', 'change_amount', 'changeAmount', 'ch'];
 const GOLD_PREVIOUS_PRICE_KEYS = ['previous_close_price', 'prev_close_price', 'previous_close', 'prev_close', 'open_price', 'open', 'prev'];
 
 const pickFirstDefined = (source, keys) => {
@@ -1357,9 +1357,9 @@ async function loadGoldPriceSnapshot() {
         previousUsdPerOunce = null;
     }
     if (!previousUsdPerOunce) {
-        const absoluteChange = Number(pickFirstDefined(currentData, GOLD_ABSOLUTE_CHANGE_KEYS));
-        const inferredPreviousPrice = usdPerOunce - absoluteChange;
-        if (Number.isFinite(absoluteChange) && Number.isFinite(inferredPreviousPrice) && inferredPreviousPrice > 0) {
+        const signedAbsoluteChange = Number(pickFirstDefined(currentData, GOLD_ABSOLUTE_CHANGE_KEYS));
+        const inferredPreviousPrice = usdPerOunce - signedAbsoluteChange;
+        if (Number.isFinite(signedAbsoluteChange) && Number.isFinite(inferredPreviousPrice) && inferredPreviousPrice > 0) {
             previousUsdPerOunce = inferredPreviousPrice;
         }
     }
