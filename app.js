@@ -243,11 +243,16 @@ function extractGoldDailySeriesSnapshot(payload) {
                     ? data.results
                     : [];
     const points = entries
-        .map((entry) => ({
-            date: normalizeWhitespace(entry?.date || entry?.datetime || entry?.time || entry?.timestamp || ''),
-            price: Number(entry?.price ?? entry?.close ?? entry?.value ?? entry?.usd)
-        }))
-        .filter((entry) => entry.date && Number.isFinite(entry.price) && entry.price > 0);
+        .map((entry) => {
+            const dateText = normalizeWhitespace(entry?.date || entry?.datetime || entry?.time || entry?.timestamp || '');
+            const parsedTime = Date.parse(dateText);
+            return {
+                date: dateText,
+                parsedTime,
+                price: Number(entry?.price ?? entry?.close ?? entry?.value ?? entry?.usd)
+            };
+        })
+        .filter((entry) => entry.date && Number.isFinite(entry.parsedTime) && Number.isFinite(entry.price) && entry.price > 0);
     if (points.length < 2) return null;
 
     const uniquePoints = Array.from(
@@ -255,16 +260,7 @@ function extractGoldDailySeriesSnapshot(payload) {
             map.set(entry.date, entry);
             return map;
         }, new Map()).values()
-    ).sort((left, right) => {
-        const leftTime = Date.parse(left.date || '');
-        const rightTime = Date.parse(right.date || '');
-        if (Number.isFinite(leftTime) && Number.isFinite(rightTime)) {
-            return leftTime - rightTime;
-        }
-        if (Number.isFinite(leftTime)) return -1;
-        if (Number.isFinite(rightTime)) return 1;
-        return leftTime - rightTime;
-    });
+    ).sort((left, right) => left.parsedTime - right.parsedTime);
     if (uniquePoints.length < 2) return null;
 
     const latestPoint = uniquePoints[uniquePoints.length - 1];
@@ -275,8 +271,8 @@ function extractGoldDailySeriesSnapshot(payload) {
         usdPerOunce: latestPoint.price,
         previousUsdPerOunce: previousPoint.price,
         change24h: ((latestPoint.price - previousPoint.price) / previousPoint.price) * 100,
-        asOfDate: latestPoint.date,
-        previousDate: previousPoint.date
+        asOfDate: new Date(latestPoint.parsedTime).toISOString().slice(0, 10),
+        previousDate: new Date(previousPoint.parsedTime).toISOString().slice(0, 10)
     };
 }
 
