@@ -270,7 +270,7 @@ function extractGoldDailySeriesSnapshot(payload) {
     return {
         usdPerOunce: latestPoint.price,
         previousUsdPerOunce: previousPoint.price,
-        change24h: ((latestPoint.price - previousPoint.price) / previousPoint.price) * 100,
+        dailyChangePercent: ((latestPoint.price - previousPoint.price) / previousPoint.price) * 100,
         asOfDate: new Date(latestPoint.parsedTime).toISOString().slice(0, 10),
         previousDate: new Date(previousPoint.parsedTime).toISOString().slice(0, 10)
     };
@@ -289,7 +289,7 @@ async function loadGoldDailySeriesSnapshot() {
                 return {
                     usdPerOunce: snapshot.usdPerOunce,
                     previousUsdPerOunce: snapshot.previousUsdPerOunce,
-                    change24h: snapshot.change24h,
+                    change24h: snapshot.dailyChangePercent,
                     source: `${candidate.source}（${snapshot.asOfDate}）`,
                     historySource: `${candidate.source}（${snapshot.previousDate}）`
                 };
