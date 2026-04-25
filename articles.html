@@ -38,7 +38,7 @@
                 <h1>博客园文章展示</h1>
                 <p>
                     这一页集中展示博客园主页入口与最近同步到的网站文章列表，方便把代码输出之外的文字内容也纳入统一展示。
-                    如果外部站点暂时不可用，这里仍会保留博客园主页的直达入口。
+                    现在除了文章列表，也会继续尝试进入每篇文章正文补全摘要；如果外部站点暂时不可用，这里仍会保留博客园主页的直达入口。
                 </p>
                 <div class="page-local-nav" aria-label="Article sections">
                     <a href="#article-snapshot">Snapshot</a>
@@ -57,7 +57,7 @@
                 <div class="banner-meta-card glass-card">
                     <small>来源</small>
                     <strong data-article-source>博客园主页</strong>
-                    <span class="meta-note">优先读取博客园开放 API，必要时回退到 RSS / 主页解析</span>
+                    <span class="meta-note">优先读取博客园开放 API，再结合文章正文补充更完整的摘要</span>
                 </div>
             </div>
         </section>
@@ -125,7 +125,7 @@
                     <div class="section-heading">
                         <div>
                             <h2>Recent articles</h2>
-                            <p>展示最近通过博客园开放 API / RSS / 主页解析获取到的网站文章；如果暂时无法同步，也会保留博客园主页入口。</p>
+                            <p>展示最近通过博客园开放 API / RSS / 主页解析获取到的网站文章，并继续读取文章正文补全摘要；如果暂时无法同步，也会保留博客园主页入口。</p>
                         </div>
                         <span class="tag">Articles</span>
                     </div>
@@ -145,7 +145,7 @@
                     <div class="section-heading">
                         <div>
                             <h2>Content digest</h2>
-                            <p>把已同步到的网站文章说明进一步整理成更短的内容提要，便于快速浏览最近写作主题。</p>
+                            <p>把文章列表与正文首段进一步整理成更短的内容提要，便于快速浏览最近写作主题。</p>
                         </div>
                         <span class="tag">Digest</span>
                     </div>
@@ -192,7 +192,7 @@
     <footer class="footer">
         <div class="footer-inner">
             <p>ZYX · zhyx1996.github.io · Cnblogs articles</p>
-            <p>文章数据优先直接来自博客园开放 API，其次回退到 RSS / 主页解析；接口不可用时保留主页入口。</p>
+            <p>文章数据优先来自博客园开放 API，再逐篇尝试读取正文补全摘要；接口不可用时保留主页入口。</p>
         </div>
     </footer>
 

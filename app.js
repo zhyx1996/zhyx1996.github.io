@@ -145,10 +145,42 @@ const ARTICLE_DIGEST_TRUNCATE_LENGTH = 96;
 const ARTICLE_DIGEST_MIN_LENGTH = 36;
 const ARTICLE_DIGEST_LIST_LIMIT = 6;
 const ARTICLE_HIGHLIGHT_DIGEST_LIMIT = 3;
+const ARTICLE_EXCERPT_MIN_LENGTH = 48;
+const ARTICLE_READABLE_TEXT_MIN_LENGTH = 12;
+const ARTICLE_DETAIL_FETCH_TIMEOUT_MS = 3000;
+const ARTICLE_DETAIL_BATCH_SIZE = 3;
 const ARTICLE_PENDING_SYNC_TEXT = '待同步';
 const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
 const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g;
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"]';
+const CNBLOGS_ARTICLE_BODY_SELECTORS = [
+    '#cnblogs_post_body',
+    '.postBody',
+    '.blogpost-body',
+    '.entry-content',
+    '.post .postBody',
+    'article'
+].join(', ');
+const CNBLOGS_ARTICLE_META_DESCRIPTION_SELECTORS = 'meta[name="description"], meta[property="og:description"], meta[name="twitter:description"]';
+const CNBLOGS_ARTICLE_CONTENT_SKIP_SELECTORS = [
+    'script',
+    'style',
+    'noscript',
+    'pre',
+    'code',
+    '.cnblogs_code',
+    '.copy-code',
+    '.postDesc',
+    '.clear',
+    '.ad_text',
+    '.under-post-card'
+].join(', ');
+const CNBLOGS_ARTICLE_DETAIL_PROXY_BUILDERS = [
+    { label: '博客园正文', buildUrl: (articleUrl) => articleUrl },
+    { label: '博客园正文 / allorigins', buildUrl: (articleUrl) => `https://api.allorigins.win/raw?url=${encodeURIComponent(articleUrl)}` },
+    { label: '博客园正文 / codetabs', buildUrl: (articleUrl) => `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(articleUrl)}` },
+    { label: '博客园正文 / corsproxy', buildUrl: (articleUrl) => `https://corsproxy.io/?${encodeURIComponent(articleUrl)}` }
+];
 const CNBLOGS_OPEN_API_POSTS_URL = `https://api.cnblogs.com/api/blog/posts/@${CNBLOGS_BLOG_APP}?pageIndex=1&pageSize=10`;
 const CNBLOGS_OPEN_API_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_OPEN_API_POSTS_URL)}`;
 const CNBLOGS_WCF_POSTS_URL = `https://wcf.open.cnblogs.com/blog/u/${CNBLOGS_BLOG_APP}/posts/1/10`;
@@ -399,6 +431,49 @@ function buildSummaryExcerpt(value, maxLength = ARTICLE_SUMMARY_TRUNCATE_LENGTH)
     return `${slice.slice(0, end).trimEnd()}…`;
 }
 
+function buildSentenceExcerpt(value, maxLength = ARTICLE_SUMMARY_TRUNCATE_LENGTH) {
+    const text = normalizeWhitespace(value);
+    if (!text) return '';
+
+    const sentences = text.match(ARTICLE_DIGEST_SENTENCE_PATTERN)?.map((sentence) => sentence.trim()).filter(Boolean) || [];
+    let excerpt = '';
+
+    for (const sentence of sentences) {
+        const nextExcerpt = excerpt ? `${excerpt} ${sentence}` : sentence;
+        if (nextExcerpt.length > maxLength) break;
+        excerpt = nextExcerpt;
+        if (excerpt.length >= Math.min(ARTICLE_EXCERPT_MIN_LENGTH, maxLength)) break;
+    }
+
+    return excerpt || buildSummaryExcerpt(text, maxLength);
+}
+
+function removeTitlePrefix(text, title) {
+    const normalizedText = normalizeWhitespace(text);
+    const normalizedTitle = normalizeWhitespace(title);
+    if (!normalizedText || !normalizedTitle) return normalizedText;
+    return normalizedText.toLowerCase().startsWith(normalizedTitle.toLowerCase())
+        ? normalizedText.slice(normalizedTitle.length).replace(ARTICLE_DIGEST_TRIM_PREFIX_PATTERN, '').trim()
+        : normalizedText;
+}
+
+function extractReadableTextSegments(node, title = '') {
+    if (!node) return [];
+
+    const clone = node.cloneNode(true);
+    clone.querySelectorAll(CNBLOGS_ARTICLE_CONTENT_SKIP_SELECTORS).forEach((element) => element.remove());
+
+    const paragraphTexts = [...clone.querySelectorAll('p, li, blockquote')]
+        .map((element) => removeTitlePrefix(element.textContent, title))
+        .map(normalizeWhitespace)
+        .filter((text) => text.length >= ARTICLE_READABLE_TEXT_MIN_LENGTH);
+
+    if (paragraphTexts.length) return paragraphTexts;
+
+    const fallbackText = removeTitlePrefix(clone.textContent, title);
+    return fallbackText ? [normalizeWhitespace(fallbackText)] : [];
+}
+
 function renderArticleSummary(articles) {
     const items = sortArticles(articles);
     const placeholderOnly = items.length === 1 && items[0]?.isFallbackHub;
@@ -597,6 +672,84 @@ function parseCnblogsArticleList(html, source) {
     }).filter(Boolean);
 }
 
+function parseCnblogsArticleDetail(html, article, source) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const detailNode = [...doc.querySelectorAll(CNBLOGS_ARTICLE_BODY_SELECTORS)]
+        .map((node) => ({ node, segments: extractReadableTextSegments(node, article?.title) }))
+        .filter((entry) => entry.segments.length)
+        .sort((left, right) => right.segments.join(' ').length - left.segments.join(' ').length)[0];
+    const detailSegments = detailNode?.segments || [];
+    const detailText = detailSegments.join(' ');
+    const metaDescription = normalizeWhitespace(
+        doc.querySelector(CNBLOGS_ARTICLE_META_DESCRIPTION_SELECTORS)?.getAttribute('content') || ''
+    );
+    const summary = buildSentenceExcerpt(detailText || metaDescription);
+    const timeValue = doc.querySelector('time')?.getAttribute('datetime')
+        || doc.querySelector('time')?.textContent?.trim()
+        || '';
+    const publishedMatch = timeValue.match(CNBLOGS_DATE_PATTERN);
+
+    if (!summary) return null;
+
+    return {
+        ...article,
+        summary,
+        published_at: article?.published_at || publishedMatch?.[0] || null,
+        detailSource: source
+    };
+}
+
+function buildCnblogsArticleDetailCandidates(articleUrl) {
+    return CNBLOGS_ARTICLE_DETAIL_PROXY_BUILDERS.map((plan) => ({
+        requestUrl: plan.buildUrl(articleUrl),
+        source: plan.label
+    }));
+}
+
+async function loadCnblogsArticleDetail(article) {
+    if (!article?.link || article.isFallbackHub) return null;
+    const articleLabel = safeText(article.title, article.link);
+
+    for (const candidate of buildCnblogsArticleDetailCandidates(article.link)) {
+        try {
+            const response = await fetchWithTimeout(candidate.requestUrl, {
+                headers: { Accept: 'text/html,application/xhtml+xml' }
+            }, ARTICLE_DETAIL_FETCH_TIMEOUT_MS);
+            if (!response.ok) {
+                console.warn(`Failed to load cnblogs article detail from ${candidate.source}: HTTP ${response.status}`, articleLabel, candidate.requestUrl);
+                continue;
+            }
+
+            const text = await response.text();
+            const detail = parseCnblogsArticleDetail(text, article, candidate.source);
+            if (detail?.summary) return detail;
+        } catch (error) {
+            console.warn(`Failed to load cnblogs article detail from ${candidate.source}`, articleLabel, candidate.requestUrl, error);
+        }
+    }
+
+    return null;
+}
+
+async function enrichCnblogsArticles(rawArticles) {
+    const normalizedArticles = rawArticles.map(normalizeArticle).filter((article) => article.title && article.link);
+    if (!normalizedArticles.length) return [];
+
+    const detailedArticles = [];
+
+    for (let index = 0; index < normalizedArticles.length; index += ARTICLE_DETAIL_BATCH_SIZE) {
+        const batch = normalizedArticles.slice(index, index + ARTICLE_DETAIL_BATCH_SIZE);
+        const batchResults = await Promise.allSettled(batch.map((article) => loadCnblogsArticleDetail(article)));
+
+        batchResults.forEach((result, batchIndex) => {
+            const article = batch[batchIndex];
+            detailedArticles.push(result.status === 'fulfilled' && result.value ? normalizeArticle(result.value) : article);
+        });
+    }
+
+    return detailedArticles;
+}
+
 const cnblogsArticleCandidates = [
     {
         source: '博客园开放 API',
@@ -692,7 +845,17 @@ async function hydrateArticles() {
         const articles = await loadCnblogsArticles();
         if (articles?.length) {
             renderArticles(articles);
-            updateArticleStatus('博客园文章已刷新，展示的是最近获取到的公开文章。');
+            updateArticleStatus('博客园文章列表已刷新，正在逐篇补充正文摘要...');
+            const enrichedArticles = await enrichCnblogsArticles(articles);
+            const previousSummaries = articles.map((article) => normalizeWhitespace(article?.summary));
+            const currentSummaries = enrichedArticles.map((article) => normalizeWhitespace(article?.summary));
+            const hasDetailSummary = currentSummaries.some((summary, index) => summary !== previousSummaries[index]);
+            if (hasDetailSummary) {
+                renderArticles(enrichedArticles);
+                updateArticleStatus('博客园文章已刷新，并已尽量补充每篇文章的正文摘要。');
+            } else {
+                updateArticleStatus('博客园文章已刷新，展示的是最近获取到的公开文章。');
+            }
         } else {
             updateArticleStatus('暂时未能连接博客园，页面已保留主页入口。');
         }
