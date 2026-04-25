@@ -289,8 +289,8 @@ async function loadGoldDailySeriesSnapshot() {
                     historySource: `${candidate.source}（${snapshot.previousDate}）`
                 };
             }
-        } catch (error) {
-            console.warn('Failed to load gold daily series candidate', candidate.requestUrl, error);
+        } catch {
+            continue;
         }
     }
 
@@ -898,23 +898,19 @@ function buildCnblogsArticleDetailCandidates(articleUrl) {
 
 async function loadCnblogsArticleDetail(article) {
     if (!article?.link || article.isFallbackHub) return null;
-    const articleLabel = safeText(article.title, article.link);
 
     for (const candidate of buildCnblogsArticleDetailCandidates(article.link)) {
         try {
             const response = await fetchWithTimeout(candidate.requestUrl, {
                 headers: { Accept: 'text/html,application/xhtml+xml' }
             }, ARTICLE_DETAIL_FETCH_TIMEOUT_MS);
-            if (!response.ok) {
-                console.warn(`Failed to load cnblogs article detail from ${candidate.source}: HTTP ${response.status}`, articleLabel, candidate.requestUrl);
-                continue;
-            }
+            if (!response.ok) continue;
 
             const text = await response.text();
             const detail = parseCnblogsArticleDetail(text, article, candidate.source);
             if (detail?.summary) return detail;
-        } catch (error) {
-            console.warn(`Failed to load cnblogs article detail from ${candidate.source}`, articleLabel, candidate.requestUrl, error);
+        } catch {
+            continue;
         }
     }
 
@@ -963,15 +959,12 @@ async function loadCnblogsArticles() {
             const response = await fetchWithTimeout(candidate.requestUrl, {
                 headers: { Accept: candidate.accept }
             }, 5000);
-            if (!response.ok) {
-                console.warn(`Failed to load cnblogs articles from ${candidate.source}: HTTP ${response.status}`, candidate.requestUrl);
-                continue;
-            }
+            if (!response.ok) continue;
             const text = await response.text();
             const articles = candidate.parser(text, candidate.source);
             if (Array.isArray(articles) && articles.length) return articles;
-        } catch (error) {
-            console.warn(`Failed to load cnblogs articles from ${candidate.source}`, candidate.requestUrl, error);
+        } catch {
+            continue;
         }
     }
 
@@ -1009,30 +1002,66 @@ async function hydrateArticles() {
         } else {
             updateArticleStatus('暂时未能连接博客园，页面已保留主页入口。');
         }
-    } catch (error) {
+    } catch {
         updateArticleStatus('暂时未能连接博客园，页面已保留主页入口。');
-        console.warn('Failed to load cnblogs articles', error);
     }
 }
 
 async function hydrateGithubData() {
     const status = document.querySelectorAll('[data-github-status]');
     const starStatus = document.querySelectorAll('[data-star-status]');
+    const hasProfileTargets = Boolean(
+        document.getElementById('profile-name')
+        || document.getElementById('profile-login')
+        || document.getElementById('profile-bio')
+        || document.getElementById('profile-avatar')
+        || document.getElementById('profile-link')
+    );
+    const hasRepoTargets = Boolean(
+        document.getElementById('project-list')
+        || document.getElementById('repo-total-stars')
+        || document.getElementById('repo-language-count')
+        || document.getElementById('repo-language-count-metric')
+        || document.getElementById('repo-last-updated')
+        || document.getElementById('repo-latest-label')
+        || document.getElementById('repo-top-project')
+    );
+    const hasStarTargets = Boolean(
+        document.getElementById('star-list')
+        || document.getElementById('star-total')
+        || document.getElementById('star-language-count')
+        || document.getElementById('star-last-updated')
+        || document.getElementById('star-top-project')
+    );
+    const hasAboutTargets = Boolean(
+        document.getElementById('about-repo-summary')
+        || document.getElementById('about-star-summary')
+        || document.getElementById('about-sponsor-summary')
+    );
+    const hasGithubTargets = Boolean(
+        status.length
+        || starStatus.length
+        || hasProfileTargets
+        || hasRepoTargets
+        || hasStarTargets
+        || hasAboutTargets
+    );
+    if (!hasGithubTargets) return;
     const updateStatus = (text) => status.forEach((node) => { node.textContent = text; });
     const updateStarStatus = (text) => starStatus.forEach((node) => { node.textContent = text; });
 
-    renderProfile(profileFallback, repoFallback);
-    renderRepos(repoFallback);
-    renderStarred(starredFallback);
-    renderAboutSummary(profileFallback, repoFallback, starredFallback, sponsorFallback);
+    if (hasProfileTargets) renderProfile(profileFallback, repoFallback);
+    if (hasRepoTargets) renderRepos(repoFallback);
+    if (hasStarTargets) renderStarred(starredFallback);
+    if (hasAboutTargets) renderAboutSummary(profileFallback, repoFallback, starredFallback, sponsorFallback);
     updateStatus('已先展示静态摘要，联网后会自动刷新为 GitHub 公开资料。');
     updateStarStatus('已先展示静态 Star 摘要，联网后会自动刷新。');
 
     try {
         const [profileRes, reposRes, starredRes] = await Promise.allSettled([
-            fetch('https://api.github.com/users/zhyx1996', { headers: { Accept: 'application/vnd.github+json' } }),
-            fetch('https://api.github.com/users/zhyx1996/repos?sort=updated&per_page=100', { headers: { Accept: 'application/vnd.github+json' } }),
-            fetch('https://api.github.com/users/zhyx1996/starred?sort=updated&per_page=100', { headers: { Accept: 'application/vnd.github+json' } })
+            hasProfileTargets || hasAboutTargets ? fetch('https://api.github.com/users/zhyx1996', { headers: { Accept: 'application/vnd.github+json' } }) : null,
+            hasProfileTargets || hasRepoTargets || hasAboutTargets ? fetch('https://api.github.com/users/zhyx1996/repos?sort=updated&per_page=100', { headers: { Accept: 'application/vnd.github+json' } }) : null,
+            hasStarTargets || hasAboutTargets ? fetch('https://api.github.com/users/zhyx1996/starred?sort=updated&per_page=100', { headers: { Accept: 'application/vnd.github+json' } }) : null
         ]);
 
         let profile = profileFallback;
@@ -1042,12 +1071,12 @@ async function hydrateGithubData() {
         let hasLiveRepos = false;
         let hasLiveStars = false;
 
-        if (profileRes.status === 'fulfilled' && profileRes.value.ok) {
+        if (profileRes.status === 'fulfilled' && profileRes.value?.ok) {
             profile = { ...profileFallback, ...(await profileRes.value.json()) };
             hasLiveProfile = true;
         }
 
-        if (reposRes.status === 'fulfilled' && reposRes.value.ok) {
+        if (reposRes.status === 'fulfilled' && reposRes.value?.ok) {
             const repoData = await reposRes.value.json();
             if (Array.isArray(repoData) && repoData.length) {
                 const publicRepos = repoData.filter((repo) => !repo.private);
@@ -1058,7 +1087,7 @@ async function hydrateGithubData() {
             }
         }
 
-        if (starredRes.status === 'fulfilled' && starredRes.value.ok) {
+        if (starredRes.status === 'fulfilled' && starredRes.value?.ok) {
             const starredData = await starredRes.value.json();
             if (Array.isArray(starredData) && starredData.length) {
                 starredRepos = starredData;
@@ -1066,10 +1095,10 @@ async function hydrateGithubData() {
             }
         }
 
-        renderProfile(profile, repos);
-        renderRepos(repos);
-        renderStarred(starredRepos);
-        renderAboutSummary(profile, repos, starredRepos, sponsorFallback);
+        if (hasProfileTargets) renderProfile(profile, repos);
+        if (hasRepoTargets) renderRepos(repos);
+        if (hasStarTargets) renderStarred(starredRepos);
+        if (hasAboutTargets) renderAboutSummary(profile, repos, starredRepos, sponsorFallback);
 
         if (hasLiveProfile || hasLiveRepos) {
             updateStatus('GitHub 公开资料已刷新，首页与仓库页展示的是实时接口数据。');
@@ -1082,10 +1111,9 @@ async function hydrateGithubData() {
         } else {
             updateStarStatus('暂时未能连接 GitHub Star 接口，页面已保留静态 Star 摘要。');
         }
-    } catch (error) {
+    } catch {
         updateStatus('暂时未能连接 GitHub API，页面已保留静态摘要与仓库信息。');
         updateStarStatus('暂时未能连接 GitHub Star 接口，页面已保留静态 Star 摘要。');
-        console.warn('Failed to load GitHub data', error);
     }
 }
 
@@ -1352,8 +1380,8 @@ async function loadGas92Price() {
                         source: result.effectiveDate ? `${candidate.source}（${result.effectiveDate}）` : `${candidate.source}${sampleText}`
                     };
                 }
-            } catch (error) {
-                console.warn('Failed to load gas92 candidate', candidate.requestUrl, error);
+            } catch {
+                continue;
             }
         }
     }
@@ -1550,9 +1578,8 @@ async function hydrateMarketData() {
         } else {
             updateMarketStatus('行情接口暂时不可用，当前展示的是本地参考数据。');
         }
-    } catch (error) {
+    } catch {
         updateMarketStatus('行情接口暂时不可用，当前展示的是本地参考数据。');
-        console.warn('Failed to load market data', error);
     }
 }
 
