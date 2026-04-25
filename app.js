@@ -146,6 +146,10 @@ const ARTICLE_DIGEST_TRUNCATE_LENGTH = 96;
 const ARTICLE_DIGEST_MIN_LENGTH = 36;
 const ARTICLE_DIGEST_LIST_LIMIT = 6;
 const ARTICLE_HIGHLIGHT_DIGEST_LIMIT = 3;
+const ARTICLE_CONTENT_CARD_LIMIT = 2;
+const ARTICLE_CONTENT_MAX_LENGTH = 960;
+const ARTICLE_CONTENT_PARAGRAPH_LIMIT = 3;
+const ARTICLE_CONTENT_PARAGRAPH_MAX_LENGTH = 320;
 const ARTICLE_EXCERPT_MIN_LENGTH = 48;
 const ARTICLE_READABLE_TEXT_MIN_LENGTH = 12;
 const ARTICLE_DETAIL_FETCH_TIMEOUT_MS = 3000;
@@ -546,6 +550,9 @@ const normalizeArticle = (item) => ({
     title: normalizeWhitespace(item?.title),
     link: safeUrl(item?.link, ''),
     summary: normalizeWhitespace(item?.summary || item?.description || ''),
+    content: Array.isArray(item?.content)
+        ? item.content.map(normalizeWhitespace).filter(Boolean).join('\n\n')
+        : String(item?.content || item?.body || ''),
     published_at: item?.published_at || item?.pubDate || item?.date || null,
     source: safeText(item?.source, '博客园'),
     isFallbackHub: Boolean(item?.isFallbackHub)
@@ -645,6 +652,27 @@ function buildArticleDigest(article) {
     return digest || buildSummaryExcerpt(candidate, ARTICLE_DIGEST_TRUNCATE_LENGTH) || fallback;
 }
 
+function buildDetailedArticleContent(segments, ...fallbacks) {
+    const paragraphs = [];
+    let totalLength = 0;
+
+    for (const segment of Array.isArray(segments) ? segments : []) {
+        const candidate = buildSummaryExcerpt(segment, ARTICLE_CONTENT_PARAGRAPH_MAX_LENGTH);
+        if (!candidate || paragraphs.includes(candidate)) continue;
+        if (totalLength + candidate.length > ARTICLE_CONTENT_MAX_LENGTH && paragraphs.length) break;
+
+        paragraphs.push(candidate);
+        totalLength += candidate.length;
+
+        if (paragraphs.length >= ARTICLE_CONTENT_PARAGRAPH_LIMIT) break;
+    }
+
+    if (paragraphs.length) return paragraphs.join('\n\n');
+
+    const fallbackText = fallbacks.map(normalizeWhitespace).find(Boolean) || '';
+    return buildSentenceExcerpt(fallbackText, ARTICLE_CONTENT_MAX_LENGTH);
+}
+
 function buildArticleDigestMarkup(articles, limit = ARTICLE_DIGEST_LIST_LIMIT) {
     return sortArticles(articles).slice(0, limit).map((article, index) => {
         const publishedText = article.published_at ? fmtDate(article.published_at) : ARTICLE_PENDING_SYNC_TEXT;
@@ -668,6 +696,59 @@ function buildArticleDigestMarkup(articles, limit = ARTICLE_DIGEST_LIST_LIMIT) {
 function renderArticleDigests(articles) {
     renderMarkup('article-digest-list', buildArticleDigestMarkup(articles, ARTICLE_DIGEST_LIST_LIMIT));
     renderMarkup('article-highlight-digest-list', buildArticleDigestMarkup(articles, ARTICLE_HIGHLIGHT_DIGEST_LIMIT));
+}
+
+function buildArticleContentParagraphs(article) {
+    const contentBlocks = String(article?.content || '')
+        .split(/\n{2,}/)
+        .map(normalizeWhitespace)
+        .filter(Boolean);
+    const paragraphs = [];
+
+    for (const block of contentBlocks) {
+        const candidate = buildSummaryExcerpt(block, ARTICLE_CONTENT_PARAGRAPH_MAX_LENGTH);
+        if (!candidate || paragraphs.includes(candidate)) continue;
+        paragraphs.push(candidate);
+        if (paragraphs.length >= ARTICLE_CONTENT_PARAGRAPH_LIMIT) break;
+    }
+
+    if (paragraphs.length) return paragraphs;
+
+    const fallback = article?.isFallbackHub
+        ? '博客园主页收录全部公开文章，可打开原文继续阅读。'
+        : buildSentenceExcerpt(article?.summary || '', ARTICLE_CONTENT_PARAGRAPH_MAX_LENGTH) || '打开原文查看完整内容。';
+    return [fallback];
+}
+
+function buildArticleContentMarkup(articles, limit = ARTICLE_CONTENT_CARD_LIMIT) {
+    return sortArticles(articles).slice(0, limit).map((article, index) => {
+        const publishedText = article.published_at ? fmtDate(article.published_at) : ARTICLE_PENDING_SYNC_TEXT;
+        const badgeLabel = article.isFallbackHub ? '博客园' : `文章 ${String(index + 1).padStart(2, '0')}`;
+        const paragraphs = buildArticleContentParagraphs(article)
+            .map((paragraph) => `<p class="article-content-paragraph">${escapeHtml(paragraph)}</p>`)
+            .join('');
+
+        return `
+            <article class="card glass-card article-content-card">
+                <div class="repo-title-row">
+                    <span class="badge">${escapeHtml(badgeLabel)}</span>
+                    <span class="pill">${escapeHtml(publishedText)}</span>
+                </div>
+                <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(article.link))}" target="_blank" rel="noreferrer">${escapeHtml(safeText(article.title, '未命名文章'))}</a></h3>
+                <div class="article-content-body">${paragraphs}</div>
+                <p class="article-digest-meta">${escapeHtml(safeText(article.source, '博客园'))} · ${escapeHtml(publishedText)}</p>
+                <div class="repo-actions">
+                    <a class="button outline" href="${escapeHtml(safeUrl(article.link))}" target="_blank" rel="noreferrer">${article.isFallbackHub ? '访问博客园' : '阅读原文'}</a>
+                </div>
+            </article>
+        `;
+    }).join('');
+}
+
+function renderArticleContent(articles) {
+    const markup = buildArticleContentMarkup(articles, ARTICLE_CONTENT_CARD_LIMIT);
+    renderMarkup('article-content-list', markup);
+    renderMarkup('article-featured-content-list', markup);
 }
 
 function buildArticleMarkup(articles, limit = articles.length) {
@@ -708,6 +789,7 @@ function renderArticles(rawArticles) {
     renderMarkup('article-list', buildArticleMarkup(items));
     renderMarkup('article-highlight-list', buildArticleMarkup(items, 3));
     renderArticleDigests(items);
+    renderArticleContent(items);
     renderArticleSummary(items);
 }
 
@@ -960,6 +1042,7 @@ function parseCnblogsArticleDetail(html, article, source) {
     return {
         ...article,
         summary,
+        content: buildDetailedArticleContent(detailSegments, detailText, metaDescription, article?.summary),
         published_at: article?.published_at || publishedMatch?.[0] || null,
         detailSource: source
     };
