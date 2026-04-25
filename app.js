@@ -130,7 +130,6 @@ const GOLD_LEGACY_API_URL = 'https://api.gold-api.com/price/XAU';
 const GOLD_HISTORY_LOOKBACK_DAY_OFFSETS = [1, 2, 3];
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
-const GAS92_TARGET_REGION = '北京';
 const GAS92_SUCCESS_CODES = new Set([0, 200, '0', '200']);
 const MAX_URL_LABEL_LENGTH = 96;
 const URL_TRUNCATE_LENGTH = 93;
@@ -612,7 +611,7 @@ const marketFallback = {
         historySource: '静态快照'
     },
     btc: { usd: 65800, cnyPerBtc: 449809, change24h: null },
-    gas92: { cnyPerLiter: 8.46, note: '当前展示北京市 92# 汽油参考价', source: '静态快照（2026-04-24）' }
+    gas92: { cnyPerLiter: 8.51, note: '联网成功后展示全国 92# 汽油均价；当前为静态参考值', source: '静态快照（2026-04-24）' }
 };
 
 const fmtRate = (n, d = 4) => n != null ? Number(n).toFixed(d) : '暂无';
@@ -675,12 +674,12 @@ function renderMarket(data) {
             ])}
         </article>
         <article class="market-card glass-card">
-            <small>92# 汽油</small>
+            <small>全国 92# 均价</small>
             <strong class="market-value">¥${fmtPrice(data.gas92.cnyPerLiter, 2)} / L</strong>
-            <span class="market-change">${escapeHtml(data.gas92.note || '当前展示北京市参考价')}</span>
+            <span class="market-change">${escapeHtml(data.gas92.note || '当前展示全国 92# 汽油均价')}</span>
             ${renderMarketFacts([
                 { label: '数据来源', value: safeText(data.gas92.source, '静态摘要') },
-                { label: '说明', value: '优先读取北京市公开油价接口' }
+                { label: '说明', value: '优先读取全国油价接口并计算 92# 均价' }
             ])}
         </article>
     `;
@@ -729,6 +728,18 @@ function buildGas92Candidates(plan) {
     ];
 }
 
+function pickGas92EntryPrice(entry) {
+    return [
+        entry?.n92,
+        entry?.p92,
+        entry?.price92,
+        entry?.oilPrice92,
+        entry?.oil92,
+        entry?.oil?.p92
+    ].map((value) => Number(value))
+        .find((value) => Number.isFinite(value) && value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
+}
+
 function extractGas92PriceFromApiPayload(payload) {
     let data;
     try {
@@ -746,31 +757,39 @@ function extractGas92PriceFromApiPayload(payload) {
         : data?.data
             ? [data.data]
             : [];
+    const validEntries = entries
+        .map((entry) => ({
+            regionName: normalizeGas92RegionName(
+                entry?.regionName
+                || entry?.name
+                || entry?.province
+                || entry?.region
+                || entry?.city
+                || ''
+            ),
+            price: pickGas92EntryPrice(entry),
+            effectiveDate: normalizeWhitespace(entry?.updateTime || entry?.date || entry?.dt || '')
+        }))
+        .filter((entry) => entry.regionName && entry.price != null);
+    if (!validEntries.length) return null;
 
-    const beijingEntry = entries.find((entry) => [
-        entry?.regionName,
-        entry?.name,
-        entry?.province,
-        entry?.region,
-        entry?.city
-    ].filter(Boolean).some((label) => normalizeGas92RegionName(label) === GAS92_TARGET_REGION));
-    if (!beijingEntry) return null;
+    const uniqueRegionEntries = Array.from(
+        validEntries.reduce((map, entry) => {
+            if (!map.has(entry.regionName)) {
+                map.set(entry.regionName, entry);
+            }
+            return map;
+        }, new Map()).values()
+    );
+    if (!uniqueRegionEntries.length) return null;
 
-    const price = [
-        beijingEntry?.n92,
-        beijingEntry?.p92,
-        beijingEntry?.price92,
-        beijingEntry?.oil?.p92
-    ].map((value) => Number(value))
-        .find((value) => Number.isFinite(value) && value >= GAS92_PRICE_RANGE.min && value <= GAS92_PRICE_RANGE.max);
-    if (price == null) return null;
+    const averagePrice = uniqueRegionEntries.reduce((sum, entry) => sum + entry.price, 0) / uniqueRegionEntries.length;
 
     return {
-        cnyPerLiter: price,
+        cnyPerLiter: averagePrice,
+        sampleCount: uniqueRegionEntries.length,
         effectiveDate: normalizeWhitespace(
-            beijingEntry?.updateTime
-            || beijingEntry?.date
-            || beijingEntry?.dt
+            uniqueRegionEntries.find((entry) => entry.effectiveDate)?.effectiveDate
             || data?.time
             || data?.date
             || ''
@@ -789,10 +808,11 @@ async function loadGas92Price() {
                 const payload = await response.text();
                 const result = extractGas92PriceFromApiPayload(payload);
                 if (result) {
+                    const sampleText = result.sampleCount ? `（${result.sampleCount}个地区均值）` : '';
                     return {
                         cnyPerLiter: result.cnyPerLiter,
-                        note: '当前展示北京市 92# 汽油实时价',
-                        source: result.effectiveDate ? `${candidate.source}（${result.effectiveDate}）` : candidate.source
+                        note: `当前展示全国 92# 汽油实时均价${sampleText}`,
+                        source: result.effectiveDate ? `${candidate.source}（${result.effectiveDate}）` : `${candidate.source}${sampleText}`
                     };
                 }
             } catch (error) {
