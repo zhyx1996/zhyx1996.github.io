@@ -53,6 +53,7 @@
                     <a href="#focus">Current focus</a>
                     <a href="#articles">Recent writing</a>
                     <a href="#market">Market snapshot</a>
+                    <a href="#showcase">Game showcase</a>
                     <a href="#links">Quick links</a>
                 </div>
                 <div class="button-row banner-actions">
@@ -209,6 +210,77 @@
                     <p class="market-static-notice" data-market-fallback-note>当前先展示静态行情参考（快照日期：2026年4月24日）：汇率、黄金、比特币、92# 汽油当前均为静态数据；联网后会按可用接口逐项刷新。</p>
                     <div class="market-grid" id="market-grid"></div>
                     <p class="status-inline" data-market-status>正在刷新行情数据...</p>
+                </section>
+                <section class="section" id="showcase">
+                    <div class="section-heading">
+                        <div>
+                            <h2>Game showcase</h2>
+                            <p>在不使用本地代理的前提下，原神使用可直接嵌入的公开页面，Steam 仅保留外链资料卡与官方支持的游戏 widget。</p>
+                        </div>
+                        <span class="tag">No Proxy</span>
+                    </div>
+                    <div class="embed-stack">
+                        <article class="card glass-card embed-card">
+                            <div class="repo-title-row">
+                                <span class="badge">Genshin Impact</span>
+                                <span class="pill">Enka iframe</span>
+                            </div>
+                            <h3>公开展柜</h3>
+                            <p>直接嵌入 Enka 的公开展示页。若偶发返回 424，通常是上游数据暂时异常，不代表嵌入方式失效。</p>
+                            <iframe
+                                class="external-embed-frame"
+                                src="https://enka.network/u/147521967/"
+                                loading="lazy"
+                                referrerpolicy="no-referrer"
+                                title="Genshin Showcase"
+                            ></iframe>
+                            <p class="embed-note">内容是否完整仍取决于 UID 的公开展柜状态和 Enka 当前可用性。</p>
+                        </article>
+                        <div class="grid-2 embed-grid">
+                            <article class="card glass-card embed-card">
+                                <div class="repo-title-row">
+                                    <span class="badge">Steam</span>
+                                    <span class="pill">Profile link</span>
+                                </div>
+                                <h3>个人主页资料卡</h3>
+                                <p>Steam 个人主页不能被第三方网页 iframe 嵌入，也不能在纯前端页面直接跨域抓取动态资料，因此这里保留静态卡片与外链入口。</p>
+                                <a class="steam-profile-card" href="https://steamcommunity.com/profiles/76561198391062314/" target="_blank" rel="noreferrer">
+                                    <img
+                                        class="avatar avatar-sm"
+                                        src="https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg"
+                                        alt="Steam avatar"
+                                        width="96"
+                                        height="96"
+                                    >
+                                    <span class="steam-profile-copy">
+                                        <strong>ZYX 的 Steam 主页</strong>
+                                        <span>打开社区主页查看完整公开资料</span>
+                                    </span>
+                                </a>
+                                <ul class="embed-meta-list">
+                                    <li>不使用代理，不做浏览器端动态抓取</li>
+                                    <li>避免受到 Steam 的 iframe 与 CORS 限制</li>
+                                </ul>
+                            </article>
+                            <article class="card glass-card embed-card">
+                                <div class="repo-title-row">
+                                    <span class="badge">Steam Store</span>
+                                    <span class="pill">Official widget</span>
+                                </div>
+                                <h3>官方商店游戏 widget</h3>
+                                <p>如果需要补充 Steam 内容，可以嵌入单个游戏的官方商店 widget；这类 widget 是 Steam 官方支持的前端嵌入方式。</p>
+                                <iframe
+                                    class="store-widget-frame"
+                                    src="https://store.steampowered.com/widget/3903190/"
+                                    loading="lazy"
+                                    title="Steam Store Widget"
+                                ></iframe>
+                                <div class="button-row">
+                                    <a class="button outline" href="/public-data-proxy/embed-demo.html">查看演示页</a>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
                 </section>
                 <section class="section" id="links">
                     <div class="section-heading">
