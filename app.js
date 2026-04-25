@@ -84,7 +84,7 @@ const starredFallback = [
     }
 ];
 
-const CNBLOGS_BLOG_APP = 'zhyx1996';
+const CNBLOGS_BLOG_APP = 'fix-me';
 const CNBLOGS_HOME_URL = `https://www.cnblogs.com/${CNBLOGS_BLOG_APP}`;
 
 const articleFallback = [
