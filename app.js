@@ -634,6 +634,35 @@ const marketFallback = {
 const fmtRate = (n, d = 4) => n != null ? Number(n).toFixed(d) : '暂无';
 const fmtPrice = (n, digits = 0) => n != null ? Number(n).toLocaleString('zh-CN', { minimumFractionDigits: digits, maximumFractionDigits: digits }) : '暂无';
 const fmtFxLine = (baseAmount, baseUnit, quoteAmount, quoteUnit, digits = 4) => `${baseAmount} ${baseUnit} ≈ ${fmtRate(quoteAmount, digits)} ${quoteUnit}`;
+const marketItemLabels = {
+    fx: '汇率',
+    gold: '黄金',
+    btc: '比特币',
+    gas92: '92# 汽油'
+};
+const normalizeMarketStatuses = (statuses = {}) => Object.fromEntries(
+    Object.entries(marketItemLabels).map(([key, label]) => {
+        const status = statuses[key] || {};
+        return [key, {
+            label,
+            live: Boolean(status.live)
+        }];
+    })
+);
+const summarizeMarketStatuses = (statuses = {}) => {
+    const normalized = normalizeMarketStatuses(statuses);
+    return Object.values(normalized).reduce((summary, item) => {
+        if (item.live) {
+            summary.liveItems.push(item.label);
+        } else {
+            summary.fallbackItems.push(item.label);
+        }
+        return summary;
+    }, { liveItems: [], fallbackItems: [] });
+};
+const marketStatusBadgeHTML = (status) => `
+    <span class="market-status-badge ${status.live ? 'is-live' : 'is-fallback'}">${status.live ? '实时数据' : '静态快照'}</span>
+`;
 const renderMarketFacts = (items) => `
     <dl class="market-facts">
         ${items.map((item) => `
@@ -650,25 +679,33 @@ const changeHTML = (c) => {
     const sign = c >= 0 ? '+' : '';
     return `<span class="market-change ${cls}">24h：${sign}${Number(c).toFixed(2)}%</span>`;
 };
+const buildForexFacts = (data) => [
+    { label: 'USD / CNY', value: fmtFxLine('1', '美元', data.usdCny, '人民币') },
+    { label: 'SGD / CNY', value: fmtFxLine('1', '新币', data.sgdCny, '人民币') },
+    { label: 'CNY / JPY', value: fmtFxLine('1', '人民币', data.jpyPerCny, '日元', 2) }
+];
 
-function renderMarket(data) {
+function renderMarket(data, statuses = {}) {
     const container = document.getElementById('market-grid');
     if (!container) return;
-    const fxFacts = [
-        { label: 'USD / CNY', value: fmtFxLine('1', '美元', data.usdCny, '人民币') },
-        { label: 'SGD / CNY', value: fmtFxLine('1', '新币', data.sgdCny, '人民币') },
-        { label: 'CNY / JPY', value: fmtFxLine('1', '人民币', data.jpyPerCny, '日元', 2) }
-    ];
+    const marketStatuses = normalizeMarketStatuses(statuses);
+    const fxFacts = buildForexFacts(data);
 
     container.innerHTML = `
         <article class="market-card glass-card">
-            <small>外汇汇率</small>
+            <div class="market-card-head">
+                <small>外汇汇率</small>
+                ${marketStatusBadgeHTML(marketStatuses.fx)}
+            </div>
             <strong class="market-value">3 组常看汇率</strong>
             <span class="market-change">按 1 单位基准货币换算</span>
             ${renderMarketFacts(fxFacts)}
         </article>
         <article class="market-card glass-card">
-            <small>现货黄金</small>
+            <div class="market-card-head">
+                <small>现货黄金</small>
+                ${marketStatusBadgeHTML(marketStatuses.gold)}
+            </div>
             <strong class="market-value">¥${fmtPrice(data.gold.cnyPerGram, 2)} / g</strong>
             ${changeHTML(data.gold.change24h)}
             ${renderMarketFacts([
@@ -684,7 +721,10 @@ function renderMarket(data) {
             ])}
         </article>
         <article class="market-card glass-card">
-            <small>Bitcoin</small>
+            <div class="market-card-head">
+                <small>Bitcoin</small>
+                ${marketStatusBadgeHTML(marketStatuses.btc)}
+            </div>
             <strong class="market-value">¥${fmtPrice(data.btc.cnyPerBtc)} / BTC</strong>
             ${changeHTML(data.btc.change24h)}
             ${renderMarketFacts([
@@ -693,7 +733,10 @@ function renderMarket(data) {
             ])}
         </article>
         <article class="market-card glass-card">
-            <small>92# 汽油</small>
+            <div class="market-card-head">
+                <small>92# 汽油</small>
+                ${marketStatusBadgeHTML(marketStatuses.gas92)}
+            </div>
             <strong class="market-value">¥${fmtPrice(data.gas92.cnyPerLiter, 2)} / L</strong>
             <span class="market-change">${escapeHtml(data.gas92.note || '当前展示全国参考价')}</span>
             ${renderMarketFacts([
@@ -893,9 +936,10 @@ async function hydrateMarketData() {
         fallbackNoticeEl.hidden = !visible;
     };
 
-    renderMarket(marketFallback);
-    updateFallbackNotice(`当前先展示静态行情参考（快照日期：${fallbackDateText}），联网后会按可用接口逐项刷新。`);
-    updateMarketStatus('正在刷新汇率、黄金、比特币与 92# 汽油...');
+    const initialMarketStatuses = normalizeMarketStatuses();
+    renderMarket(marketFallback, initialMarketStatuses);
+    updateFallbackNotice(`当前先展示静态行情参考（快照日期：${fallbackDateText}）：汇率、黄金、比特币、92# 汽油当前均为静态数据；联网后会按可用接口逐项刷新。`);
+    updateMarketStatus('正在刷新行情数据；当前四项均为静态参考。');
 
     try {
         const [ratesResult, cryptoResult, goldResult, gas92Result] = await Promise.allSettled([
@@ -963,29 +1007,25 @@ async function hydrateMarketData() {
             hasLiveGas92 = true;
         }
 
-        renderMarket(marketData);
-        const fullyLive = hasLiveUsdCny && hasLiveCrypto && hasLiveGold && hasLiveGas92;
-        const refreshedItems = [
-            hasLiveUsdCny ? '汇率' : null,
-            hasLiveGold ? '黄金' : null,
-            hasLiveCrypto ? '比特币' : null,
-            hasLiveGas92 ? '92# 汽油' : null
-        ].filter(Boolean);
-        const fallbackItems = [
-            hasLiveUsdCny ? null : '汇率',
-            hasLiveGold ? null : '黄金',
-            hasLiveCrypto ? null : '比特币',
-            hasLiveGas92 ? null : '92# 汽油'
-        ].filter(Boolean);
+        const marketStatuses = normalizeMarketStatuses({
+            fx: { live: hasLiveUsdCny },
+            gold: { live: hasLiveGold },
+            btc: { live: hasLiveCrypto },
+            gas92: { live: hasLiveGas92 }
+        });
+        const { liveItems, fallbackItems } = summarizeMarketStatuses(marketStatuses);
+        renderMarket(marketData, marketStatuses);
+        const fullyLive = liveItems.length === Object.keys(marketItemLabels).length;
         if (fullyLive) {
             updateFallbackNotice('', false);
         } else {
-            updateFallbackNotice(`当前仍含静态行情参考（静态快照日期：${fallbackDateText}）：${fallbackItems.join('、')}仍为本地参考。`);
+            updateFallbackNotice(`当前仍含静态行情参考（静态快照日期：${fallbackDateText}）：${fallbackItems.join('、')}仍为静态数据；其余项目已刷新。`);
         }
         if (hasLiveData || hasLiveGas92) {
             const now = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
-            const fallbackText = fallbackItems.length ? `；未刷新：${fallbackItems.join('、')}` : '';
-            updateMarketStatus(`已刷新：${refreshedItems.join('、')}${fallbackText}（${now}）`);
+            const liveText = liveItems.length ? `已刷新：${liveItems.join('、')}` : '已刷新：暂无';
+            const fallbackText = fallbackItems.length ? `；静态：${fallbackItems.join('、')}` : '；静态：无';
+            updateMarketStatus(`${liveText}${fallbackText}（${now}）`);
         } else {
             updateMarketStatus('行情接口暂时不可用，当前展示的是本地参考数据。');
         }
