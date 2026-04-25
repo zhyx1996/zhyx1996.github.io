@@ -148,6 +148,7 @@ const ARTICLE_HIGHLIGHT_DIGEST_LIMIT = 3;
 const ARTICLE_EXCERPT_MIN_LENGTH = 48;
 const ARTICLE_READABLE_TEXT_MIN_LENGTH = 12;
 const ARTICLE_DETAIL_FETCH_TIMEOUT_MS = 5000;
+const ARTICLE_DETAIL_BATCH_SIZE = 3;
 const ARTICLE_PENDING_SYNC_TEXT = '待同步';
 const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
 const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g;
@@ -704,6 +705,7 @@ function buildCnblogsArticleDetailCandidates(articleUrl) {
 
 async function loadCnblogsArticleDetail(article) {
     if (!article?.link || article.isFallbackHub) return null;
+    const articleLabel = safeText(article.title, article.link);
 
     for (const candidate of buildCnblogsArticleDetailCandidates(article.link)) {
         try {
@@ -711,7 +713,7 @@ async function loadCnblogsArticleDetail(article) {
                 headers: { Accept: 'text/html,application/xhtml+xml' }
             }, ARTICLE_DETAIL_FETCH_TIMEOUT_MS);
             if (!response.ok) {
-                console.warn(`Failed to load cnblogs article detail from ${candidate.source}: HTTP ${response.status}`, candidate.requestUrl);
+                console.warn(`Failed to load cnblogs article detail from ${candidate.source}: HTTP ${response.status}`, articleLabel, candidate.requestUrl);
                 continue;
             }
 
@@ -719,7 +721,7 @@ async function loadCnblogsArticleDetail(article) {
             const detail = parseCnblogsArticleDetail(text, article, candidate.source);
             if (detail?.summary) return detail;
         } catch (error) {
-            console.warn(`Failed to load cnblogs article detail from ${candidate.source}`, candidate.requestUrl, error);
+            console.warn(`Failed to load cnblogs article detail from ${candidate.source}`, articleLabel, candidate.requestUrl, error);
         }
     }
 
@@ -730,10 +732,17 @@ async function enrichCnblogsArticles(rawArticles) {
     const normalizedArticles = rawArticles.map(normalizeArticle).filter((article) => article.title && article.link);
     if (!normalizedArticles.length) return [];
 
-    const detailedArticles = await Promise.all(normalizedArticles.map(async (article) => {
-        const detail = await loadCnblogsArticleDetail(article);
-        return detail ? normalizeArticle(detail) : article;
-    }));
+    const detailedArticles = [];
+
+    for (let index = 0; index < normalizedArticles.length; index += ARTICLE_DETAIL_BATCH_SIZE) {
+        const batch = normalizedArticles.slice(index, index + ARTICLE_DETAIL_BATCH_SIZE);
+        const batchResults = await Promise.allSettled(batch.map((article) => loadCnblogsArticleDetail(article)));
+
+        batchResults.forEach((result, batchIndex) => {
+            const article = batch[batchIndex];
+            detailedArticles.push(result.status === 'fulfilled' && result.value ? normalizeArticle(result.value) : article);
+        });
+    }
 
     return detailedArticles;
 }
@@ -835,7 +844,11 @@ async function hydrateArticles() {
             renderArticles(articles);
             updateArticleStatus('博客园文章列表已刷新，正在逐篇补充正文摘要...');
             const enrichedArticles = await enrichCnblogsArticles(articles);
-            const hasDetailSummary = enrichedArticles.some((article, index) => normalizeWhitespace(article?.summary) !== normalizeWhitespace(articles[index]?.summary));
+            const hasDetailSummary = enrichedArticles.some((article, index) => {
+                const currentSummary = normalizeWhitespace(article?.summary);
+                const previousSummary = normalizeWhitespace(articles[index]?.summary);
+                return currentSummary !== previousSummary;
+            });
             if (hasDetailSummary) {
                 renderArticles(enrichedArticles);
                 updateArticleStatus('博客园文章已刷新，并已尽量补充每篇文章的正文摘要。');
