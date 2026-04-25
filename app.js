@@ -255,7 +255,16 @@ function extractGoldDailySeriesSnapshot(payload) {
             map.set(entry.date, entry);
             return map;
         }, new Map()).values()
-    ).sort((left, right) => left.date.localeCompare(right.date));
+    ).sort((left, right) => {
+        const leftTime = Date.parse(left.date || '');
+        const rightTime = Date.parse(right.date || '');
+        if (Number.isFinite(leftTime) && Number.isFinite(rightTime)) {
+            return leftTime - rightTime;
+        }
+        if (Number.isFinite(leftTime)) return -1;
+        if (Number.isFinite(rightTime)) return 1;
+        return leftTime - rightTime;
+    });
     if (uniquePoints.length < 2) return null;
 
     const latestPoint = uniquePoints[uniquePoints.length - 1];
