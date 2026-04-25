@@ -145,6 +145,10 @@ const MAX_URL_LABEL_LENGTH = 96;
 const URL_TRUNCATE_LENGTH = 93;
 const ARTICLE_SUMMARY_TRUNCATE_LENGTH = 120;
 const ARTICLE_SUMMARY_WORD_BOUNDARY_MIN_RATIO = 0.6;
+const ARTICLE_DIGEST_TRUNCATE_LENGTH = 96;
+const ARTICLE_DIGEST_MIN_LENGTH = 36;
+const ARTICLE_DIGEST_LIST_LIMIT = 6;
+const ARTICLE_HIGHLIGHT_DIGEST_LIMIT = 3;
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"]';
 const CNBLOGS_OPEN_API_POSTS_URL = `https://api.cnblogs.com/api/blog/posts/@${CNBLOGS_BLOG_APP}?pageIndex=1&pageSize=10`;
 const CNBLOGS_OPEN_API_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_OPEN_API_POSTS_URL)}`;
@@ -371,6 +375,55 @@ function renderArticleSummary(articles) {
     setTextAll('[data-article-source]', placeholderOnly ? '博客园主页' : safeText(latestArticle?.source, '博客园'));
 }
 
+function buildArticleDigest(article) {
+    const fallback = article.isFallbackHub
+        ? '当前先保留博客园主页入口，待网络可用后会自动替换为最近文章与对应内容提要。'
+        : '摘要源暂时没有返回更多正文信息，可以直接打开原文继续阅读。';
+    const summary = normalizeWhitespace(article.summary);
+    const withoutTitle = summary.startsWith(article.title || '')
+        ? summary.slice(String(article.title || '').length).replace(/^[:：\-—|·\s]+/, '').trim()
+        : summary;
+    const candidate = withoutTitle || summary;
+    if (!candidate) return fallback;
+
+    const sentences = candidate.match(/[^。！？!?；;]+[。！？!?；;]?/g)?.map((sentence) => sentence.trim()).filter(Boolean) || [];
+    let digest = '';
+
+    for (const sentence of sentences) {
+        const nextDigest = digest ? `${digest} ${sentence}` : sentence;
+        if (nextDigest.length > ARTICLE_DIGEST_TRUNCATE_LENGTH) break;
+        digest = nextDigest;
+        if (digest.length >= ARTICLE_DIGEST_MIN_LENGTH) break;
+    }
+
+    return digest || buildSummaryExcerpt(candidate, ARTICLE_DIGEST_TRUNCATE_LENGTH) || fallback;
+}
+
+function buildArticleDigestMarkup(articles, limit = ARTICLE_DIGEST_LIST_LIMIT) {
+    return sortArticles(articles).slice(0, limit).map((article, index) => {
+        const publishedText = article.published_at ? fmtDate(article.published_at) : '待同步';
+        const digest = buildArticleDigest(article);
+        const digestLabel = article.isFallbackHub ? '入口' : `摘要 ${String(index + 1).padStart(2, '0')}`;
+
+        return `
+            <article class="card glass-card article-digest-card">
+                <div class="repo-title-row">
+                    <span class="badge">${escapeHtml(digestLabel)}</span>
+                    <span class="pill">${escapeHtml(publishedText)}</span>
+                </div>
+                <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(article.link))}" target="_blank" rel="noreferrer">${escapeHtml(safeText(article.title, '未命名文章'))}</a></h3>
+                <p class="article-digest-text">${escapeHtml(digest)}</p>
+                <p class="article-digest-meta">基于已同步文章信息生成 · ${escapeHtml(safeText(article.source, '博客园'))}</p>
+            </article>
+        `;
+    }).join('');
+}
+
+function renderArticleDigests(articles) {
+    renderMarkup('article-digest-list', buildArticleDigestMarkup(articles, ARTICLE_DIGEST_LIST_LIMIT));
+    renderMarkup('article-highlight-digest-list', buildArticleDigestMarkup(articles, ARTICLE_HIGHLIGHT_DIGEST_LIMIT));
+}
+
 function buildArticleMarkup(articles, limit = articles.length) {
     return sortArticles(articles).slice(0, limit).map((article) => {
         const title = safeText(article.title, '未命名文章');
@@ -408,6 +461,7 @@ function renderArticles(rawArticles) {
 
     renderMarkup('article-list', buildArticleMarkup(items));
     renderMarkup('article-highlight-list', buildArticleMarkup(items, 3));
+    renderArticleDigests(items);
     renderArticleSummary(items);
 }
 
