@@ -409,12 +409,12 @@ function buildArticleDigestMarkup(articles, limit = ARTICLE_DIGEST_LIST_LIMIT) {
     return sortArticles(articles).slice(0, limit).map((article, index) => {
         const publishedText = article.published_at ? fmtDate(article.published_at) : ARTICLE_PENDING_SYNC_TEXT;
         const digest = buildArticleDigest(article);
-        const digestLabel = article.isFallbackHub ? '入口' : `摘要 ${String(index + 1).padStart(2, '0')}`;
+        const badgeLabel = article.isFallbackHub ? '入口' : `摘要 ${String(index + 1).padStart(2, '0')}`;
 
         return `
             <article class="card glass-card article-digest-card">
                 <div class="repo-title-row">
-                    <span class="badge">${escapeHtml(digestLabel)}</span>
+                    <span class="badge">${escapeHtml(badgeLabel)}</span>
                     <span class="pill">${escapeHtml(publishedText)}</span>
                 </div>
                 <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(article.link))}" target="_blank" rel="noreferrer">${escapeHtml(safeText(article.title, '未命名文章'))}</a></h3>
