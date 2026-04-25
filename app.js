@@ -149,6 +149,7 @@ const ARTICLE_DIGEST_TRUNCATE_LENGTH = 96;
 const ARTICLE_DIGEST_MIN_LENGTH = 36;
 const ARTICLE_DIGEST_LIST_LIMIT = 6;
 const ARTICLE_HIGHLIGHT_DIGEST_LIMIT = 3;
+const ARTICLE_PENDING_SYNC_TEXT = '待同步';
 const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
 const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g;
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"]';
@@ -382,8 +383,11 @@ function buildArticleDigest(article) {
         ? '当前先保留博客园主页入口，待网络可用后会自动替换为最近文章与对应内容提要。'
         : '摘要源暂时没有返回更多正文信息，可以直接打开原文继续阅读。';
     const summary = normalizeWhitespace(article.summary);
-    const withoutTitle = summary.startsWith(article.title || '')
-        ? summary.slice(String(article.title || '').length).replace(ARTICLE_DIGEST_TRIM_PREFIX_PATTERN, '').trim()
+    const normalizedTitle = normalizeWhitespace(article.title);
+    const summaryStartsWithTitle = normalizedTitle
+        && summary.toLocaleLowerCase().startsWith(normalizedTitle.toLocaleLowerCase());
+    const withoutTitle = summaryStartsWithTitle
+        ? summary.slice(normalizedTitle.length).replace(ARTICLE_DIGEST_TRIM_PREFIX_PATTERN, '').trim()
         : summary;
     const candidate = withoutTitle || summary;
     if (!candidate) return fallback;
@@ -403,7 +407,7 @@ function buildArticleDigest(article) {
 
 function buildArticleDigestMarkup(articles, limit = ARTICLE_DIGEST_LIST_LIMIT) {
     return sortArticles(articles).slice(0, limit).map((article, index) => {
-        const publishedText = article.published_at ? fmtDate(article.published_at) : '待同步';
+        const publishedText = article.published_at ? fmtDate(article.published_at) : ARTICLE_PENDING_SYNC_TEXT;
         const digest = buildArticleDigest(article);
         const digestLabel = article.isFallbackHub ? '入口' : `摘要 ${String(index + 1).padStart(2, '0')}`;
 
@@ -436,7 +440,7 @@ function buildArticleMarkup(articles, limit = articles.length) {
                 : '文章摘要暂时不可用，可以直接打开原文继续阅读。'
         );
         const actionLabel = article.isFallbackHub ? '打开博客园主页' : '阅读原文';
-        const publishedText = article.published_at ? fmtDate(article.published_at) : '待同步';
+        const publishedText = article.published_at ? fmtDate(article.published_at) : ARTICLE_PENDING_SYNC_TEXT;
 
         return `
             <article class="repo-card article-card glass-card">
