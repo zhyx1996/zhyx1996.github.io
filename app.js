@@ -96,7 +96,7 @@ const articleFallback = [
     {
         title: '博客园主页',
         link: CNBLOGS_HOME_URL,
-        summary: '当外部站点暂时不可用时，这里至少保留博客园主页入口，避免页面留白；接口恢复后会自动刷新为最近随笔。',
+        summary: '博客园主页与全部公开文章入口。',
         published_at: null,
         source: '博客园',
         isFallbackHub: true
@@ -154,9 +154,12 @@ const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
 const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g;
 const CNBLOGS_HOSTNAME = 'www.cnblogs.com';
 const CNBLOGS_HOME_ENTRY_SELECTORS = '.forFlow .day, .forFlow .postItem, .forFlow .entrylistItem, #post_list .post-item, #post_list .entrylistItem';
-const CNBLOGS_HOME_TITLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle2 a, a.postTitle, .postTitle a, a.entrylistItemTitle';
+const CNBLOGS_HOME_TITLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle2 a, a.postTitle, .postTitle a, a.entrylistItemTitle, a.entrylistTitle, h2 a[href*="/p/"], h2 a[href*="/articles/"], h3 a[href*="/p/"], h3 a[href*="/articles/"]';
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle2 a, a.postTitle, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"], #mainContent a[href*="/articles/"]';
 const CNBLOGS_VALID_ARTICLE_PATH_PATTERN = /^\/[^/]+\/(?:p|articles)\/[^/]+$/i;
+const CNBLOGS_HOME_SUMMARY_SELECTORS = '.entrylistItemPostDesc, .entrylistPostSummary, .c_b_p_desc, .postCon, .entrylistSummary, .post_summary, .summary, .postBody';
+const CNBLOGS_HOME_TIME_SELECTORS = 'time, .postDesc, .entrylistItemPostDesc + div, .article_manage, .postMeta, .post-foot, .post-info';
+const CNBLOGS_JSON_LD_TYPES = new Set(['article', 'blogposting', 'newsarticle', 'techarticle']);
 const CNBLOGS_ARTICLE_BODY_SELECTORS = [
     '#cnblogs_post_body',
     '.postBody',
@@ -363,8 +366,8 @@ function renderRepos(repos) {
         renderMarkup('project-list', `
             <article class="repo-card glass-card">
                 <span class="tag">Repositories</span>
-                <h3>暂时没有可展示的公开仓库</h3>
-                <p class="repo-description">GitHub 接口没有返回公开仓库时，这里会保留一个空态提示，避免页面直接留白。</p>
+                <h3>GitHub Repositories</h3>
+                <p class="repo-description">查看 zhyx1996 的公开仓库集合。</p>
             </article>
         `);
         renderRepoSummary(repoFallback);
@@ -409,8 +412,8 @@ function renderStarred(starredRepos) {
         renderMarkup('star-list', `
             <article class="repo-card star-card glass-card">
                 <span class="tag">Stars</span>
-                <h3>暂时没有可展示的收藏项目</h3>
-                <p class="repo-description">如果 GitHub Star 接口暂时不可用，页面会继续保留静态收藏摘要而不是出现空白区域。</p>
+                <h3>GitHub Stars</h3>
+                <p class="repo-description">查看近期收藏与参考项目。</p>
             </article>
         `);
         setText('star-count', '0');
@@ -529,8 +532,8 @@ function renderArticleSummary(articles) {
 
 function buildArticleDigest(article) {
     const fallback = article.isFallbackHub
-        ? '当前先保留博客园主页入口，待网络可用后会自动替换为最近文章与对应内容提要。'
-        : '摘要源暂时没有返回更多正文信息，可以直接打开原文继续阅读。';
+        ? '博客园主页与全部公开文章入口。'
+        : '打开原文查看完整内容。';
     const summary = normalizeWhitespace(article.summary);
     const normalizedTitle = normalizeWhitespace(article.title);
     const summaryStartsWithTitle = normalizedTitle
@@ -558,7 +561,7 @@ function buildArticleDigestMarkup(articles, limit = ARTICLE_DIGEST_LIST_LIMIT) {
     return sortArticles(articles).slice(0, limit).map((article, index) => {
         const publishedText = article.published_at ? fmtDate(article.published_at) : ARTICLE_PENDING_SYNC_TEXT;
         const digest = buildArticleDigest(article);
-        const badgeLabel = article.isFallbackHub ? '入口' : `摘要 ${String(index + 1).padStart(2, '0')}`;
+        const badgeLabel = article.isFallbackHub ? '博客园' : `随笔 ${String(index + 1).padStart(2, '0')}`;
 
         return `
             <article class="card glass-card article-digest-card">
@@ -568,7 +571,7 @@ function buildArticleDigestMarkup(articles, limit = ARTICLE_DIGEST_LIST_LIMIT) {
                 </div>
                 <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(article.link))}" target="_blank" rel="noreferrer">${escapeHtml(safeText(article.title, '未命名文章'))}</a></h3>
                 <p class="article-digest-text">${escapeHtml(digest)}</p>
-                <p class="article-digest-meta">基于已同步文章信息生成 · ${escapeHtml(safeText(article.source, '博客园'))}</p>
+                <p class="article-digest-meta">${escapeHtml(safeText(article.source, '博客园'))} · ${escapeHtml(publishedText)}</p>
             </article>
         `;
     }).join('');
@@ -585,17 +588,17 @@ function buildArticleMarkup(articles, limit = articles.length) {
         const summary = safeText(
             article.summary,
             article.isFallbackHub
-                ? '直接打开博客园主页，查看最新公开文章。'
-                : '文章摘要暂时不可用，可以直接打开原文继续阅读。'
+                ? '博客园主页与全部公开文章入口。'
+                : '打开原文查看完整内容。'
         );
-        const actionLabel = article.isFallbackHub ? '打开博客园主页' : '阅读原文';
+        const actionLabel = article.isFallbackHub ? '访问博客园' : '阅读原文';
         const publishedText = article.published_at ? fmtDate(article.published_at) : ARTICLE_PENDING_SYNC_TEXT;
 
         return `
             <article class="repo-card article-card glass-card">
                 <div class="repo-title-row">
                     <span class="tag">${escapeHtml(safeText(article.source, '博客园'))}</span>
-                    <span class="pill">${escapeHtml(article.isFallbackHub ? '入口' : 'Article')}</span>
+                    <span class="pill">${escapeHtml(article.isFallbackHub ? '主页' : '随笔')}</span>
                 </div>
                 <h3><a class="repo-name-link" href="${escapeHtml(safeUrl(article.link))}" target="_blank" rel="noreferrer">${escapeHtml(title)}</a></h3>
                 <p class="repo-description">${escapeHtml(summary)}</p>
@@ -708,6 +711,82 @@ function buildCnblogsArticleSummarySeed(summaryNode, text, title) {
     return `${text.slice(0, titleIndex)} ${text.slice(titleIndex + title.length)}`.trim();
 }
 
+function cleanCnblogsSummaryText(value) {
+    return normalizeWhitespace(String(value ?? ''))
+        .replace(/\bposted\s+@\s+.*$/i, '')
+        .replace(/阅读全文|查看全文|继续阅读/g, '')
+        .replace(/阅读\(\d+\)|评论\(\d+\)|推荐\(\d+\)/g, '')
+        .replace(CNBLOGS_DATE_PATTERN, '')
+        .replace(ARTICLE_DIGEST_TRIM_PREFIX_PATTERN, '')
+        .trim();
+}
+
+function pickCnblogsSummary(container, titleAnchor, title) {
+    const candidates = [];
+    const pushCandidate = (value) => {
+        const cleaned = cleanCnblogsSummaryText(removeTitlePrefix(value, title));
+        if (cleaned) candidates.push(cleaned);
+    };
+
+    container.querySelectorAll(CNBLOGS_HOME_SUMMARY_SELECTORS).forEach((node) => pushCandidate(node.textContent));
+
+    let sibling = titleAnchor?.closest('h1, h2, h3, header, .entrylistPosttitle, .postTitle, .postTitle2, .entrylistItemTitle')?.nextElementSibling;
+    for (let index = 0; sibling && index < 3; index += 1, sibling = sibling.nextElementSibling) {
+        if (sibling.matches(CNBLOGS_HOME_TIME_SELECTORS)) continue;
+        pushCandidate(sibling.textContent);
+    }
+
+    pushCandidate(container.querySelector('p, blockquote, li')?.textContent || '');
+    pushCandidate(buildCnblogsArticleSummarySeed(null, container.textContent || '', title));
+
+    return candidates.find((candidate) => candidate.length >= ARTICLE_READABLE_TEXT_MIN_LENGTH)
+        || candidates[0]
+        || '';
+}
+
+function parseCnblogsJsonLdArticles(doc, source) {
+    const articles = [];
+    const seen = new Set();
+    const visitNode = (node) => {
+        if (!node) return;
+        if (Array.isArray(node)) {
+            node.forEach(visitNode);
+            return;
+        }
+        if (typeof node !== 'object') return;
+
+        const type = String(node['@type'] || '').toLowerCase();
+        if (CNBLOGS_JSON_LD_TYPES.has(type)) {
+            const link = normalizeCnblogsArticleLink(node.url || node.mainEntityOfPage || '');
+            const title = normalizeWhitespace(node.headline || node.name || node.title);
+            if (title && link && !seen.has(link)) {
+                seen.add(link);
+                articles.push({
+                    title,
+                    link,
+                    summary: buildSummaryExcerpt(cleanCnblogsSummaryText(node.description || node.abstract || '')),
+                    published_at: node.datePublished || node.dateCreated || node.dateModified || null,
+                    source
+                });
+            }
+        }
+
+        visitNode(node.itemListElement);
+        visitNode(node.mainEntity);
+        visitNode(node['@graph']);
+    };
+
+    doc.querySelectorAll('script[type="application/ld+json"]').forEach((script) => {
+        try {
+            visitNode(JSON.parse(script.textContent || 'null'));
+        } catch {
+            // Ignore malformed JSON-LD blocks.
+        }
+    });
+
+    return articles;
+}
+
 function extractCnblogsArticleFromContainer(container, source) {
     if (!container) return null;
 
@@ -716,14 +795,12 @@ function extractCnblogsArticleFromContainer(container, source) {
     const link = normalizeCnblogsArticleLink(titleAnchor?.getAttribute('href') || titleAnchor?.href || '');
     if (!title || !link) return null;
 
-    const summaryNode = container.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
-    const timeNode = container.querySelector('time, .postDesc, .entrylistItemPostDesc + div, .article_manage');
+    const timeNode = container.querySelector(CNBLOGS_HOME_TIME_SELECTORS);
     const text = normalizeWhitespace(container.textContent || '');
     const timeText = timeNode?.getAttribute('datetime') || timeNode?.textContent?.trim() || '';
     const timeMatch = timeText.match(CNBLOGS_DATE_PATTERN);
     const dateMatch = timeMatch || text.slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH).match(CNBLOGS_DATE_PATTERN);
-    const summarySeed = buildCnblogsArticleSummarySeed(summaryNode, text, title);
-    const summary = buildSummaryExcerpt(summarySeed);
+    const summary = buildSummaryExcerpt(pickCnblogsSummary(container, titleAnchor, title));
 
     return {
         title,
@@ -736,45 +813,41 @@ function extractCnblogsArticleFromContainer(container, source) {
 
 function parseCnblogsArticleList(html, source) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    const seen = new Set();
-    const entryArticles = [];
+    const articleMap = new Map();
+    const mergeArticle = (article) => {
+        if (!article?.link || articleMap.has(article.link)) return;
+        articleMap.set(article.link, article);
+    };
 
     [...doc.querySelectorAll(CNBLOGS_HOME_ENTRY_SELECTORS)].forEach((container) => {
-        const article = extractCnblogsArticleFromContainer(container, source);
-        if (!article || seen.has(article.link)) return;
-        seen.add(article.link);
-        entryArticles.push(article);
+        mergeArticle(extractCnblogsArticleFromContainer(container, source));
     });
 
-    // 优先使用博客园主页的结构化随笔卡片；只有在页面结构退化时，才回退到较宽松的链接扫描。
-    if (entryArticles.length) return entryArticles;
+    parseCnblogsJsonLdArticles(doc, source).forEach(mergeArticle);
 
-    const anchors = [...doc.querySelectorAll(CNBLOGS_ARTICLE_SELECTORS)];
-
-    return anchors.map((anchor) => {
+    [...doc.querySelectorAll(CNBLOGS_ARTICLE_SELECTORS)].forEach((anchor) => {
         const link = normalizeCnblogsArticleLink(anchor.getAttribute('href') || anchor.href || '');
         const title = normalizeWhitespace(anchor.textContent);
-        if (!title || !link || link === '#' || seen.has(link)) return null;
-        seen.add(link);
+        if (!title || !link || link === '#') return;
 
         const container = anchor.closest('article, li, section, div');
-        const summaryNode = container?.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
-        const timeNode = container?.querySelector('time, .postDesc, .entrylistItemPostDesc + div, .article_manage');
+        const timeNode = container?.querySelector(CNBLOGS_HOME_TIME_SELECTORS);
         const text = normalizeWhitespace(container?.textContent || '');
         const timeText = timeNode?.getAttribute('datetime') || timeNode?.textContent?.trim() || '';
         const timeMatch = timeText.match(CNBLOGS_DATE_PATTERN);
         const dateMatch = timeMatch || text.slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH).match(CNBLOGS_DATE_PATTERN);
-        const summarySeed = buildCnblogsArticleSummarySeed(summaryNode, text, title);
-        const summary = buildSummaryExcerpt(summarySeed);
+        const summary = buildSummaryExcerpt(container ? pickCnblogsSummary(container, anchor, title) : '');
 
-        return {
+        mergeArticle({
             title,
             link,
             summary,
             published_at: timeText || dateMatch?.[0] || null,
             source
-        };
-    }).filter(Boolean);
+        });
+    });
+
+    return [...articleMap.values()];
 }
 
 function parseCnblogsArticleDetail(html, article, source) {

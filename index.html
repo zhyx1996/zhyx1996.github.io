@@ -23,13 +23,6 @@
         </div>
     </header>
 
-    <section class="site-notice" aria-label="Copilot 生成说明">
-        <div class="container site-notice-inner">
-            <strong>Copilot 生成说明</strong>
-            <span>本网站页面内容与结构由 GitHub Copilot 生成，并基于公开资料持续整理。</span>
-        </div>
-    </section>
-
     <main class="container page-shell">
         <section class="page-banner hero-banner">
             <div class="hero-ambient" aria-hidden="true">
@@ -44,10 +37,7 @@
                 <span class="kicker">Overview</span>
                 <p class="page-eyebrow">Personal site / Computer vision, parallel computing &amp; writing</p>
                 <h1>ZYX 的个人主页</h1>
-                <p>
-                    我主要围绕计算机视觉、自动驾驶感知与并行计算做持续实践，关注从传统视觉流程到深度学习方法、
-                    从算法验证到工程加速的完整链路。这个站点用于整理公开项目、文章与常用入口，方便查看公开内容与站内导航。
-                </p>
+                <p>聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。</p>
                 <div class="page-local-nav" aria-label="Overview sections">
                     <a href="#about">About</a>
                     <a href="#focus">Current focus</a>
@@ -73,7 +63,6 @@
                     <strong>Lane Detection · CUDA · OpenMP</strong>
                     <span class="meta-note">持续做实验、整理结果并沉淀工程经验</span>
                 </div>
-                <p class="muted">公开仓库、收藏项目与文章都已拆分到独立页面，首页只保留简介与导航入口。</p>
             </div>
         </section>
 
@@ -111,7 +100,6 @@
                     <div class="section-heading">
                         <div>
                             <h2>About</h2>
-                            <p>首页只保留对外简介，重点放在个人简介、公开内容入口与站内导航。</p>
                         </div>
                         <span class="tag">Profile</span>
                     </div>
@@ -135,7 +123,6 @@
                     <div class="section-heading">
                         <div>
                             <h2>Current focus</h2>
-                            <p>当前主要围绕感知算法、算力优化与知识整理这三条线持续推进。</p>
                         </div>
                         <span class="tag">Focus</span>
                     </div>
@@ -162,7 +149,6 @@
                     <div class="section-heading">
                         <div>
                             <h2>Recent writing</h2>
-                            <p>最近公开写作会保留这里，方便从首页快速看到文字输出；同步到文章列表后，还会继续读取正文补全摘要。</p>
                         </div>
                         <span class="tag">Cnblogs</span>
                     </div>
@@ -170,7 +156,7 @@
                         <article class="repo-card article-card glass-card">
                             <span class="tag">博客园</span>
                             <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me" target="_blank" rel="noreferrer">博客园主页</a></h3>
-                            <p class="repo-description">这里会展示最近通过博客园主页 / 开放 API / RSS 获取到的文章；如果暂时无法联网，也会保留直达主页的入口。</p>
+                            <p class="repo-description">博客园主页与全部公开文章入口。</p>
                             <div class="repo-actions">
                                 <a class="button outline" href="/articles.html">打开文章页</a>
                             </div>
@@ -180,70 +166,61 @@
                         <div class="section-heading section-subheading">
                             <div>
                                 <h3>内容摘要</h3>
-                                <p>把最近同步到的文章列表与正文摘要进一步压缩成更短的提要，便于在首页快速扫读。</p>
                             </div>
                             <span class="tag">Digest</span>
                         </div>
                         <div class="grid-3 info-grid article-digest-list" id="article-highlight-digest-list">
                             <article class="card glass-card article-digest-card">
-                                <span class="badge">入口</span>
+                                <span class="badge">博客园</span>
                                 <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me" target="_blank" rel="noreferrer">博客园主页</a></h3>
-                                <p class="article-digest-text">首页会优先从博客园主页读取最近随笔与正文摘要，未读取成功时则保留主页入口。</p>
-                                <p class="article-digest-meta">基于已同步文章信息生成 · 博客园</p>
+                                <p class="article-digest-text">博客园主页与全部公开文章入口。</p>
+                                <p class="article-digest-meta">博客园</p>
                             </article>
                         </div>
                     </div>
                     <div class="button-row">
                         <a class="button outline" href="/articles.html">查看全部文章展示</a>
                     </div>
-                    <p class="status-inline" data-article-status>正在读取博客园主页文章...</p>
                 </section>
 
                 <section class="section" id="market">
                     <div class="section-heading">
                         <div>
                             <h2>Market snapshot</h2>
-                            <p>保留常看的行情参考，作为技术工作之外的轻量信息面板。</p>
                         </div>
                         <span class="tag">Insights</span>
                     </div>
-                    <p class="market-static-notice" data-market-fallback-note>当前先展示静态行情参考（快照日期：2026年4月24日）：汇率、黄金、比特币、92# 汽油当前均为静态数据；联网后会按可用接口逐项刷新。</p>
                     <div class="market-grid" id="market-grid"></div>
-                    <p class="status-inline" data-market-status>正在刷新行情数据...</p>
                 </section>
                 <section class="section" id="showcase">
                     <div class="section-heading">
                         <div>
                             <h2>Game showcase</h2>
-                            <p>在不使用本地代理的前提下，原神使用可直接嵌入的公开页面，Steam 仅保留外链资料卡与官方支持的游戏 widget。</p>
                         </div>
                         <span class="tag">No Proxy</span>
                     </div>
                     <div class="embed-stack">
                         <article class="card glass-card embed-card">
-                            <div class="repo-title-row">
-                                <span class="badge">Genshin Impact</span>
-                                <span class="pill">Enka iframe</span>
-                            </div>
-                            <h3>公开展柜</h3>
-                            <p>直接嵌入 Enka 的公开展示页。若偶发返回 424，通常是上游数据暂时异常，不代表嵌入方式失效。</p>
-                            <iframe
-                                class="external-embed-frame"
-                                src="https://enka.network/u/147521967/"
+                                <div class="repo-title-row">
+                                    <span class="badge">Genshin Impact</span>
+                                    <span class="pill">Enka iframe</span>
+                                </div>
+                                <h3>公开展柜</h3>
+                                <iframe
+                                    class="external-embed-frame"
+                                    src="https://enka.network/u/147521967/"
                                 loading="lazy"
                                 referrerpolicy="no-referrer"
-                                title="Genshin Showcase"
-                            ></iframe>
-                            <p class="embed-note">内容是否完整仍取决于 UID 的公开展柜状态和 Enka 当前可用性。</p>
-                        </article>
-                        <div class="grid-2 embed-grid">
+                                    title="Genshin Showcase"
+                                ></iframe>
+                            </article>
+                            <div class="grid-2 embed-grid">
                             <article class="card glass-card embed-card">
                                 <div class="repo-title-row">
                                     <span class="badge">Steam</span>
                                     <span class="pill">Profile link</span>
                                 </div>
                                 <h3>个人主页资料卡</h3>
-                                <p>Steam 个人主页不能被第三方网页 iframe 嵌入，也不能在纯前端页面直接跨域抓取动态资料，因此这里保留静态卡片与外链入口。</p>
                                 <a class="steam-profile-card" href="https://steamcommunity.com/profiles/76561198391062314/" target="_blank" rel="noreferrer">
                                     <img
                                         class="avatar avatar-sm"
@@ -257,10 +234,6 @@
                                         <span>打开社区主页查看完整公开资料</span>
                                     </span>
                                 </a>
-                                <ul class="embed-meta-list">
-                                    <li>不使用代理，不做浏览器端动态抓取</li>
-                                    <li>避免受到 Steam 的 iframe 与 CORS 限制</li>
-                                </ul>
                             </article>
                             <article class="card glass-card embed-card">
                                 <div class="repo-title-row">
@@ -268,7 +241,6 @@
                                     <span class="pill">Official widget</span>
                                 </div>
                                 <h3>官方商店游戏 widget</h3>
-                                <p>如果需要补充 Steam 内容，可以嵌入单个游戏的官方商店 widget；这类 widget 是 Steam 官方支持的前端嵌入方式。</p>
                                 <iframe
                                     class="store-widget-frame"
                                     src="https://store.steampowered.com/widget/3903190/"
@@ -286,7 +258,6 @@
                     <div class="section-heading">
                         <div>
                             <h2>Quick links</h2>
-                            <p>把常用入口集中到首页底部，需要看项目、文章或收藏时可以直接进入对应页面。</p>
                         </div>
                         <span class="tag">Links</span>
                     </div>
@@ -332,7 +303,6 @@
     <footer class="footer">
         <div class="footer-inner">
             <p>ZYX · zhyx1996.github.io · Published portfolio</p>
-            <p>内容整理自 GitHub 公开资料、博客园公开页面/文章正文与开放行情接口；项目、收藏、文章与市场快照分别按可用数据持续更新。</p>
         </div>
     </footer>
 

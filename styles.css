@@ -185,7 +185,6 @@ a {
 }
 
 .site-header,
-.site-notice,
 .page-shell,
 .footer {
     position: relative;
@@ -194,32 +193,6 @@ a {
 
 .site-header {
     padding-top: 0.8rem;
-}
-
-.site-notice {
-    margin-top: 0.85rem;
-}
-
-.site-notice-inner {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    padding: 0.95rem 1.15rem;
-    border-radius: 18px;
-    border: 1px solid rgba(11, 101, 216, 0.18);
-    background: linear-gradient(135deg, rgba(11, 101, 216, 0.16), rgba(255, 255, 255, 0.9));
-    box-shadow: var(--shadow-soft);
-    color: var(--text);
-    font-weight: 600;
-}
-
-.site-notice-inner strong {
-    color: var(--primary-strong);
-    white-space: nowrap;
-}
-
-.site-notice-inner span {
-    color: var(--text);
 }
 
 .nav-inner {
@@ -283,7 +256,7 @@ a {
 }
 
 .page-shell {
-    padding: 1.25rem 0 3rem;
+    padding: 1.4rem 0 3rem;
 }
 
 .glass-card,
@@ -915,17 +888,48 @@ a {
 }
 
 .article-digest-card {
+    position: relative;
+    overflow: hidden;
     display: grid;
     gap: 0.8rem;
 }
 
+.article-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.article-card::before,
+.article-digest-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, rgba(11, 101, 216, 0.92), rgba(76, 140, 255, 0.5), rgba(255, 141, 119, 0.84));
+}
+
+.article-card h3,
+.article-digest-card h3 {
+    font-size: 1.12rem;
+}
+
+.article-digest-text,
+.article-card .repo-description {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+}
+
 .article-digest-text {
-    min-height: 4.6rem;
+    min-height: 0;
 }
 
 .article-digest-meta {
     margin-top: auto;
     font-size: 0.88rem;
+    letter-spacing: 0.02em;
 }
 
 .repo-title-row {
@@ -942,7 +946,7 @@ a {
 }
 
 .repo-description {
-    min-height: 4.2rem;
+    min-height: 0;
 }
 
 .repo-stats {
@@ -1049,7 +1053,7 @@ a {
 
 .footer-inner {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: 1rem;
     flex-wrap: wrap;
     padding: 1rem 1.2rem;
@@ -1137,7 +1141,6 @@ a {
 
 @media (max-width: 820px) {
     .nav-inner,
-    .site-notice-inner,
     .section-heading,
     .footer-inner {
         flex-direction: column;
