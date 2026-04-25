@@ -1205,8 +1205,8 @@ a {
 
     .site-ambient-orb,
     .hero-orb {
-        filter: blur(12px);
-        opacity: 0.4;
+        filter: blur(10px);
+        opacity: 0.46;
         transform: none;
     }
 }

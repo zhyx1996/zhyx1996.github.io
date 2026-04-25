@@ -257,7 +257,7 @@ const setImage = (id, value, alt) => {
 
 function ensureAmbientBackdrop() {
     const body = document.body;
-    if (!body || body.querySelector('[data-site-ambient]')) return;
+    if (!body || body.querySelector('.site-ambient[data-site-ambient]')) return;
 
     const ambient = document.createElement('div');
     ambient.className = 'site-ambient';
