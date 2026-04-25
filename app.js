@@ -155,6 +155,7 @@ const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g
 const CNBLOGS_HOME_ENTRY_SELECTORS = '.forFlow .day, .forFlow .postItem, .forFlow .entrylistItem, #post_list .post-item, #post_list .entrylistItem';
 const CNBLOGS_HOME_TITLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle2 a, a.postTitle, .postTitle a, a.entrylistItemTitle';
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle2 a, a.postTitle, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"], #mainContent a[href*="/articles/"]';
+const CNBLOGS_VALID_ARTICLE_PATH_PATTERN = /^\/[^/]+\/(?:p|articles)\/[^/]+$/i;
 const CNBLOGS_ARTICLE_BODY_SELECTORS = [
     '#cnblogs_post_body',
     '.postBody',
@@ -693,11 +694,17 @@ function normalizeCnblogsArticleLink(value) {
         const [, blogApp = ''] = path.split('/');
         if (parsed.hostname !== 'www.cnblogs.com') return '';
         if (blogApp.toLowerCase() !== CNBLOGS_BLOG_APP.toLowerCase()) return '';
-        if (!/^\/[^/]+\/(?:p|articles)\/[^/]+$/i.test(path)) return '';
+        if (!CNBLOGS_VALID_ARTICLE_PATH_PATTERN.test(path)) return '';
         return `${parsed.origin}${path}`;
     } catch {
         return '';
     }
+}
+
+function buildCnblogsArticleSummarySeed(summaryNode, text, title) {
+    if (summaryNode?.textContent) return summaryNode.textContent;
+    if (text.startsWith(title)) return text.slice(title.length).trim();
+    return text.replace(title, '').trim();
 }
 
 function extractCnblogsArticleFromContainer(container, source) {
@@ -714,8 +721,7 @@ function extractCnblogsArticleFromContainer(container, source) {
     const timeText = timeNode?.getAttribute('datetime') || timeNode?.textContent?.trim() || '';
     const timeMatch = timeText.match(CNBLOGS_DATE_PATTERN);
     const dateMatch = timeMatch || text.slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH).match(CNBLOGS_DATE_PATTERN);
-    const summarySeed = summaryNode?.textContent
-        || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
+    const summarySeed = buildCnblogsArticleSummarySeed(summaryNode, text, title);
     const summary = buildSummaryExcerpt(summarySeed);
 
     return {
@@ -756,8 +762,7 @@ function parseCnblogsArticleList(html, source) {
         const timeText = timeNode?.getAttribute('datetime') || timeNode?.textContent?.trim() || '';
         const timeMatch = timeText.match(CNBLOGS_DATE_PATTERN);
         const dateMatch = timeMatch || text.slice(0, ARTICLE_SUMMARY_TRUNCATE_LENGTH).match(CNBLOGS_DATE_PATTERN);
-        const summarySeed = summaryNode?.textContent
-            || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
+        const summarySeed = buildCnblogsArticleSummarySeed(summaryNode, text, title);
         const summary = buildSummaryExcerpt(summarySeed);
 
         return {
