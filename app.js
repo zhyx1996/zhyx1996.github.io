@@ -692,7 +692,7 @@ function normalizeCnblogsArticleLink(value) {
         const path = parsed.pathname.replace(/\/+$/, '');
         const [, blogApp = ''] = path.split('/');
         if (parsed.hostname !== 'www.cnblogs.com') return '';
-        if (blogApp.toLocaleLowerCase() !== CNBLOGS_BLOG_APP.toLocaleLowerCase()) return '';
+        if (blogApp.toLowerCase() !== CNBLOGS_BLOG_APP.toLowerCase()) return '';
         if (!/^\/[^/]+\/(?:p|articles)\/[^/]+$/i.test(path)) return '';
         return `${parsed.origin}${path}`;
     } catch {
@@ -747,6 +747,7 @@ function parseCnblogsArticleList(html, source) {
         const link = normalizeCnblogsArticleLink(anchor.getAttribute('href') || anchor.href || '');
         const title = normalizeWhitespace(anchor.textContent);
         if (!title || !link || link === '#' || seen.has(link)) return null;
+        seen.add(link);
 
         const container = anchor.closest('article, li, section, div');
         const summaryNode = container?.querySelector('.entrylistItemPostDesc, .c_b_p_desc, .postCon, .entrylistPostSummary, .summary');
@@ -758,7 +759,6 @@ function parseCnblogsArticleList(html, source) {
         const summarySeed = summaryNode?.textContent
             || (text.startsWith(title) ? text.slice(title.length).trim() : text.replace(title, '').trim());
         const summary = buildSummaryExcerpt(summarySeed);
-        seen.add(link);
 
         return {
             title,
