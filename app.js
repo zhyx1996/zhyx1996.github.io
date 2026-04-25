@@ -175,6 +175,12 @@ const CNBLOGS_ARTICLE_CONTENT_SKIP_SELECTORS = [
     '.ad_text',
     '.under-post-card'
 ].join(', ');
+const CNBLOGS_ARTICLE_DETAIL_PROXY_BUILDERS = [
+    { label: '博客园正文', buildUrl: (articleUrl) => articleUrl },
+    { label: '博客园正文 / allorigins', buildUrl: (articleUrl) => `https://api.allorigins.win/raw?url=${encodeURIComponent(articleUrl)}` },
+    { label: '博客园正文 / codetabs', buildUrl: (articleUrl) => `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(articleUrl)}` },
+    { label: '博客园正文 / corsproxy', buildUrl: (articleUrl) => `https://corsproxy.io/?${encodeURIComponent(articleUrl)}` }
+];
 const CNBLOGS_OPEN_API_POSTS_URL = `https://api.cnblogs.com/api/blog/posts/@${CNBLOGS_BLOG_APP}?pageIndex=1&pageSize=10`;
 const CNBLOGS_OPEN_API_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_OPEN_API_POSTS_URL)}`;
 const CNBLOGS_WCF_POSTS_URL = `https://wcf.open.cnblogs.com/blog/u/${CNBLOGS_BLOG_APP}/posts/1/10`;
@@ -694,13 +700,10 @@ function parseCnblogsArticleDetail(html, article, source) {
 }
 
 function buildCnblogsArticleDetailCandidates(articleUrl) {
-    const encodedUrl = encodeURIComponent(articleUrl);
-    return [
-        { requestUrl: articleUrl, source: '博客园正文' },
-        { requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}`, source: '博客园正文 / allorigins' },
-        { requestUrl: `https://api.codetabs.com/v1/proxy?url=${encodedUrl}`, source: '博客园正文 / codetabs' },
-        { requestUrl: `https://corsproxy.io/?${encodedUrl}`, source: '博客园正文 / corsproxy' }
-    ];
+    return CNBLOGS_ARTICLE_DETAIL_PROXY_BUILDERS.map((plan) => ({
+        requestUrl: plan.buildUrl(articleUrl),
+        source: plan.label
+    }));
 }
 
 async function loadCnblogsArticleDetail(article) {
@@ -844,11 +847,9 @@ async function hydrateArticles() {
             renderArticles(articles);
             updateArticleStatus('博客园文章列表已刷新，正在逐篇补充正文摘要...');
             const enrichedArticles = await enrichCnblogsArticles(articles);
-            const hasDetailSummary = enrichedArticles.some((article, index) => {
-                const currentSummary = normalizeWhitespace(article?.summary);
-                const previousSummary = normalizeWhitespace(articles[index]?.summary);
-                return currentSummary !== previousSummary;
-            });
+            const previousSummaries = articles.map((article) => normalizeWhitespace(article?.summary));
+            const currentSummaries = enrichedArticles.map((article) => normalizeWhitespace(article?.summary));
+            const hasDetailSummary = currentSummaries.some((summary, index) => summary !== previousSummaries[index]);
             if (hasDetailSummary) {
                 renderArticles(enrichedArticles);
                 updateArticleStatus('博客园文章已刷新，并已尽量补充每篇文章的正文摘要。');
