@@ -149,6 +149,8 @@ const ARTICLE_DIGEST_TRUNCATE_LENGTH = 96;
 const ARTICLE_DIGEST_MIN_LENGTH = 36;
 const ARTICLE_DIGEST_LIST_LIMIT = 6;
 const ARTICLE_HIGHLIGHT_DIGEST_LIMIT = 3;
+const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
+const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g;
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"]';
 const CNBLOGS_OPEN_API_POSTS_URL = `https://api.cnblogs.com/api/blog/posts/@${CNBLOGS_BLOG_APP}?pageIndex=1&pageSize=10`;
 const CNBLOGS_OPEN_API_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_OPEN_API_POSTS_URL)}`;
@@ -381,12 +383,12 @@ function buildArticleDigest(article) {
         : '摘要源暂时没有返回更多正文信息，可以直接打开原文继续阅读。';
     const summary = normalizeWhitespace(article.summary);
     const withoutTitle = summary.startsWith(article.title || '')
-        ? summary.slice(String(article.title || '').length).replace(/^[:：\-—|·\s]+/, '').trim()
+        ? summary.slice(String(article.title || '').length).replace(ARTICLE_DIGEST_TRIM_PREFIX_PATTERN, '').trim()
         : summary;
     const candidate = withoutTitle || summary;
     if (!candidate) return fallback;
 
-    const sentences = candidate.match(/[^。！？!?；;]+[。！？!?；;]?/g)?.map((sentence) => sentence.trim()).filter(Boolean) || [];
+    const sentences = candidate.match(ARTICLE_DIGEST_SENTENCE_PATTERN)?.map((sentence) => sentence.trim()).filter(Boolean) || [];
     let digest = '';
 
     for (const sentence of sentences) {
