@@ -705,7 +705,9 @@ function normalizeCnblogsArticleLink(value) {
 function buildCnblogsArticleSummarySeed(summaryNode, text, title) {
     if (summaryNode?.textContent) return summaryNode.textContent;
     if (text.startsWith(title)) return text.slice(title.length).trim();
-    return text.replace(title, '').trim();
+    const titleIndex = text.indexOf(title);
+    if (titleIndex === -1) return text;
+    return `${text.slice(0, titleIndex)} ${text.slice(titleIndex + title.length)}`.trim();
 }
 
 function extractCnblogsArticleFromContainer(container, source) {
