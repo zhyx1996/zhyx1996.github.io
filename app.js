@@ -133,6 +133,7 @@ const escapeHtml = (value) => String(value ?? '')
 const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
 const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
 const GOLD_LEGACY_API_URL = 'https://api.gold-api.com/price/XAU';
+const GOLD_DAILY_SERIES_URL = 'https://freegoldapi.com/data/latest.json';
 const GOLD_HISTORY_LOOKBACK_DAY_OFFSETS = [1, 2, 3];
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 const GAS92_PRICE_RANGE = { min: 5, max: 10 };
@@ -214,6 +215,87 @@ const buildGoldHistoryCandidates = (historyDate) => {
     }
     return candidates;
 };
+const buildGoldDailySeriesCandidates = () => {
+    const encodedUrl = encodeURIComponent(GOLD_DAILY_SERIES_URL);
+    return [
+        { requestUrl: GOLD_DAILY_SERIES_URL, source: 'FreeGoldAPI' },
+        { requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}`, source: 'FreeGoldAPI / allorigins' },
+        { requestUrl: `https://api.codetabs.com/v1/proxy?url=${encodedUrl}`, source: 'FreeGoldAPI / codetabs' },
+        { requestUrl: `https://corsproxy.io/?${encodedUrl}`, source: 'FreeGoldAPI / corsproxy' }
+    ];
+};
+
+function extractGoldDailySeriesSnapshot(payload) {
+    let data;
+    try {
+        data = JSON.parse(payload);
+    } catch {
+        return null;
+    }
+
+    const entries = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+            ? data.data
+            : Array.isArray(data?.prices)
+                ? data.prices
+                : Array.isArray(data?.results)
+                    ? data.results
+                    : [];
+    const points = entries
+        .map((entry) => ({
+            date: normalizeWhitespace(entry?.date || entry?.datetime || entry?.time || entry?.timestamp || ''),
+            price: Number(entry?.price ?? entry?.close ?? entry?.value ?? entry?.usd)
+        }))
+        .filter((entry) => entry.date && Number.isFinite(entry.price) && entry.price > 0);
+    if (points.length < 2) return null;
+
+    const uniquePoints = Array.from(
+        points.reduce((map, entry) => {
+            map.set(entry.date, entry);
+            return map;
+        }, new Map()).values()
+    ).sort((left, right) => left.date.localeCompare(right.date));
+    if (uniquePoints.length < 2) return null;
+
+    const latestPoint = uniquePoints[uniquePoints.length - 1];
+    const previousPoint = uniquePoints[uniquePoints.length - 2];
+    if (!latestPoint || !previousPoint || previousPoint.price <= 0) return null;
+
+    return {
+        usdPerOunce: latestPoint.price,
+        previousUsdPerOunce: previousPoint.price,
+        change24h: ((latestPoint.price - previousPoint.price) / previousPoint.price) * 100,
+        asOfDate: latestPoint.date,
+        previousDate: previousPoint.date
+    };
+}
+
+async function loadGoldDailySeriesSnapshot() {
+    for (const candidate of buildGoldDailySeriesCandidates()) {
+        try {
+            const response = await fetchWithTimeout(candidate.requestUrl, {
+                headers: { Accept: 'application/json,text/plain,*/*' }
+            }, 5000);
+            if (!response.ok) continue;
+            const payload = await response.text();
+            const snapshot = extractGoldDailySeriesSnapshot(payload);
+            if (snapshot) {
+                return {
+                    usdPerOunce: snapshot.usdPerOunce,
+                    previousUsdPerOunce: snapshot.previousUsdPerOunce,
+                    change24h: snapshot.change24h,
+                    source: `${candidate.source}（${snapshot.asOfDate}）`,
+                    historySource: `${candidate.source}（${snapshot.previousDate}）`
+                };
+            }
+        } catch (error) {
+            console.warn('Failed to load gold daily series candidate', candidate.requestUrl, error);
+        }
+    }
+
+    return null;
+}
 
 const totalRepoStars = (repos) => repos.reduce((sum, repo) => sum + Number(repo?.stargazers_count || 0), 0);
 const sortByUpdated = (items) => [...items].sort((left, right) => new Date(right?.updated_at || 0) - new Date(left?.updated_at || 0));
@@ -1320,6 +1402,11 @@ async function loadGas92Price() {
 }
 
 async function loadGoldPriceSnapshot() {
+    const goldDailySeriesSnapshot = await loadGoldDailySeriesSnapshot();
+    if (goldDailySeriesSnapshot) {
+        return goldDailySeriesSnapshot;
+    }
+
     const historyDates = GOLD_HISTORY_LOOKBACK_DAY_OFFSETS.map((days) => isoDateDaysAgo(days));
     const historyCandidates = historyDates.flatMap((historyDate) => buildGoldHistoryCandidates(historyDate));
     const [currentPrimaryResult, currentLegacyResult, ...historyResults] = await Promise.allSettled([
