@@ -84,6 +84,11 @@ const starredFallback = [
     }
 ];
 
+const sponsorFallback = {
+    count: 2,
+    entities: ['LizardByte', 'glenn-jocher']
+};
+
 const CNBLOGS_BLOG_APP = 'fix-me';
 const CNBLOGS_HOME_URL = `https://www.cnblogs.com/${CNBLOGS_BLOG_APP}`;
 
@@ -178,6 +183,7 @@ const sortByUpdated = (items) => [...items].sort((left, right) => new Date(right
 const collectLanguages = (items) => [...new Set(items.map((item) => safeText(item?.language, '')).filter(Boolean))];
 const getLatestUpdated = (items) => sortByUpdated(items)[0]?.updated_at || null;
 const getMostStarred = (items) => [...items].sort((left, right) => Number(right?.stargazers_count || 0) - Number(left?.stargazers_count || 0))[0] || null;
+const joinNames = (items) => items.filter(Boolean).join('、');
 const toTimestamp = (value) => {
     const time = new Date(value || 0).getTime();
     return Number.isFinite(time) ? time : 0;
@@ -234,6 +240,35 @@ function renderProfile(profile, repos = repoFallback) {
 function renderMarkup(selector, markup) {
     const container = document.getElementById(selector);
     if (container) container.innerHTML = markup;
+}
+
+function renderAboutSummary(profile = profileFallback, repos = repoFallback, starredRepos = starredFallback, sponsors = sponsorFallback) {
+    const publicRepoCount = Number(profile?.public_repos ?? repos.length ?? 0);
+    const repoStars = totalRepoStars(repos);
+    const repoLatestUpdated = fmtDate(getLatestUpdated(repos));
+    const starCount = Array.isArray(starredRepos) ? starredRepos.length : 0;
+    const starLanguageCount = collectLanguages(starredRepos).length;
+    const topStar = getMostStarred(starredRepos);
+    const sponsorNames = joinNames(sponsors?.entities || sponsorFallback.entities);
+
+    setText(
+        'about-repo-summary',
+        publicRepoCount
+            ? `当前公开仓库 ${publicRepoCount} 个，累计获得 ${repoStars} 个 Star，最近一次公开更新在 ${repoLatestUpdated}。`
+            : '当前还没有可展示的公开仓库摘要。'
+    );
+    setText(
+        'about-star-summary',
+        starCount
+            ? `当前公开收藏 ${starCount} 个项目，覆盖 ${starLanguageCount} 种语言；最近最受关注的项目是 ${safeText(topStar?.full_name || topStar?.name, '暂无')}。`
+            : '当前还没有可展示的公开 Stars 摘要。'
+    );
+    setText(
+        'about-sponsor-summary',
+        sponsors?.count
+            ? `当前公开显示正在赞助 ${sponsors.count} 个开发者/组织：${safeText(sponsorNames, '暂无公开赞助对象')}。`
+            : '当前没有可展示的公开 Sponsoring 信息。'
+    );
 }
 
 function renderRepoSummary(repos) {
@@ -676,6 +711,7 @@ async function hydrateGithubData() {
     renderProfile(profileFallback, repoFallback);
     renderRepos(repoFallback);
     renderStarred(starredFallback);
+    renderAboutSummary(profileFallback, repoFallback, starredFallback, sponsorFallback);
     updateStatus('已先展示静态摘要，联网后会自动刷新为 GitHub 公开资料。');
     updateStarStatus('已先展示静态 Star 摘要，联网后会自动刷新。');
 
@@ -720,6 +756,7 @@ async function hydrateGithubData() {
         renderProfile(profile, repos);
         renderRepos(repos);
         renderStarred(starredRepos);
+        renderAboutSummary(profile, repos, starredRepos, sponsorFallback);
 
         if (hasLiveProfile || hasLiveRepos) {
             updateStatus('GitHub 公开资料已刷新，首页与仓库页展示的是实时接口数据。');
