@@ -94,18 +94,12 @@ const CNBLOGS_HOME_URL = `https://www.cnblogs.com/${CNBLOGS_BLOG_APP}`;
 
 const articleFallback = [
     {
-        title: '记录 GStreamer 打开 JPEG 编码的视频时出现错误的原因',
-        link: 'https://www.cnblogs.com/fix-me/p/archive/2026/04/23',
-        summary: '在 C++ 中使用 gst_parse_launch 创建 GStreamer 管道，并通过 decodebin 解码 JPEG 编码的 avi 视频时，程序会在没有明显报错信息的情况下崩溃。排查后确认根因不是管道本身，而是进程里同时使用了 OpenCV 的 VideoCapture / VideoWriter，触发了 videoio 相关库冲突。',
-        published_at: '2026-04-23T11:47:00+08:00',
-        source: '博客园静态整理'
-    },
-    {
-        title: 'CARLA 中的坐标系与标准车辆坐标系转换',
-        link: 'https://www.cnblogs.com/fix-me/p/19882892',
-        summary: '梳理 CARLA 左手坐标系与标准车辆右手坐标系的差异：CARLA 采用 X 前、Y 右、Z 上，标准车辆坐标系通常为 X 前、Y 左、Z 上。文中给出了位置与姿态的转换规则，核心是 y、yaw、pitch 取反，便于仿真数据和实车/算法坐标定义对齐。',
-        published_at: '2026-04-17T13:47:00+08:00',
-        source: '博客园静态整理'
+        title: '博客园主页',
+        link: CNBLOGS_HOME_URL,
+        summary: '正在尝试直接从博客园主页读取最近随笔；如果外部站点暂时不可用，这里至少保留博客园主页入口，避免页面留白。',
+        published_at: null,
+        source: '博客园主页',
+        isFallbackHub: true
     }
 ];
 
@@ -192,11 +186,9 @@ const CNBLOGS_ARTICLE_DETAIL_PROXY_BUILDERS = [
     { label: '博客园正文 / corsproxy', buildUrl: (articleUrl) => `https://corsproxy.io/?${encodeURIComponent(articleUrl)}` }
 ];
 const CNBLOGS_OPEN_API_POSTS_URL = `https://api.cnblogs.com/api/blog/posts/@${CNBLOGS_BLOG_APP}?pageIndex=1&pageSize=10`;
-const CNBLOGS_OPEN_API_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_OPEN_API_POSTS_URL)}`;
 const CNBLOGS_WCF_POSTS_URL = `https://wcf.open.cnblogs.com/blog/u/${CNBLOGS_BLOG_APP}/posts/1/10`;
-const CNBLOGS_WCF_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_WCF_POSTS_URL)}`;
-const CNBLOGS_HOME_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(CNBLOGS_HOME_URL)}`;
-const CNBLOGS_RSS_PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${CNBLOGS_HOME_URL}/rss`)}`;
+const CNBLOGS_RSS_URL = `${CNBLOGS_HOME_URL}/rss`;
+const CNBLOGS_RSS_XML_URL = `${CNBLOGS_HOME_URL}/rss.xml`;
 const CNBLOGS_DATE_PATTERN = /\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2})?|\d{4}年\d{1,2}月\d{1,2}日/;
 const GOLD_CHANGE_KEYS = ['chg_percentage', 'change_percent', 'change_percentage', 'changePercentage', 'changePercent', 'chp'];
 const GOLD_PREVIOUS_PRICE_KEYS = ['previous_close_price', 'prev_close_price', 'previous_close', 'prev_close', 'open_price', 'open'];
@@ -863,61 +855,47 @@ async function enrichCnblogsArticles(rawArticles) {
     return detailedArticles;
 }
 
+function buildCnblogsFetchCandidates(requestUrl, source, parser, accept) {
+    const encodedUrl = encodeURIComponent(requestUrl);
+    return [
+        { source, requestUrl, parser, accept },
+        { source: `${source} / allorigins`, requestUrl: `https://api.allorigins.win/raw?url=${encodedUrl}`, parser, accept },
+        { source: `${source} / codetabs`, requestUrl: `https://api.codetabs.com/v1/proxy?url=${encodedUrl}`, parser, accept },
+        { source: `${source} / corsproxy`, requestUrl: `https://corsproxy.io/?${encodedUrl}`, parser, accept }
+    ];
+}
+
 const cnblogsArticleCandidates = [
-    {
-        source: '博客园主页',
-        requestUrl: CNBLOGS_HOME_URL,
-        parser: parseCnblogsArticleList,
-        accept: 'text/html,application/xhtml+xml'
-    },
-    {
-        source: '博客园主页 / allorigins',
-        requestUrl: CNBLOGS_HOME_PROXY_URL,
-        parser: parseCnblogsArticleList,
-        accept: 'text/html,application/xhtml+xml'
-    },
-    {
-        source: '博客园开放 API',
-        requestUrl: CNBLOGS_OPEN_API_POSTS_URL,
-        parser: parseCnblogsOpenApiPosts,
-        accept: 'application/json,text/plain'
-    },
-    {
-        source: '博客园开放 API / allorigins',
-        requestUrl: CNBLOGS_OPEN_API_PROXY_URL,
-        parser: parseCnblogsOpenApiPosts,
-        accept: 'application/json,text/plain'
-    },
-    {
-        source: '博客园开放 API / WCF',
-        requestUrl: CNBLOGS_WCF_POSTS_URL,
-        parser: parseCnblogsWcfPosts,
-        accept: 'application/atom+xml,application/xml,text/xml'
-    },
-    {
-        source: '博客园开放 API / WCF / allorigins',
-        requestUrl: CNBLOGS_WCF_PROXY_URL,
-        parser: parseCnblogsWcfPosts,
-        accept: 'application/atom+xml,application/xml,text/xml'
-    },
-    {
-        source: '博客园 RSS',
-        requestUrl: `${CNBLOGS_HOME_URL}/rss`,
-        parser: parseCnblogsRss,
-        accept: 'application/rss+xml,application/xml,text/xml'
-    },
-    {
-        source: '博客园 RSS / rss.xml',
-        requestUrl: `${CNBLOGS_HOME_URL}/rss.xml`,
-        parser: parseCnblogsRss,
-        accept: 'application/rss+xml,application/xml,text/xml'
-    },
-    {
-        source: '博客园 RSS / allorigins',
-        requestUrl: CNBLOGS_RSS_PROXY_URL,
-        parser: parseCnblogsRss,
-        accept: 'application/rss+xml,application/xml,text/xml'
-    }
+    ...buildCnblogsFetchCandidates(
+        CNBLOGS_HOME_URL,
+        '博客园主页',
+        parseCnblogsArticleList,
+        'text/html,application/xhtml+xml'
+    ),
+    ...buildCnblogsFetchCandidates(
+        CNBLOGS_OPEN_API_POSTS_URL,
+        '博客园开放 API',
+        parseCnblogsOpenApiPosts,
+        'application/json,text/plain'
+    ),
+    ...buildCnblogsFetchCandidates(
+        CNBLOGS_WCF_POSTS_URL,
+        '博客园开放 API / WCF',
+        parseCnblogsWcfPosts,
+        'application/atom+xml,application/xml,text/xml'
+    ),
+    ...buildCnblogsFetchCandidates(
+        CNBLOGS_RSS_URL,
+        '博客园 RSS',
+        parseCnblogsRss,
+        'application/rss+xml,application/xml,text/xml'
+    ),
+    ...buildCnblogsFetchCandidates(
+        CNBLOGS_RSS_XML_URL,
+        '博客园 RSS / rss.xml',
+        parseCnblogsRss,
+        'application/rss+xml,application/xml,text/xml'
+    )
 ];
 
 async function loadCnblogsArticles() {
@@ -952,7 +930,7 @@ async function hydrateArticles() {
     if (!hasArticleTargets) return;
 
     renderArticles(articleFallback);
-    updateArticleStatus('已先展示根据博客园主页整理的两篇最新随笔，联网后会自动刷新为实时文章列表。');
+    updateArticleStatus('正在读取博客园主页文章；如果接口可用，页面会自动刷新为最新随笔。');
 
     try {
         const articles = await loadCnblogsArticles();
@@ -970,10 +948,10 @@ async function hydrateArticles() {
                 updateArticleStatus('博客园文章已刷新，展示的是最近获取到的公开文章。');
             }
         } else {
-            updateArticleStatus('暂时未能连接博客园，页面仍展示静态整理的两篇最新随笔。');
+            updateArticleStatus('暂时未能从博客园主页读取文章，页面已保留主页入口。');
         }
     } catch (error) {
-        updateArticleStatus('暂时未能连接博客园，页面仍展示静态整理的两篇最新随笔。');
+        updateArticleStatus('暂时未能从博客园主页读取文章，页面已保留主页入口。');
         console.warn('Failed to load cnblogs articles', error);
     }
 }
