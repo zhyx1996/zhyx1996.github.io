@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公开数据嵌入演示 | ZYX</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-inner">
+            <a class="brand" href="/index.html">
+                <span class="brand-mark">◉</span>
+                <span>zhyx1996</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/index.html">Overview</a></li>
+                <li><a href="/projects.html">Repositories</a></li>
+                <li><a href="/stars.html">Stars</a></li>
+                <li><a href="/articles.html">Articles</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="container page-shell">
+        <section class="page-banner compact-banner">
+            <div>
+                <span class="kicker">Public embed demo</span>
+                <p class="page-eyebrow">Genshin / Steam / No local proxy</p>
+                <h1>公开信息嵌入演示</h1>
+                <p>这个页面只使用纯前端可行的公开嵌入方式：原神直接嵌 Enka 展示页，Steam 个人主页保留资料卡外链，游戏内容仅使用官方商店 widget。</p>
+            </div>
+            <div class="page-banner-meta">
+                <div class="banner-meta-card glass-card">
+                    <small>Genshin</small>
+                    <strong>Enka 公开展示页 iframe</strong>
+                    <span class="meta-note">不需要本地代理</span>
+                </div>
+                <div class="banner-meta-card glass-card">
+                    <small>Steam</small>
+                    <strong>资料卡 + 官方 widget</strong>
+                    <span class="meta-note">避开个人主页 iframe / CORS 限制</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-heading">
+                <div>
+                    <h2>原神公开展柜</h2>
+                    <p>直接使用 Enka 的公开页面作为 iframe 源地址。</p>
+                </div>
+                <span class="tag">Enka</span>
+            </div>
+            <article class="card glass-card embed-card">
+                <iframe
+                    class="external-embed-frame"
+                    src="https://enka.network/u/147521967/"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    title="Genshin Showcase Demo"
+                ></iframe>
+                <p class="embed-note">Enka 偶发出现 424 时，通常是上游数据暂时异常；页面内容仍取决于 UID 的公开展柜与 Enka 当前状态。</p>
+            </article>
+        </section>
+
+        <section class="section">
+            <div class="section-heading">
+                <div>
+                    <h2>Steam 无代理替代方案</h2>
+                    <p>Steam 个人主页不能直接被第三方网页嵌入，因此这里仅保留纯前端可行方案。</p>
+                </div>
+                <span class="tag">Steam</span>
+            </div>
+            <div class="grid-2 embed-grid">
+                <article class="card glass-card embed-card">
+                    <h3>资料卡外链</h3>
+                    <p>通过静态头像与个人主页链接提供入口，不尝试浏览器端动态抓取。</p>
+                    <a class="steam-profile-card" href="https://steamcommunity.com/profiles/76561198391062314/" target="_blank" rel="noreferrer">
+                        <img
+                            class="avatar avatar-sm"
+                            src="https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg"
+                            alt="Steam avatar"
+                            width="96"
+                            height="96"
+                        >
+                        <span class="steam-profile-copy">
+                            <strong>ZYX 的 Steam 主页</strong>
+                            <span>打开社区主页</span>
+                        </span>
+                    </a>
+                </article>
+                <article class="card glass-card embed-card">
+                    <h3>官方商店 widget</h3>
+                    <p>单个游戏可使用 Steam 官方提供的店铺 widget 进行嵌入。</p>
+                    <iframe
+                        class="store-widget-frame"
+                        src="https://store.steampowered.com/widget/3903190/"
+                        loading="lazy"
+                        title="Steam Store Widget Demo"
+                    ></iframe>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>ZYX · public-data-proxy/embed-demo.html</p>
+            <p>用于演示“原神可直接 iframe，Steam 个人主页仅保留外链卡片”的无代理实现。</p>
+        </div>
+    </footer>
+</body>
+</html>
