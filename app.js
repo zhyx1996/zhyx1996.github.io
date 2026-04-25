@@ -255,6 +255,26 @@ const setImage = (id, value, alt) => {
     }
 };
 
+function ensureAmbientBackdrop() {
+    const body = document.body;
+    if (!body || body.querySelector('.site-ambient[data-site-ambient]')) return;
+
+    const ambient = document.createElement('div');
+    ambient.className = 'site-ambient';
+    ambient.setAttribute('aria-hidden', 'true');
+    ambient.dataset.siteAmbient = 'true';
+    ambient.innerHTML = `
+        <span class="site-ambient-orb site-ambient-orb-a"></span>
+        <span class="site-ambient-orb site-ambient-orb-b"></span>
+        <span class="site-ambient-orb site-ambient-orb-c"></span>
+        <span class="site-ambient-grid"></span>
+        <span class="site-ambient-grid site-ambient-grid-b"></span>
+        <span class="site-ambient-beam site-ambient-beam-a"></span>
+        <span class="site-ambient-beam site-ambient-beam-b"></span>
+    `;
+    body.prepend(ambient);
+}
+
 function renderProfile(profile, repos = repoFallback) {
     setText('profile-name', safeText(profile.name, profile.login));
     setText('profile-login', `@${profile.login}`);
@@ -1411,6 +1431,7 @@ async function hydrateMarketData() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+    ensureAmbientBackdrop();
     hydrateGithubData();
     hydrateArticles();
     hydrateMarketData();
