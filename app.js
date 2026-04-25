@@ -152,6 +152,7 @@ const ARTICLE_DETAIL_BATCH_SIZE = 3;
 const ARTICLE_PENDING_SYNC_TEXT = '待同步';
 const ARTICLE_DIGEST_TRIM_PREFIX_PATTERN = /^[:：\-—|·\s]+/;
 const ARTICLE_DIGEST_SENTENCE_PATTERN = /[^。！？!?；;]+[。！？!?；;]?/g;
+const CNBLOGS_HOSTNAME = 'www.cnblogs.com';
 const CNBLOGS_HOME_ENTRY_SELECTORS = '.forFlow .day, .forFlow .postItem, .forFlow .entrylistItem, #post_list .post-item, #post_list .entrylistItem';
 const CNBLOGS_HOME_TITLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle2 a, a.postTitle, .postTitle a, a.entrylistItemTitle';
 const CNBLOGS_ARTICLE_SELECTORS = '.entrylistPosttitle a, a.postTitle2, .postTitle2 a, a.postTitle, .postTitle a, a.entrylistItemTitle, #mainContent a[href*="/p/"], #mainContent a[href*="/articles/"]';
@@ -692,7 +693,7 @@ function normalizeCnblogsArticleLink(value) {
         const parsed = new URL(String(value ?? ''), CNBLOGS_HOME_URL);
         const path = parsed.pathname.replace(/\/+$/, '');
         const [, blogApp = ''] = path.split('/');
-        if (parsed.hostname !== 'www.cnblogs.com') return '';
+        if (parsed.hostname !== CNBLOGS_HOSTNAME) return '';
         if (blogApp.toLowerCase() !== CNBLOGS_BLOG_APP.toLowerCase()) return '';
         if (!CNBLOGS_VALID_ARTICLE_PATH_PATTERN.test(path)) return '';
         return `${parsed.origin}${path}`;
@@ -745,6 +746,7 @@ function parseCnblogsArticleList(html, source) {
         entryArticles.push(article);
     });
 
+    // 优先使用博客园主页的结构化随笔卡片；只有在页面结构退化时，才回退到较宽松的链接扫描。
     if (entryArticles.length) return entryArticles;
 
     const anchors = [...doc.querySelectorAll(CNBLOGS_ARTICLE_SELECTORS)];
