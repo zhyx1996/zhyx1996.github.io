@@ -253,6 +253,23 @@ function renderAboutSummary(profile = profileFallback, repos = repoFallback, sta
     const pastSponsors = Array.isArray(sponsors?.past) ? sponsors.past : sponsorFallback.past;
     const currentSponsorNames = joinNames(currentSponsors);
     const pastSponsorNames = joinNames(pastSponsors);
+    let sponsorSummary = '当前没有可展示的公开 Sponsoring 信息。';
+
+    if (currentSponsors.length || pastSponsors.length) {
+        const summaryParts = [];
+
+        summaryParts.push(
+            currentSponsors.length
+                ? `当前公开显示正在赞助 ${currentSponsors.length} 个开发者/组织：${safeText(currentSponsorNames, '暂无公开赞助对象')}。`
+                : '当前公开没有正在赞助的开发者/组织。'
+        );
+
+        if (pastSponsors.length) {
+            summaryParts.push(`历史上还赞助过 ${pastSponsors.length} 个开发者/组织：${safeText(pastSponsorNames, '暂无公开历史赞助对象')}。`);
+        }
+
+        sponsorSummary = summaryParts.join('');
+    }
 
     setText(
         'about-repo-summary',
@@ -268,16 +285,7 @@ function renderAboutSummary(profile = profileFallback, repos = repoFallback, sta
     );
     setText(
         'about-sponsor-summary',
-        currentSponsors.length || pastSponsors.length
-            ? [
-                currentSponsors.length
-                    ? `当前公开显示正在赞助 ${currentSponsors.length} 个开发者/组织：${safeText(currentSponsorNames, '暂无公开赞助对象')}。`
-                    : '当前公开没有正在赞助的开发者/组织。 ',
-                pastSponsors.length
-                    ? `历史上还赞助过 ${pastSponsors.length} 个开发者/组织：${safeText(pastSponsorNames, '暂无公开历史赞助对象')}。`
-                    : ''
-            ].join('')
-            : '当前没有可展示的公开 Sponsoring 信息。'
+        sponsorSummary
     );
 }
 
