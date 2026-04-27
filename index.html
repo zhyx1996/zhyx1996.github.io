@@ -155,10 +155,21 @@
                     <div class="repo-grid" id="article-highlight-list">
                         <article class="repo-card article-card glass-card">
                             <span class="tag">博客园</span>
-                            <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me" target="_blank" rel="noreferrer">博客园主页</a></h3>
-                            <p class="repo-description">博客园主页与全部公开文章入口。</p>
+                            <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">记录GStreamer打开JPEG编码的视频时出现段错误的原因</a></h3>
+                            <p class="repo-description">排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。</p>
+                            <div class="repo-stats">
+                                <span>🕒 2026年4月23日</span>
+                            </div>
                             <div class="repo-actions">
-                                <a class="button outline" href="/articles.html">打开文章页</a>
+                                <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">阅读原文</a>
+                            </div>
+                        </article>
+                        <article class="repo-card article-card glass-card">
+                            <span class="tag">博客园</span>
+                            <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">CARLA中的坐标系与标准车辆坐标系</a></h3>
+                            <p class="repo-description">梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。</p>
+                            <div class="repo-actions">
+                                <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">阅读原文</a>
                             </div>
                         </article>
                     </div>
@@ -171,10 +182,62 @@
                         </div>
                         <div class="grid-3 info-grid article-digest-list" id="article-highlight-digest-list">
                             <article class="card glass-card article-digest-card">
-                                <span class="badge">博客园</span>
-                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me" target="_blank" rel="noreferrer">博客园主页</a></h3>
-                                <p class="article-digest-text">博客园主页与全部公开文章入口。</p>
-                                <p class="article-digest-meta">博客园</p>
+                                <div class="repo-title-row">
+                                    <span class="badge">随笔 01</span>
+                                    <span class="pill">2026年4月23日</span>
+                                </div>
+                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">记录GStreamer打开JPEG编码的视频时出现段错误的原因</a></h3>
+                                <p class="article-digest-text">排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。</p>
+                                <p class="article-digest-meta">博客园 · 扶摇接海 · 2026年4月23日</p>
+                            </article>
+                            <article class="card glass-card article-digest-card">
+                                <div class="repo-title-row">
+                                    <span class="badge">随笔 02</span>
+                                    <span class="pill">待同步</span>
+                                </div>
+                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">CARLA中的坐标系与标准车辆坐标系</a></h3>
+                                <p class="article-digest-text">梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。</p>
+                                <p class="article-digest-meta">博客园 · 扶摇接海 · 待同步</p>
+                            </article>
+                        </div>
+                    </div>
+                    <div class="article-detail-block">
+                        <div class="section-heading section-subheading">
+                            <div>
+                                <h3>文章具体内容</h3>
+                            </div>
+                            <span class="tag">Feature</span>
+                        </div>
+                        <div class="repo-grid article-content-list" id="article-featured-content-list">
+                            <article class="card glass-card article-content-card">
+                                <div class="repo-title-row">
+                                    <span class="badge">文章 01</span>
+                                    <span class="pill">2026年4月23日</span>
+                                </div>
+                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">记录GStreamer打开JPEG编码的视频时出现段错误的原因</a></h3>
+                                <div class="article-content-body">
+                                    <p class="article-content-paragraph">文章围绕一个实际排障问题展开：同一进程里同时使用 OpenCV 的 VideoCapture / VideoWriter 和 GStreamer 管线处理 JPEG 编码视频时，会在解码阶段触发段错误。</p>
+                                    <p class="article-content-paragraph">定位后发现，问题核心是 libjpeg.so.8 与 libnvjpeg.so 在同进程下的解码链路冲突，文中进一步给出改用 nvv4l2decoder、jpegdec 或先转 H264 的处理方案。</p>
+                                </div>
+                                <p class="article-digest-meta">博客园 · 扶摇接海 · 2026年4月23日</p>
+                                <div class="repo-actions">
+                                    <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">阅读原文</a>
+                                </div>
+                            </article>
+                            <article class="card glass-card article-content-card">
+                                <div class="repo-title-row">
+                                    <span class="badge">文章 02</span>
+                                    <span class="pill">待同步</span>
+                                </div>
+                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">CARLA中的坐标系与标准车辆坐标系</a></h3>
+                                <div class="article-content-body">
+                                    <p class="article-content-paragraph">文章先把 CARLA 的左手坐标系、车辆前向、Y 轴朝右以及 Z-Y-X 欧拉角顺序讲清楚，方便在仿真、感知和控制链路里统一约定。</p>
+                                    <p class="article-content-paragraph">随后把它和标准车辆坐标系做逐项对照，重点说明左右手系差异、Y 轴符号变化以及姿态角转换时容易出错的地方。</p>
+                                </div>
+                                <p class="article-digest-meta">博客园 · 扶摇接海 · 待同步</p>
+                                <div class="repo-actions">
+                                    <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">阅读原文</a>
+                                </div>
                             </article>
                         </div>
                     </div>
