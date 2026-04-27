@@ -94,12 +94,26 @@ const CNBLOGS_HOME_URL = `https://www.cnblogs.com/${CNBLOGS_BLOG_APP}`;
 
 const articleFallback = [
     {
-        title: '博客园主页',
-        link: CNBLOGS_HOME_URL,
-        summary: '博客园主页与全部公开文章入口。',
+        title: '记录GStreamer打开JPEG编码的视频时出现段错误的原因',
+        link: `${CNBLOGS_HOME_URL}/p/19914336`,
+        summary: '排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。',
+        content: [
+            '文章围绕一个实际排障问题展开：同一进程里同时使用 OpenCV 的 VideoCapture / VideoWriter 和 GStreamer 管线处理 JPEG 编码视频时，会在解码阶段触发段错误。作者把现象收敛到 JPEG / MJPEG 场景，并逐步排除普通文件损坏、接口误用等表面因素。',
+            '定位后发现，问题核心是 OpenCV 依赖的 libjpeg.so.8 与 GStreamer 中 nvjpegdec 依赖的 libnvjpeg.so 在同进程下的解码链路冲突。文章进一步给出三种可落地方案：改用 nvv4l2decoder、退回 jpegdec，或先把原始视频转换成 H264，再进入后续处理流程。'
+        ].join('\n\n'),
+        published_at: '2026-04-23T00:00:00Z',
+        source: '博客园 · 扶摇接海'
+    },
+    {
+        title: 'CARLA中的坐标系与标准车辆坐标系',
+        link: `${CNBLOGS_HOME_URL}/p/19882892`,
+        summary: '梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。',
+        content: [
+            '文章先把 CARLA 里的坐标定义讲清楚：它采用左手坐标系，车辆前向通常沿 X 轴，Y 轴朝右，姿态角遵循 Z-Y-X 的欧拉角顺序。对于做自动驾驶感知、控制或仿真数据回放的人来说，这些约定如果没有先统一，后续计算很容易出现方向和符号错误。',
+            '在此基础上，作者把 CARLA 坐标和常见标准车辆坐标系做了对照，重点说明 Y 轴方向、左右手系差异以及姿态角转换时的注意点，帮助读者在仿真平台、算法模块和车辆工程表达之间建立一致的坐标转换关系。'
+        ].join('\n\n'),
         published_at: null,
-        source: '博客园',
-        isFallbackHub: true
+        source: '博客园 · 扶摇接海'
     }
 ];
 
