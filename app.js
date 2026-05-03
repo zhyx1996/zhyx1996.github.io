@@ -989,10 +989,7 @@ function extractCnblogsArticleFromContainer(container, source) {
         title,
         link,
         summary,
-        published_at: timeText || dateMatch?.[0] || null,
-        source
-    };
-}
+        published_at: timeMatch?.[0] || dateMatch?.[0] || null,
 
 function parseCnblogsArticleList(html, source) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -1025,7 +1022,7 @@ function parseCnblogsArticleList(html, source) {
             title,
             link,
             summary,
-            published_at: timeText || dateMatch?.[0] || null,
+            published_at: timeMatch?.[0] || dateMatch?.[0] || null,
             source
         });
     });
