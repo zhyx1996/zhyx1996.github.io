@@ -633,8 +633,8 @@ function renderArticleSummary(articles) {
 
     setTextAll('[data-article-count]', placeholderOnly ? '待刷新' : String(items.length));
     setTextAll('[data-article-last-updated]', placeholderOnly ? '待刷新' : fmtDate(latestDate));
-    setTextAll('[data-article-last-updated-hero]', placeholderOnly ? '待刷新' : safeText(latestArticle?.title, '暂无'));
-    setTextAll('[data-article-last-updated-hero-date]', placeholderOnly ? '' : fmtDate(latestDate));
+    setTextAll('[data-article-last-updated-hero]', safeText(latestArticle?.title, placeholderOnly ? '待刷新' : '暂无'));
+    setTextAll('[data-article-last-updated-hero-date]', fmtDate(latestDate));
     setTextAll('[data-article-latest-title]', placeholderOnly ? '博客园主页' : safeText(latestArticle?.title, '暂无'));
     setTextAll('[data-article-source]', placeholderOnly ? '博客园主页' : safeText(latestArticle?.source, '博客园'));
 }
@@ -991,6 +991,9 @@ function extractCnblogsArticleFromContainer(container, source) {
         link,
         summary,
         published_at: timeMatch?.[0] || dateMatch?.[0] || null,
+        source
+    };
+}
 
 function parseCnblogsArticleList(html, source) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
