@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>公开数据嵌入演示 | ZYX</title>
     <link rel="stylesheet" href="/styles.css">
+    <!-- Sakana Widget -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css" />
 </head>
 <body>
     <header class="site-header">
@@ -110,5 +112,15 @@
             <p>用于演示“原神可直接 iframe，Steam 个人主页仅保留外链卡片”的无代理实现。</p>
         </div>
     </footer>
+
+    <!-- Sakana Widget -->
+    <div id="sakana-widget" style="position:fixed;bottom:16px;right:16px;width:170px;height:200px;z-index:9999;"></div>
+    <script>
+      function initSakanaWidget() {
+        new SakanaWidget({ size: 170, character: 'chisato' }).mount('#sakana-widget');
+      }
+    </script>
+    <script async onload="initSakanaWidget()"
+      src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
 </body>
 </html>

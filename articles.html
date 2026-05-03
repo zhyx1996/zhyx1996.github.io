@@ -6,6 +6,8 @@
     <title>ZYX | Cnblogs Articles</title>
     <meta name="description" content="zhyx1996 的博客园文章展示页，集中展示最近同步到的网站文章与博客园原始入口。">
     <link rel="stylesheet" href="/styles.css">
+    <!-- Sakana Widget -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css" />
 </head>
 <body>
     <header class="site-header">
@@ -212,5 +214,15 @@
     </footer>
 
     <script src="/app.js"></script>
+
+    <!-- Sakana Widget -->
+    <div id="sakana-widget" style="position:fixed;bottom:16px;right:16px;width:170px;height:200px;z-index:9999;"></div>
+    <script>
+      function initSakanaWidget() {
+        new SakanaWidget({ size: 170, character: 'chisato' }).mount('#sakana-widget');
+      }
+    </script>
+    <script async onload="initSakanaWidget()"
+      src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
 </body>
 </html>
