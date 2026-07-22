@@ -561,7 +561,7 @@ body::after {
 
 /* ── 响应式 ── */
 @media (max-width: 900px) {
-    .hero-banner { min-height: 50vh; }
+    .hero-banner { min-height: 50vh; flex-direction: column; }
     .hero-copy { max-width: 100%; padding: 2rem; }
     .about-strip { flex-direction: column; align-items: flex-start; gap: 1rem; }
     .about-tags { width: 100%; }
@@ -569,12 +569,16 @@ body::after {
     .article-card-horizontal { flex-direction: column; gap: 0.8rem; }
     .article-card-action { justify-content: flex-start; }
     .toolbar-inner { flex-direction: column; gap: 1rem; }
+    .pretext-columns { flex-direction: column; }
+    .pretext-column { width: 100%; }
 }
 @media (max-width: 600px) {
     .nav-inner { flex-direction: column; padding: 0.8rem; }
     .hero-copy { padding: 1.5rem; }
     .hero-copy h1 { font-size: 2.5rem; }
     .about-tag { min-width: 100%; }
+    #pretext-output { position: relative; height: 300px; }
+    .pretext-line { font-size: 14px; line-height: 22px; }
 }
 
 /* ── 无障碍 ── */
