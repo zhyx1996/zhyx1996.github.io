@@ -411,6 +411,12 @@ body::after {
     border-radius: var(--radius-sm);
     padding: 0.8rem 1.2rem;
     min-width: 180px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.about-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    border-color: var(--border-strong);
 }
 
 .about-tag--lane { border-left: 3px solid var(--lane); }
