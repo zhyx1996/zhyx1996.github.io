@@ -13,7 +13,7 @@
     <header class="site-header">
         <div class="nav-inner">
             <a class="brand" href="/index.html">
-                <span class="brand-mark">◉</span>
+                <span class="brand-mark">?</span>
                 <span>扶摇接海</span>
             </a>
             <ul class="nav-links">
@@ -26,7 +26,8 @@
     </header>
 
     <main class="container page-shell">
-        <section class="page-banner hero-banner">
+        <!-- Hero -->
+        <section class="hero-banner">
             <div id="pretext-output" aria-hidden="true"></div>
             <div class="hero-ambient" aria-hidden="true">
                 <span class="hero-orb hero-orb-a"></span>
@@ -38,287 +39,103 @@
             </div>
             <div class="hero-copy">
                 <span class="kicker">首页</span>
-                <p class="page-eyebrow">个人主页 / 计算机视觉、并行计算与公开写作</p>
-                <h1>个人主页</h1>
+                <h1>扶摇接海</h1>
                 <p>聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。</p>
-                <div class="page-local-nav" aria-label="Overview sections">
-                    <a href="#about">关于</a>
-                    <a href="#focus">当前关注</a>
-                    <a href="#articles">最新文章</a>
-                    <a href="#market">市场快照</a>
-                    <a href="#showcase">游戏展示</a>
-                    <a href="#links">快速链接</a>
-                </div>
-                <div class="button-row banner-actions">
-                    <a class="button primary" id="profile-link" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">访问 GitHub</a>
-                    <a class="button secondary" href="/articles.html">查看文章</a>
-                    <a class="button secondary" href="/projects.html">查看项目</a>
-                </div>
-            </div>
-            <div class="page-banner-meta hero-meta-stack">
-                <div class="banner-meta-card glass-card">
-                    <small>主要方向</small>
-                    <strong>Computer Vision · Parallel Computing</strong>
-                    <span class="meta-note">视觉感知、算法验证与性能优化</span>
-                </div>
-                <div class="banner-meta-card glass-card">
-                    <small>当前关注</small>
-                    <strong>Lane Detection · CUDA · OpenMP</strong>
-                    <span class="meta-note">持续做实验、整理结果并沉淀工程经验</span>
+                <div class="button-row">
+                    <a class="button primary" href="/projects.html">查看项目</a>
                 </div>
             </div>
         </section>
 
-        <div class="profile-layout">
-            <aside class="sidebar-column">
-                <article class="profile-summary glass-card">
-                    <img class="avatar avatar-xl" id="profile-avatar" src="https://avatars.githubusercontent.com/u/74281356?v=4" alt="扶摇接海头像">
-                    <h2 id="profile-name"></h2>
-                    <p class="profile-login" id="profile-login">@zhyx1996</p>
-                    <p class="profile-bio" id="profile-bio">围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。</p>
-                    <div class="button-row full-width">
-                        <a class="button primary full-width" href="/projects.html">浏览公开项目</a>
-                        <a class="button secondary full-width" href="/articles.html">浏览博客文章</a>
-                        <a class="button secondary full-width" href="/stars.html">查看收藏项目</a>
+        <!-- About -->
+        <section class="about-strip" id="about">
+            <div class="about-avatar">
+                <img class="avatar avatar-xl" id="profile-avatar" src="https://avatars.githubusercontent.com/u/74281356?v=4" alt="扶摇接海头像">
+            </div>
+            <div class="about-info">
+                <h2 id="profile-name">扶摇接海</h2>
+                <p class="profile-login" id="profile-login">@zhyx1996</p>
+                <p class="profile-bio" id="profile-bio">围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。</p>
+            </div>
+            <div class="about-tags">
+                <div class="about-tag about-tag--lane">
+                    <span class="meta-label">研究</span>
+                    <strong>视觉感知 / 传统方法 + 深度学习</strong>
+                </div>
+                <div class="about-tag about-tag--alert">
+                    <span class="meta-label">工程</span>
+                    <strong>CUDA / OpenMP / 数据处理效率优化</strong>
+                </div>
+                <div class="about-tag about-tag--depth">
+                    <span class="meta-label">写作</span>
+                    <strong>项目复盘、实验记录与公开文章整理</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Articles -->
+        <section class="section" id="articles">
+            <div class="section-heading">
+                <h2>最新文章</h2>
+                <span class="tag">博客园</span>
+            </div>
+            <div class="article-list" id="article-highlight-list">
+                <article class="article-card-horizontal glass-card">
+                    <div class="article-card-main">
+                        <div class="repo-title-row">
+                            <span class="badge">随笔 01</span>
+                            <span class="pill">2026年4月23日</span>
+                        </div>
+                        <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">记录GStreamer打开JPEG编码的视频时出现段错误的原因</a></h3>
+                        <p class="repo-description">排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。</p>
                     </div>
-                    <div class="sidebar-meta">
-                        <div class="sidebar-meta-item glass-panel">
-                            <span class="meta-label">研究</span>
-                            <strong>视觉感知 / 传统方法 + 深度学习</strong>
-                        </div>
-                        <div class="sidebar-meta-item glass-panel">
-                            <span class="meta-label">工程</span>
-                            <strong>CUDA / OpenMP / 数据处理效率优化</strong>
-                        </div>
-                        <div class="sidebar-meta-item glass-panel">
-                            <span class="meta-label">写作</span>
-                            <strong>项目复盘、实验记录与公开文章整理</strong>
-                        </div>
+                    <div class="article-card-action">
+                        <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">阅读原文</a>
                     </div>
                 </article>
-            </aside>
-
-            <div class="content-column">
-                <section class="section" id="articles">
-                    <div class="section-heading">
-                        <div>
-                            <h2>最新文章</h2>
+                <article class="article-card-horizontal glass-card">
+                    <div class="article-card-main">
+                        <div class="repo-title-row">
+                            <span class="badge">随笔 02</span>
+                            <span class="pill">待同步</span>
                         </div>
-                        <span class="tag">博客园</span>
+                        <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">CARLA中的坐标系与标准车辆坐标系</a></h3>
+                        <p class="repo-description">梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。</p>
                     </div>
-                    <div class="repo-grid" id="article-highlight-list">
-                        <article class="repo-card article-card glass-card">
-                            <span class="tag">博客园</span>
-                            <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">记录GStreamer打开JPEG编码的视频时出现段错误的原因</a></h3>
-                            <p class="repo-description">排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。</p>
-                            <div class="repo-stats">
-                                <span>🕒 2026年4月23日</span>
-                            </div>
-                            <div class="repo-actions">
-                                <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">阅读原文</a>
-                            </div>
-                        </article>
-                        <article class="repo-card article-card glass-card">
-                            <span class="tag">博客园</span>
-                            <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">CARLA中的坐标系与标准车辆坐标系</a></h3>
-                            <p class="repo-description">梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。</p>
-                            <div class="repo-actions">
-                                <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">阅读原文</a>
-                            </div>
-                        </article>
+                    <div class="article-card-action">
+                        <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">阅读原文</a>
                     </div>
-                    <div class="article-digest-block">
-                        <div class="section-heading section-subheading">
-                            <div>
-                                <h3>内容摘要</h3>
-                            </div>
-                            <span class="tag">摘要</span>
-                        </div>
-                        <div class="grid-3 info-grid article-digest-list" id="article-highlight-digest-list">
-                            <article class="card glass-card article-digest-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">随笔 01</span>
-                                    <span class="pill">2026年4月23日</span>
-                                </div>
-                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">记录GStreamer打开JPEG编码的视频时出现段错误的原因</a></h3>
-                                <p class="article-digest-text">排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。</p>
-                                <p class="article-digest-meta">博客园 · 扶摇接海 · 2026年4月23日</p>
-                            </article>
-                            <article class="card glass-card article-digest-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">随笔 02</span>
-                                    <span class="pill">待同步</span>
-                                </div>
-                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">CARLA中的坐标系与标准车辆坐标系</a></h3>
-                                <p class="article-digest-text">梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。</p>
-                                <p class="article-digest-meta">博客园 · 扶摇接海 · 待同步</p>
-                            </article>
-                        </div>
-                    </div>
-                    <div class="article-detail-block">
-                        <div class="section-heading section-subheading">
-                            <div>
-                                <h3>文章具体内容</h3>
-                            </div>
-                            <span class="tag">正文</span>
-                        </div>
-                        <div class="repo-grid article-content-list" id="article-featured-content-list">
-                            <article class="card glass-card article-content-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">文章 01</span>
-                                    <span class="pill">2026年4月23日</span>
-                                </div>
-                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">记录GStreamer打开JPEG编码的视频时出现段错误的原因</a></h3>
-                                <div class="article-content-body">
-                                    <p class="article-content-paragraph">文章围绕一个实际排障问题展开：同一进程里同时使用 OpenCV 的 VideoCapture / VideoWriter 和 GStreamer 管线处理 JPEG 编码视频时，会在解码阶段触发段错误。</p>
-                                    <p class="article-content-paragraph">定位后发现，问题核心是 libjpeg.so.8 与 libnvjpeg.so 在同进程下的解码链路冲突，文中进一步给出改用 nvv4l2decoder、jpegdec 或先转 H264 的处理方案。</p>
-                                </div>
-                                <p class="article-digest-meta">博客园 · 扶摇接海 · 2026年4月23日</p>
-                                <div class="repo-actions">
-                                    <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">阅读原文</a>
-                                </div>
-                            </article>
-                            <article class="card glass-card article-content-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">文章 02</span>
-                                    <span class="pill">待同步</span>
-                                </div>
-                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">CARLA中的坐标系与标准车辆坐标系</a></h3>
-                                <div class="article-content-body">
-                                    <p class="article-content-paragraph">文章先把 CARLA 的左手坐标系、车辆前向、Y 轴朝右以及 Z-Y-X 欧拉角顺序讲清楚，方便在仿真、感知和控制链路里统一约定。</p>
-                                    <p class="article-content-paragraph">随后把它和标准车辆坐标系做逐项对照，重点说明左右手系差异、Y 轴符号变化以及姿态角转换时容易出错的地方。</p>
-                                </div>
-                                <p class="article-digest-meta">博客园 · 扶摇接海 · 待同步</p>
-                                <div class="repo-actions">
-                                    <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">阅读原文</a>
-                                </div>
-                            </article>
-                        </div>
-                    </div>
-                    <div class="button-row">
-                        <a class="button outline" href="/articles.html">查看全部文章</a>
-                    </div>
-                </section>
-
-                <section class="section" id="market">
-                    <div class="section-heading">
-                        <div>
-                            <h2>市场快照</h2>
-                        </div>
-                        <span class="tag">洞察</span>
-                    </div>
-                    <div class="market-grid" id="market-grid"></div>
-                </section>
-                <section class="section" id="showcase">
-                    <div class="section-heading">
-                        <div>
-                            <h2>游戏展示</h2>
-                        </div>
-                        <span class="tag">直连</span>
-                    </div>
-                    <div class="embed-stack">
-                        <article class="card glass-card embed-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">原神</span>
-                                    <span class="pill">Enka 框架</span>
-                                </div>
-                                <h3>公开展柜</h3>
-                                <iframe
-                                    class="external-embed-frame"
-                                    src="https://enka.network/u/147521967/"
-                                loading="lazy"
-                                referrerpolicy="no-referrer"
-                                    title="Genshin Showcase"
-                                ></iframe>
-                            </article>
-                            <div class="grid-2 embed-grid">
-                            <article class="card glass-card embed-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">Steam</span>
-                                    <span class="pill">已隐藏</span>
-                                </div>
-                                <h3>个人主页资料卡</h3>
-                                <div class="steam-profile-card">
-                                    <img
-                                        class="avatar avatar-sm"
-                                        src="https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg"
-                                        alt="Steam avatar"
-                                        width="96"
-                                        height="96"
-                                    >
-                                    <span class="steam-profile-copy">
-                                        <strong>扶摇接海</strong>
-                                        <span>Steam 主页</span>
-                                    </span>
-                                </div>
-                            </article>
-                            <article class="card glass-card embed-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">Steam 商店</span>
-                                    <span class="pill">官方组件</span>
-                                </div>
-                                <h3>戴森球计划</h3>
-                                <iframe
-                                    class="store-widget-frame"
-                                    src="https://store.steampowered.com/widget/1366540/"
-                                    loading="lazy"
-                                    title="Dyson Sphere Program"
-                                ></iframe>
-                                <div class="button-row">
-                                    <a class="button outline" href="/public-data-proxy/embed-demo.html">查看演示页</a>
-                                </div>
-                            </article>
-                        </div>
-                    </div>
-                </section>
-                <section class="section" id="links">
-                    <div class="section-heading">
-                        <div>
-                            <h2>快速链接</h2>
-                        </div>
-                        <span class="tag">链接</span>
-                    </div>
-                    <div class="links-grid">
-                        <article class="link-card glass-card">
-                            <span class="tag">GitHub</span>
-                            <h3>个人主页</h3>
-                            <p>查看 GitHub 公开资料，以及完整的仓库与个人主页入口。</p>
-                            <div class="button-row">
-                                <a class="button outline" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">打开 GitHub</a>
-                            </div>
-                        </article>
-                        <article class="link-card glass-card">
-                            <span class="tag">仓库</span>
-                            <h3>公开项目</h3>
-                            <p>进入独立仓库页，按更新时间浏览公开项目与代码说明。</p>
-                            <div class="button-row">
-                                <a class="button outline" href="/projects.html">打开仓库页</a>
-                            </div>
-                        </article>
-                        <article class="link-card glass-card">
-                            <span class="tag">收藏</span>
-                            <h3>收藏与参考项目</h3>
-                            <p>单独查看最近收藏的公开项目，了解我近期关注的工具与实现方向。</p>
-                            <div class="button-row">
-                                <a class="button outline" href="/stars.html">打开 Stars 页</a>
-                            </div>
-                        </article>
-                        <article class="link-card glass-card">
-                            <span class="tag">博客园</span>
-                            <h3>博客文章展示</h3>
-                            <p>单独查看博客园主页文章流、最近同步到本站的文章列表，以及逐篇补全后的正文摘要。</p>
-                            <div class="button-row">
-                                <a class="button outline" href="/articles.html">打开文章页</a>
-                            </div>
-                        </article>
-                    </div>
-                </section>
+                </article>
             </div>
-        </div>
+            <div class="button-row" style="margin-top:1.5rem">
+                <a class="button outline" href="/articles.html">查看全部文章</a>
+            </div>
+        </section>
     </main>
 
-    <footer class="footer">
-        <div class="footer-inner">
+    <!-- Footer Toolbar -->
+    <footer class="footer-toolbar">
+        <div class="toolbar-inner">
+            <div class="toolbar-item">
+                <span class="toolbar-label">市场快照</span>
+                <span class="toolbar-value" id="market-snap">加载中…</span>
+            </div>
+            <div class="toolbar-item">
+                <span class="toolbar-label">游戏</span>
+                <div class="toolbar-links">
+                    <a href="https://enka.network/u/147521967/" target="_blank" rel="noreferrer">原神</a>
+                    <a href="https://steamcommunity.com/id/zhyx1996" target="_blank" rel="noreferrer">Steam</a>
+                </div>
+            </div>
+            <div class="toolbar-item">
+                <span class="toolbar-label">社交</span>
+                <div class="toolbar-links">
+                    <a href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">GitHub</a>
+                    <a href="https://www.cnblogs.com/fix-me" target="_blank" rel="noreferrer">博客园</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
             <p>扶摇接海 · 个人主页</p>
         </div>
     </footer>
@@ -337,16 +154,3 @@
       src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
