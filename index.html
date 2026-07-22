@@ -3,233 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>扶摇接海 · 个人主页 | 计算机视觉 · 自动驾驶感知 · 并行计算</title>
-    <meta name="description" content="个人主页，聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。">
-    <link rel="canonical" href="https://zhyx1996.github.io/">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="扶摇接海 · 个人主页">
-    <meta property="og:description" content="聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。">
-    <meta property="og:url" content="https://zhyx1996.github.io/">
-    <meta property="og:locale" content="zh_CN">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="扶摇接海 · 个人主页">
-    <meta name="twitter:description" content="聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。">
-    <meta property="og:image" content="https://avatars.githubusercontent.com/u/74281356?v=4">
-    <meta property="og:image:width" content="400">
-    <meta property="og:image:height" content="400">
-    <meta property="og:image:alt" content="扶摇接海头像">
-    <meta name="twitter:image" content="https://avatars.githubusercontent.com/u/74281356?v=4">
-    <meta name="twitter:site" content="@zhyx1996">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◉</text></svg>">
-    <link rel="stylesheet" href="/styles.css">
-    <!-- 预连接外部资源 -->
+    <title>扶摇接海 · 感知工程师</title>
+    <meta name="description" content="扶摇接海的个人主页 — 计算机视觉、自动驾驶感知、并行计算。">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23D97706'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>扶</text></svg>">
     <link rel="preconnect" href="https://avatars.githubusercontent.com" crossorigin>
     <link rel="preconnect" href="https://api.github.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://www.gold-api.com" crossorigin>
     <link rel="dns-prefetch" href="https://enka.network">
-    <link rel="dns-prefetch" href="https://steamcommunity.com">
-    <!-- Sakana Widget -->
+    <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css" />
 </head>
 <body>
-    <header class="site-header">
-        <div class="nav-inner">
-            <a class="brand" href="/index.html">
-                <span class="brand-mark">◉</span>
-                <span>扶摇接海</span>
-            </a>
-            <ul class="nav-links">
-                <li><a class="active" href="/index.html">首页</a></li>
-                <li><a href="/projects.html">仓库</a></li>
-                <li><a href="/stars.html">收藏</a></li>
-                <li><a href="/articles.html">文章</a></li>
-                <li><button id="theme-toggle" class="theme-toggle" aria-label="切换主题">☀️</button></li>
-            </ul>
-        </div>
-    </header>
+    <div class="layout">
+        <!-- 左侧导航 -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="logo-mark">扶</span>
+                <span class="logo-text">扶摇接海</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="nav-item active" href="/index.html">首页</a>
+                <a class="nav-item" href="/projects.html">仓库</a>
+                <a class="nav-item" href="/stars.html">收藏</a>
+                <a class="nav-item" href="/articles.html">文章</a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="sidebar-meta">@zhyx1996</span>
+            </div>
+        </aside>
 
-    <main class="container page-shell">
-        <!-- Hero -->
-        <section class="hero-banner">
-            <div id="pretext-output" aria-hidden="true"></div>
-            <div class="hero-ambient" aria-hidden="true">
-                <span class="hero-orb hero-orb-a"></span>
-                <span class="hero-orb hero-orb-b"></span>
-                <span class="hero-orb hero-orb-c"></span>
-                <span class="hero-grid"></span>
-                <span class="hero-beam hero-beam-a"></span>
-                <span class="hero-beam hero-beam-b"></span>
-            </div>
-            <div class="hero-copy">
-                <span class="kicker">首页</span>
-                <h1>扶摇接海</h1>
-                <p>聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。</p>
-                <div class="button-row">
-                    <a class="button primary" href="/projects.html">查看项目</a>
+        <!-- 主内容 -->
+        <main class="main">
+            <!-- Hero -->
+            <section class="hero">
+                <div class="hero-content">
+                    <p class="eyebrow">感知工程师 / 并行计算</p>
+                    <h1 class="hero-title">扶摇接海</h1>
+                    <p class="hero-subtitle">围绕计算机视觉、自动驾驶感知、并行计算做持续实践。<br>写代码，写文章，写下去。</p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="/projects.html">查看项目</a>
+                        <a class="btn btn-ghost" href="/articles.html">阅读文章</a>
+                    </div>
                 </div>
-            </div>
-        </section>
+                <!-- 签名元素：实验标本框 -->
+                <div class="specimen-box">
+                    <div class="specimen-label">
+                        <span class="specimen-id">SPECIMEN-001</span>
+                        <span class="specimen-status">● LIVE</span>
+                    </div>
+                    <div class="specimen-stage" id="sakana-stage">
+                        <div id="sakana-widget"></div>
+                    </div>
+                    <div class="specimen-readout">
+                        <span class="readout-item">x: <span id="readout-x">0</span></span>
+                        <span class="readout-item">y: <span id="readout-y">0</span></span>
+                        <span class="readout-item">fps: <span id="readout-fps">60</span></span>
+                    </div>
+                </div>
+            </section>
 
-        <!-- About -->
-        <section class="about-strip" id="about">
-            <div class="about-avatar">
-                <img class="avatar avatar-xl" id="profile-avatar" src="https://avatars.githubusercontent.com/u/74281356?v=4" alt="扶摇接海头像">
-            </div>
-            <div class="about-info">
-                <h2 id="profile-name">扶摇接海</h2>
-                <p class="profile-login" id="profile-login">@zhyx1996</p>
-                <p class="profile-bio" id="profile-bio">围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。</p>
-            </div>
-            <div class="about-tags">
-                <div class="about-tag about-tag--lane">
-                    <span class="meta-label">研究</span>
-                    <strong>视觉感知 / 传统方法 + 深度学习</strong>
+            <!-- 研究方向 -->
+            <section class="section">
+                <h2 class="section-title">方向</h2>
+                <div class="directions">
+                    <div class="direction-card">
+                        <span class="direction-tag">研究</span>
+                        <h3>视觉感知</h3>
+                        <p>传统方法 + 深度学习。车道线检测、目标感知、场景理解。</p>
+                    </div>
+                    <div class="direction-card">
+                        <span class="direction-tag tag-amber">工程</span>
+                        <h3>并行计算</h3>
+                        <p>CUDA / OpenMP。图像与点云处理热点流程的性能优化。</p>
+                    </div>
+                    <div class="direction-card">
+                        <span class="direction-tag tag-teal">写作</span>
+                        <h3>公开文章</h3>
+                        <p>项目复盘、实验记录与踩坑经验整理。</p>
+                    </div>
                 </div>
-                <div class="about-tag about-tag--alert">
-                    <span class="meta-label">工程</span>
-                    <strong>CUDA / OpenMP / 数据处理效率优化</strong>
-                </div>
-                <div class="about-tag about-tag--depth">
-                    <span class="meta-label">写作</span>
-                    <strong>项目复盘、实验记录与公开文章整理</strong>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Articles -->
-        <section class="section" id="articles">
-            <div class="section-heading">
-                <h2>最新文章</h2>
-                <span class="tag">博客园</span>
-            </div>
-            <div class="article-list" id="article-highlight-list">
-                <article class="article-card-horizontal glass-card">
-                    <div class="article-card-main">
-                        <div class="repo-title-row">
-                            <span class="badge">随笔 01</span>
-                            <span class="pill">2026年6月30日</span>
+            <!-- 最新文章 -->
+            <section class="section">
+                <h2 class="section-title">最新文章</h2>
+                <div class="article-list">
+                    <article class="article-card">
+                        <div class="article-meta">
+                            <span class="article-date">2026年6月30日</span>
                         </div>
-                        <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/20968815" target="_blank" rel="noreferrer">Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及 pyinstaller 打包</a></h3>
-                        <p class="repo-description">Windows + Python + GStreamer + 打包的实战记录，涵盖环境安装、RTSP 推流、SEI 注入与 pyinstaller 打包的完整流程与踩坑经验。</p>
-                    </div>
-                    <div class="article-card-action">
-                        <a class="button outline" href="https://www.cnblogs.com/fix-me/p/20968815" target="_blank" rel="noreferrer">阅读原文</a>
-                    </div>
-                </article>
-                <article class="article-card-horizontal glass-card">
-                    <div class="article-card-main">
-                        <div class="repo-title-row">
-                            <span class="badge">随笔 02</span>
-                            <span class="pill">2026年5月28日</span>
+                        <h3><a href="https://www.cnblogs.com/fix-me/p/20968815" target="_blank" rel="noreferrer">Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及 pyinstaller 打包</a></h3>
+                        <p>Windows + Python + GStreamer + 打包的实战记录，涵盖环境安装、RTSP 推流、SEI 注入与 pyinstaller 打包的完整流程与踩坑经验。</p>
+                    </article>
+                    <article class="article-card">
+                        <div class="article-meta">
+                            <span class="article-date">2026年5月28日</span>
                         </div>
-                        <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/20194105" target="_blank" rel="noreferrer">123云盘报错：检测到本地通信被防火墙或 VPN 拦截</a></h3>
-                        <p class="repo-description">排查 123 云盘因本地通信被防火墙或 VPN 拦截导致的报错问题，通过日志定位根因并给出解决方案。</p>
-                    </div>
-                    <div class="article-card-action">
-                        <a class="button outline" href="https://www.cnblogs.com/fix-me/p/20194105" target="_blank" rel="noreferrer">阅读原文</a>
-                    </div>
-                </article>
-            </div>
-            <div class="button-row" style="margin-top:1.5rem">
-                <a class="button outline" href="/articles.html">查看全部文章</a>
-            </div>
-        </section>
-
-        <!-- Market -->
-        <section class="section" id="market">
-            <div class="section-heading">
-                <div>
-                    <h2>市场快照</h2>
+                        <h3><a href="https://www.cnblogs.com/fix-me/p/20194105" target="_blank" rel="noreferrer">123云盘报错：检测到本地通信被防火墙或 VPN 拦截</a></h3>
+                        <p>排查 123 云盘因本地通信被防火墙或 VPN 拦截导致的报错问题，通过日志定位根因并给出解决方案。</p>
+                    </article>
                 </div>
-                <span class="tag">洞察</span>
-            </div>
-            <div class="market-grid" id="market-grid"></div>
-        </section>
+                <a class="section-link" href="/articles.html">查看全部文章 →</a>
+            </section>
 
-        <!-- Showcase -->
-        <section class="section" id="showcase">
-            <div class="section-heading">
-                <div>
-                    <h2>游戏展示</h2>
-                </div>
-                <span class="tag">直连</span>
-            </div>
-            <div class="embed-stack">
-                <article class="card glass-card embed-card">
-                    <div class="repo-title-row">
-                        <span class="badge">原神</span>
-                        <span class="pill">Enka 框架</span>
-                    </div>
-                    <h3>公开展柜</h3>
-                    <iframe
-                        class="external-embed-frame"
-                        src="https://enka.network/u/147521967/"
-                        loading="lazy"
-                        referrerpolicy="no-referrer"
-                        title="Genshin Showcase"
-                    ></iframe>
-                </article>
-                <div class="grid-2 embed-grid">
-                    <article class="card glass-card embed-card">
-                        <div class="repo-title-row">
-                            <span class="badge">Steam</span>
-                            <span class="pill">已隐藏</span>
+            <!-- 市场快照 -->
+            <section class="section">
+                <h2 class="section-title">市场快照</h2>
+                <div class="market-grid" id="market-grid"></div>
+            </section>
+
+            <!-- 游戏展示 -->
+            <section class="section">
+                <h2 class="section-title">游戏展示</h2>
+                <div class="showcase-grid">
+                    <div class="showcase-item showcase-wide">
+                        <div class="showcase-header">
+                            <span class="showcase-badge">原神</span>
+                            <span class="showcase-frame">Enka 框架</span>
                         </div>
-                        <h3>个人主页资料卡</h3>
-                        <div class="steam-profile-card">
-                            <img
-                                class="avatar avatar-sm"
-                                src="https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg"
-                                alt="Steam avatar"
-                                width="96"
-                                height="96"
-                            >
-                            <span class="steam-profile-copy">
+                        <iframe class="showcase-frame-lg" src="https://enka.network/u/147521967/" loading="lazy" referrerpolicy="no-referrer" title="Genshin Showcase"></iframe>
+                    </div>
+                    <div class="showcase-item">
+                        <div class="showcase-header">
+                            <span class="showcase-badge">Steam</span>
+                        </div>
+                        <div class="steam-card">
+                            <img class="steam-avatar" src="https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg" alt="Steam avatar" width="64" height="64">
+                            <div>
                                 <strong>扶摇接海</strong>
                                 <span>Steam 主页</span>
-                            </span>
+                            </div>
                         </div>
-                    </article>
-                    <article class="card glass-card embed-card">
-                        <div class="repo-title-row">
-                            <span class="badge">Steam 商店</span>
-                            <span class="pill">官方组件</span>
+                    </div>
+                    <div class="showcase-item">
+                        <div class="showcase-header">
+                            <span class="showcase-badge">戴森球计划</span>
                         </div>
-                        <h3>戴森球计划</h3>
-                        <iframe
-                            class="store-widget-frame"
-                            src="https://store.steampowered.com/widget/1366540/"
-                            loading="lazy"
-                            title="Dyson Sphere Program"
-                        ></iframe>
-                        <div class="button-row">
-                            <a class="button outline" href="/public-data-proxy/embed-demo.html">查看演示页</a>
-                        </div>
-                    </article>
+                        <iframe class="showcase-frame-sm" src="https://store.steampowered.com/widget/1366540/" loading="lazy" title="Dyson Sphere Program"></iframe>
+                    </div>
                 </div>
-            </div>
-        </section>
-    </main>
+            </section>
+        </main>
+    </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-inner">
-            <p>扶摇接海 · 个人主页</p>
-        </div>
-    </footer>
-
-    <script src="/public/pretext-bundle.js"></script>
     <script src="/app.js"></script>
-
-    <!-- Sakana Widget -->
-    <div id="sakana-widget" style="position:fixed;bottom:16px;right:16px;width:170px;height:200px;z-index:9999;"></div>
     <script>
       function initSakanaWidget() {
-        new SakanaWidget({ size: 170, character: 'chisato' }).mount('#sakana-widget');
+        new SakanaWidget({ size: 140, character: 'chisato' }).mount('#sakana-widget');
       }
     </script>
-    <script async onload="initSakanaWidget()"
-      src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
+    <script async onload="initSakanaWidget()" src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
 </body>
 </html>

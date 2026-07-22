@@ -1,15 +1,9 @@
 // ── 扶摇接海 · 个人主页 — 主脚本 ──
 
-// ── 配置 ──
 const GITHUB_USERNAME = 'zhyx1996';
 const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}`;
 const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
 const GOLD_LEGACY_API_URL = 'https://api.gold-api.com/price/XAU';
-const GOLD_DAILY_SERIES_URL = 'https://freegoldapi.com/data/latest.json';
-const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
-const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
-const GAS92_PRICE_RANGE = { min: 5, max: 10 };
-const GAS92_SUCCESS_CODES = new Set([0, 200, '0', '200']);
 
 // ── 工具函数 ──
 const fmtDate = (value) => {
@@ -19,8 +13,6 @@ const fmtDate = (value) => {
     return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
   } catch { return '暂无'; }
 };
-
-const safeText = (value, fallback = '暂无') => value || fallback;
 
 const escapeHtml = (value) => String(value ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -34,10 +26,9 @@ async function loadProfile() {
   const avatarEl = document.getElementById('profile-avatar');
 
   try {
-    const res = await fetchWithTimeout(GITHUB_API);
+    const res = await fetch(GITHUB_API);
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-
     if (nameEl) nameEl.textContent = data.name || GITHUB_USERNAME;
     if (loginEl) loginEl.textContent = '@' + data.login;
     if (bioEl) bioEl.textContent = data.bio || '围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。';
@@ -48,95 +39,58 @@ async function loadProfile() {
   }
 }
 
-// ── 市场快照 ──
-const marketFallback = {
-  usdCny: { rate: 7.25, note: '静态快照时间（2026-04-24）', source: '静态快照' },
-  sgdCny: { rate: 5.55, note: '静态快照时间（2026-04-24）', source: '静态快照' },
-  jpyPerCny: { rate: 20.85, note: '静态快照时间（2026-04-24）', source: '静态快照' },
-  gold: { price: 3315.50, unit: 'USD/盎司', note: '静态快照时间（2026-04-24）', source: '静态快照' },
-  btc: { price: 94500, unit: 'USD', note: '静态快照时间（2026-04-24）', source: '静态快照' },
-  gas92: { cnyPerLiter: 8.51, note: '联网成功后展示全国92#汽油均价；当前为静态参考值', source: '静态快照（2026-04-24）' },
-  asOf: '2026-04-24T00:00:00Z'
-};
+// ── 市场快照（实时数据）──
+const PROXY = 'https://corsproxy.io/?';
 
-const renderMarketFacts = (items) => items.map(item => `
+function renderMarketFacts(items) {
+  return items.map(item => `
     <div class="market-card">
-        <div class="label">${escapeHtml(item.label)}</div>
-        <div class="value">${escapeHtml(item.value)}</div>
-        ${item.note ? `<div class="note">${escapeHtml(item.note)}</div>` : ''}
-        ${item.change ? `<div class="change ${item.change.dir}">${escapeHtml(item.change.text)}</div>` : ''}
+      <div class="label">${escapeHtml(item.label)}</div>
+      <div class="value">${escapeHtml(item.value)}</div>
+      ${item.note ? `<div class="note">${escapeHtml(item.note)}</div>` : ''}
+      ${item.change ? `<div class="change ${item.change.dir}">${escapeHtml(item.change.text)}</div>` : ''}
     </div>
-`).join('');
+  `).join('');
+}
 
-function buildForexFacts(data) {
+function buildForexFacts(rates) {
+  if (!rates) return [];
   const items = [];
-  if (data.usdCny) {
-    items.push({ label: 'USD/CNY', value: data.usdCny.rate.toFixed(4), note: data.usdCny.note });
-  }
-  if (data.sgdCny) {
-    items.push({ label: 'SGD/CNY', value: data.sgdCny.rate.toFixed(4), note: data.sgdCny.note });
-  }
-  if (data.jpyPerCny) {
-    items.push({ label: 'JPY/CNY', value: data.jpyPerCny.rate.toFixed(2), note: data.jpyPerCny.note });
+  if (rates.CNY) items.push({ label: 'USD/CNY', value: rates.CNY.toFixed(4), note: '实时汇率' });
+  if (rates.SGD) items.push({ label: 'USD/SGD', value: rates.SGD.toFixed(4), note: '实时汇率' });
+  if (rates.JPY) items.push({ label: 'USD/JPY', value: rates.JPY.toFixed(2), note: '实时汇率' });
+  if (rates.EUR) items.push({ label: 'USD/EUR', value: rates.EUR.toFixed(4), note: '实时汇率' });
+  return items;
+}
+
+function buildCryptoFacts(btcPrice) {
+  const items = [];
+  if (btcPrice) {
+    items.push({ label: 'Bitcoin', value: `$${btcPrice.toLocaleString()}`, note: '实时价格' });
   }
   return items;
 }
 
-function buildGoldFacts(data) {
+function buildGoldFacts(goldPrice) {
   const items = [];
-  if (data.gold) {
-    items.push({
-      label: '黄金',
-      value: `$${data.gold.price.toLocaleString()}/盎司`,
-      note: data.gold.note,
-      change: data.gold.changePercent ? {
-        dir: data.gold.changePercent >= 0 ? 'up' : 'down',
-        text: `${data.gold.changePercent >= 0 ? '+' : ''}${data.gold.changePercent.toFixed(2)}%`
-      } : null
-    });
-  }
-  if (data.btc) {
-    items.push({
-      label: 'Bitcoin',
-      value: `$${data.btc.price.toLocaleString()}`,
-      note: data.btc.note
-    });
+  if (goldPrice) {
+    items.push({ label: '黄金', value: `$${goldPrice.toLocaleString()}/盎司`, note: '实时价格' });
   }
   return items;
 }
 
-function buildGasFacts(data) {
-  const items = [];
-  if (data.gas92) {
-    items.push({
-      label: '92#汽油',
-      value: `¥${data.gas92.cnyPerLiter.toFixed(2)}/升`,
-      note: data.gas92.note
-    });
-  }
-  return items;
-}
-
-function renderMarket(data, statuses = {}) {
+function renderMarket(rates, btcPrice, goldPrice) {
   const container = document.getElementById('market-grid');
   if (!container) return;
-
-  const fxFacts = buildForexFacts(data);
-  const goldFacts = buildGoldFacts(data);
-  const gasFacts = buildGasFacts(data);
-
-  container.innerHTML = `
-    <div class="market-col">
-      ${renderMarketFacts(fxFacts)}
-    </div>
-    <div class="market-col">
-      ${renderMarketFacts(goldFacts)}
-      ${renderMarketFacts(gasFacts)}
-    </div>
-  `;
+  const parts = [
+    ...buildForexFacts(rates),
+    ...buildCryptoFacts(btcPrice),
+    ...buildGoldFacts(goldPrice),
+  ];
+  container.innerHTML = renderMarketFacts(parts);
 }
 
-function fetchWithTimeout(url, timeout = 5000) {
+function fetchWithTimeout(url, timeout = 8000) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('timeout')), timeout);
     fetch(url)
@@ -145,118 +99,189 @@ function fetchWithTimeout(url, timeout = 5000) {
   });
 }
 
-async function fetchGoldPrice() {
-  const candidates = [
-    { url: GOLD_API_BASE_URL, source: 'GoldAPI' },
-    { url: GOLD_LEGACY_API_URL, source: 'GoldAPI Legacy' },
-  ];
-
-  for (const c of candidates) {
-    try {
-      const res = await fetchWithTimeout(c.url);
-      if (!res.ok) continue;
-      const data = await res.json();
-      const price = data.price || data[0]?.price;
-      if (price) return { price, source: c.source };
-    } catch { continue; }
-  }
-  return null;
-}
-
 async function loadMarket() {
   const container = document.getElementById('market-grid');
   if (!container) return;
 
-  // Render fallback first
-  renderMarket(marketFallback);
+  // 汇率 API（免费无需密钥）
+  const fetchRates = async () => {
+    try {
+      const res = await fetchWithTimeout('https://api.exchangerate-api.com/v4/latest/USD');
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.rates || null;
+    } catch { return null; }
+  };
 
-  // Try to fetch live gold price
-  const gold = await fetchGoldPrice();
-  if (gold) {
-    const updated = {
-      ...marketFallback,
-      gold: { ...marketFallback.gold, price: gold.price, note: `实时数据（${gold.source}）`, source: gold.source }
-    };
-    renderMarket(updated);
-  }
+  // Bitcoin 价格（CoinGecko，免费无需密钥）
+  const fetchBtc = async () => {
+    try {
+      const res = await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.bitcoin?.usd || null;
+    } catch { return null; }
+  };
+
+  // 黄金价格（通过代理避开 CORS）
+  const fetchGold = async () => {
+    try {
+      const res = await fetchWithTimeout(PROXY + encodeURIComponent('https://api.gold-api.com/price/XAU'));
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.price || data[0]?.price || null;
+    } catch { return null; }
+  };
+
+  const [rates, btcPrice, goldPrice] = await Promise.all([
+    fetchRates(),
+    fetchBtc(),
+    fetchGold(),
+  ]);
+
+  renderMarket(rates, btcPrice, goldPrice);
 }
 
-// ── 主题切换 ──
-const THEME_KEY = 'theme';
-
-function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
-  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-  const theme = saved || (prefersLight ? 'light' : 'dark');
-  document.documentElement.setAttribute('data-theme', theme);
-  updateThemeToggle(theme);
-}
-
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') || 'dark';
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem(THEME_KEY, next);
-  updateThemeToggle(next);
-}
-
-function updateThemeToggle(theme) {
-  const btn = document.getElementById('theme-toggle');
-  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-}
-
-// ── Sakana Widget 拖拽 ──
+// ── Sakana 拖拽（限制在视口内）──
 function initSakanaDrag() {
   const widget = document.getElementById('sakana-widget');
   if (!widget) return;
 
+  // Sakana widget 是 fixed 定位，我们需要改为 absolute 或在容器内拖拽
+  // 改为在 specimen-stage 内拖拽
+  const stage = document.getElementById('sakana-stage');
+  if (!stage) return;
+
+  // 将 widget 改为 absolute 定位，限制在 stage 内
+  widget.style.position = 'absolute';
+  widget.style.bottom = 'auto';
+  widget.style.right = 'auto';
+  widget.style.left = '50%';
+  widget.style.top = '50%';
+  widget.style.transform = 'translate(-50%, -50%)';
+  widget.style.cursor = 'grab';
+  widget.style.transition = 'none';
+  widget.style.zIndex = '1';
+
   let isDragging = false;
-  let startX, startY, startRight, startBottom;
+  let startX, startY, startLeft, startTop;
+  const readoutX = document.getElementById('readout-x');
+  const readoutY = document.getElementById('readout-y');
 
-  const onStart = (e) => {
-    const target = e.touches ? e.touches[0] : e;
-    if (target.target && target.target.closest && target.target.closest('.sakana-widget-ctrl')) return;
+  const updateReadout = (left, top) => {
+    if (readoutX) readoutX.textContent = Math.round(left);
+    if (readoutY) readoutY.textContent = Math.round(top);
+  };
+
+  const onPointerDown = (e) => {
+    // 不拦截控制按钮
+    if (e.target.closest('.sakana-widget-ctrl')) return;
     isDragging = true;
-    startX = target.clientX;
-    startY = target.clientY;
+    startX = e.clientX;
+    startY = e.clientY;
     const rect = widget.getBoundingClientRect();
-    startRight = window.innerWidth - rect.right;
-    startBottom = window.innerHeight - rect.bottom;
-    widget.style.transition = 'none';
+    const stageRect = stage.getBoundingClientRect();
+    startLeft = rect.left - stageRect.left;
+    startTop = rect.top - stageRect.top;
+    widget.style.cursor = 'grabbing';
+    widget.style.left = startLeft + 'px';
+    widget.style.top = startTop + 'px';
+    widget.style.transform = 'none';
     e.preventDefault();
+    e.stopPropagation();
   };
 
-  const onMove = (e) => {
+  const onPointerMove = (e) => {
     if (!isDragging) return;
-    const target = e.touches ? e.touches[0] : e;
-    const dx = target.clientX - startX;
-    const dy = target.clientY - startY;
-    const newRight = Math.max(0, Math.min(window.innerWidth - widget.offsetWidth, startRight - dx));
-    const newBottom = Math.max(0, Math.min(window.innerHeight - widget.offsetHeight, startBottom - dy));
-    widget.style.right = newRight + 'px';
-    widget.style.bottom = newBottom + 'px';
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const stageRect = stage.getBoundingClientRect();
+    const widgetW = widget.offsetWidth;
+    const widgetH = widget.offsetHeight;
+    // 限制在 stage 内
+    let newLeft = startLeft + dx;
+    let newTop = startTop + dy;
+    newLeft = Math.max(0, Math.min(stageRect.width - widgetW, newLeft));
+    newTop = Math.max(0, Math.min(stageRect.height - widgetH, newTop));
+    widget.style.left = newLeft + 'px';
+    widget.style.top = newTop + 'px';
+    updateReadout(newLeft, newTop);
   };
 
-  const onEnd = () => {
+  const onPointerUp = () => {
+    if (!isDragging) return;
     isDragging = false;
-    widget.style.transition = '';
+    widget.style.cursor = 'grab';
   };
 
-  widget.addEventListener('mousedown', onStart);
-  widget.addEventListener('touchstart', onStart, { passive: false });
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('touchmove', onMove, { passive: false });
-  document.addEventListener('mouseup', onEnd);
-  document.addEventListener('touchend', onEnd);
+  widget.addEventListener('mousedown', onPointerDown);
+  widget.addEventListener('touchstart', onPointerDown, { passive: false });
+  document.addEventListener('mousemove', onPointerMove);
+  document.addEventListener('touchmove', onPointerMove, { passive: false });
+  document.addEventListener('mouseup', onPointerUp);
+  document.addEventListener('touchend', onPointerUp);
+}
+
+// ── Steam 资料（动态获取）──
+async function loadSteamProfile() {
+  const container = document.querySelector('.steam-card');
+  if (!container) return;
+
+  // Steam 自定义 URL ID（不是账号名）
+  const STEAM_CUSTOM_ID = 'zhyx490991014';
+  const proxyUrl = 'https://corsproxy.io/?';
+  const steamUrl = `https://steamcommunity.com/id/${STEAM_CUSTOM_ID}/?xml=1`;
+
+  try {
+    const res = await fetchWithTimeout(proxyUrl + encodeURIComponent(steamUrl));
+    if (!res.ok) throw new Error('Steam API error');
+    const text = await res.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(text, 'text/xml');
+
+    const steamID = xml.querySelector('steamID')?.textContent || '扶摇接海';
+    const steamID64 = xml.querySelector('steamID64')?.textContent || '';
+    const avatarFull = xml.querySelector('avatarFull')?.textContent || 'https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg';
+    const onlineState = xml.querySelector('onlineState')?.textContent || 'offline';
+    const stateMessage = xml.querySelector('stateMessage')?.textContent || '';
+    const visibilityState = xml.querySelector('visibilityState')?.textContent || '3';
+
+    const isOnline = onlineState === 'online';
+    const statusText = isOnline ? (stateMessage || '在线') : '离线';
+    const profileUrl = steamID64
+      ? `https://steamcommunity.com/profiles/${steamID64}/`
+      : `https://steamcommunity.com/id/${STEAM_CUSTOM_ID}/`;
+
+    container.innerHTML = `
+      <a href="${escapeHtml(profileUrl)}" target="_blank" rel="noreferrer" style="display:flex;align-items:center;gap:12px;">
+        <img class="steam-avatar" src="${escapeHtml(avatarFull)}" alt="Steam avatar" width="64" height="64">
+        <div>
+          <strong>${escapeHtml(steamID)}</strong>
+          <span style="display:flex;align-items:center;gap:6px;">
+            <span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${isOnline ? '#4ADE80' : '#888'}"></span>
+            ${escapeHtml(statusText)}
+          </span>
+        </div>
+      </a>
+    `;
+  } catch {
+    // 失败时保持原有静态内容
+  }
 }
 
 // ── 初始化 ──
 document.addEventListener('DOMContentLoaded', () => {
-  initTheme();
   loadProfile();
   loadMarket();
-  initSakanaDrag();
-
-  const themeToggle = document.getElementById('theme-toggle');
-  if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+  loadSteamProfile();
+  // Sakana widget 加载完成后初始化拖拽
+  const checkSakana = setInterval(() => {
+    const widget = document.getElementById('sakana-widget');
+    if (widget && widget.querySelector('canvas')) {
+      clearInterval(checkSakana);
+      initSakanaDrag();
+    }
+  }, 200);
+  // 10秒后停止检查
+  setTimeout(() => clearInterval(checkSakana), 10000);
 });
