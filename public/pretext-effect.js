@@ -57,32 +57,56 @@ function renderText() {
     for (let y = LINE_HEIGHT * 1.5; y < H - 20 && cursor.segmentIndex < prepared.segments.length; y += LINE_HEIGHT) {
         const lineCY = y + LINE_HEIGHT / 2;
         
-        // 检查小球是否挡住整行
-        let blocked = false;
+        // 计算小球在这一行的阻挡区域
+        let blockedLeft = -1;
+        let blockedRight = -1;
         for (const orb of orbs) {
             const dy = lineCY - orb.y;
             if (Math.abs(dy) < orb.r) {
                 const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
+                const left = orb.x - half;
+                const right = orb.x + half;
                 // 如果小球挡住整行，跳过
-                if (orb.x - half <= colStart && orb.x + half >= colEnd) {
-                    blocked = true;
+                if (left <= colStart && right >= colEnd) {
+                    blockedLeft = colStart;
+                    blockedRight = colEnd;
                     break;
+                }
+                // 记录阻挡区域（取最大的）
+                if (right - left > blockedRight - blockedLeft) {
+                    blockedLeft = Math.max(colStart, left);
+                    blockedRight = Math.min(colEnd, right);
                 }
             }
         }
-        if (blocked) continue;
         
-        // 使用固定列宽，不被小球挤窄
+        // 如果有阻挡，计算可用宽度
+        let availableWidth = colWidth;
+        let textLeft = colStart;
+        if (blockedLeft >= 0 && blockedRight > blockedLeft) {
+            // 小球在中间，文字绕开：左边或右边，取较大的一侧
+            const leftWidth = blockedLeft - colStart;
+            const rightWidth = colEnd - blockedRight;
+            if (leftWidth >= rightWidth) {
+                availableWidth = leftWidth;
+                textLeft = colStart;
+            } else {
+                availableWidth = rightWidth;
+                textLeft = blockedRight;
+            }
+        }
+        
+        if (availableWidth < MIN_SLOT_WIDTH) continue;
         if (cursor.segmentIndex >= prepared.segments.length) break;
-        const range = layoutNextLineRange(prepared, cursor, colWidth - 4);
+        const range = layoutNextLineRange(prepared, cursor, availableWidth - 4);
         if (!range) break;
         const line = materializeLineRange(prepared, range);
         if (!line.text.trim()) break;
         const el = document.createElement('div');
         el.className = 'pretext-line';
-        el.style.left = colStart + 'px';
+        el.style.left = textLeft + 'px';
         el.style.top = y + 'px';
-        el.style.width = colWidth + 'px';
+        el.style.width = availableWidth + 'px';
         el.textContent = line.text;
         container.appendChild(el);
         cursor = range.end;
