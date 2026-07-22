@@ -3384,9 +3384,9 @@
   function initOrbs() {
     const r = Math.min(W, H) * 0.08;
     orbs = [
-      { x: W * 0.3, y: H * 0.35, r, color: "#FF78B8", dragging: false, vx: 0.3, vy: 0.2 },
-      { x: W * 0.7, y: H * 0.6, r: r * 1.2, color: "#00D4FF", dragging: false, vx: -0.2, vy: 0.3 },
-      { x: W * 0.5, y: H * 0.8, r: r * 0.8, color: "#7C83FF", dragging: false, vx: 0.25, vy: -0.2 }
+      { x: W * 0.3, y: H * 0.35, r, color: "#D97706", dragging: false, vx: 0.3, vy: 0.2 },
+      { x: W * 0.7, y: H * 0.6, r: r * 1.2, color: "#0D9488", dragging: false, vx: -0.2, vy: 0.3 },
+      { x: W * 0.5, y: H * 0.8, r: r * 0.8, color: "#B45309", dragging: false, vx: 0.25, vy: -0.2 }
     ];
   }
   function renderText() {
