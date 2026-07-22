@@ -96,14 +96,14 @@ const articleFallback = [
     {
         title: "Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及pyinstaller打包",
         link: "https://www.cnblogs.com/fix-me/p/20968815",
-        summary: "代码仓库：https://github.com/zhyx1996/GStreamer-SEI 网上 Windows + Python + GStreamer + 打包 的攻略比较少，踩了好多坑，简单记录一下。 1. 环境安装 有两种方式。 方式一：直接 pip 安装 需要 Python > 3.8：",
+        summary: "代码仓库：https://github.com/zhyx1996/GStreamer-SEI 网上 Windows + Python + GStreamer + 打包 的攻略比较少，踩了好多坑，简单记录一下。 1. 环境安装 有两种方式。 方式一：直接 pip 安装 需要 Python  3.8：",
         published_at: "2026-06-30T08:22:00Z",
         source: "博客园 · 扶摇接海"
     },
     {
         title: "123云盘报错：检测到本地通信被防火墙或vpn拦截",
         link: "https://www.cnblogs.com/fix-me/p/20194105",
-        summary: "联系客服，查看日志C:\\ProgramData\\123SyncCloud\\Logs\\SyncCloud.MaintenanceServer.log [2026-05-26 13:10:32.632] [123SyncCloud_MaintenanceService] [error] process",
+        summary: "联系客服，查看日志C:\\ProgramData\\123SyncCloud\\Logs\\SyncCloud.MaintenanceServer.log [2026-05-26 13:10:32.632] [123SyncCloud_MaintenanceService] [error] process ",
         published_at: "2026-05-28T00:53:00Z",
         source: "博客园 · 扶摇接海"
     },
