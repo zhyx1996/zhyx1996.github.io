@@ -1,9 +1,6 @@
 // ── 扶摇接海 · 个人主页 — 主脚本 ──
 
 const GITHUB_USERNAME = 'zhyx1996';
-const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}`;
-const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
-const GOLD_LEGACY_API_URL = 'https://api.gold-api.com/price/XAU';
 
 // ── 工具函数 ──
 const fmtDate = (value) => {
