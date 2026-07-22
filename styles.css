@@ -12,11 +12,12 @@
     --text-secondary: #4A4A4A;
     --text-muted: #8A8A8A;
     --accent: #D97706;
-    --accent-dim: rgba(217, 119, 6, 0.15);
+    --accent-dim: rgba(217, 119, 6, 0.12);
+    --accent-hover: #B45309;
     --teal: #0D9488;
-    --teal-dim: rgba(13, 148, 136, 0.12);
+    --teal-dim: rgba(13, 148, 136, 0.1);
     --amber: #B45309;
-    --amber-dim: rgba(180, 83, 9, 0.1);
+    --amber-dim: rgba(180, 83, 9, 0.08);
     --border: #D4CFC3;
     --border-light: #E5E0D6;
 
@@ -27,8 +28,13 @@
 
     /* 尺寸 */
     --sidebar-w: 220px;
-    --radius: 6px;
+    --radius: 8px;
     --gap: 24px;
+
+    /* 阴影 */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -135,11 +141,12 @@ a:hover { opacity: 0.8; }
 .hero {
     display: grid;
     grid-template-columns: 1fr 1.3fr;
-    gap: 40px;
+    gap: 48px;
     align-items: start;
-    margin-bottom: 64px;
-    padding-bottom: 48px;
+    margin-bottom: 72px;
+    padding-bottom: 56px;
     border-bottom: 1px solid var(--border-light);
+    position: relative;
 }
 
 .hero-side {
@@ -223,25 +230,26 @@ a:hover { opacity: 0.8; }
 .btn {
     display: inline-flex;
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px 22px;
     border-radius: var(--radius);
     font-weight: 600;
     font-size: 14px;
-    transition: all 0.15s;
+    transition: all 0.2s ease;
     border: 1px solid transparent;
+    cursor: pointer;
 }
 
 .btn-primary {
     background: var(--text);
     color: var(--bg);
 }
-.btn-primary:hover { background: var(--accent); color: white; opacity: 1; }
+.btn-primary:hover { background: var(--accent); color: white; opacity: 1; transform: translateY(-1px); box-shadow: var(--shadow-md); }
 
 .btn-ghost {
     border-color: var(--border);
     color: var(--text-secondary);
 }
-.btn-ghost:hover { border-color: var(--text); color: var(--text); opacity: 1; }
+.btn-ghost:hover { border-color: var(--text); color: var(--text); opacity: 1; transform: translateY(-1px); }
 
 /* ── 签名元素：实验标本框 ── */
 .specimen-box {
@@ -299,17 +307,26 @@ a:hover { opacity: 0.8; }
 
 /* ── 分区 ── */
 .section {
-    margin-bottom: 56px;
+    margin-bottom: 64px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.section.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .section-title {
     font-family: var(--font-display);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--text);
-    margin-bottom: 20px;
-    padding-bottom: 8px;
+    margin-bottom: 24px;
+    padding-bottom: 10px;
     border-bottom: 2px solid var(--text);
+    letter-spacing: -0.01em;
 }
 
 .section-link {
@@ -363,6 +380,65 @@ a:hover { opacity: 0.8; }
     font-size: 13px;
     color: var(--text-secondary);
     line-height: 1.6;
+}
+
+/* ── 仓库网格 ── */
+.repo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.repo-card {
+    padding: 20px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    background: var(--bg-surface);
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.repo-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.repo-card h3 {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.repo-card h3 a { color: var(--accent); }
+.repo-card h3 a:hover { text-decoration: underline; opacity: 1; }
+
+.repo-card p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.repo-meta {
+    display: flex;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.repo-lang {
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-weight: 500;
 }
 
 /* ── 文章列表 ── */
@@ -541,6 +617,39 @@ a:hover { opacity: 0.8; }
     margin-top: 4px;
 }
 
+/* ── 返回顶部 ── */
+.back-to-top {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 9998;
+    box-shadow: var(--shadow-md);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+}
+
 /* ── 响应式 ── */
 @media (max-width: 800px) {
     .layout {
@@ -566,16 +675,19 @@ a:hover { opacity: 0.8; }
         grid-template-columns: 1fr;
         gap: 32px;
     }
+    .hero-side { min-height: 280px; }
     .specimen-box { width: 100%; }
     .specimen-stage { height: 180px; }
     .directions { grid-template-columns: 1fr; }
     .market-grid { grid-template-columns: 1fr 1fr; }
     .showcase-grid { grid-template-columns: 1fr; }
+    .back-to-top { bottom: 80px; left: 20px; }
 }
 
 @media (max-width: 480px) {
     .market-grid { grid-template-columns: 1fr; }
     .hero-title { font-size: 2rem; }
+    .repo-grid { grid-template-columns: 1fr; }
 }
 
 /* ── 无障碍 ── */
@@ -584,52 +696,6 @@ a:hover { opacity: 0.8; }
         animation-duration: 0.01ms !important;
         transition-duration: 0.01ms !important;
     }
-}
-
-/* ── Pretext 文字流 ── */
-#pretext-output {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-#pretext-orbs {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: 1;
-    pointer-events: auto;
-    overflow: hidden;
-    cursor: default;
-}
-
-.pretext-line {
-    position: absolute;
-    white-space: pre;
-    pointer-events: none;
-    font-size: 13px;
-    line-height: 22px;
-    color: var(--text-muted);
-    overflow: hidden;
-    opacity: 0.6;
-}
-
-.pretext-orb {
-    position: absolute;
-    border-radius: 50%;
-    border: 2px dashed var(--accent);
-    background: var(--accent-dim);
-    pointer-events: auto;
-    z-index: 4;
-    will-change: transform;
-    cursor: grab;
-}
-
-.pretext-orb:active {
-    cursor: grabbing;
 }
 
 /* ── Sakana 拖拽小球 ── */

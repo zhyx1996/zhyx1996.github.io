@@ -263,11 +263,45 @@ async function loadSteamProfile() {
   }
 }
 
+// ── 返回顶部 ──
+function initBackToTop() {
+  const btn = document.getElementById('back-to-top');
+  if (!btn) return;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  });
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+// ── 滚动动画 ──
+function initScrollAnimations() {
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  sections.forEach(section => observer.observe(section));
+}
+
 // ── 初始化 ──
 document.addEventListener('DOMContentLoaded', () => {
   loadProfile();
   loadMarket();
   loadSteamProfile();
+  initScrollAnimations();
+  initBackToTop();
   // Sakana widget 加载完成后初始化拖拽
   const checkSakana = setInterval(() => {
     const widget = document.getElementById('sakana-drag-widget');
