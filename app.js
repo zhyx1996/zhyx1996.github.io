@@ -129,7 +129,7 @@ function initSakanaDrag() {
   if (!widget) return;
 
   let isDragging = false;
-  let vx = 0, vy = 0; // 速度
+  let vx = 0, vy = 0;
   let lastX, lastY;
   let animId = null;
 
@@ -153,20 +153,18 @@ function initSakanaDrag() {
     const widgetW = rect.width;
     const widgetH = rect.height;
 
-    // 计算新的 left/top
     let newLeft = rect.left + (e.clientX - lastX);
     let newTop = rect.top + (e.clientY - lastY);
 
-    // 限制在视口内
-    newLeft = Math.max(0, Math.min(viewportW - widgetW, newLeft));
-    newTop = Math.max(0, Math.min(viewportH - widgetH, newTop));
+    // 允许拖出视口外（限制在 -50% 到 +50% 范围内）
+    newLeft = Math.max(-widgetW * 0.5, Math.min(viewportW - widgetW * 0.5, newLeft));
+    newTop = Math.max(-widgetH * 0.5, Math.min(viewportH - widgetH * 0.5, newTop));
 
     widget.style.left = newLeft + 'px';
     widget.style.top = newTop + 'px';
     widget.style.right = 'auto';
     widget.style.bottom = 'auto';
 
-    // 计算速度（用于抛出时的惯性）
     vx = (e.clientX - lastX);
     vy = (e.clientY - lastY);
     lastX = e.clientX;
@@ -177,40 +175,36 @@ function initSakanaDrag() {
     if (!isDragging) return;
     isDragging = false;
     widget.classList.remove('dragging');
-    // 开始惯性 + 弹跳动画
     startBounce();
   };
 
   const startBounce = () => {
     if (animId) cancelAnimationFrame(animId);
-    const bounce = () => {
-      const rect = widget.getBoundingClientRect();
-      const viewportW = window.innerWidth;
-      const viewportH = window.innerHeight;
-      const widgetW = rect.width;
-      const widgetH = rect.height;
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
 
+    const bounce = () => {
+      const widgetW = widget.offsetWidth;
+      const widgetH = widget.offsetHeight;
       let left = parseFloat(widget.style.left || 0);
       let top = parseFloat(widget.style.top || 0);
 
-      // 摩擦
-      vx *= 0.95;
-      vy *= 0.95;
+      vx *= 0.96;
+      vy *= 0.96;
 
       left += vx;
       top += vy;
 
-      // 边界弹跳
-      if (left <= 0) { left = 0; vx = -vx * 0.7; }
-      if (left >= viewportW - widgetW) { left = viewportW - widgetW; vx = -vx * 0.7; }
-      if (top <= 0) { top = 0; vy = -vy * 0.7; }
-      if (top >= viewportH - widgetH) { top = viewportH - widgetH; vy = -vy * 0.7; }
+      // 边界弹碰 — 左右上下都处理
+      if (left <= 0) { left = 0; vx = Math.abs(vx) * 0.75; }
+      if (left >= viewportW - widgetW) { left = viewportW - widgetW; vx = -Math.abs(vx) * 0.75; }
+      if (top <= 0) { top = 0; vy = Math.abs(vy) * 0.75; }
+      if (top >= viewportH - widgetH) { top = viewportH - widgetH; vy = -Math.abs(vy) * 0.75; }
 
       widget.style.left = left + 'px';
       widget.style.top = top + 'px';
 
-      // 速度足够小时停止
-      if (Math.abs(vx) > 0.5 || Math.abs(vy) > 0.5) {
+      if (Math.abs(vx) > 0.3 || Math.abs(vy) > 0.3) {
         animId = requestAnimationFrame(bounce);
       } else {
         animId = null;
@@ -279,11 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const widget = document.getElementById('sakana-drag-widget');
     if (widget && widget.querySelector('canvas')) {
       clearInterval(checkSakana);
-      // 确保初始位置在右下角
-      widget.style.right = '20px';
-      widget.style.bottom = '20px';
-      widget.style.left = 'auto';
-      widget.style.top = 'auto';
       initSakanaDrag();
     }
   }, 200);
