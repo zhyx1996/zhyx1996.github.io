@@ -75,7 +75,10 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+html {
+    scroll-behavior: smooth;
+    overflow-x: clip;
+}
 
 body {
     position: relative;
@@ -85,6 +88,7 @@ body {
     color: var(--text);
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
 }
 
 /* ── 背景氛围 ── */
@@ -93,7 +97,6 @@ body::after {
     content: "";
     position: fixed;
     border-radius: 50%;
-    filter: blur(80px);
     pointer-events: none;
     z-index: 0;
 }
@@ -205,8 +208,7 @@ body::after {
     flex-direction: column;
     justify-content: center;
     pointer-events: none;
-    background: rgba(10, 13, 18, 0.82);
-    backdrop-filter: blur(8px);
+    background: rgba(10, 13, 18, 0.9);
     border-radius: var(--radius-md) 0 0 var(--radius-md);
     margin: -2rem;
     padding-right: 2.5rem;
@@ -254,19 +256,17 @@ body::after {
     gap: 0.8rem;
     padding: 1.5rem;
     pointer-events: none;
-    background: rgba(10, 13, 18, 0.75);
-    backdrop-filter: blur(8px);
+    background: rgba(10, 13, 18, 0.88);
     border-radius: 0 var(--radius-md) var(--radius-md) 0;
     margin: -2rem -2rem -2rem 0;
     padding-left: 2.5rem;
 }
 
 .banner-meta-card {
-    background: rgba(26, 31, 43, 0.7);
+    background: rgba(26, 31, 43, 0.92);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     padding: 1rem 1.2rem;
-    backdrop-filter: blur(8px);
 }
 .banner-meta-card small {
     font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
@@ -385,14 +385,23 @@ body::after {
 /* ── 卡片网格 ── */
 .grid-3 {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
 }
 .grid-2 {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
 }
+
+.card,
+.repo-card,
+.market-card,
+.link-card { min-width: 0; }
+
+.repo-name-link,
+.article-digest-text,
+.article-digest-meta { overflow-wrap: anywhere; }
 
 /* ── 玻璃卡片 → 深色面板 ── */
 .card {
@@ -464,10 +473,12 @@ body::after {
 /* ── 侧边栏 ── */
 .profile-layout {
     display: grid;
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: 300px minmax(0, 1fr);
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
+
+.content-column { min-width: 0; }
 
 .sidebar-column { position: sticky; top: 1rem; align-self: start; }
 
@@ -525,7 +536,7 @@ body::after {
 /* ── 快速链接 ── */
 .links-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem;
 }
 .link-card {

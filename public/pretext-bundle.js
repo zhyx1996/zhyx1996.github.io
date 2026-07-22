@@ -3370,7 +3370,7 @@
   var ACCENT_SOFT = "rgba(100, 220, 255, 0.12)";
   var canvas = document.getElementById("pretext-canvas");
   var ctx = canvas.getContext("2d");
-  var dpr = window.devicePixelRatio || 1;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
   var W;
   var H;
   var prepared = null;
@@ -3478,7 +3478,9 @@
     }
   }
   var needsRedraw = true;
+  var drawFramePending = false;
   function draw() {
+    drawFramePending = false;
     if (!needsRedraw) return;
     needsRedraw = false;
     ctx.clearRect(0, 0, W, H);
@@ -3487,6 +3489,8 @@
   }
   function requestDraw() {
     needsRedraw = true;
+    if (drawFramePending) return;
+    drawFramePending = true;
     requestAnimationFrame(draw);
   }
   var dragOrb = null;
@@ -3559,36 +3563,28 @@
       dragOrb = null;
     }
   });
-  var lastInteraction = Date.now();
-  canvas.addEventListener("mousedown", () => lastInteraction = Date.now());
-  canvas.addEventListener("touchstart", () => lastInteraction = Date.now());
-  function autoFloat() {
-    const idle = Date.now() - lastInteraction;
-    if (idle > 3e3) {
-      orbs.forEach((orb, i) => {
-        if (orb.dragging) return;
-        const t = Date.now() * 3e-4 + i * 2.1;
-        orb.x += Math.sin(t + i) * 0.3;
-        orb.y += Math.cos(t * 0.7 + i) * 0.3;
-        orb.x = Math.max(orb.r, Math.min(W - orb.r, orb.x));
-        orb.y = Math.max(orb.r, Math.min(H - orb.r, orb.y));
-      });
-      requestDraw();
-    }
-    setTimeout(autoFloat, 33);
-  }
-  autoFloat();
+  var initialized = false;
+  var resizeFramePending = false;
   function init() {
+    if (initialized) return;
+    initialized = true;
     resize();
     initOrbs();
     canvas.style.cursor = "grab";
     requestDraw();
   }
-  window.addEventListener("resize", () => {
-    resize();
-    initOrbs();
-    requestDraw();
-  });
+  function requestResize() {
+    if (resizeFramePending) return;
+    resizeFramePending = true;
+    requestAnimationFrame(() => {
+      resizeFramePending = false;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      resize();
+      initOrbs();
+      requestDraw();
+    });
+  }
+  window.addEventListener("resize", requestResize);
   window.addEventListener("load", init);
   if (document.readyState === "interactive" || document.readyState === "complete") init();
 })();
