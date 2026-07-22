@@ -625,26 +625,18 @@ a:hover { opacity: 0.8; }
     cursor: grab;
     user-select: none;
     touch-action: none;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.95);
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    transition: box-shadow 0.2s;
-}
-
-#sakana-drag-widget:hover {
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 #sakana-drag-widget:active,
 #sakana-drag-widget.dragging {
     cursor: grabbing;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.15);
 }
 
 #sakana-drag-widget canvas {
     display: block;
-    border-radius: 8px;
 }
 :focus-visible {
     outline: 2px solid var(--accent);
