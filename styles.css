@@ -495,64 +495,124 @@ body::after {
     flex-shrink: 0;
 }
 
-/* ── Footer Toolbar ── */
-.footer-toolbar {
-    position: relative;
-    z-index: 1;
-    border-top: 1px solid var(--border);
-    margin-top: 2rem;
+/* ── 市场快照 ── */
+.market-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.market-card {
     background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.3rem;
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
 }
 
-.toolbar-inner {
-    width: min(1280px, calc(100% - 2rem));
-    margin: 0 auto;
-    padding: 1.5rem 0;
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
+.market-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transform: translateY(-2px);
 }
 
-.toolbar-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-}
-
-.toolbar-label {
+.market-card .label {
     font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--text-muted);
+    margin-bottom: 0.3rem;
 }
 
-.toolbar-value {
-    font-size: 0.9rem;
+.market-card .value {
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
     color: var(--text);
 }
 
-.toolbar-links {
-    display: flex;
-    gap: 0.8rem;
-}
-
-.toolbar-links a {
+.market-card .note {
+    font-size: 0.78rem;
     color: var(--text-dim);
+    margin-top: 0.3rem;
+}
+
+.market-card .change {
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+    font-size: 0.75rem;
+    margin-top: 0.3rem;
+}
+
+.market-card .change.up { color: #4ADE80; }
+.market-card .change.down { color: #F87171; }
+
+.market-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* ── 游戏展示 ── */
+.embed-stack { display: flex; flex-direction: column; gap: 1rem; }
+.embed-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.3rem;
+}
+.embed-card h3 {
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 1rem;
+    color: var(--text);
+    margin: 0.5rem 0;
+}
+
+.external-embed-frame {
+    width: 100%;
+    height: 195px;
+    border: none;
+    border-radius: var(--radius-sm);
+    margin-top: 0.8rem;
+}
+.store-widget-frame {
+    width: 100%;
+    height: 195px;
+    border: none;
+    border-radius: var(--radius-sm);
+    margin-top: 0.8rem;
+}
+
+.embed-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+/* Steam 资料卡 */
+.steam-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
     text-decoration: none;
-    font-size: 0.85rem;
-    transition: color 0.2s;
+    color: var(--text);
+    margin-top: 0.5rem;
 }
+.steam-profile-copy { display: flex; flex-direction: column; }
+.steam-profile-copy strong { font-size: 0.95rem; }
+.steam-profile-copy span { font-size: 0.8rem; color: var(--text-muted); }
 
-.toolbar-links a:hover {
-    color: var(--lane);
+/* ── Footer ── */
+.footer {
+    position: relative;
+    z-index: 1;
+    padding: 2rem 0;
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
 }
-
-.footer-bottom {
+.footer-inner {
     width: min(1280px, calc(100% - 2rem));
     margin: 0 auto;
-    padding: 1rem 0;
-    border-top: 1px solid var(--border);
     text-align: center;
     font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.78rem;
@@ -571,6 +631,8 @@ body::after {
     .toolbar-inner { flex-direction: column; gap: 1rem; }
     .pretext-columns { flex-direction: column; }
     .pretext-column { width: 100%; }
+    .market-grid { grid-template-columns: 1fr; }
+    .embed-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
     .nav-inner { flex-direction: column; padding: 0.8rem; }

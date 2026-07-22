@@ -3,39 +3,13 @@
 // ── 配置 ──
 const GITHUB_USERNAME = 'zhyx1996';
 const GITHUB_API = `https://api.github.com/users/${GITHUB_USERNAME}`;
-const GOLD_API = 'https://www.gold-api.com/api/XAU/USD';
-
-// ── 博客园文章兜底数据（由 maintenance.js --sync 自动更新）──
-const articleFallback = [
-    {
-        title: "Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及pyinstaller打包",
-        link: "https://www.cnblogs.com/fix-me/p/20968815",
-        summary: "代码仓库：https://github.com/zhyx1996/GStreamer-SEI 网上 Windows + Python + GStreamer + 打包 的攻略比较少，踩了好多坑，简单记录一下。 1. 环境安装 有两种方式。 方式一：直接 pip 安装 需要 Python  3.8：",
-        published_at: "2026-06-30T08:22:00Z",
-        source: "博客园 · 扶摇接海"
-    },
-    {
-        title: "123云盘报错：检测到本地通信被防火墙或vpn拦截",
-        link: "https://www.cnblogs.com/fix-me/p/20194105",
-        summary: "联系客服，查看日志C:\\ProgramData\\123SyncCloud\\Logs\\SyncCloud.MaintenanceServer.log [2026-05-26 13:10:32.632] [123SyncCloud_MaintenanceService] [error] process ",
-        published_at: "2026-05-28T00:53:00Z",
-        source: "博客园 · 扶摇接海"
-    },
-    {
-        title: "记录 GStreamer 打开 JPEG 编码的视频时出现段错误的原因",
-        link: "https://www.cnblogs.com/fix-me/p/19914336",
-        summary: "问题现象 在 C++ 中，使用 gst_parse_launch 创建 GStreamer 管道，并通过 decodebin 解码 JPEG 编码的 .avi 视频时，程序会出现段错误，但没有其他明显报错信息。 排查结果 程序中同时使用了 OpenCV 的 VideoCapture 和 VideoW",
-        published_at: "2026-04-23T03:47:00Z",
-        source: "博客园 · 扶摇接海"
-    },
-    {
-        title: "CARLA 中的坐标系与标准车辆坐标系转换",
-        link: "https://www.cnblogs.com/fix-me/p/19882892",
-        summary: "标准车辆坐标系 常见的车辆坐标系通常采用“前、左、上”的定义，也就是右手系。 在这种坐标系下，各轴对应的旋转正方向均为逆时针，符合右手系。 CARLA 坐标系 参考 CARLA 文档： CARLA 使用的是左手坐标系，其中 Y 轴指向右侧。 它的欧拉角同样按照 Z-Y-X 顺序、绕自身坐标轴依次旋转",
-        published_at: "2026-04-17T05:47:00Z",
-        source: "博客园 · 扶摇接海"
-    }
-];
+const GOLD_API_BASE_URL = 'https://www.gold-api.com/api/XAU/USD';
+const GOLD_LEGACY_API_URL = 'https://api.gold-api.com/price/XAU';
+const GOLD_DAILY_SERIES_URL = 'https://freegoldapi.com/data/latest.json';
+const GOLD_TROY_OUNCE_GRAMS = 31.1034768;
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+const GAS92_PRICE_RANGE = { min: 5, max: 10 };
+const GAS92_SUCCESS_CODES = new Set([0, 200, '0', '200']);
 
 // ── 工具函数 ──
 const fmtDate = (value) => {
@@ -75,27 +49,133 @@ async function loadProfile() {
 }
 
 // ── 市场快照 ──
-async function loadMarketSnap() {
-  const el = document.getElementById('market-snap');
-  if (!el) return;
+const marketFallback = {
+  usdCny: { rate: 7.25, note: '静态快照时间（2026-04-24）', source: '静态快照' },
+  sgdCny: { rate: 5.55, note: '静态快照时间（2026-04-24）', source: '静态快照' },
+  jpyPerCny: { rate: 20.85, note: '静态快照时间（2026-04-24）', source: '静态快照' },
+  gold: { price: 3315.50, unit: 'USD/盎司', note: '静态快照时间（2026-04-24）', source: '静态快照' },
+  btc: { price: 94500, unit: 'USD', note: '静态快照时间（2026-04-24）', source: '静态快照' },
+  gas92: { cnyPerLiter: 8.51, note: '联网成功后展示全国92#汽油均价；当前为静态参考值', source: '静态快照（2026-04-24）' },
+  asOf: '2026-04-24T00:00:00Z'
+};
 
-  try {
-    const res = await fetch(GOLD_API);
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    const price = data.price || data[0]?.price;
-    if (price) {
-      el.textContent = `$${price.toFixed(2)}/盎司`;
-    } else {
-      el.textContent = '数据暂不可用';
-    }
-  } catch {
-    el.textContent = '数据暂不可用';
+const renderMarketFacts = (items) => `
+    <div class="market-card">
+        ${items.map(item => `
+            <div class="label">${escapeHtml(item.label)}</div>
+            <div class="value">${escapeHtml(item.value)}</div>
+            ${item.note ? `<div class="note">${escapeHtml(item.note)}</div>` : ''}
+            ${item.change ? `<div class="change ${item.change.dir}">${escapeHtml(item.change.text)}</div>` : ''}
+        `).join('')}
+    </div>
+`.trim();
+
+function buildForexFacts(data) {
+  const items = [];
+  if (data.usdCny) {
+    items.push({ label: 'USD/CNY', value: data.usdCny.rate.toFixed(4), note: data.usdCny.note });
+  }
+  if (data.sgdCny) {
+    items.push({ label: 'SGD/CNY', value: data.sgdCny.rate.toFixed(4), note: data.sgdCny.note });
+  }
+  if (data.jpyPerCny) {
+    items.push({ label: 'JPY/CNY', value: data.jpyPerCny.rate.toFixed(2), note: data.jpyPerCny.note });
+  }
+  return items;
+}
+
+function buildGoldFacts(data) {
+  const items = [];
+  if (data.gold) {
+    items.push({
+      label: '黄金',
+      value: `$${data.gold.price.toLocaleString()}/盎司`,
+      note: data.gold.note,
+      change: data.gold.changePercent ? {
+        dir: data.gold.changePercent >= 0 ? 'up' : 'down',
+        text: `${data.gold.changePercent >= 0 ? '+' : ''}${data.gold.changePercent.toFixed(2)}%`
+      } : null
+    });
+  }
+  if (data.btc) {
+    items.push({
+      label: 'Bitcoin',
+      value: `$${data.btc.price.toLocaleString()}`,
+      note: data.btc.note
+    });
+  }
+  return items;
+}
+
+function buildGasFacts(data) {
+  const items = [];
+  if (data.gas92) {
+    items.push({
+      label: '92#汽油',
+      value: `¥${data.gas92.cnyPerLiter.toFixed(2)}/升`,
+      note: data.gas92.note
+    });
+  }
+  return items;
+}
+
+function renderMarket(data, statuses = {}) {
+  const container = document.getElementById('market-grid');
+  if (!container) return;
+
+  const fxFacts = buildForexFacts(data);
+  const goldFacts = buildGoldFacts(data);
+  const gasFacts = buildGasFacts(data);
+
+  container.innerHTML = `
+    <div class="market-col">
+      ${renderMarketFacts(fxFacts)}
+    </div>
+    <div class="market-col">
+      ${renderMarketFacts(goldFacts)}
+      ${renderMarketFacts(gasFacts)}
+    </div>
+  `;
+}
+
+async function fetchGoldPrice() {
+  const candidates = [
+    { url: GOLD_API_BASE_URL, source: 'GoldAPI' },
+    { url: GOLD_LEGACY_API_URL, source: 'GoldAPI Legacy' },
+  ];
+
+  for (const c of candidates) {
+    try {
+      const res = await fetch(c.url);
+      if (!res.ok) continue;
+      const data = await res.json();
+      const price = data.price || data[0]?.price;
+      if (price) return { price, source: c.source };
+    } catch { continue; }
+  }
+  return null;
+}
+
+async function loadMarket() {
+  const container = document.getElementById('market-grid');
+  if (!container) return;
+
+  // Render fallback first
+  renderMarket(marketFallback);
+
+  // Try to fetch live gold price
+  const gold = await fetchGoldPrice();
+  if (gold) {
+    const updated = {
+      ...marketFallback,
+      gold: { ...marketFallback.gold, price: gold.price, note: `实时数据（${gold.source}）`, source: gold.source }
+    };
+    renderMarket(updated);
   }
 }
 
 // ── 初始化 ──
 document.addEventListener('DOMContentLoaded', () => {
   loadProfile();
-  loadMarketSnap();
+  loadMarket();
 });

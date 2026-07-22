@@ -133,31 +133,86 @@
                 <a class="button outline" href="/articles.html">查看全部文章</a>
             </div>
         </section>
+
+        <!-- Market -->
+        <section class="section" id="market">
+            <div class="section-heading">
+                <div>
+                    <h2>市场快照</h2>
+                </div>
+                <span class="tag">洞察</span>
+            </div>
+            <div class="market-grid" id="market-grid"></div>
+        </section>
+
+        <!-- Showcase -->
+        <section class="section" id="showcase">
+            <div class="section-heading">
+                <div>
+                    <h2>游戏展示</h2>
+                </div>
+                <span class="tag">直连</span>
+            </div>
+            <div class="embed-stack">
+                <article class="card glass-card embed-card">
+                    <div class="repo-title-row">
+                        <span class="badge">原神</span>
+                        <span class="pill">Enka 框架</span>
+                    </div>
+                    <h3>公开展柜</h3>
+                    <iframe
+                        class="external-embed-frame"
+                        src="https://enka.network/u/147521967/"
+                        loading="lazy"
+                        referrerpolicy="no-referrer"
+                        title="Genshin Showcase"
+                    ></iframe>
+                </article>
+                <div class="grid-2 embed-grid">
+                    <article class="card glass-card embed-card">
+                        <div class="repo-title-row">
+                            <span class="badge">Steam</span>
+                            <span class="pill">已隐藏</span>
+                        </div>
+                        <h3>个人主页资料卡</h3>
+                        <div class="steam-profile-card">
+                            <img
+                                class="avatar avatar-sm"
+                                src="https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg"
+                                alt="Steam avatar"
+                                width="96"
+                                height="96"
+                            >
+                            <span class="steam-profile-copy">
+                                <strong>扶摇接海</strong>
+                                <span>Steam 主页</span>
+                            </span>
+                        </div>
+                    </article>
+                    <article class="card glass-card embed-card">
+                        <div class="repo-title-row">
+                            <span class="badge">Steam 商店</span>
+                            <span class="pill">官方组件</span>
+                        </div>
+                        <h3>戴森球计划</h3>
+                        <iframe
+                            class="store-widget-frame"
+                            src="https://store.steampowered.com/widget/1366540/"
+                            loading="lazy"
+                            title="Dyson Sphere Program"
+                        ></iframe>
+                        <div class="button-row">
+                            <a class="button outline" href="/public-data-proxy/embed-demo.html">查看演示页</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- Footer Toolbar -->
-    <footer class="footer-toolbar">
-        <div class="toolbar-inner">
-            <div class="toolbar-item">
-                <span class="toolbar-label">市场快照</span>
-                <span class="toolbar-value" id="market-snap">加载中…</span>
-            </div>
-            <div class="toolbar-item">
-                <span class="toolbar-label">游戏</span>
-                <div class="toolbar-links">
-                    <a href="https://enka.network/u/147521967/" target="_blank" rel="noreferrer">原神</a>
-                    <a href="https://steamcommunity.com/id/zhyx1996" target="_blank" rel="noreferrer">Steam</a>
-                </div>
-            </div>
-            <div class="toolbar-item">
-                <span class="toolbar-label">社交</span>
-                <div class="toolbar-links">
-                    <a href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">GitHub</a>
-                    <a href="https://www.cnblogs.com/fix-me" target="_blank" rel="noreferrer">博客园</a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
             <p>扶摇接海 · 个人主页</p>
         </div>
     </footer>
