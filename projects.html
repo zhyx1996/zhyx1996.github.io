@@ -3,149 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公开仓库</title>
-    <meta name="description" content="扶摇接海 的公开仓库页面，集中展示所有公开 Repositories、技术方向与最新更新时间。">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◉</text></svg>">
+    <title>公开仓库 · 扶摇接海</title>
+    <meta name="theme-color" content="#D97706">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23D97706'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>扶</text></svg>">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" href="/styles.css">
-    <!-- Sakana Widget -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css" />
 </head>
 <body>
-    <header class="site-header">
-        <div class="nav-inner">
-            <a class="brand" href="/index.html">
-                <span class="brand-mark">◉</span>
-                <span>扶摇接海</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="/index.html">首页</a></li>
-                <li><a class="active" href="/projects.html">仓库</a></li>
-                <li><a href="/stars.html">收藏</a></li>
-                <li><a href="/articles.html">文章</a></li>
-                <li><button id="theme-toggle" class="theme-toggle" aria-label="切换主题">☀️</button></li>
-            </ul>
-        </div>
-    </header>
-
-    <main class="container page-shell">
-        <section class="page-banner compact-banner repository-banner">
-            <div>
-                <span class="kicker">仓库</span>
-                <p class="page-eyebrow">Published portfolio / Public repositories</p>
-                <h1>公开仓库</h1>
-                <p>公开仓库、技术方向与近期维护内容。</p>
-                <div class="page-local-nav" aria-label="Repository sections">
-                    <a href="#repo-snapshot">Snapshot</a>
-                    <a href="#project-list-section">All repositories</a>
-                </div>
+    <div class="layout">
+        <!-- 左侧导航 -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="logo-mark">扶</span>
+                <span class="logo-text">扶摇接海</span>
             </div>
-            <div class="page-banner-meta hero-meta-stack">
-                <div class="banner-meta-card glass-card">
-                    <small>最近更新</small>
-                    <strong id="repo-last-updated">2026年4月10日</strong>
-                </div>
-                <div class="banner-meta-card glass-card">
-                    <small>覆盖语言</small>
-                    <strong id="repo-language-count">4</strong>
-                </div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="/index.html">首页</a>
+                <a class="nav-item active" href="/projects.html">仓库</a>
+                <a class="nav-item" href="/stars.html">收藏</a>
+                <a class="nav-item" href="/articles.html">文章</a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="sidebar-meta">@zhyx1996</span>
             </div>
-        </section>
+        </aside>
 
-        <div class="profile-layout projects-layout">
-            <aside class="sidebar-column">
-                <article class="profile-summary compact-profile glass-card">
-                    <h2>Repository snapshot</h2>
-                    <div class="sidebar-meta">
-                        <div class="sidebar-meta-item glass-panel">
-                            <span class="meta-label">Total stars</span>
-                            <strong id="repo-total-stars">1</strong>
+        <!-- 主内容 -->
+        <main class="main">
+            <section class="page-banner">
+                <div>
+                    <span class="eyebrow">Published portfolio</span>
+                    <h1>公开仓库</h1>
+                    <p>公开仓库、技术方向与近期维护内容。</p>
+                </div>
+                <div class="page-stats">
+                    <div class="stat-card">
+                        <span class="stat-num">4</span>
+                        <span class="stat-label">仓库</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-num">1</span>
+                        <span class="stat-label">Stars</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-num">4</span>
+                        <span class="stat-label">语言</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="repo-grid">
+                    <div class="repo-card">
+                        <h3><a href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">lane2seq</a></h3>
+                        <p>Real-time lane detection using OpenCV (Canny/Hough transforms, CLAHE, HLS) and Lane2Seq-ViT (Transformer-based sequence generation), with ENet segmentation (PyTorch) on TuSimple/LLAMAS datasets.</p>
+                        <div class="repo-meta">
+                            <span class="repo-lang">Jupyter Notebook</span>
+                            <span>⭐ 1</span>
+                            <span>🕒 2026年4月10日</span>
                         </div>
-                        <div class="sidebar-meta-item glass-panel">
-                            <span class="meta-label">Top project</span>
-                            <strong id="repo-top-project">lane2seq</strong>
+                    </div>
+                    <div class="repo-card">
+                        <h3><a href="https://github.com/zhyx1996/pcl" target="_blank" rel="noreferrer">pcl</a></h3>
+                        <p>PCL库BoundaryEstimation使用OMP加速</p>
+                        <div class="repo-meta">
+                            <span class="repo-lang">C++</span>
                         </div>
-                        <div class="sidebar-meta-item glass-panel">
-                            <span class="meta-label">Browse order</span>
-                            <strong>按最近更新时间从新到旧</strong>
+                    </div>
+                    <div class="repo-card">
+                        <h3><a href="https://github.com/zhyx1996/GStreamer" target="_blank" rel="noreferrer">GStreamer</a></h3>
+                        <p>gstreamer推流、自定义SEI、carla相机管理、打包exe</p>
+                        <div class="repo-meta">
+                            <span class="repo-lang">Python</span>
                         </div>
                     </div>
-                    <div class="button-row full-width">
-                        <a class="button primary full-width" href="https://github.com/zhyx1996?tab=repositories" target="_blank" rel="noreferrer">GitHub 仓库页</a>
-                        <a class="button secondary full-width" href="/stars.html">转到 Stars 页</a>
-                    </div>
-                </article>
-            </aside>
-
-            <div class="content-column">
-                <section class="section" id="repo-snapshot">
-                    <div class="section-heading">
-                        <div>
-                            <h2>Repository overview</h2>
+                    <div class="repo-card">
+                        <h3><a href="https://github.com/zhyx1996/auto_calib_v2" target="_blank" rel="noreferrer">auto_calib_v2</a></h3>
+                        <p>对PJLab-ADG/SensorsCalibration的lidar2camera/auto_calib_v2.0进行了修改</p>
+                        <div class="repo-meta">
+                            <span class="repo-lang">C++</span>
                         </div>
-                        <span class="tag">Snapshot</span>
                     </div>
-                    <div class="metrics-grid">
-                        <article class="metric-card glass-card">
-                            <small>公开仓库</small>
-                            <strong id="repo-count">4</strong>
-                        </article>
-                        <article class="metric-card glass-card">
-                            <small>累计 Stars</small>
-                            <strong id="total-stars">1</strong>
-                        </article>
-                        <article class="metric-card glass-card">
-                            <small>覆盖语言</small>
-                            <strong id="repo-language-count-metric">4</strong>
-                        </article>
-                        <article class="metric-card glass-card">
-                            <small>最近活跃</small>
-                            <strong id="repo-latest-label">2026年4月10日</strong>
-                        </article>
-                    </div>
-                </section>
+                </div>
+            </section>
+        </main>
+    </div>
 
-                <section class="section" id="project-list-section">
-                    <div class="section-heading">
-                        <div>
-                            <h2>All public repositories</h2>
-                        </div>
-                        <span class="tag">All repos</span>
-                    </div>
-                    <div class="repo-grid repo-grid-expanded" id="project-list">
-                        <article class="repo-card glass-card">
-                            <span class="tag">Jupyter Notebook</span>
-                            <h3>lane2seq</h3>
-                            <p>基于 OpenCV、ENet 与 Vision Transformer 的车道线检测实验项目。</p>
-                            <div class="repo-stats">
-                                <span>⭐ 1</span>
-                                <span>🕒 2026年4月10日</span>
-                            </div>
-                        </article>
-                    </div>
-                </section>
+    <!-- Sakana 拖拽小球 -->
+    <div id="sakana-drag-widget"></div>
 
-            </div>
-        </div>
-    </main>
-
-    <footer class="footer">
-        <div class="footer-inner">
-            <p>扶摇接海 · 个人主页</p>
-        </div>
-    </footer>
-
-    <script src="/app.js"></script>
-
-    <!-- Sakana Widget -->
-    <div id="sakana-widget" style="position:fixed;bottom:16px;right:16px;width:170px;height:200px;z-index:9999;"></div>
+    <script src="/app.js?v=3"></script>
     <script>
       function initSakanaWidget() {
-        new SakanaWidget({ size: 170, character: 'chisato' }).mount('#sakana-widget');
+        new SakanaWidget({ size: 120, character: 'chisato' }).mount('#sakana-drag-widget');
       }
     </script>
-    <script async onload="initSakanaWidget()"
-      src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
+    <script async onload="initSakanaWidget()" src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
 </body>
 </html>
-
-

@@ -268,6 +268,59 @@ a:hover { opacity: 0.8; }
     color: var(--text-muted);
 }
 
+/* ── Page Banner (sub-pages) ── */
+.page-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border-light);
+    flex-wrap: wrap;
+}
+
+.page-banner h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 8px 0;
+}
+
+.page-banner p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    max-width: 400px;
+}
+
+.page-stats {
+    display: flex;
+    gap: 16px;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 16px 24px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    background: var(--bg-surface);
+    min-width: 80px;
+}
+
+.stat-num {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
 /* ── 分区 ── */
 .section {
     margin-bottom: 56px;

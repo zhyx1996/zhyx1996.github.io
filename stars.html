@@ -3,121 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>收藏项目</title>
-    <meta name="description" content="扶摇接海 的 Stars 页面，集中展示最近收藏的公开项目、语言分布与关注方向。">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◉</text></svg>">
+    <title>收藏项目 · 扶摇接海</title>
+    <meta name="theme-color" content="#D97706">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23D97706'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>扶</text></svg>">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" href="/styles.css">
-    <!-- Sakana Widget -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css" />
 </head>
 <body>
-    <header class="site-header">
-        <div class="nav-inner">
-            <a class="brand" href="/index.html">
-                <span class="brand-mark">◉</span>
-                <span>扶摇接海</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="/index.html">首页</a></li>
-                <li><a href="/projects.html">仓库</a></li>
-                <li><a class="active" href="/stars.html">收藏</a></li>
-                <li><a href="/articles.html">文章</a></li>
-                <li><button id="theme-toggle" class="theme-toggle" aria-label="切换主题">☀️</button></li>
-            </ul>
-        </div>
-    </header>
-
-    <main class="container page-shell">
-        <section class="page-banner compact-banner star-banner">
-            <div>
-                <span class="kicker">收藏</span>
-                <p class="page-eyebrow">Published portfolio / Starred projects</p>
-                <h1>最近收藏的公开项目</h1>
-                <p>关注中的工具、实现与近期参考项目。</p>
-                <div class="page-local-nav" aria-label="Star sections">
-                    <a href="#star-list-section">Star list</a>
-                </div>
+    <div class="layout">
+        <!-- 左侧导航 -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="logo-mark">扶</span>
+                <span class="logo-text">扶摇接海</span>
             </div>
-            <div class="page-banner-meta hero-meta-stack">
-                <div class="banner-meta-card glass-card">
-                    <small>最近更新</small>
-                    <strong id="star-last-updated">2026年4月13日</strong>
-                </div>
-                <div class="banner-meta-card glass-card">
-                    <small>覆盖语言</small>
-                    <strong id="star-language-count">4</strong>
-                </div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="/index.html">首页</a>
+                <a class="nav-item" href="/projects.html">仓库</a>
+                <a class="nav-item active" href="/stars.html">收藏</a>
+                <a class="nav-item" href="/articles.html">文章</a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="sidebar-meta">@zhyx1996</span>
             </div>
-        </section>
+        </aside>
 
-        <div class="profile-layout projects-layout">
-            <aside class="sidebar-column">
-                <article class="profile-summary compact-profile glass-card">
-                    <h2>Star snapshot</h2>
-                    <div class="sidebar-meta">
-                        <div class="sidebar-meta-item glass-panel">
-                            <span class="meta-label">收藏数量</span>
-                            <strong id="star-count">4</strong>
-                        </div>
-                        <div class="sidebar-meta-item glass-panel">
-                            <span class="meta-label">Most starred</span>
-                            <strong id="star-top-name">smallmain/vscode-unify-chat-provider</strong>
-                        </div>
-                        <div class="sidebar-meta-item glass-panel">
-                            <span class="meta-label">用途</span>
-                            <strong>寻找工具、交互与工程实现灵感</strong>
+        <!-- 主内容 -->
+        <main class="main">
+            <section class="page-banner">
+                <div>
+                    <span class="eyebrow">Starred projects</span>
+                    <h1>最近收藏的公开项目</h1>
+                    <p>关注中的工具、实现与近期参考项目。</p>
+                </div>
+                <div class="page-stats">
+                    <div class="stat-card">
+                        <span class="stat-num">4</span>
+                        <span class="stat-label">收藏</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="repo-grid">
+                    <div class="repo-card">
+                        <h3><a href="https://github.com/smallmain/vscode-unify-chat-provider" target="_blank" rel="noreferrer">smallmain / vscode-unify-chat-provider</a></h3>
+                        <p>把多个 LLM API 提供方接到 VS Code Copilot Chat 的聚合型扩展。</p>
+                        <div class="repo-meta">
+                            <span class="repo-lang">TypeScript</span>
+                            <span>⭐ 366</span>
                         </div>
                     </div>
-                    <div class="button-row full-width">
-                        <a class="button primary full-width" href="https://github.com/zhyx1996?tab=stars" target="_blank" rel="noreferrer">GitHub Stars</a>
-                        <a class="button secondary full-width" href="/projects.html">查看仓库页</a>
-                    </div>
-                </article>
-            </aside>
+                </div>
+            </section>
+        </main>
+    </div>
 
-            <div class="content-column">
-                <section class="section" id="star-list-section">
-                    <div class="section-heading">
-                        <div>
-                            <h2>Starred repositories</h2>
-                        </div>
-                        <span class="tag">Star list</span>
-                    </div>
-                    <div class="repo-grid repo-grid-expanded star-grid" id="star-list">
-                        <article class="repo-card star-card glass-card">
-                            <span class="tag">TypeScript</span>
-                            <h3>smallmain / vscode-unify-chat-provider</h3>
-                            <p>把多个 LLM API 提供方接到 VS Code Copilot Chat 的聚合型扩展。</p>
-                            <div class="repo-stats">
-                                <span>⭐ 366</span>
-                                <span>🕒 2026年4月13日</span>
-                            </div>
-                        </article>
-                    </div>
-                </section>
+    <!-- Sakana 拖拽小球 -->
+    <div id="sakana-drag-widget"></div>
 
-            </div>
-        </div>
-    </main>
-
-    <footer class="footer">
-        <div class="footer-inner">
-            <p>扶摇接海 · 个人主页</p>
-        </div>
-    </footer>
-
-    <script src="/app.js"></script>
-
-    <!-- Sakana Widget -->
-    <div id="sakana-widget" style="position:fixed;bottom:16px;right:16px;width:170px;height:200px;z-index:9999;"></div>
+    <script src="/app.js?v=3"></script>
     <script>
       function initSakanaWidget() {
-        new SakanaWidget({ size: 170, character: 'chisato' }).mount('#sakana-widget');
+        new SakanaWidget({ size: 120, character: 'chisato' }).mount('#sakana-drag-widget');
       }
     </script>
-    <script async onload="initSakanaWidget()"
-      src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
+    <script async onload="initSakanaWidget()" src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
 </body>
 </html>
-
-

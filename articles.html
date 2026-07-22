@@ -3,195 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>博客园文章</title>
-    <meta name="description" content="扶摇接海 的博客园文章展示页，集中展示最近同步到的网站文章与博客园原始入口。">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◉</text></svg>">
+    <title>博客园文章 · 扶摇接海</title>
+    <meta name="theme-color" content="#D97706">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23D97706'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>扶</text></svg>">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" href="/styles.css">
-    <!-- Sakana Widget -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css" />
 </head>
 <body>
-    <header class="site-header">
-        <div class="nav-inner">
-            <a class="brand" href="/index.html">
-                <span class="brand-mark">◉</span>
-                <span>扶摇接海</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="/index.html">首页</a></li>
-                <li><a href="/projects.html">仓库</a></li>
-                <li><a href="/stars.html">收藏</a></li>
-                <li><a class="active" href="/articles.html">文章</a></li>
-                <li><button id="theme-toggle" class="theme-toggle" aria-label="切换主题">☀️</button></li>
-            </ul>
-        </div>
-    </header>
-
-    <main class="container page-shell">
-        <section class="page-banner compact-banner article-banner">
-            <div>
-                <span class="kicker">文章</span>
-                <p class="page-eyebrow">Published portfolio / Cnblogs articles</p>
-                <h1>博客园文章展示</h1>
-                <p>公开文章、最近随笔与内容摘要。</p>
-                <div class="page-local-nav" aria-label="Article sections">
-                    <a href="#article-snapshot">Snapshot</a>
-                    <a href="#article-list-section">全部文章</a>
-                </div>
+    <div class="layout">
+        <!-- 左侧导航 -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="logo-mark">扶</span>
+                <span class="logo-text">扶摇接海</span>
             </div>
-            <div class="page-banner-meta hero-meta-stack">
-                <div class="banner-meta-card glass-card">
-                    <small>最近更新</small>
-                    <strong data-article-last-updated-hero>2026年6月30日</strong>
-                    <span class="meta-note" data-article-last-updated-hero-date>博客园同步</span>
-                </div>
-                <div class="banner-meta-card glass-card">
-                    <small>来源</small>
-                    <strong data-article-source>博客园主页</strong>
-                </div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="/index.html">首页</a>
+                <a class="nav-item" href="/projects.html">仓库</a>
+                <a class="nav-item" href="/stars.html">收藏</a>
+                <a class="nav-item active" href="/articles.html">文章</a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="sidebar-meta">@zhyx1996</span>
             </div>
-        </section>
+        </aside>
 
-        <div class="profile-layout projects-layout">
-            <aside class="sidebar-column">
-                <article class="profile-summary compact-profile glass-card">
-                    <h2>Article snapshot</h2>
-                        <div class="sidebar-meta">
-                            <div class="sidebar-meta-item glass-panel">
-                                <span class="meta-label">文章数量</span>
-                                <strong data-article-count>4</strong>
-                            </div>
-                            <div class="sidebar-meta-item glass-panel">
-                                <span class="meta-label">最新文章</span>
-                                <strong data-article-latest-title>Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及 pyinstaller 打包</strong>
-                            </div>
-                        <div class="sidebar-meta-item glass-panel">
-                            <span class="meta-label">入口</span>
-                            <strong>https://www.cnblogs.com/fix-me</strong>
+        <!-- 主内容 -->
+        <main class="main">
+            <section class="page-banner">
+                <div>
+                    <span class="eyebrow">Cnblogs articles</span>
+                    <h1>博客园文章展示</h1>
+                    <p>公开文章、最近随笔与内容摘要。</p>
+                </div>
+                <div class="page-stats">
+                    <div class="stat-card">
+                        <span class="stat-num">4</span>
+                        <span class="stat-label">文章</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2 class="section-title">全部文章</h2>
+                <div class="article-list">
+                    <article class="article-card">
+                        <div class="article-meta">
+                            <span class="article-date">2026年6月30日</span>
                         </div>
-                    </div>
-                    <div class="button-row full-width">
-                        <a class="button primary full-width" href="https://www.cnblogs.com/fix-me" target="_blank" rel="noreferrer">打开博客园主页</a>
-                        <a class="button secondary full-width" href="/index.html#articles">返回首页文章区</a>
-                    </div>
-                </article>
-            </aside>
-
-                <div class="content-column">
-                <section class="section" id="article-snapshot">
-                    <div class="section-heading">
-                        <div>
-                            <h2>Article overview</h2>
+                        <h3><a href="https://www.cnblogs.com/fix-me/p/20968815" target="_blank" rel="noreferrer">Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及 pyinstaller 打包</a></h3>
+                        <p>Windows + Python + GStreamer + 打包的实战记录，涵盖环境安装、RTSP 推流、SEI 注入与 pyinstaller 打包的完整流程与踩坑经验。</p>
+                    </article>
+                    <article class="article-card">
+                        <div class="article-meta">
+                            <span class="article-date">2026年5月28日</span>
                         </div>
-                        <span class="tag">Snapshot</span>
-                    </div>
-                    <div class="metrics-grid">
-                        <article class="metric-card glass-card">
-                            <small>同步文章</small>
-                            <strong data-article-count>4</strong>
-                        </article>
-                        <article class="metric-card glass-card">
-                            <small>最近更新</small>
-                            <strong data-article-last-updated>2026年6月30日</strong>
-                        </article>
-                        <article class="metric-card glass-card">
-                            <small>来源</small>
-                            <strong data-article-source>博客园 · 扶摇接海</strong>
-                        </article>
-                        <article class="metric-card glass-card">
-                            <small>平台</small>
-                            <strong>博客园</strong>
-                        </article>
-                    </div>
-                </section>
-
-                <section class="section" id="article-list-section">
-                    <div class="section-heading">
-                        <div>
-                            <h2>全部文章</h2>
+                        <h3><a href="https://www.cnblogs.com/fix-me/p/20194105" target="_blank" rel="noreferrer">123云盘报错：检测到本地通信被防火墙或 VPN 拦截</a></h3>
+                        <p>排查 123 云盘因本地通信被防火墙或 VPN 拦截导致的报错问题，通过日志定位根因并给出解决方案。</p>
+                    </article>
+                    <article class="article-card">
+                        <div class="article-meta">
+                            <span class="article-date">2026年4月23日</span>
                         </div>
-                        <span class="tag">文章</span>
-                    </div>
-                    <div class="repo-grid repo-grid-expanded" id="article-list">
-                            <article class="repo-card glass-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">随笔 01</span>
-                                    <span class="pill">2026年6月30日</span>
-                                </div>
-                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/20968815" target="_blank" rel="noreferrer">Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及 pyinstaller 打包</a></h3>
-                                <p class="repo-description">Windows + Python + GStreamer + 打包的实战记录，涵盖环境安装、RTSP 推流、SEI 注入与 pyinstaller 打包的完整流程与踩坑经验。</p>
-                                <div class="article-content-body">
-                                    <p class="article-content-paragraph">网上 Windows + Python + GStreamer + 打包的攻略比较少，踩了好多坑。记录环境安装、RTSP 推流、SEI 注入与 pyinstaller 打包的完整流程。</p>
-                                </div>
-                                <div class="repo-actions">
-                                    <a class="button outline" href="https://www.cnblogs.com/fix-me/p/20968815" target="_blank" rel="noreferrer">阅读原文</a>
-                                </div>
-                        </article>
-                        <article class="repo-card glass-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">随笔 02</span>
-                                    <span class="pill">2026年5月28日</span>
-                                </div>
-                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/20194105" target="_blank" rel="noreferrer">123云盘报错：检测到本地通信被防火墙或 VPN 拦截</a></h3>
-                                <p class="repo-description">排查 123 云盘因本地通信被防火墙或 VPN 拦截导致的报错问题，通过日志定位根因并给出解决方案。</p>
-                                <div class="article-content-body">
-                                    <p class="article-content-paragraph">联系客服，查看日志定位问题。通过分析 C:\ProgramData\123SyncCloud\Logs 下的日志文件找到根因并解决。</p>
-                                </div>
-                                <div class="repo-actions">
-                                    <a class="button outline" href="https://www.cnblogs.com/fix-me/p/20194105" target="_blank" rel="noreferrer">阅读原文</a>
-                                </div>
-                        </article>
-                        <article class="repo-card glass-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">随笔 03</span>
-                                    <span class="pill">2026年4月23日</span>
-                                </div>
-                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">记录GStreamer打开JPEG编码的视频时出现段错误的原因</a></h3>
-                                <p class="repo-description">排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。</p>
-                                <div class="article-content-body">
-                                    <p class="article-content-paragraph">文章围绕一个实际排障问题展开：同一进程里同时使用 OpenCV 的 VideoCapture / VideoWriter 和 GStreamer 管线处理 JPEG 编码视频时，会在解码阶段触发段错误。</p>
-                                </div>
-                                <div class="repo-actions">
-                                    <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">阅读原文</a>
-                                </div>
-                        </article>
-                        <article class="repo-card glass-card">
-                                <div class="repo-title-row">
-                                    <span class="badge">随笔 04</span>
-                                    <span class="pill">2026年4月17日</span>
-                                </div>
-                                <h3><a class="repo-name-link" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">CARLA 中的坐标系与标准车辆坐标系转换</a></h3>
-                                <p class="repo-description">梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。</p>
-                                <div class="article-content-body">
-                                    <p class="article-content-paragraph">文章先把 CARLA 的左手坐标系、车辆前向、Y 轴朝右以及 Z-Y-X 欧拉角顺序讲清楚，方便在仿真、感知和控制链路里统一约定。</p>
-                                </div>
-                                <div class="repo-actions">
-                                    <a class="button outline" href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">阅读原文</a>
-                                </div>
-                        </article>
-                    </div>
-                </section>
-            </div>
-        </div>
-    </main>
+                        <h3><a href="https://www.cnblogs.com/fix-me/p/19914336" target="_blank" rel="noreferrer">记录 GStreamer 打开 JPEG 编码的视频时出现段错误的原因</a></h3>
+                        <p>排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。</p>
+                    </article>
+                    <article class="article-card">
+                        <div class="article-meta">
+                            <span class="article-date">2026年4月17日</span>
+                        </div>
+                        <h3><a href="https://www.cnblogs.com/fix-me/p/19882892" target="_blank" rel="noreferrer">CARLA 中的坐标系与标准车辆坐标系转换</a></h3>
+                        <p>梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。</p>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
 
-    <footer class="footer">
-        <div class="footer-inner">
-            <p>扶摇接海 · 个人主页</p>
-        </div>
-    </footer>
+    <!-- Sakana 拖拽小球 -->
+    <div id="sakana-drag-widget"></div>
 
-    <script src="/app.js"></script>
-
-    <!-- Sakana Widget -->
-    <div id="sakana-widget" style="position:fixed;bottom:16px;right:16px;width:170px;height:200px;z-index:9999;"></div>
+    <script src="/app.js?v=3"></script>
     <script>
       function initSakanaWidget() {
-        new SakanaWidget({ size: 170, character: 'chisato' }).mount('#sakana-widget');
+        new SakanaWidget({ size: 120, character: 'chisato' }).mount('#sakana-drag-widget');
       }
     </script>
-    <script async onload="initSakanaWidget()"
-      src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
+    <script async onload="initSakanaWidget()" src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
 </body>
 </html>
-
