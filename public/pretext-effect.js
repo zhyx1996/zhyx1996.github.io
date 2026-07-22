@@ -1,6 +1,7 @@
 import { prepareWithSegments, layoutNextLineRange, materializeLineRange } from './layout.js';
 
-const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。公开仓库 15 个，获得 1 个 Star。正在赞助开发者：LizardByte、glenn-jocher。车道线与感知实验：持续整理传统视觉流程、深度学习方案与场景感知实验。并行计算与围绕 CUDA、OpenMP 和图像/点云处理热点流程做性能优化。最新文章：Windows 下用 Python 加 GStreamer 推 RTSP 流并注入 SEI 以及 pyinstaller 打包。123云盘报错：检测到本地通信被防火墙或 VPN 拦截。`;
+const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。公开仓库 15 个。车道线与感知实验：持续整理传统视觉流程、深度学习方案与场景感知实验。并行计算围绕 CUDA、OpenMP 和图像/点云处理做性能优化。记录 GStreamer 推流与 SEI 注入、CARLA 坐标系转换、Jetson 部署、多路视频编解码等实战经验。`;
+
 const FONT = '16px "Inter", "Noto Sans SC", system-ui, sans-serif';
 const LINE_HEIGHT = 26;
 const MIN_SLOT_WIDTH = 60;
