@@ -212,43 +212,40 @@ function hitTest(p) {
     return null;
 }
 
-orbsLayer.addEventListener('mousedown', e => {
-    dragOrb = hitTest(getPos(e));
-    if (dragOrb) { dragOrb.dragging = true; orbsLayer.style.cursor = 'grabbing'; }
-});
-
-orbsLayer.addEventListener('mousemove', e => {
-    const p = getPos(e);
-    if (!dragOrb) { orbsLayer.style.cursor = hitTest(p) ? 'grab' : 'default'; return; }
-    dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
-    dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-    const idx = orbs.indexOf(dragOrb);
-    if (idx >= 0 && orbElements[idx]) {
-        orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
-    }
-});
-
-orbsLayer.addEventListener('mouseup', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } orbsLayer.style.cursor = 'default'; });
-orbsLayer.addEventListener('mouseleave', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } orbsLayer.style.cursor = 'default'; });
-
-orbsLayer.addEventListener('touchstart', e => {
-    dragOrb = hitTest(getPos(e));
-    if (dragOrb) { dragOrb.dragging = true; }
-}, { passive: true });
-
-orbsLayer.addEventListener('touchmove', e => {
-    if (!dragOrb) return;
-    e.preventDefault();
-    const p = getPos(e);
-    dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
-    dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-    const idx = orbs.indexOf(dragOrb);
-    if (idx >= 0 && orbElements[idx]) {
-        orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
-    }
-}, { passive: false });
-
-orbsLayer.addEventListener('touchend', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } });
+function attachDragEvents() {
+    orbsLayer.addEventListener('mousedown', e => {
+        dragOrb = hitTest(getPos(e));
+        if (dragOrb) { dragOrb.dragging = true; orbsLayer.style.cursor = 'grabbing'; }
+    });
+    orbsLayer.addEventListener('mousemove', e => {
+        const p = getPos(e);
+        if (!dragOrb) { orbsLayer.style.cursor = hitTest(p) ? 'grab' : 'default'; return; }
+        dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
+        dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
+        const idx = orbs.indexOf(dragOrb);
+        if (idx >= 0 && orbElements[idx]) {
+            orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
+        }
+    });
+    orbsLayer.addEventListener('mouseup', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } orbsLayer.style.cursor = 'default'; });
+    orbsLayer.addEventListener('mouseleave', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } orbsLayer.style.cursor = 'default'; });
+    orbsLayer.addEventListener('touchstart', e => {
+        dragOrb = hitTest(getPos(e));
+        if (dragOrb) { dragOrb.dragging = true; }
+    }, { passive: true });
+    orbsLayer.addEventListener('touchmove', e => {
+        if (!dragOrb) return;
+        e.preventDefault();
+        const p = getPos(e);
+        dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
+        dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
+        const idx = orbs.indexOf(dragOrb);
+        if (idx >= 0 && orbElements[idx]) {
+            orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
+        }
+    }, { passive: false });
+    orbsLayer.addEventListener('touchend', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } });
+}
 
 // ─── 初始化 ──────────────────────────────────────────────────────
 let resizeTimer;
@@ -256,7 +253,10 @@ window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer
 
 function init() {
     orbsLayer = document.getElementById('pretext-orbs');
-    resize(); initOrbs(); prepared = getPrepared(); createOrbElements(); renderText(); startAnimation();
+    resize(); initOrbs(); prepared = getPrepared(); createOrbElements(); renderText(); attachDragEvents(); startAnimation();
 }
-window.addEventListener('load', init);
-if (document.readyState === 'interactive' || document.readyState === 'complete') init();
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
