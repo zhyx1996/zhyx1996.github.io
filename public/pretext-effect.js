@@ -50,16 +50,15 @@ function renderText() {
     const prepared = getPrepared();
     let cursor = { segmentIndex: 0, graphemeIndex: 0 };
     const padding = 30;
-    const colW = (W - padding * 2 - 40) / 2;
     const columns = [
-        { start: padding, end: padding + colW },
-        { start: padding + colW + 40, end: W - padding },
+        { start: padding, end: W - padding },
     ];
     for (const col of columns) {
         let y = LINE_HEIGHT * 1.5;
         const colBottom = H - 20;
         while (y < colBottom && cursor.segmentIndex < prepared.segments.length) {
             const lineCY = y + LINE_HEIGHT / 2;
+            
             const blocks = [];
             for (const orb of orbs) {
                 const dy = lineCY - orb.y;
