@@ -1,0 +1,14 @@
+{
+  "name": "zhyx1996-github-io",
+  "version": "1.0.0",
+  "private": true,
+  "description": "zhyx1996.github.io 维护脚本依赖",
+  "scripts": {
+    "maintain": "node scripts/maintenance.js",
+    "maintain:fix": "node scripts/maintenance.js --fix"
+  },
+  "dependencies": {
+    "https-proxy-agent": "^7.0.6",
+    "http-proxy-agent": "^7.0.2"
+  }
+}

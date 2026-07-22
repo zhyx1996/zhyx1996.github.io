@@ -18,6 +18,16 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+// 代理配置：国外 API 需要通过代理访问
+const PROXY_URL = process.env.HTTP_PROXY || process.env.http_proxy || 'http://127.0.0.1:18808';
+let HttpsProxyAgent, HttpProxyAgent;
+try {
+    HttpsProxyAgent = require('https-proxy-agent').HttpsProxyAgent;
+    HttpProxyAgent = require('http-proxy-agent').HttpProxyAgent;
+} catch {
+    process.stdout.write('⚠️ 未安装代理包，国外 API 可能无法访问\n');
+}
+
 // ─── 常量 ────────────────────────────────────────────────────────
 const SITE_DIR = path.resolve(__dirname, '..');
 const REPORT_DIR = path.join(__dirname, 'reports');
@@ -26,31 +36,68 @@ const APP_JS = path.join(SITE_DIR, 'app.js');
 const STYLES_CSS = path.join(SITE_DIR, 'styles.css');
 
 // ─── 工具函数 ────────────────────────────────────────────────────
+function needsProxy(url) {
+    try {
+        const host = new URL(url).hostname;
+        const bypass = ['localhost', '127.0.0.1', 'cnblogs.com', 'feed.cnblogs.com', 'github.com', 'api.github.com', 'avatars.githubusercontent.com'];
+        return !bypass.some(h => host === h || host.endsWith('.' + h));
+    } catch { return false; }
+}
+
+function getAgent(url) {
+    if (!needsProxy(url) || !HttpsProxyAgent) return undefined;
+    return url.startsWith('https') ? new HttpsProxyAgent(PROXY_URL) : new HttpProxyAgent(PROXY_URL);
+}
+
 function getJSON(url, opts = {}) {
-    return new Promise((resolve, reject) => {
-        const mod = url.startsWith('https') ? https : http;
-        const req = mod.get(url, {
-            headers: {
-                'User-Agent': 'site-maintenance/1.0',
-                'Accept': 'application/json',
-                ...opts.headers
-            },
-            timeout: 8000,
-            ...opts
-        }, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, data }));
+    const maxRetries = opts.retries || 1;
+    let attempt = 0;
+    const agent = getAgent(url);
+    function tryOnce() {
+        return new Promise((resolve, reject) => {
+            const mod = url.startsWith('https') ? https : http;
+            const req = mod.get(url, {
+                headers: {
+                    'User-Agent': 'site-maintenance/1.0',
+                    'Accept': 'application/json',
+                    ...opts.headers
+                },
+                timeout: opts.timeout || 8000,
+                agent,
+                ...opts
+            }, (res) => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, data }));
+            });
+            req.on('error', reject);
+            req.on('timeout', () => req.destroy(new Error('timeout')));
         });
-        req.on('error', reject);
-        req.on('timeout', () => req.destroy(new Error('timeout')));
+    }
+    return new Promise((resolve, reject) => {
+        const attemptFetch = () => {
+            tryOnce().then(resolve).catch(e => {
+                attempt++;
+                if (attempt < maxRetries) {
+                    process.stdout.write(`    ⚠️ 重试 ${attempt}/${maxRetries} (${e.message})`);
+                    setTimeout(attemptFetch, 2000 * attempt);
+                } else {
+                    reject(e);
+                }
+            });
+        };
+        attemptFetch();
     });
 }
 
 function head(url) {
     return new Promise((resolve) => {
         const mod = url.startsWith('https') ? https : http;
-        const req = mod.request(url, { method: 'HEAD', headers: { 'User-Agent': 'site-maintenance/1.0' }, timeout: 8000 }, (res) => {
+        const agent = getAgent(url);
+        const req = mod.request(url, { method: 'HEAD', headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }, timeout: 10000, agent }, (res) => {
+            if (res.statusCode === 405 || res.statusCode === 403) {
+                return headGetFallback(url).then(resolve);
+            }
             resolve({ status: res.statusCode, ok: res.statusCode >= 200 && res.statusCode < 400 });
         });
         req.on('error', () => resolve({ status: 0, ok: false }));
@@ -59,11 +106,31 @@ function head(url) {
     });
 }
 
+function headGetFallback(url) {
+    return new Promise((resolve) => {
+        const mod = url.startsWith('https') ? https : http;
+        const agent = getAgent(url);
+        const req = mod.get(url, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+            timeout: 10000,
+            agent
+        }, (res) => {
+            res.on('data', () => {});
+            res.on('end', () => resolve({ status: res.statusCode, ok: res.statusCode >= 200 && res.statusCode < 400 }));
+        });
+        req.on('error', () => resolve({ status: 0, ok: false }));
+        req.on('timeout', () => { req.destroy(); resolve({ status: 0, ok: false }); });
+    });
+}
+
 function loadState() {
     try { return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')); }
-    catch { return { cssVersion: 0, lastRun: null, CSS_PLAN: [] }; }
+    catch { return { cssVersion: 0, lastRun: null, CSS_PLAN: [], linkHistory: {} }; }
 }
-function saveState(s) { fs.writeFileSync(STATE_FILE, JSON.stringify(s, null, 2)); }
+function saveState(s) {
+    s.lastRun = new Date().toISOString().replace('T', ' ').slice(0, 19);
+    fs.writeFileSync(STATE_FILE, JSON.stringify(s, null, 2));
+}
 function ensureDir(d) { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); }
 function ts() { return new Date().toISOString().replace('T', ' ').slice(0, 19); }
 
@@ -78,7 +145,7 @@ async function checkLinks() {
         { label: '博客园文章 GStreamer', url: 'https://www.cnblogs.com/fix-me/p/19914336' },
         { label: '博客园文章 CARLA', url: 'https://www.cnblogs.com/fix-me/p/19882892' },
         { label: '博客园文章 RTSP/SEI', url: 'https://www.cnblogs.com/fix-me/p/20968815' },
-        { label: '博客园文章 123云盘', url: 'https://www.cnblogs.com/fix-me/p/20194105' },
+        // { label: '博客园文章 123云盘', url: 'https://www.cnblogs.com/fix-me/p/20194105' }, // 已删除 (404)
         { label: 'Sakana Widget CSS', url: 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css' },
         { label: 'Sakana Widget JS', url: 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js' },
         { label: 'lane2seq 仓库', url: 'https://github.com/zhyx1996/lane2seq' },
@@ -104,21 +171,22 @@ async function checkApis() {
         { label: 'GitHub Repos API', url: 'https://api.github.com/users/zhyx1996/repos?sort=updated&per_page=100' },
         { label: 'GitHub Starred API', url: 'https://api.github.com/users/zhyx1996/starred?sort=updated&per_page=100' },
         { label: 'ER-API 汇率', url: 'https://open.er-api.com/v6/latest/USD' },
-        { label: 'CoinGecko BTC', url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,cny&include_24hr_change=true' },
-        { label: 'Gold-API', url: 'https://www.gold-api.com/api/XAU/USD' },
+        { label: 'CoinGecko BTC', url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,cny&include_24hr_change=true', retries: 3, timeout: 12000 },
+        { label: 'Gold-API', url: 'https://data-asg.goldprice.org/dbXRates/USD', retries: 2 },
         { label: '博客园 RSS Feed', url: 'https://feed.cnblogs.com/blog/u/836363/rss/' },
     ];
 
     const results = [];
     for (const api of apis) {
         try {
-            const r = await getJSON(api.url);
+            const r = await getJSON(api.url, { retries: api.retries || 1, timeout: api.timeout || 8000 });
             let ok = r.status >= 200 && r.status < 400;
             let note = '';
             if (ok) {
                 try {
                     const j = JSON.parse(r.data);
                     if (j.result === 'success' || j.login || j.bitcoin || Array.isArray(j)) note = '数据正常';
+                    else if (j.gold || j.price || j.rates) note = '数据正常';
                     else if (j.message?.includes('rate limit')) { ok = false; note = '速率限制'; }
                     else note = 'JSON 正常';
                 } catch {
