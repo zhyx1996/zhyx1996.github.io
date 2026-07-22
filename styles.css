@@ -191,13 +191,34 @@ body::after {
 
 .hero-banner { align-items: stretch; }
 
-/* Pretext Canvas */
-#pretext-canvas {
+/* Pretext DOM 文字环绕 */
+#pretext-output {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
     z-index: 0;
     pointer-events: auto;
+    overflow: hidden;
+}
+
+.pretext-line {
+    position: absolute;
+    white-space: pre;
+    pointer-events: none;
+    font-size: 16px;
+    line-height: 26px;
+    color: rgba(255, 255, 255, 0.88);
+    overflow: hidden;
+}
+
+.pretext-orb {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px dashed rgba(0, 212, 255, 0.6);
+    background: rgba(0, 212, 255, 0.06);
+    pointer-events: none;
+    z-index: 5;
+    will-change: transform;
 }
 
 .hero-copy {
