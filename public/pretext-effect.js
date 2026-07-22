@@ -50,6 +50,21 @@ function renderText() {
     const prepared = getPrepared();
     let cursor = { segmentIndex: 0, graphemeIndex: 0 };
     const padding = 30;
+    
+    // 获取 hero-copy 的边界，用于文字避让
+    const heroCopy = container.parentElement.querySelector('.hero-copy');
+    let heroCopyRect = { left: 0, right: 0, top: 0, bottom: 0 };
+    if (heroCopy) {
+        const parentRect = container.parentElement.getBoundingClientRect();
+        const copyRect = heroCopy.getBoundingClientRect();
+        heroCopyRect = {
+            left: copyRect.left - parentRect.left,
+            right: copyRect.right - parentRect.left,
+            top: copyRect.top - parentRect.top,
+            bottom: copyRect.bottom - parentRect.top
+        };
+    }
+    
     const colW = (W - padding * 2 - 40) / 2;
     const columns = [
         { start: padding, end: padding + colW },
@@ -60,6 +75,13 @@ function renderText() {
         const colBottom = H - 20;
         while (y < colBottom && cursor.segmentIndex < prepared.segments.length) {
             const lineCY = y + LINE_HEIGHT / 2;
+            
+            // 如果当前行在 hero-copy 垂直范围内，且列与 hero-copy 有重叠，跳过该行
+            if (heroCopyRect.bottom > 0 && lineCY >= heroCopyRect.top && lineCY <= heroCopyRect.bottom && col.end > heroCopyRect.left && col.start < heroCopyRect.right) {
+                y += LINE_HEIGHT;
+                continue;
+            }
+            
             const blocks = [];
             for (const orb of orbs) {
                 const dy = lineCY - orb.y;
@@ -67,6 +89,10 @@ function renderText() {
                     const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
                     blocks.push({ left: orb.x - half, right: orb.x + half });
                 }
+            }
+            // 添加 hero-copy 区域的避让（对部分重叠的行）
+            if (heroCopyRect.right > 0 && lineCY >= heroCopyRect.top - LINE_HEIGHT && lineCY <= heroCopyRect.bottom + LINE_HEIGHT) {
+                blocks.push({ left: heroCopyRect.left, right: heroCopyRect.right });
             }
             blocks.sort((a, b) => a.left - b.left);
             const merged = [];
