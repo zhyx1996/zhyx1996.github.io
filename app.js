@@ -229,10 +229,10 @@ function initSakanaDrag() {
 
 // ── Steam 资料（动态获取）──
 async function loadSteamProfile() {
-  const container = document.querySelector('.steam-card');
+  const container = document.getElementById('steam-profile');
   if (!container) return;
 
-  const STEAM_ID64 = '76561198450256742';
+  const STEAM_ID64 = '76561198391062314';
   const proxyUrl = 'https://corsproxy.io/?';
   const steamUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/?xml=1`;
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>扶摇接海 · 感知工程师</title>
+    <title>扶摇接海</title>
     <meta name="theme-color" content="#D97706">
     <meta name="description" content="扶摇接海的个人主页 — 计算机视觉、自动驾驶感知、并行计算。">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23D97706'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>扶</text></svg>">
@@ -35,10 +35,8 @@
         <main class="main">
             <!-- Hero -->
             <section class="hero">
-                <div id="pretext-output" aria-hidden="true"></div>
-                <div id="pretext-orbs" aria-hidden="true"></div>
                 <div class="hero-content">
-                    <p class="eyebrow">感知工程师 / 并行计算</p>
+                    <p class="eyebrow">计算机视觉 · 自动驾驶感知 · 并行计算</p>
                     <h1 class="hero-title">扶摇接海</h1>
                     <p class="hero-subtitle">围绕计算机视觉、自动驾驶感知、并行计算做持续实践。<br>写代码，写文章，写下去。</p>
                     <div class="hero-actions">
@@ -46,27 +44,51 @@
                         <a class="btn btn-ghost" href="/articles.html">阅读文章</a>
                     </div>
                 </div>
-
+                <div class="hero-side">
+                    <div id="pretext-output" aria-hidden="true"></div>
+                    <div id="pretext-orbs" aria-hidden="true"></div>
+                </div>
             </section>
 
-            <!-- 研究方向 -->
+            <!-- 置顶仓库 -->
             <section class="section">
-                <h2 class="section-title">方向</h2>
-                <div class="directions">
-                    <div class="direction-card">
-                        <span class="direction-tag">研究</span>
-                        <h3>视觉感知</h3>
-                        <p>传统方法 + 深度学习。车道线检测、目标感知、场景理解。</p>
+                <h2 class="section-title">置顶仓库</h2>
+                <div class="repo-grid">
+                    <div class="repo-card">
+                        <h3><a href="https://github.com/zhyx1996/lane2seq" target="_blank" rel="noreferrer">lane2seq</a></h3>
+                        <p>Real-time lane detection using OpenCV (Canny/Hough transforms, CLAHE, HLS) and Lane2Seq-ViT (Transformer-based sequence generation), with ENet segmentation (PyTorch) on TuSimple/LLAMAS datasets.</p>
+                        <div class="repo-meta">
+                            <span class="repo-lang">Jupyter Notebook</span>
+                            <span>⭐ 1</span>
+                        </div>
                     </div>
-                    <div class="direction-card">
-                        <span class="direction-tag tag-amber">工程</span>
-                        <h3>并行计算</h3>
-                        <p>CUDA / OpenMP。图像与点云处理热点流程的性能优化。</p>
+                    <div class="repo-card">
+                        <h3><a href="https://github.com/zhyx1996/pcl" target="_blank" rel="noreferrer">pcl</a></h3>
+                        <p>PCL库BoundaryEstimation使用OMP加速</p>
+                        <div class="repo-meta">
+                            <span class="repo-lang">C++</span>
+                        </div>
                     </div>
-                    <div class="direction-card">
-                        <span class="direction-tag tag-teal">写作</span>
-                        <h3>公开文章</h3>
-                        <p>项目复盘、实验记录与踩坑经验整理。</p>
+                    <div class="repo-card">
+                        <h3><a href="https://github.com/zhyx1996/GStreamer" target="_blank" rel="noreferrer">GStreamer</a></h3>
+                        <p>gstreamer推流、自定义SEI、carla相机管理、打包exe</p>
+                        <div class="repo-meta">
+                            <span class="repo-lang">Python</span>
+                        </div>
+                    </div>
+                    <div class="repo-card">
+                        <h3><a href="https://github.com/zhyx1996/auto_calib_v2" target="_blank" rel="noreferrer">auto_calib_v2</a></h3>
+                        <p>对PJLab-ADG/SensorsCalibration的lidar2camera/auto_calib_v2.0进行了修改</p>
+                        <div class="repo-meta">
+                            <span class="repo-lang">C++</span>
+                        </div>
+                    </div>
+                    <div class="repo-card">
+                        <h3><a href="https://github.com/zhyx1996/achievements" target="_blank" rel="noreferrer">achievements</a></h3>
+                        <p>GitHub 成就追踪</p>
+                        <div class="repo-meta">
+                            <span class="repo-lang">Markdown</span>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -128,7 +150,7 @@
                         <div class="showcase-header">
                             <span class="showcase-badge">Steam</span>
                         </div>
-                        <div class="steam-card">
+                        <div class="steam-card" id="steam-profile">
                             <img class="steam-avatar" src="https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg" alt="Steam avatar" width="64" height="64">
                             <div>
                                 <strong>扶摇接海</strong>

@@ -133,19 +133,26 @@ a:hover { opacity: 0.8; }
 
 /* ── Hero ── */
 .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
     margin-bottom: 64px;
     padding-bottom: 48px;
     border-bottom: 1px solid var(--border-light);
     position: relative;
     min-height: 280px;
-    display: flex;
-    align-items: center;
 }
 
 .hero-content {
     position: relative;
     z-index: 2;
-    max-width: 45%;
+}
+
+.hero-side {
+    position: relative;
+    width: 100%;
+    height: 280px;
 }
 
 .eyebrow {
@@ -165,6 +172,7 @@ a:hover { opacity: 0.8; }
     letter-spacing: -0.02em;
     color: var(--text);
     margin-bottom: 16px;
+    text-shadow: 0 2px 8px var(--bg);
 }
 
 .hero-subtitle {
@@ -280,6 +288,55 @@ a:hover { opacity: 0.8; }
     margin-top: 16px;
     font-size: 14px;
     font-weight: 500;
+    color: var(--accent);
+}
+
+/* ── 仓库网格 ── */
+.repo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.repo-card {
+    padding: 20px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    background: var(--bg-surface);
+    transition: border-color 0.15s;
+}
+
+.repo-card:hover { border-color: var(--border); }
+
+.repo-card h3 {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.repo-card h3 a { color: var(--accent); }
+.repo-card h3 a:hover { text-decoration: underline; opacity: 1; }
+
+.repo-card p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.repo-meta {
+    display: flex;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.repo-lang {
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--accent-dim);
     color: var(--accent);
 }
 
@@ -532,8 +589,8 @@ a:hover { opacity: 0.8; }
 /* ── Pretext 文字流 ── */
 #pretext-output {
     position: absolute;
-    top: 0; right: 0;
-    width: 55%; height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
