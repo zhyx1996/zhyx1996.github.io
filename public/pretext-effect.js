@@ -12,8 +12,7 @@ const ACCENT_SOFT = 'rgba(100, 220, 255, 0.12)';
 // ─── Canvas ─────────────────────────────────────────────────────
 const canvas = document.getElementById('pretext-canvas');
 const ctx = canvas.getContext('2d');
-// 高倍屏上继续放大画布会显著增加每次重排的像素量，2 倍已经足够清晰。
-let dpr = Math.min(window.devicePixelRatio || 1, 2);
+let dpr = window.devicePixelRatio || 1;
 let W, H;
 
 // ─── 缓存 prepared（只计算一次）────────────────────────────────
@@ -156,10 +155,8 @@ function drawOrbs() {
 }
 
 let needsRedraw = true;
-let drawFramePending = false;
 
 function draw() {
-  drawFramePending = false;
   if (!needsRedraw) return;
   needsRedraw = false;
   ctx.clearRect(0, 0, W, H);
@@ -167,12 +164,7 @@ function draw() {
   flowText();
 }
 
-function requestDraw() {
-  needsRedraw = true;
-  if (drawFramePending) return;
-  drawFramePending = true;
-  requestAnimationFrame(draw);
-}
+function requestDraw() { needsRedraw = true; requestAnimationFrame(draw); }
 
 // ─── 拖拽交互 ───────────────────────────────────────────────────
 let dragOrb = null;
@@ -244,10 +236,46 @@ canvas.addEventListener('touchend', () => {
   if (dragOrb) { dragOrb.dragging = false; dragOrb = null; }
 });
 
-// ─── 初始化 ──────────────────────────────────────────────────────
-let initialized = false;
-let resizeFramePending = false;
+// ─── 自动浮动动画（空闲时圆球缓慢飘动）──────────────────────────
+let lastInteraction = Date.now();
+canvas.addEventListener('mousedown', () => { lastInteraction = Date.now(); });
+canvas.addEventListener('touchstart', () => { lastInteraction = Date.now(); });
 
+let autoFloatRAF = null;
+
+function autoFloatTick() {
+  const idle = Date.now() - lastInteraction;
+  if (idle <= 3000) {
+    // 不活跃时停止动画循环，避免无意义的 CPU 占用
+    autoFloatRAF = null;
+    return;
+  }
+  let moved = false;
+  orbs.forEach((orb, i) => {
+    if (orb.dragging) return;
+    const t = Date.now() * 0.0003 + i * 2.1;
+    const nx = orb.x + Math.sin(t + i) * 0.3;
+    const ny = orb.y + Math.cos(t * 0.7 + i) * 0.3;
+    if (Math.abs(nx - orb.x) > 0.01 || Math.abs(ny - orb.y) > 0.01) {
+      orb.x = Math.max(orb.r, Math.min(W - orb.r, nx));
+      orb.y = Math.max(orb.r, Math.min(H - orb.r, ny));
+      moved = true;
+    }
+  });
+  if (moved) requestDraw();
+  autoFloatRAF = requestAnimationFrame(autoFloatTick);
+}
+
+function ensureAutoFloat() {
+  if (!autoFloatRAF) autoFloatRAF = requestAnimationFrame(autoFloatTick);
+}
+
+// 交互后检查是否需要启动浮动
+canvas.addEventListener('mouseup', ensureAutoFloat);
+canvas.addEventListener('touchend', ensureAutoFloat);
+setInterval(ensureAutoFloat, 1000);
+
+// ─── 初始化 ──────────────────────────────────────────────────────
 function init() {
   if (initialized) return;
   initialized = true;
@@ -257,21 +285,10 @@ function init() {
   requestDraw();
 }
 
-function requestResize() {
-  if (resizeFramePending) return;
-  resizeFramePending = true;
-  requestAnimationFrame(() => {
-    resizeFramePending = false;
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    resize();
-    initOrbs();
-    requestDraw();
-  });
-}
-
 window.addEventListener('resize', requestResize);
 window.addEventListener('load', init);
-// 如果 DOM 已就绪则立即执行
 if (document.readyState === 'interactive' || document.readyState === 'complete') init();
+// 兜底：如果 load 事件未触发（如外部资源阻塞），500ms 后强制执行
+setTimeout(init, 500);
 
 

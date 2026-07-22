@@ -3370,7 +3370,7 @@
   var ACCENT_SOFT = "rgba(100, 220, 255, 0.12)";
   var canvas = document.getElementById("pretext-canvas");
   var ctx = canvas.getContext("2d");
-  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var dpr = window.devicePixelRatio || 1;
   var W;
   var H;
   var prepared = null;
@@ -3478,9 +3478,7 @@
     }
   }
   var needsRedraw = true;
-  var drawFramePending = false;
   function draw() {
-    drawFramePending = false;
     if (!needsRedraw) return;
     needsRedraw = false;
     ctx.clearRect(0, 0, W, H);
@@ -3489,8 +3487,6 @@
   }
   function requestDraw() {
     needsRedraw = true;
-    if (drawFramePending) return;
-    drawFramePending = true;
     requestAnimationFrame(draw);
   }
   var dragOrb = null;
@@ -3563,8 +3559,41 @@
       dragOrb = null;
     }
   });
-  var initialized = false;
-  var resizeFramePending = false;
+  var lastInteraction = Date.now();
+  canvas.addEventListener("mousedown", () => {
+    lastInteraction = Date.now();
+  });
+  canvas.addEventListener("touchstart", () => {
+    lastInteraction = Date.now();
+  });
+  var autoFloatRAF = null;
+  function autoFloatTick() {
+    const idle = Date.now() - lastInteraction;
+    if (idle <= 3e3) {
+      autoFloatRAF = null;
+      return;
+    }
+    let moved = false;
+    orbs.forEach((orb, i) => {
+      if (orb.dragging) return;
+      const t = Date.now() * 3e-4 + i * 2.1;
+      const nx = orb.x + Math.sin(t + i) * 0.3;
+      const ny = orb.y + Math.cos(t * 0.7 + i) * 0.3;
+      if (Math.abs(nx - orb.x) > 0.01 || Math.abs(ny - orb.y) > 0.01) {
+        orb.x = Math.max(orb.r, Math.min(W - orb.r, nx));
+        orb.y = Math.max(orb.r, Math.min(H - orb.r, ny));
+        moved = true;
+      }
+    });
+    if (moved) requestDraw();
+    autoFloatRAF = requestAnimationFrame(autoFloatTick);
+  }
+  function ensureAutoFloat() {
+    if (!autoFloatRAF) autoFloatRAF = requestAnimationFrame(autoFloatTick);
+  }
+  canvas.addEventListener("mouseup", ensureAutoFloat);
+  canvas.addEventListener("touchend", ensureAutoFloat);
+  setInterval(ensureAutoFloat, 1e3);
   function init() {
     if (initialized) return;
     initialized = true;
@@ -3573,18 +3602,8 @@
     canvas.style.cursor = "grab";
     requestDraw();
   }
-  function requestResize() {
-    if (resizeFramePending) return;
-    resizeFramePending = true;
-    requestAnimationFrame(() => {
-      resizeFramePending = false;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      resize();
-      initOrbs();
-      requestDraw();
-    });
-  }
   window.addEventListener("resize", requestResize);
   window.addEventListener("load", init);
   if (document.readyState === "interactive" || document.readyState === "complete") init();
+  setTimeout(init, 500);
 })();
