@@ -133,20 +133,22 @@ a:hover { opacity: 0.8; }
 
 /* ── Hero ── */
 .hero {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 40px;
-    align-items: start;
     margin-bottom: 64px;
     padding-bottom: 48px;
     border-bottom: 1px solid var(--border-light);
     position: relative;
-    min-height: 300px;
+    min-height: 280px;
+    display: flex;
+    align-items: center;
 }
 
 .hero-content {
     position: relative;
     z-index: 2;
+    background: var(--bg);
+    padding: 32px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
 }
 
 .eyebrow {
@@ -544,10 +546,11 @@ a:hover { opacity: 0.8; }
     position: absolute;
     white-space: pre;
     pointer-events: none;
-    font-size: 14px;
-    line-height: 24px;
+    font-size: 13px;
+    line-height: 22px;
     color: var(--text-muted);
     overflow: hidden;
+    opacity: 0.6;
 }
 
 .pretext-orb {
