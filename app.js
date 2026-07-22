@@ -34,7 +34,7 @@ async function loadProfile() {
   const avatarEl = document.getElementById('profile-avatar');
 
   try {
-    const res = await fetch(GITHUB_API);
+    const res = await fetchWithTimeout(GITHUB_API);
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
 
@@ -59,16 +59,14 @@ const marketFallback = {
   asOf: '2026-04-24T00:00:00Z'
 };
 
-const renderMarketFacts = (items) => `
+const renderMarketFacts = (items) => items.map(item => `
     <div class="market-card">
-        ${items.map(item => `
-            <div class="label">${escapeHtml(item.label)}</div>
-            <div class="value">${escapeHtml(item.value)}</div>
-            ${item.note ? `<div class="note">${escapeHtml(item.note)}</div>` : ''}
-            ${item.change ? `<div class="change ${item.change.dir}">${escapeHtml(item.change.text)}</div>` : ''}
-        `).join('')}
+        <div class="label">${escapeHtml(item.label)}</div>
+        <div class="value">${escapeHtml(item.value)}</div>
+        ${item.note ? `<div class="note">${escapeHtml(item.note)}</div>` : ''}
+        ${item.change ? `<div class="change ${item.change.dir}">${escapeHtml(item.change.text)}</div>` : ''}
     </div>
-`.trim();
+`).join('');
 
 function buildForexFacts(data) {
   const items = [];
@@ -138,6 +136,15 @@ function renderMarket(data, statuses = {}) {
   `;
 }
 
+function fetchWithTimeout(url, timeout = 5000) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('timeout')), timeout);
+    fetch(url)
+      .then(res => { clearTimeout(timer); resolve(res); })
+      .catch(err => { clearTimeout(timer); reject(err); });
+  });
+}
+
 async function fetchGoldPrice() {
   const candidates = [
     { url: GOLD_API_BASE_URL, source: 'GoldAPI' },
@@ -146,7 +153,7 @@ async function fetchGoldPrice() {
 
   for (const c of candidates) {
     try {
-      const res = await fetch(c.url);
+      const res = await fetchWithTimeout(c.url);
       if (!res.ok) continue;
       const data = await res.json();
       const price = data.price || data[0]?.price;
@@ -174,8 +181,36 @@ async function loadMarket() {
   }
 }
 
+// ── 主题切换 ──
+const THEME_KEY = 'theme';
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+  const theme = saved || (prefersLight ? 'light' : 'dark');
+  document.documentElement.setAttribute('data-theme', theme);
+  updateThemeToggle(theme);
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem(THEME_KEY, next);
+  updateThemeToggle(next);
+}
+
+function updateThemeToggle(theme) {
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
 // ── 初始化 ──
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   loadProfile();
   loadMarket();
+
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
 });
