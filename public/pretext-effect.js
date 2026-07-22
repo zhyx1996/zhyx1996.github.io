@@ -104,9 +104,10 @@ function renderText() {
 }
 
 // ─── 圆球渲染（CSS transform，GPU 加速）─────────────────────────
+let orbsLayer;
 function createOrbElements() {
     orbElements = [];
-    container.querySelectorAll('.pretext-orb').forEach(el => el.remove());
+    orbsLayer.querySelectorAll('.pretext-orb').forEach(el => el.remove());
     for (const orb of orbs) {
         const el = document.createElement('div');
         el.className = 'pretext-orb';
@@ -114,7 +115,7 @@ function createOrbElements() {
         el.style.height = (orb.r * 2) + 'px';
         el.style.borderColor = orb.color;
         el.style.transform = `translate3d(${orb.x - orb.r}px, ${orb.y - orb.r}px, 0)`;
-        container.appendChild(el);
+        orbsLayer.appendChild(el);
         orbElements.push(el);
     }
     saveOrbPositions();
@@ -197,7 +198,7 @@ document.addEventListener('visibilitychange', () => {
 let dragOrb = null;
 
 function getPos(e) {
-    const r = container.getBoundingClientRect();
+    const r = orbsLayer.getBoundingClientRect();
     const cx = e.touches ? e.touches[0].clientX : e.clientX;
     const cy = e.touches ? e.touches[0].clientY : e.clientY;
     return { x: cx - r.left, y: cy - r.top };
@@ -211,32 +212,31 @@ function hitTest(p) {
     return null;
 }
 
-container.addEventListener('mousedown', e => {
+orbsLayer.addEventListener('mousedown', e => {
     dragOrb = hitTest(getPos(e));
-    if (dragOrb) { dragOrb.dragging = true; container.style.cursor = 'grabbing'; }
+    if (dragOrb) { dragOrb.dragging = true; orbsLayer.style.cursor = 'grabbing'; }
 });
 
-container.addEventListener('mousemove', e => {
+orbsLayer.addEventListener('mousemove', e => {
     const p = getPos(e);
-    if (!dragOrb) { container.style.cursor = hitTest(p) ? 'grab' : 'default'; return; }
+    if (!dragOrb) { orbsLayer.style.cursor = hitTest(p) ? 'grab' : 'default'; return; }
     dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
     dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-    // 拖拽时实时更新圆球位置
     const idx = orbs.indexOf(dragOrb);
     if (idx >= 0 && orbElements[idx]) {
         orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
     }
 });
 
-container.addEventListener('mouseup', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } container.style.cursor = 'default'; });
-container.addEventListener('mouseleave', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } container.style.cursor = 'default'; });
+orbsLayer.addEventListener('mouseup', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } orbsLayer.style.cursor = 'default'; });
+orbsLayer.addEventListener('mouseleave', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } orbsLayer.style.cursor = 'default'; });
 
-container.addEventListener('touchstart', e => {
+orbsLayer.addEventListener('touchstart', e => {
     dragOrb = hitTest(getPos(e));
     if (dragOrb) { dragOrb.dragging = true; }
 }, { passive: true });
 
-container.addEventListener('touchmove', e => {
+orbsLayer.addEventListener('touchmove', e => {
     if (!dragOrb) return;
     e.preventDefault();
     const p = getPos(e);
@@ -248,12 +248,15 @@ container.addEventListener('touchmove', e => {
     }
 }, { passive: false });
 
-container.addEventListener('touchend', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } });
+orbsLayer.addEventListener('touchend', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } });
 
 // ─── 初始化 ──────────────────────────────────────────────────────
 let resizeTimer;
 window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { resize(); initOrbs(); createOrbElements(); renderText(); }, 200); });
 
-function init() { resize(); initOrbs(); prepared = getPrepared(); createOrbElements(); renderText(); startAnimation(); }
+function init() {
+    orbsLayer = document.getElementById('pretext-orbs');
+    resize(); initOrbs(); prepared = getPrepared(); createOrbElements(); renderText(); startAnimation();
+}
 window.addEventListener('load', init);
 if (document.readyState === 'interactive' || document.readyState === 'complete') init();
