@@ -123,15 +123,18 @@ async function loadMarket() {
   renderMarket(rates, btcPrice, goldPrice);
 }
 
-// ── Sakana 拖拽小球（限制在视口内 + 弹跳）──
+// ── Sakana 拖拽小球（物理弹跳）──
 function initSakanaDrag() {
   const widget = document.getElementById('sakana-drag-widget');
   if (!widget) return;
 
   let isDragging = false;
   let vx = 0, vy = 0;
-  let lastX, lastY;
+  let lastX, lastY, lastTime;
   let animId = null;
+  // 用于记录最近几帧的速度，做加权平均
+  let vxHistory = [];
+  let vyHistory = [];
 
   const onPointerDown = (e) => {
     if (e.target.closest('.sakana-widget-ctrl')) return;
@@ -139,24 +142,31 @@ function initSakanaDrag() {
     widget.classList.add('dragging');
     lastX = e.clientX;
     lastY = e.clientY;
+    lastTime = Date.now();
     vx = 0;
     vy = 0;
+    vxHistory = [];
+    vyHistory = [];
     if (animId) { cancelAnimationFrame(animId); animId = null; }
     e.preventDefault();
   };
 
   const onPointerMove = (e) => {
     if (!isDragging) return;
+    const now = Date.now();
+    const dt = Math.max(1, now - lastTime);
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
     const rect = widget.getBoundingClientRect();
     const viewportW = window.innerWidth;
     const viewportH = window.innerHeight;
     const widgetW = rect.width;
     const widgetH = rect.height;
 
-    let newLeft = rect.left + (e.clientX - lastX);
-    let newTop = rect.top + (e.clientY - lastY);
+    let newLeft = rect.left + dx;
+    let newTop = rect.top + dy;
 
-    // 允许拖出视口外（限制在 -50% 到 +50% 范围内）
+    // 限制拖拽范围（允许拖出半个身位）
     newLeft = Math.max(-widgetW * 0.5, Math.min(viewportW - widgetW * 0.5, newLeft));
     newTop = Math.max(-widgetH * 0.5, Math.min(viewportH - widgetH * 0.5, newTop));
 
@@ -165,16 +175,52 @@ function initSakanaDrag() {
     widget.style.right = 'auto';
     widget.style.bottom = 'auto';
 
-    vx = (e.clientX - lastX);
-    vy = (e.clientY - lastY);
+    // 计算瞬时速度（像素/帧）
+    const instVx = dx;
+    const instVy = dy;
+    vxHistory.push(instVx);
+    vyHistory.push(instVy);
+    if (vxHistory.length > 5) vxHistory.shift();
+    if (vyHistory.length > 5) vyHistory.shift();
+
+    vx = instVx;
+    vy = instVy;
     lastX = e.clientX;
     lastY = e.clientY;
+    lastTime = now;
   };
 
-  const onPointerUp = () => {
+  // 鼠标离开窗口时保持最后的速度
+  const onPointerLeave = () => {
+    if (!isDragging) return;
+    // 不立即释放，让速度保持，这样拖出边界后还会反弹
+  };
+
+  const onPointerUp = (e) => {
     if (!isDragging) return;
     isDragging = false;
     widget.classList.remove('dragging');
+
+    // 使用加权平均速度（最近帧权重更高）
+    if (vxHistory.length > 0) {
+      let totalWeight = 0;
+      let weightedVx = 0;
+      let weightedVy = 0;
+      for (let i = 0; i < vxHistory.length; i++) {
+        const weight = i + 1;
+        weightedVx += vxHistory[i] * weight;
+        weightedVy += vyHistory[i] * weight;
+        totalWeight += weight;
+      }
+      vx = weightedVx / totalWeight;
+      vy = weightedVy / totalWeight;
+    }
+
+    // 限制最大速度
+    const maxV = 25;
+    vx = Math.max(-maxV, Math.min(maxV, vx));
+    vy = Math.max(-maxV, Math.min(maxV, vy));
+
     startBounce();
   };
 
@@ -189,26 +235,50 @@ function initSakanaDrag() {
       let left = parseFloat(widget.style.left || 0);
       let top = parseFloat(widget.style.top || 0);
 
+      // 摩擦
       vx *= 0.96;
       vy *= 0.96;
 
       left += vx;
       top += vy;
 
-      // 边界弹碰 — 左右上下都处理
-      if (left <= 0) { left = 0; vx = Math.abs(vx) * 0.75; }
-      if (left >= viewportW - widgetW) { left = viewportW - widgetW; vx = -Math.abs(vx) * 0.75; }
-      if (top <= 0) { top = 0; vy = Math.abs(vy) * 0.75; }
-      if (top >= viewportH - widgetH) { top = viewportH - widgetH; vy = -Math.abs(vy) * 0.75; }
+      let bounced = false;
+
+      // 左边界
+      if (left <= 0) {
+        left = 0;
+        vx = Math.abs(vx) * 0.75;
+        bounced = true;
+      }
+      // 右边界
+      if (left >= viewportW - widgetW) {
+        left = viewportW - widgetW;
+        vx = -Math.abs(vx) * 0.75;
+        bounced = true;
+      }
+      // 上边界
+      if (top <= 0) {
+        top = 0;
+        vy = Math.abs(vy) * 0.75;
+        bounced = true;
+      }
+      // 下边界
+      if (top >= viewportH - widgetH) {
+        top = viewportH - widgetH;
+        vy = -Math.abs(vy) * 0.75;
+        bounced = true;
+      }
 
       widget.style.left = left + 'px';
       widget.style.top = top + 'px';
 
-      if (Math.abs(vx) > 0.3 || Math.abs(vy) > 0.3) {
-        animId = requestAnimationFrame(bounce);
-      } else {
+      // 如果速度太小就停止
+      if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) {
         animId = null;
+        return;
       }
+
+      animId = requestAnimationFrame(bounce);
     };
     animId = requestAnimationFrame(bounce);
   };
@@ -219,6 +289,7 @@ function initSakanaDrag() {
   document.addEventListener('touchmove', onPointerMove, { passive: false });
   document.addEventListener('mouseup', onPointerUp);
   document.addEventListener('touchend', onPointerUp);
+  document.addEventListener('mouseleave', onPointerLeave);
 }
 
 // ── Steam 资料（动态获取）──

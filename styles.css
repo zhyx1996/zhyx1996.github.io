@@ -45,9 +45,12 @@ body {
     font-family: var(--font-body);
     background: var(--bg);
     color: var(--text);
-    line-height: 1.65;
+    line-height: 1.7;
     font-size: 15px;
     -webkit-font-smoothing: antialiased;
+    background-image: radial-gradient(circle at 1px 1px, var(--border-light) 1px, transparent 0);
+    background-size: 24px 24px;
+    background-position: 0 0;
 }
 
 a { color: var(--accent); text-decoration: none; transition: opacity 0.15s; }
@@ -109,16 +112,17 @@ a:hover { opacity: 0.8; }
 
 .nav-item {
     display: block;
-    padding: 8px 14px;
+    padding: 10px 16px;
     border-radius: var(--radius);
     color: var(--text-secondary);
     font-size: 14px;
     font-weight: 500;
-    transition: background 0.15s, color 0.15s;
+    transition: all 0.2s ease;
+    position: relative;
 }
 
-.nav-item:hover { background: var(--bg-inset); color: var(--text); }
-.nav-item.active { background: var(--accent-dim); color: var(--accent); }
+.nav-item:hover { background: var(--bg-inset); color: var(--text); transform: translateX(2px); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 600; }
 
 .sidebar-footer {
     padding-top: 24px;
@@ -140,13 +144,18 @@ a:hover { opacity: 0.8; }
 /* ─ Hero ── */
 .hero {
     display: grid;
-    grid-template-columns: 1fr 1.3fr;
+    grid-template-columns: 1fr 1.4fr;
     gap: 48px;
     align-items: start;
     margin-bottom: 72px;
     padding-bottom: 56px;
     border-bottom: 1px solid var(--border-light);
     position: relative;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
 }
 
 .hero-side {
@@ -169,21 +178,28 @@ a:hover { opacity: 0.8; }
     position: absolute;
     white-space: pre;
     pointer-events: none;
-    font-size: 14px;
-    line-height: 22px;
-    color: rgba(26, 26, 26, 0.45);
-    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 24px;
+    color: rgba(26, 26, 26, 0.35);
+    font-family: var(--font-mono);
     overflow: hidden;
+    font-weight: 500;
 }
 
 .pretext-orb {
     position: absolute;
     border-radius: 50%;
     border: 2px dashed var(--accent);
-    background: rgba(217, 119, 6, 0.06);
+    background: rgba(217, 119, 6, 0.08);
     pointer-events: none;
     z-index: 2;
     will-change: transform;
+    animation: orbPulse 3s ease-in-out infinite;
+}
+
+@keyframes orbPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 }
 
 #pretext-orbs {
@@ -205,20 +221,24 @@ a:hover { opacity: 0.8; }
 
 .hero-title {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-size: clamp(2.8rem, 6vw, 4rem);
     font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
     color: var(--text);
-    margin-bottom: 16px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .hero-subtitle {
-    font-size: 16px;
+    font-size: 17px;
     color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 28px;
-    max-width: 520px;
+    line-height: 1.8;
+    margin-bottom: 32px;
+    max-width: 480px;
 }
 
 .hero-actions {
@@ -385,7 +405,7 @@ a:hover { opacity: 0.8; }
 /* ── 仓库网格 ── */
 .repo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px;
 }
 
@@ -449,32 +469,39 @@ a:hover { opacity: 0.8; }
 }
 
 .article-card {
-    padding: 20px 0;
+    padding: 24px 0;
     border-bottom: 1px solid var(--border-light);
+    transition: padding-left 0.2s ease;
 }
 
 .article-card:last-child { border-bottom: none; }
+
+.article-card:hover {
+    padding-left: 8px;
+}
 
 .article-meta {
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--text-muted);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .article-card h3 {
     font-family: var(--font-display);
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    line-height: 1.4;
 }
 
-.article-card h3 a { color: var(--text); }
+.article-card h3 a { color: var(--text); transition: color 0.15s; }
 .article-card h3 a:hover { color: var(--accent); opacity: 1; }
 
 .article-card p {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--text-secondary);
+    line-height: 1.7;
 }
 
 /* ── 页面横幅 ── */
@@ -555,10 +582,18 @@ a:hover { opacity: 0.8; }
 }
 
 .market-card {
-    padding: 16px;
+    padding: 18px;
     border: 1px solid var(--border-light);
     border-radius: var(--radius);
     background: var(--bg-surface);
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.market-card:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
 }
 
 .market-card .label {
@@ -566,26 +601,30 @@ a:hover { opacity: 0.8; }
     font-size: 10px;
     letter-spacing: 0.05em;
     color: var(--text-muted);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
 }
 
 .market-card .value {
     font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 700;
     color: var(--text);
+    letter-spacing: -0.01em;
 }
 
 .market-card .note {
     font-size: 11px;
     color: var(--text-muted);
-    margin-top: 4px;
+    margin-top: 6px;
+    line-height: 1.5;
 }
 
 .market-card .change {
     font-family: var(--font-mono);
     font-size: 11px;
-    margin-top: 4px;
+    margin-top: 6px;
+    font-weight: 600;
 }
 
 .market-card .change.up { color: var(--teal); }
@@ -636,14 +675,8 @@ a:hover { opacity: 0.8; }
     width: 100%;
     height: 500px;
     border: none;
-    border-radius: 4px;
-}
-
-.showcase-frame-sm {
-    width: 100%;
-    height: 195px;
-    border: none;
-    border-radius: 4px;
+    border-radius: var(--radius);
+    background: var(--bg);
 }
 
 .steam-card {
@@ -685,6 +718,20 @@ a:hover { opacity: 0.8; }
     font-weight: 500;
     color: var(--accent);
     margin-top: 4px;
+}
+
+/* ── Footer ── */
+.footer {
+    margin-top: 80px;
+    padding: 32px 0;
+    border-top: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.footer-inner p {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
 }
 
 /* ── 返回顶部 ── */
@@ -768,6 +815,12 @@ a:hover { opacity: 0.8; }
     }
 }
 
+/* ── 选中高亮 ── */
+::selection {
+    background: var(--accent-dim);
+    color: var(--text);
+}
+
 /* ── Sakana 拖拽小球 ── */
 #sakana-drag-widget {
     position: fixed;
@@ -815,5 +868,6 @@ a:hover { opacity: 0.8; }
 }
 :focus-visible {
     outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    outline-offset: 3px;
+    border-radius: 4px;
 }
