@@ -641,6 +641,23 @@ a:hover { opacity: 0.8; }
 
 #sakana-drag-widget .sakana-widget-ctrl {
     background: transparent !important;
+    box-shadow: none !important;
+}
+
+#sakana-drag-widget .sakana-widget-canvas {
+    background: transparent !important;
+}
+
+#sakana-drag-widget .sakana-widget-main {
+    background: transparent !important;
+}
+
+#sakana-drag-widget .sakana-widget-wrapper {
+    background: transparent !important;
+}
+
+#sakana-drag-widget .sakana-widget-app {
+    background: transparent !important;
 }
 :focus-visible {
     outline: 2px solid var(--accent);
