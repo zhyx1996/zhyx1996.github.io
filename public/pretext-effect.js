@@ -50,55 +50,42 @@ function renderText() {
     const prepared = getPrepared();
     let cursor = { segmentIndex: 0, graphemeIndex: 0 };
     const padding = 30;
-    const columns = [
-        { start: padding, end: W - padding },
-    ];
-    for (const col of columns) {
-        let y = LINE_HEIGHT * 1.5;
-        const colBottom = H - 20;
-        while (y < colBottom && cursor.segmentIndex < prepared.segments.length) {
-            const lineCY = y + LINE_HEIGHT / 2;
-            
-            const blocks = [];
-            for (const orb of orbs) {
-                const dy = lineCY - orb.y;
-                if (Math.abs(dy) < orb.r) {
-                    const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
-                    blocks.push({ left: orb.x - half, right: orb.x + half });
+    const colStart = padding;
+    const colEnd = W - padding;
+    const colWidth = colEnd - colStart;
+    
+    for (let y = LINE_HEIGHT * 1.5; y < H - 20 && cursor.segmentIndex < prepared.segments.length; y += LINE_HEIGHT) {
+        const lineCY = y + LINE_HEIGHT / 2;
+        
+        // 检查小球是否挡住整行
+        let blocked = false;
+        for (const orb of orbs) {
+            const dy = lineCY - orb.y;
+            if (Math.abs(dy) < orb.r) {
+                const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
+                // 如果小球挡住整行，跳过
+                if (orb.x - half <= colStart && orb.x + half >= colEnd) {
+                    blocked = true;
+                    break;
                 }
             }
-            blocks.sort((a, b) => a.left - b.left);
-            const merged = [];
-            for (const b of blocks) {
-                if (merged.length && b.left <= merged[merged.length - 1].right) {
-                    merged[merged.length - 1].right = Math.max(merged[merged.length - 1].right, b.right);
-                } else merged.push({ ...b });
-            }
-            const segments = [];
-            let segStart = col.start;
-            for (const block of merged) {
-                if (block.left > segStart) segments.push({ x: segStart, w: block.left - segStart });
-                segStart = Math.max(segStart, block.right);
-            }
-            if (segStart < col.end) segments.push({ x: segStart, w: col.end - segStart });
-            for (const seg of segments) {
-                if (seg.w < MIN_SLOT_WIDTH) continue;
-                if (cursor.segmentIndex >= prepared.segments.length) break;
-                const range = layoutNextLineRange(prepared, cursor, seg.w - 4);
-                if (!range) break;
-                const line = materializeLineRange(prepared, range);
-                if (!line.text.trim()) break;
-                const el = document.createElement('div');
-                el.className = 'pretext-line';
-                el.style.left = seg.x + 'px';
-                el.style.top = y + 'px';
-                el.style.width = seg.w + 'px';
-                el.textContent = line.text;
-                container.appendChild(el);
-                cursor = range.end;
-            }
-            y += LINE_HEIGHT;
         }
+        if (blocked) continue;
+        
+        // 使用固定列宽，不被小球挤窄
+        if (cursor.segmentIndex >= prepared.segments.length) break;
+        const range = layoutNextLineRange(prepared, cursor, colWidth - 4);
+        if (!range) break;
+        const line = materializeLineRange(prepared, range);
+        if (!line.text.trim()) break;
+        const el = document.createElement('div');
+        el.className = 'pretext-line';
+        el.style.left = colStart + 'px';
+        el.style.top = y + 'px';
+        el.style.width = colWidth + 'px';
+        el.textContent = line.text;
+        container.appendChild(el);
+        cursor = range.end;
     }
 }
 
@@ -255,7 +242,7 @@ function init() {
     resize(); initOrbs(); prepared = getPrepared(); createOrbElements(); renderText(); attachDragEvents(); startAnimation();
 }
 if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', init);
+    window.addEventListener('DOMContentLoaded', () => { setTimeout(init, 100); });
 } else {
-    init();
+    setTimeout(init, 100);
 }
