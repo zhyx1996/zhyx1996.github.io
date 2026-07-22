@@ -186,7 +186,7 @@ body::after {
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     background: linear-gradient(135deg, rgba(19,23,32,0.9), rgba(10,13,18,0.95));
-    min-height: 380px;
+    min-height: 480px;
 }
 
 .hero-banner { align-items: stretch; }

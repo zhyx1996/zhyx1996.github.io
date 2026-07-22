@@ -1,7 +1,7 @@
 import { prepareWithSegments, layoutNextLineRange, materializeLineRange } from './layout.js';
 
 // ─── 配置 ────────────────────────────────────────────────────────
-const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。围绕车道线检测、CUDA 并行加速、点云处理等方向持续实践，把实验结果沉淀为可复用的工程经验。`;
+const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。公开仓库 15 个，获得 1 个 Star，最近一次更新在 2026年4月10日。正在赞助 2 个开发者：LizardByte、glenn-jocher。车道线与感知实验：持续整理传统视觉流程、深度学习方案与场景感知实验。并行计算与性能优化：围绕 CUDA、OpenMP 和图像/点云处理热点流程做性能优化。最新文章：记录GStreamer打开JPEG编码的视频时出现段错误的原因。CARLA中的坐标系与标准车辆坐标系转换。`;
 const FONT = '16px "Inter", "Noto Sans SC", system-ui, sans-serif';
 const LINE_HEIGHT = 28;
 const COLUMN_GAP = 40;
