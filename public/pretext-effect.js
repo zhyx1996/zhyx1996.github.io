@@ -164,7 +164,7 @@ function draw() {
   flowText();
 }
 
-function requestDraw() { needsRedraw = true; requestDraw(); }
+function requestDraw() { needsRedraw = true; requestAnimationFrame(draw); }
 
 // ─── 拖拽交互 ───────────────────────────────────────────────────
 let dragOrb = null;
