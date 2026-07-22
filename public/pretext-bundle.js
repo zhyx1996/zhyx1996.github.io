@@ -3435,30 +3435,26 @@
             merged.push({ ...b });
           }
         }
-        let bestX = col.start, bestW = 0;
+        const segments = [];
         let segStart = col.start;
         for (const block of merged) {
-          const availW = block.left - segStart;
-          if (availW > bestW) {
-            bestW = availW;
-            bestX = segStart;
-          }
+          if (block.left > segStart) segments.push({ x: segStart, w: block.left - segStart });
           segStart = Math.max(segStart, block.right);
         }
-        const tailW = col.end - segStart;
-        if (tailW > bestW) {
-          bestW = tailW;
-          bestX = segStart;
+        if (segStart < col.end) segments.push({ x: segStart, w: col.end - segStart });
+        let anyText = false;
+        for (const seg of segments) {
+          if (seg.w < 40) continue;
+          if (cursor.segmentIndex >= prepared2.segments.length) break;
+          const range = layoutNextLineRange(prepared2, cursor, seg.w - 4);
+          if (range === null) break;
+          const line = materializeLineRange(prepared2, range);
+          ctx.fillText(line.text, seg.x, y);
+          cursor = range.end;
+          anyText = true;
         }
-        if (bestW < 60) {
-          y += LINE_HEIGHT;
-          continue;
+        if (!anyText && merged.length > 0) {
         }
-        const range = layoutNextLineRange(prepared2, cursor, bestW - 4);
-        if (range === null) break;
-        const line = materializeLineRange(prepared2, range);
-        ctx.fillText(line.text, bestX, y);
-        cursor = range.end;
         y += LINE_HEIGHT;
       }
     }
@@ -3562,41 +3558,6 @@
       dragOrb = null;
     }
   });
-  var lastInteraction = Date.now();
-  canvas.addEventListener("mousedown", () => {
-    lastInteraction = Date.now();
-  });
-  canvas.addEventListener("touchstart", () => {
-    lastInteraction = Date.now();
-  });
-  var autoFloatRAF = null;
-  function autoFloatTick() {
-    const idle = Date.now() - lastInteraction;
-    if (idle <= 3e3) {
-      autoFloatRAF = null;
-      return;
-    }
-    let moved = false;
-    orbs.forEach((orb, i) => {
-      if (orb.dragging) return;
-      const t = Date.now() * 3e-4 + i * 2.1;
-      const nx = orb.x + Math.sin(t + i) * 0.3;
-      const ny = orb.y + Math.cos(t * 0.7 + i) * 0.3;
-      if (Math.abs(nx - orb.x) > 0.01 || Math.abs(ny - orb.y) > 0.01) {
-        orb.x = Math.max(orb.r, Math.min(W - orb.r, nx));
-        orb.y = Math.max(orb.r, Math.min(H - orb.r, ny));
-        moved = true;
-      }
-    });
-    if (moved) requestDraw();
-    autoFloatRAF = requestAnimationFrame(autoFloatTick);
-  }
-  function ensureAutoFloat() {
-    if (!autoFloatRAF) autoFloatRAF = requestAnimationFrame(autoFloatTick);
-  }
-  canvas.addEventListener("mouseup", ensureAutoFloat);
-  canvas.addEventListener("touchend", ensureAutoFloat);
-  setInterval(ensureAutoFloat, 1e3);
   var initialized = false;
   var resizeFramePending = false;
   function init() {

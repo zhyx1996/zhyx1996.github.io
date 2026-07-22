@@ -68,7 +68,6 @@ function flowText() {
   ctx.fillStyle = FONT_COLOR;
   ctx.textBaseline = 'top';
 
-  // 对每一列
   for (let colIdx = 0; colIdx < 2; colIdx++) {
     const col = colLeft[colIdx];
     let y = LINE_HEIGHT * 1.5;
@@ -102,24 +101,33 @@ function flowText() {
         }
       }
 
-      // 找到最大可用区间
-      let bestX = col.start, bestW = 0;
+      // 构建可用区间列表（圆球之间的空隙）
+      const segments = [];
       let segStart = col.start;
       for (const block of merged) {
-        const availW = block.left - segStart;
-        if (availW > bestW) { bestW = availW; bestX = segStart; }
+        if (block.left > segStart) segments.push({ x: segStart, w: block.left - segStart });
         segStart = Math.max(segStart, block.right);
       }
-      const tailW = col.end - segStart;
-      if (tailW > bestW) { bestW = tailW; bestX = segStart; }
+      if (segStart < col.end) segments.push({ x: segStart, w: col.end - segStart });
 
-      if (bestW < 60) { y += LINE_HEIGHT; continue; }
+      // 填充所有可用区间（环绕效果）
+      let anyText = false;
+      for (const seg of segments) {
+        if (seg.w < 40) continue;
+        if (cursor.segmentIndex >= prepared.segments.length) break;
 
-      const range = layoutNextLineRange(prepared, cursor, bestW - 4);
-      if (range === null) break;
-      const line = materializeLineRange(prepared, range);
-      ctx.fillText(line.text, bestX, y);
-      cursor = range.end;
+        const range = layoutNextLineRange(prepared, cursor, seg.w - 4);
+        if (range === null) break;
+        const line = materializeLineRange(prepared, range);
+        ctx.fillText(line.text, seg.x, y);
+        cursor = range.end;
+        anyText = true;
+      }
+
+      if (!anyText && merged.length > 0) {
+        // 整行被遮挡，跳过
+      }
+
       y += LINE_HEIGHT;
     }
   }
@@ -227,45 +235,6 @@ canvas.addEventListener('touchmove', e => {
 canvas.addEventListener('touchend', () => {
   if (dragOrb) { dragOrb.dragging = false; dragOrb = null; }
 });
-
-// ─── 自动浮动动画（空闲时圆球缓慢飘动）──────────────────────────
-let lastInteraction = Date.now();
-canvas.addEventListener('mousedown', () => { lastInteraction = Date.now(); });
-canvas.addEventListener('touchstart', () => { lastInteraction = Date.now(); });
-
-let autoFloatRAF = null;
-
-function autoFloatTick() {
-  const idle = Date.now() - lastInteraction;
-  if (idle <= 3000) {
-    // 不活跃时停止动画循环，避免无意义的 CPU 占用
-    autoFloatRAF = null;
-    return;
-  }
-  let moved = false;
-  orbs.forEach((orb, i) => {
-    if (orb.dragging) return;
-    const t = Date.now() * 0.0003 + i * 2.1;
-    const nx = orb.x + Math.sin(t + i) * 0.3;
-    const ny = orb.y + Math.cos(t * 0.7 + i) * 0.3;
-    if (Math.abs(nx - orb.x) > 0.01 || Math.abs(ny - orb.y) > 0.01) {
-      orb.x = Math.max(orb.r, Math.min(W - orb.r, nx));
-      orb.y = Math.max(orb.r, Math.min(H - orb.r, ny));
-      moved = true;
-    }
-  });
-  if (moved) requestDraw();
-  autoFloatRAF = requestAnimationFrame(autoFloatTick);
-}
-
-function ensureAutoFloat() {
-  if (!autoFloatRAF) autoFloatRAF = requestAnimationFrame(autoFloatTick);
-}
-
-// 交互后检查是否需要启动浮动
-canvas.addEventListener('mouseup', ensureAutoFloat);
-canvas.addEventListener('touchend', ensureAutoFloat);
-setInterval(ensureAutoFloat, 1000);
 
 // ─── 初始化 ──────────────────────────────────────────────────────
 let initialized = false;
