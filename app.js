@@ -1,5 +1,5 @@
 const profileFallback = {
-          "name": "扶摇接海",
+          "name": "ZYX",
           "login": "zhyx1996",
           "bio": "围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。",
           "html_url": "https://github.com/zhyx1996",

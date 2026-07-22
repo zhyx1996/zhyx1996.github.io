@@ -1,4 +1,4 @@
-import { prepareWithSegments, layoutNextLineRange, materializeLineRange } from '/public/layout.js';
+import { prepareWithSegments, layoutNextLineRange, materializeLineRange } from './layout.js';
 
 // ─── 配置 ────────────────────────────────────────────────────────
 const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。围绕车道线检测、CUDA 并行加速、点云处理等方向持续实践，把实验结果沉淀为可复用的工程经验。代码仓库：github.com/zhyx1996。博客园：cnblogs.com/fix-me。`;
@@ -258,3 +258,4 @@ window.addEventListener('resize', () => { resize(); initOrbs(); draw(); });
 window.addEventListener('load', init);
 // 如果 DOM 已就绪则立即执行
 if (document.readyState === 'interactive' || document.readyState === 'complete') init();
+

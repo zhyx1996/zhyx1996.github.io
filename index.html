@@ -27,6 +27,7 @@
 
     <main class="container page-shell">
         <section class="page-banner hero-banner">
+            <canvas id="pretext-canvas" aria-hidden="true"></canvas>
             <div class="hero-ambient" aria-hidden="true">
                 <span class="hero-orb hero-orb-a"></span>
                 <span class="hero-orb hero-orb-b"></span>
@@ -371,20 +372,8 @@
         </div>
     </footer>
 
-        <script type="importmap">
-    {
-      "imports": {
-        "@chenglou/pretext": "/public/layout.js",
-        "./bidi.js": "/public/bidi.js",
-        "./analysis.js": "/public/analysis.js",
-        "./measurement.js": "/public/measurement.js",
-        "./line-break.js": "/public/line-break.js",
-        "./line-text.js": "/public/line-text.js"
-      }
-    }
-    </script>
+    <script src="/public/pretext-bundle.js"></script>
     <script src="/app.js"></script>
-    <script type="module" src="/public/pretext-effect.js"></script>
 
     <!-- Sakana Widget -->
     <div id="sakana-widget" style="position:fixed;bottom:16px;right:16px;width:170px;height:200px;z-index:9999;"></div>
@@ -397,6 +386,7 @@
       src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
 </body>
 </html>
+
 
 
 
