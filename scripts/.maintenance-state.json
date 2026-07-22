@@ -1,8 +1,9 @@
 {
   "cssVersion": 12,
-  "lastRun": "2026-07-22 09:06:15",
+  "lastRun": "2026-07-22 09:43:34",
   "CSS_PLAN": [],
   "improvements": [
-    "优化 CSS 间距"
+    "优化 CSS 间距",
+    "添加平滑滚动"
   ]
 }
