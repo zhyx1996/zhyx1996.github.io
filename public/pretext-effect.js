@@ -55,81 +55,73 @@ function colWidth(startX, endX) {
 }
 
 function flowText() {
-  prepared = getPrepared();
+  const prepared = getPrepared();
   let cursor = { segmentIndex: 0, graphemeIndex: 0 };
   const padding = 30;
-  const cols = 2;
-  const colW = (W - padding * 2 - COLUMN_GAP) / cols;
-  const positions = [
-    { x: padding, availStart: padding, availEnd: padding + colW },
-    { x: padding + colW + COLUMN_GAP, availStart: padding + colW + COLUMN_GAP, availEnd: W - padding },
+  const colW = (W - padding * 2 - COLUMN_GAP) / 2;
+  const colLeft = [
+    { start: padding, end: padding + colW },
+    { start: padding + colW + COLUMN_GAP, end: W - padding },
   ];
-
-  let y = LINE_HEIGHT * 1.5;
-  let colIdx = 0;
-  const colBottoms = [H - 20, H - 20];
 
   ctx.font = FONT;
   ctx.fillStyle = FONT_COLOR;
   ctx.textBaseline = 'top';
 
-  while (cursor.segmentIndex < prepared.segments.length) {
-    const pos = positions[colIdx];
-    const yBottom = colBottoms[colIdx];
-    if (y >= yBottom) {
-      colIdx++;
-      if (colIdx >= cols) break;
-      y = LINE_HEIGHT * 1.5;
-      continue;
-    }
+  // 对每一列
+  for (let colIdx = 0; colIdx < 2; colIdx++) {
+    const col = colLeft[colIdx];
+    let y = LINE_HEIGHT * 1.5;
+    const colBottom = H - 20;
 
-    // 计算当前行可用宽度（避让障碍物）
-    let lineW = pos.availEnd - pos.availStart;
-    const lineCY = y + LINE_HEIGHT / 2;
+    while (y < colBottom) {
+      if (cursor.segmentIndex >= prepared.segments.length) break;
 
-    for (const orb of orbs) {
-      const dy = lineCY - orb.y;
-      if (Math.abs(dy) < orb.r) {
-        const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
-        const orbLeft = orb.x - half;
-        const orbRight = orb.x + half;
+      const lineCY = y + LINE_HEIGHT / 2;
 
-        // 障碍物与本行重叠
-        if (orbLeft > pos.availStart && orbRight < pos.availEnd) {
-          // 选择较宽的一侧
-          const leftW = orbLeft - pos.availStart;
-          const rightW = pos.availEnd - orbRight;
-          if (leftW >= rightW && leftW > 80) {
-            lineW = leftW - 8;
-          } else if (rightW > 80) {
-            lineW = rightW - 8;
-            // 保持起点不变，文字只占右侧
-          }
-        } else if (orbLeft <= pos.availStart && orbRight > pos.availStart && orbRight < pos.availEnd) {
-          // 障碍物遮挡左侧
-          const newStart = orbRight + 8;
-          if (pos.availEnd - newStart > 80) {
-            lineW = pos.availEnd - newStart;
-          }
-        } else if (orbRight >= pos.availEnd && orbLeft > pos.availStart && orbLeft < pos.availEnd) {
-          // 障碍物遮挡右侧
-          lineW = orbLeft - pos.availStart - 8;
-        } else if (orbLeft <= pos.availStart && orbRight >= pos.availEnd) {
-          // 整行覆盖，跳过
-          lineW = 0;
+      // 收集当前行所有圆球遮挡区间
+      const blocks = [];
+      for (const orb of orbs) {
+        const dy = lineCY - orb.y;
+        if (Math.abs(dy) < orb.r) {
+          const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
+          const left = Math.max(col.start, orb.x - half);
+          const right = Math.min(col.end, orb.x + half);
+          if (left < right) blocks.push({ left, right });
         }
       }
-    }
 
-    if (lineW > 60) {
-      const range = layoutNextLineRange(prepared, cursor, lineW);
+      // 合并重叠区间
+      blocks.sort((a, b) => a.left - b.left);
+      const merged = [];
+      for (const b of blocks) {
+        if (merged.length > 0 && b.left <= merged[merged.length - 1].right) {
+          merged[merged.length - 1].right = Math.max(merged[merged.length - 1].right, b.right);
+        } else {
+          merged.push({ ...b });
+        }
+      }
+
+      // 找到最大可用区间
+      let bestX = col.start, bestW = 0;
+      let segStart = col.start;
+      for (const block of merged) {
+        const availW = block.left - segStart;
+        if (availW > bestW) { bestW = availW; bestX = segStart; }
+        segStart = Math.max(segStart, block.right);
+      }
+      const tailW = col.end - segStart;
+      if (tailW > bestW) { bestW = tailW; bestX = segStart; }
+
+      if (bestW < 60) { y += LINE_HEIGHT; continue; }
+
+      const range = layoutNextLineRange(prepared, cursor, bestW - 4);
       if (range === null) break;
       const line = materializeLineRange(prepared, range);
-      ctx.fillText(line.text, pos.availStart, y);
+      ctx.fillText(line.text, bestX, y);
       cursor = range.end;
+      y += LINE_HEIGHT;
     }
-
-    y += LINE_HEIGHT;
   }
 }
 
@@ -276,6 +268,9 @@ canvas.addEventListener('touchend', ensureAutoFloat);
 setInterval(ensureAutoFloat, 1000);
 
 // ─── 初始化 ──────────────────────────────────────────────────────
+let initialized = false;
+let resizeFramePending = false;
+
 function init() {
   if (initialized) return;
   initialized = true;
@@ -283,6 +278,18 @@ function init() {
   initOrbs();
   canvas.style.cursor = "grab";
   requestDraw();
+}
+
+function requestResize() {
+  if (resizeFramePending) return;
+  resizeFramePending = true;
+  requestAnimationFrame(() => {
+    resizeFramePending = false;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    resize();
+    initOrbs();
+    requestDraw();
+  });
 }
 
 window.addEventListener('resize', requestResize);
