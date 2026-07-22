@@ -142,76 +142,100 @@ async function loadMarket() {
   renderMarket(rates, btcPrice, goldPrice);
 }
 
-// ── Sakana 拖拽（限制在视口内）──
+// ── Sakana 拖拽小球（限制在视口内 + 弹跳）──
 function initSakanaDrag() {
-  const widget = document.getElementById('sakana-widget');
+  const widget = document.getElementById('sakana-drag-widget');
   if (!widget) return;
 
-  // Sakana widget 是 fixed 定位，我们需要改为 absolute 或在容器内拖拽
-  // 改为在 specimen-stage 内拖拽
-  const stage = document.getElementById('sakana-stage');
-  if (!stage) return;
-
-  // 将 widget 改为 absolute 定位，限制在 stage 内
-  widget.style.position = 'absolute';
-  widget.style.bottom = 'auto';
-  widget.style.right = 'auto';
-  widget.style.left = '50%';
-  widget.style.top = '50%';
-  widget.style.transform = 'translate(-50%, -50%)';
-  widget.style.cursor = 'grab';
-  widget.style.transition = 'none';
-  widget.style.zIndex = '1';
-
   let isDragging = false;
-  let startX, startY, startLeft, startTop;
-  const readoutX = document.getElementById('readout-x');
-  const readoutY = document.getElementById('readout-y');
-
-  const updateReadout = (left, top) => {
-    if (readoutX) readoutX.textContent = Math.round(left);
-    if (readoutY) readoutY.textContent = Math.round(top);
-  };
+  let vx = 0, vy = 0; // 速度
+  let lastX, lastY;
+  let animId = null;
 
   const onPointerDown = (e) => {
-    // 不拦截控制按钮
     if (e.target.closest('.sakana-widget-ctrl')) return;
     isDragging = true;
-    startX = e.clientX;
-    startY = e.clientY;
-    const rect = widget.getBoundingClientRect();
-    const stageRect = stage.getBoundingClientRect();
-    startLeft = rect.left - stageRect.left;
-    startTop = rect.top - stageRect.top;
-    widget.style.cursor = 'grabbing';
-    widget.style.left = startLeft + 'px';
-    widget.style.top = startTop + 'px';
-    widget.style.transform = 'none';
+    widget.classList.add('dragging');
+    lastX = e.clientX;
+    lastY = e.clientY;
+    vx = 0;
+    vy = 0;
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
     e.preventDefault();
-    e.stopPropagation();
   };
 
   const onPointerMove = (e) => {
     if (!isDragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    const stageRect = stage.getBoundingClientRect();
-    const widgetW = widget.offsetWidth;
-    const widgetH = widget.offsetHeight;
-    // 限制在 stage 内
-    let newLeft = startLeft + dx;
-    let newTop = startTop + dy;
-    newLeft = Math.max(0, Math.min(stageRect.width - widgetW, newLeft));
-    newTop = Math.max(0, Math.min(stageRect.height - widgetH, newTop));
+    const rect = widget.getBoundingClientRect();
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    const widgetW = rect.width;
+    const widgetH = rect.height;
+
+    // 计算新的 left/top
+    let newLeft = rect.left + (e.clientX - lastX);
+    let newTop = rect.top + (e.clientY - lastY);
+
+    // 限制在视口内
+    newLeft = Math.max(0, Math.min(viewportW - widgetW, newLeft));
+    newTop = Math.max(0, Math.min(viewportH - widgetH, newTop));
+
     widget.style.left = newLeft + 'px';
     widget.style.top = newTop + 'px';
-    updateReadout(newLeft, newTop);
+    widget.style.right = 'auto';
+    widget.style.bottom = 'auto';
+
+    // 计算速度（用于抛出时的惯性）
+    vx = (e.clientX - lastX);
+    vy = (e.clientY - lastY);
+    lastX = e.clientX;
+    lastY = e.clientY;
   };
 
   const onPointerUp = () => {
     if (!isDragging) return;
     isDragging = false;
-    widget.style.cursor = 'grab';
+    widget.classList.remove('dragging');
+    // 开始惯性 + 弹跳动画
+    startBounce();
+  };
+
+  const startBounce = () => {
+    if (animId) cancelAnimationFrame(animId);
+    const bounce = () => {
+      const rect = widget.getBoundingClientRect();
+      const viewportW = window.innerWidth;
+      const viewportH = window.innerHeight;
+      const widgetW = rect.width;
+      const widgetH = rect.height;
+
+      let left = parseFloat(widget.style.left || 0);
+      let top = parseFloat(widget.style.top || 0);
+
+      // 摩擦
+      vx *= 0.95;
+      vy *= 0.95;
+
+      left += vx;
+      top += vy;
+
+      // 边界弹跳
+      if (left <= 0) { left = 0; vx = -vx * 0.7; }
+      if (left >= viewportW - widgetW) { left = viewportW - widgetW; vx = -vx * 0.7; }
+      if (top <= 0) { top = 0; vy = -vy * 0.7; }
+      if (top >= viewportH - widgetH) { top = viewportH - widgetH; vy = -vy * 0.7; }
+
+      widget.style.left = left + 'px';
+      widget.style.top = top + 'px';
+
+      // 速度足够小时停止
+      if (Math.abs(vx) > 0.5 || Math.abs(vy) > 0.5) {
+        animId = requestAnimationFrame(bounce);
+      } else {
+        animId = null;
+      }
+    };
+    animId = requestAnimationFrame(bounce);
   };
 
   widget.addEventListener('mousedown', onPointerDown);

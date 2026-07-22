@@ -37,6 +37,7 @@
         <main class="main">
             <!-- Hero -->
             <section class="hero">
+                <div id="pretext-output" aria-hidden="true"></div>
                 <div class="hero-content">
                     <p class="eyebrow">感知工程师 / 并行计算</p>
                     <h1 class="hero-title">扶摇接海</h1>
@@ -53,12 +54,10 @@
                         <span class="specimen-status">● LIVE</span>
                     </div>
                     <div class="specimen-stage" id="sakana-stage">
-                        <div id="sakana-widget"></div>
+                        <div class="specimen-placeholder">交互演示</div>
                     </div>
                     <div class="specimen-readout">
-                        <span class="readout-item">x: <span id="readout-x">0</span></span>
-                        <span class="readout-item">y: <span id="readout-y">0</span></span>
-                        <span class="readout-item">fps: <span id="readout-fps">60</span></span>
+                        <span class="readout-item">状态: 就绪</span>
                     </div>
                 </div>
             </section>
@@ -147,10 +146,14 @@
         </main>
     </div>
 
+    <!-- Sakana 拖拽小球 -->
+    <div id="sakana-drag-widget"></div>
+
+    <script src="/public/pretext-bundle.js"></script>
     <script src="/app.js?v=3"></script>
     <script>
       function initSakanaWidget() {
-        new SakanaWidget({ size: 140, character: 'chisato' }).mount('#sakana-widget');
+        new SakanaWidget({ size: 120, character: 'chisato' }).mount('#sakana-drag-widget');
       }
     </script>
     <script async onload="initSakanaWidget()" src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>

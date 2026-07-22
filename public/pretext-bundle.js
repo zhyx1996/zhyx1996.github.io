@@ -1,4 +1,3619 @@
-(()=>{var we=["BN","BN","BN","BN","BN","BN","BN","BN","BN","S","B","S","WS","B","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","B","B","B","S","WS","ON","ON","ET","ET","ET","ON","ON","ON","ON","ON","ES","CS","ES","CS","CS","EN","EN","EN","EN","EN","EN","EN","EN","EN","EN","CS","ON","ON","ON","ON","ON","ON","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","ON","ON","ON","ON","ON","ON","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","ON","ON","ON","ON","BN","BN","BN","BN","BN","BN","B","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","BN","CS","ON","ET","ET","ET","ET","ON","ON","ON","ON","L","ON","ON","BN","ON","ON","ET","ET","EN","EN","ON","L","ON","ON","ON","EN","L","ON","ON","ON","ON","ON","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","ON","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","L","ON","L","L","L","L","L","L","L","L"],he=[[697,698,"ON"],[706,719,"ON"],[722,735,"ON"],[741,749,"ON"],[751,767,"ON"],[768,879,"NSM"],[884,885,"ON"],[894,894,"ON"],[900,901,"ON"],[903,903,"ON"],[1014,1014,"ON"],[1155,1161,"NSM"],[1418,1418,"ON"],[1421,1422,"ON"],[1423,1423,"ET"],[1424,1424,"R"],[1425,1469,"NSM"],[1470,1470,"R"],[1471,1471,"NSM"],[1472,1472,"R"],[1473,1474,"NSM"],[1475,1475,"R"],[1476,1477,"NSM"],[1478,1478,"R"],[1479,1479,"NSM"],[1480,1535,"R"],[1536,1541,"AN"],[1542,1543,"ON"],[1544,1544,"AL"],[1545,1546,"ET"],[1547,1547,"AL"],[1548,1548,"CS"],[1549,1549,"AL"],[1550,1551,"ON"],[1552,1562,"NSM"],[1563,1610,"AL"],[1611,1631,"NSM"],[1632,1641,"AN"],[1642,1642,"ET"],[1643,1644,"AN"],[1645,1647,"AL"],[1648,1648,"NSM"],[1649,1749,"AL"],[1750,1756,"NSM"],[1757,1757,"AN"],[1758,1758,"ON"],[1759,1764,"NSM"],[1765,1766,"AL"],[1767,1768,"NSM"],[1769,1769,"ON"],[1770,1773,"NSM"],[1774,1775,"AL"],[1776,1785,"EN"],[1786,1808,"AL"],[1809,1809,"NSM"],[1810,1839,"AL"],[1840,1866,"NSM"],[1867,1957,"AL"],[1958,1968,"NSM"],[1969,1983,"AL"],[1984,2026,"R"],[2027,2035,"NSM"],[2036,2037,"R"],[2038,2041,"ON"],[2042,2044,"R"],[2045,2045,"NSM"],[2046,2069,"R"],[2070,2073,"NSM"],[2074,2074,"R"],[2075,2083,"NSM"],[2084,2084,"R"],[2085,2087,"NSM"],[2088,2088,"R"],[2089,2093,"NSM"],[2094,2136,"R"],[2137,2139,"NSM"],[2140,2143,"R"],[2144,2191,"AL"],[2192,2193,"AN"],[2194,2198,"AL"],[2199,2207,"NSM"],[2208,2249,"AL"],[2250,2273,"NSM"],[2274,2274,"AN"],[2275,2306,"NSM"],[2362,2362,"NSM"],[2364,2364,"NSM"],[2369,2376,"NSM"],[2381,2381,"NSM"],[2385,2391,"NSM"],[2402,2403,"NSM"],[2433,2433,"NSM"],[2492,2492,"NSM"],[2497,2500,"NSM"],[2509,2509,"NSM"],[2530,2531,"NSM"],[2546,2547,"ET"],[2555,2555,"ET"],[2558,2558,"NSM"],[2561,2562,"NSM"],[2620,2620,"NSM"],[2625,2626,"NSM"],[2631,2632,"NSM"],[2635,2637,"NSM"],[2641,2641,"NSM"],[2672,2673,"NSM"],[2677,2677,"NSM"],[2689,2690,"NSM"],[2748,2748,"NSM"],[2753,2757,"NSM"],[2759,2760,"NSM"],[2765,2765,"NSM"],[2786,2787,"NSM"],[2801,2801,"ET"],[2810,2815,"NSM"],[2817,2817,"NSM"],[2876,2876,"NSM"],[2879,2879,"NSM"],[2881,2884,"NSM"],[2893,2893,"NSM"],[2901,2902,"NSM"],[2914,2915,"NSM"],[2946,2946,"NSM"],[3008,3008,"NSM"],[3021,3021,"NSM"],[3059,3064,"ON"],[3065,3065,"ET"],[3066,3066,"ON"],[3072,3072,"NSM"],[3076,3076,"NSM"],[3132,3132,"NSM"],[3134,3136,"NSM"],[3142,3144,"NSM"],[3146,3149,"NSM"],[3157,3158,"NSM"],[3170,3171,"NSM"],[3192,3198,"ON"],[3201,3201,"NSM"],[3260,3260,"NSM"],[3276,3277,"NSM"],[3298,3299,"NSM"],[3328,3329,"NSM"],[3387,3388,"NSM"],[3393,3396,"NSM"],[3405,3405,"NSM"],[3426,3427,"NSM"],[3457,3457,"NSM"],[3530,3530,"NSM"],[3538,3540,"NSM"],[3542,3542,"NSM"],[3633,3633,"NSM"],[3636,3642,"NSM"],[3647,3647,"ET"],[3655,3662,"NSM"],[3761,3761,"NSM"],[3764,3772,"NSM"],[3784,3790,"NSM"],[3864,3865,"NSM"],[3893,3893,"NSM"],[3895,3895,"NSM"],[3897,3897,"NSM"],[3898,3901,"ON"],[3953,3966,"NSM"],[3968,3972,"NSM"],[3974,3975,"NSM"],[3981,3991,"NSM"],[3993,4028,"NSM"],[4038,4038,"NSM"],[4141,4144,"NSM"],[4146,4151,"NSM"],[4153,4154,"NSM"],[4157,4158,"NSM"],[4184,4185,"NSM"],[4190,4192,"NSM"],[4209,4212,"NSM"],[4226,4226,"NSM"],[4229,4230,"NSM"],[4237,4237,"NSM"],[4253,4253,"NSM"],[4957,4959,"NSM"],[5008,5017,"ON"],[5120,5120,"ON"],[5760,5760,"WS"],[5787,5788,"ON"],[5906,5908,"NSM"],[5938,5939,"NSM"],[5970,5971,"NSM"],[6002,6003,"NSM"],[6068,6069,"NSM"],[6071,6077,"NSM"],[6086,6086,"NSM"],[6089,6099,"NSM"],[6107,6107,"ET"],[6109,6109,"NSM"],[6128,6137,"ON"],[6144,6154,"ON"],[6155,6157,"NSM"],[6158,6158,"BN"],[6159,6159,"NSM"],[6277,6278,"NSM"],[6313,6313,"NSM"],[6432,6434,"NSM"],[6439,6440,"NSM"],[6450,6450,"NSM"],[6457,6459,"NSM"],[6464,6464,"ON"],[6468,6469,"ON"],[6622,6655,"ON"],[6679,6680,"NSM"],[6683,6683,"NSM"],[6742,6742,"NSM"],[6744,6750,"NSM"],[6752,6752,"NSM"],[6754,6754,"NSM"],[6757,6764,"NSM"],[6771,6780,"NSM"],[6783,6783,"NSM"],[6832,6877,"NSM"],[6880,6891,"NSM"],[6912,6915,"NSM"],[6964,6964,"NSM"],[6966,6970,"NSM"],[6972,6972,"NSM"],[6978,6978,"NSM"],[7019,7027,"NSM"],[7040,7041,"NSM"],[7074,7077,"NSM"],[7080,7081,"NSM"],[7083,7085,"NSM"],[7142,7142,"NSM"],[7144,7145,"NSM"],[7149,7149,"NSM"],[7151,7153,"NSM"],[7212,7219,"NSM"],[7222,7223,"NSM"],[7376,7378,"NSM"],[7380,7392,"NSM"],[7394,7400,"NSM"],[7405,7405,"NSM"],[7412,7412,"NSM"],[7416,7417,"NSM"],[7616,7679,"NSM"],[8125,8125,"ON"],[8127,8129,"ON"],[8141,8143,"ON"],[8157,8159,"ON"],[8173,8175,"ON"],[8189,8190,"ON"],[8192,8202,"WS"],[8203,8205,"BN"],[8207,8207,"R"],[8208,8231,"ON"],[8232,8232,"WS"],[8233,8233,"B"],[8234,8238,"BN"],[8239,8239,"CS"],[8240,8244,"ET"],[8245,8259,"ON"],[8260,8260,"CS"],[8261,8286,"ON"],[8287,8287,"WS"],[8288,8303,"BN"],[8304,8304,"EN"],[8308,8313,"EN"],[8314,8315,"ES"],[8316,8318,"ON"],[8320,8329,"EN"],[8330,8331,"ES"],[8332,8334,"ON"],[8352,8399,"ET"],[8400,8432,"NSM"],[8448,8449,"ON"],[8451,8454,"ON"],[8456,8457,"ON"],[8468,8468,"ON"],[8470,8472,"ON"],[8478,8483,"ON"],[8485,8485,"ON"],[8487,8487,"ON"],[8489,8489,"ON"],[8494,8494,"ET"],[8506,8507,"ON"],[8512,8516,"ON"],[8522,8525,"ON"],[8528,8543,"ON"],[8585,8587,"ON"],[8592,8721,"ON"],[8722,8722,"ES"],[8723,8723,"ET"],[8724,9013,"ON"],[9083,9108,"ON"],[9110,9257,"ON"],[9280,9290,"ON"],[9312,9351,"ON"],[9352,9371,"EN"],[9450,9899,"ON"],[9901,10239,"ON"],[10496,11123,"ON"],[11126,11263,"ON"],[11493,11498,"ON"],[11503,11505,"NSM"],[11513,11519,"ON"],[11647,11647,"NSM"],[11744,11775,"NSM"],[11776,11869,"ON"],[11904,11929,"ON"],[11931,12019,"ON"],[12032,12245,"ON"],[12272,12287,"ON"],[12288,12288,"WS"],[12289,12292,"ON"],[12296,12320,"ON"],[12330,12333,"NSM"],[12336,12336,"ON"],[12342,12343,"ON"],[12349,12351,"ON"],[12441,12442,"NSM"],[12443,12444,"ON"],[12448,12448,"ON"],[12539,12539,"ON"],[12736,12773,"ON"],[12783,12783,"ON"],[12829,12830,"ON"],[12880,12895,"ON"],[12924,12926,"ON"],[12977,12991,"ON"],[13004,13007,"ON"],[13175,13178,"ON"],[13278,13279,"ON"],[13311,13311,"ON"],[19904,19967,"ON"],[42128,42182,"ON"],[42509,42511,"ON"],[42607,42610,"NSM"],[42611,42611,"ON"],[42612,42621,"NSM"],[42622,42623,"ON"],[42654,42655,"NSM"],[42736,42737,"NSM"],[42752,42785,"ON"],[42888,42888,"ON"],[43010,43010,"NSM"],[43014,43014,"NSM"],[43019,43019,"NSM"],[43045,43046,"NSM"],[43048,43051,"ON"],[43052,43052,"NSM"],[43064,43065,"ET"],[43124,43127,"ON"],[43204,43205,"NSM"],[43232,43249,"NSM"],[43263,43263,"NSM"],[43302,43309,"NSM"],[43335,43345,"NSM"],[43392,43394,"NSM"],[43443,43443,"NSM"],[43446,43449,"NSM"],[43452,43453,"NSM"],[43493,43493,"NSM"],[43561,43566,"NSM"],[43569,43570,"NSM"],[43573,43574,"NSM"],[43587,43587,"NSM"],[43596,43596,"NSM"],[43644,43644,"NSM"],[43696,43696,"NSM"],[43698,43700,"NSM"],[43703,43704,"NSM"],[43710,43711,"NSM"],[43713,43713,"NSM"],[43756,43757,"NSM"],[43766,43766,"NSM"],[43882,43883,"ON"],[44005,44005,"NSM"],[44008,44008,"NSM"],[44013,44013,"NSM"],[64285,64285,"R"],[64286,64286,"NSM"],[64287,64296,"R"],[64297,64297,"ES"],[64298,64335,"R"],[64336,64450,"AL"],[64451,64466,"ON"],[64467,64829,"AL"],[64830,64847,"ON"],[64848,64911,"AL"],[64912,64913,"ON"],[64914,64967,"AL"],[64968,64975,"ON"],[64976,65007,"BN"],[65008,65020,"AL"],[65021,65023,"ON"],[65024,65039,"NSM"],[65040,65049,"ON"],[65056,65071,"NSM"],[65072,65103,"ON"],[65104,65104,"CS"],[65105,65105,"ON"],[65106,65106,"CS"],[65108,65108,"ON"],[65109,65109,"CS"],[65110,65118,"ON"],[65119,65119,"ET"],[65120,65121,"ON"],[65122,65123,"ES"],[65124,65126,"ON"],[65128,65128,"ON"],[65129,65130,"ET"],[65131,65131,"ON"],[65136,65278,"AL"],[65279,65279,"BN"],[65281,65282,"ON"],[65283,65285,"ET"],[65286,65290,"ON"],[65291,65291,"ES"],[65292,65292,"CS"],[65293,65293,"ES"],[65294,65295,"CS"],[65296,65305,"EN"],[65306,65306,"CS"],[65307,65312,"ON"],[65339,65344,"ON"],[65371,65381,"ON"],[65504,65505,"ET"],[65506,65508,"ON"],[65509,65510,"ET"],[65512,65518,"ON"],[65520,65528,"BN"],[65529,65533,"ON"],[65534,65535,"BN"],[65793,65793,"ON"],[65856,65932,"ON"],[65936,65948,"ON"],[65952,65952,"ON"],[66045,66045,"NSM"],[66272,66272,"NSM"],[66273,66299,"EN"],[66422,66426,"NSM"],[67584,67870,"R"],[67871,67871,"ON"],[67872,68096,"R"],[68097,68099,"NSM"],[68100,68100,"R"],[68101,68102,"NSM"],[68103,68107,"R"],[68108,68111,"NSM"],[68112,68151,"R"],[68152,68154,"NSM"],[68155,68158,"R"],[68159,68159,"NSM"],[68160,68324,"R"],[68325,68326,"NSM"],[68327,68408,"R"],[68409,68415,"ON"],[68416,68863,"R"],[68864,68899,"AL"],[68900,68903,"NSM"],[68904,68911,"AL"],[68912,68921,"AN"],[68922,68927,"AL"],[68928,68937,"AN"],[68938,68968,"R"],[68969,68973,"NSM"],[68974,68974,"ON"],[68975,69215,"R"],[69216,69246,"AN"],[69247,69290,"R"],[69291,69292,"NSM"],[69293,69311,"R"],[69312,69327,"AL"],[69328,69336,"ON"],[69337,69369,"AL"],[69370,69375,"NSM"],[69376,69423,"R"],[69424,69445,"AL"],[69446,69456,"NSM"],[69457,69487,"AL"],[69488,69505,"R"],[69506,69509,"NSM"],[69510,69631,"R"],[69633,69633,"NSM"],[69688,69702,"NSM"],[69714,69733,"ON"],[69744,69744,"NSM"],[69747,69748,"NSM"],[69759,69761,"NSM"],[69811,69814,"NSM"],[69817,69818,"NSM"],[69826,69826,"NSM"],[69888,69890,"NSM"],[69927,69931,"NSM"],[69933,69940,"NSM"],[70003,70003,"NSM"],[70016,70017,"NSM"],[70070,70078,"NSM"],[70089,70092,"NSM"],[70095,70095,"NSM"],[70191,70193,"NSM"],[70196,70196,"NSM"],[70198,70199,"NSM"],[70206,70206,"NSM"],[70209,70209,"NSM"],[70367,70367,"NSM"],[70371,70378,"NSM"],[70400,70401,"NSM"],[70459,70460,"NSM"],[70464,70464,"NSM"],[70502,70508,"NSM"],[70512,70516,"NSM"],[70587,70592,"NSM"],[70606,70606,"NSM"],[70608,70608,"NSM"],[70610,70610,"NSM"],[70625,70626,"NSM"],[70712,70719,"NSM"],[70722,70724,"NSM"],[70726,70726,"NSM"],[70750,70750,"NSM"],[70835,70840,"NSM"],[70842,70842,"NSM"],[70847,70848,"NSM"],[70850,70851,"NSM"],[71090,71093,"NSM"],[71100,71101,"NSM"],[71103,71104,"NSM"],[71132,71133,"NSM"],[71219,71226,"NSM"],[71229,71229,"NSM"],[71231,71232,"NSM"],[71264,71276,"ON"],[71339,71339,"NSM"],[71341,71341,"NSM"],[71344,71349,"NSM"],[71351,71351,"NSM"],[71453,71453,"NSM"],[71455,71455,"NSM"],[71458,71461,"NSM"],[71463,71467,"NSM"],[71727,71735,"NSM"],[71737,71738,"NSM"],[71995,71996,"NSM"],[71998,71998,"NSM"],[72003,72003,"NSM"],[72148,72151,"NSM"],[72154,72155,"NSM"],[72160,72160,"NSM"],[72193,72198,"NSM"],[72201,72202,"NSM"],[72243,72248,"NSM"],[72251,72254,"NSM"],[72263,72263,"NSM"],[72273,72278,"NSM"],[72281,72283,"NSM"],[72330,72342,"NSM"],[72344,72345,"NSM"],[72544,72544,"NSM"],[72546,72548,"NSM"],[72550,72550,"NSM"],[72752,72758,"NSM"],[72760,72765,"NSM"],[72850,72871,"NSM"],[72874,72880,"NSM"],[72882,72883,"NSM"],[72885,72886,"NSM"],[73009,73014,"NSM"],[73018,73018,"NSM"],[73020,73021,"NSM"],[73023,73029,"NSM"],[73031,73031,"NSM"],[73104,73105,"NSM"],[73109,73109,"NSM"],[73111,73111,"NSM"],[73459,73460,"NSM"],[73472,73473,"NSM"],[73526,73530,"NSM"],[73536,73536,"NSM"],[73538,73538,"NSM"],[73562,73562,"NSM"],[73685,73692,"ON"],[73693,73696,"ET"],[73697,73713,"ON"],[78912,78912,"NSM"],[78919,78933,"NSM"],[90398,90409,"NSM"],[90413,90415,"NSM"],[92912,92916,"NSM"],[92976,92982,"NSM"],[94031,94031,"NSM"],[94095,94098,"NSM"],[94178,94178,"ON"],[94180,94180,"NSM"],[113821,113822,"NSM"],[113824,113827,"BN"],[117760,117973,"ON"],[118e3,118009,"EN"],[118010,118012,"ON"],[118016,118451,"ON"],[118458,118480,"ON"],[118496,118512,"ON"],[118528,118573,"NSM"],[118576,118598,"NSM"],[119143,119145,"NSM"],[119155,119162,"BN"],[119163,119170,"NSM"],[119173,119179,"NSM"],[119210,119213,"NSM"],[119273,119274,"ON"],[119296,119361,"ON"],[119362,119364,"NSM"],[119365,119365,"ON"],[119552,119638,"ON"],[120513,120513,"ON"],[120539,120539,"ON"],[120571,120571,"ON"],[120597,120597,"ON"],[120629,120629,"ON"],[120655,120655,"ON"],[120687,120687,"ON"],[120713,120713,"ON"],[120745,120745,"ON"],[120771,120771,"ON"],[120782,120831,"EN"],[121344,121398,"NSM"],[121403,121452,"NSM"],[121461,121461,"NSM"],[121476,121476,"NSM"],[121499,121503,"NSM"],[121505,121519,"NSM"],[122880,122886,"NSM"],[122888,122904,"NSM"],[122907,122913,"NSM"],[122915,122916,"NSM"],[122918,122922,"NSM"],[123023,123023,"NSM"],[123184,123190,"NSM"],[123566,123566,"NSM"],[123628,123631,"NSM"],[123647,123647,"ET"],[124140,124143,"NSM"],[124398,124399,"NSM"],[124643,124643,"NSM"],[124646,124646,"NSM"],[124654,124655,"NSM"],[124661,124661,"NSM"],[124928,125135,"R"],[125136,125142,"NSM"],[125143,125251,"R"],[125252,125258,"NSM"],[125259,126063,"R"],[126064,126143,"AL"],[126144,126207,"R"],[126208,126287,"AL"],[126288,126463,"R"],[126464,126703,"AL"],[126704,126705,"ON"],[126706,126719,"AL"],[126720,126975,"R"],[126976,127019,"ON"],[127024,127123,"ON"],[127136,127150,"ON"],[127153,127167,"ON"],[127169,127183,"ON"],[127185,127221,"ON"],[127232,127242,"EN"],[127243,127247,"ON"],[127279,127279,"ON"],[127338,127343,"ON"],[127405,127405,"ON"],[127584,127589,"ON"],[127744,128728,"ON"],[128732,128748,"ON"],[128752,128764,"ON"],[128768,128985,"ON"],[128992,129003,"ON"],[129008,129008,"ON"],[129024,129035,"ON"],[129040,129095,"ON"],[129104,129113,"ON"],[129120,129159,"ON"],[129168,129197,"ON"],[129200,129211,"ON"],[129216,129217,"ON"],[129232,129240,"ON"],[129280,129623,"ON"],[129632,129645,"ON"],[129648,129660,"ON"],[129664,129674,"ON"],[129678,129734,"ON"],[129736,129736,"ON"],[129741,129756,"ON"],[129759,129770,"ON"],[129775,129784,"ON"],[129792,129938,"ON"],[129940,130031,"ON"],[130032,130041,"EN"],[130042,130042,"ON"],[131070,131071,"BN"],[196606,196607,"BN"],[262142,262143,"BN"],[327678,327679,"BN"],[393214,393215,"BN"],[458750,458751,"BN"],[524286,524287,"BN"],[589822,589823,"BN"],[655358,655359,"BN"],[720894,720895,"BN"],[786430,786431,"BN"],[851966,851967,"BN"],[917502,917759,"BN"],[917760,917999,"NSM"],[918e3,921599,"BN"],[983038,983039,"BN"],[1048574,1048575,"BN"],[1114110,1114111,"BN"]];function g0(e){if(e<=255)return we[e];let t=0,n=he.length-1;for(;t<=n;){let i=t+n>>1,r=he[i];if(e<r[0]){n=i-1;continue}if(e>r[1]){t=i+1;continue}return r[2]}return"L"}function B0(e){let t=e.length;if(t===0)return null;let n=new Array(t),i=!1;for(let s=0;s<t;){let l=e.charCodeAt(s),h=l,c=1;if(l>=55296&&l<=56319&&s+1<t){let E=e.charCodeAt(s+1);E>=56320&&E<=57343&&(h=(l-55296<<10)+(E-56320)+65536,c=2)}let f=g0(h);(f==="R"||f==="AL"||f==="AN")&&(i=!0);for(let E=0;E<c;E++)n[s+E]=f;s+=c}if(!i)return null;let r=0;for(let s=0;s<t;s++){let l=n[s];if(l==="L"){r=0;break}if(l==="R"||l==="AL"){r=1;break}}let x=new Int8Array(t);for(let s=0;s<t;s++)x[s]=r;let o=r&1?"R":"L",a=o,u=a;for(let s=0;s<t;s++)n[s]==="NSM"?n[s]=u:u=n[s];u=a;for(let s=0;s<t;s++){let l=n[s];l==="EN"?n[s]=u==="AL"?"AN":"EN":(l==="R"||l==="L"||l==="AL")&&(u=l)}for(let s=0;s<t;s++)n[s]==="AL"&&(n[s]="R");for(let s=1;s<t-1;s++)n[s]==="ES"&&n[s-1]==="EN"&&n[s+1]==="EN"&&(n[s]="EN"),n[s]==="CS"&&(n[s-1]==="EN"||n[s-1]==="AN")&&n[s+1]===n[s-1]&&(n[s]=n[s-1]);for(let s=0;s<t;s++){if(n[s]!=="EN")continue;let l;for(l=s-1;l>=0&&n[l]==="ET";l--)n[l]="EN";for(l=s+1;l<t&&n[l]==="ET";l++)n[l]="EN"}for(let s=0;s<t;s++){let l=n[s];(l==="WS"||l==="ES"||l==="ET"||l==="CS")&&(n[s]="ON")}u=a;for(let s=0;s<t;s++){let l=n[s];l==="EN"?n[s]=u==="L"?"L":"EN":(l==="R"||l==="L")&&(u=l)}for(let s=0;s<t;s++){if(n[s]!=="ON")continue;let l=s+1;for(;l<t&&n[l]==="ON";)l++;let h=s>0?n[s-1]:a,c=l<t?n[l]:a,f=h!=="L"?"R":"L";if(f===(c!=="L"?"R":"L"))for(let A=s;A<l;A++)n[A]=f;s=l-1}for(let s=0;s<t;s++)n[s]==="ON"&&(n[s]=o);for(let s=0;s<t;s++){let l=n[s];(x[s]&1)===0?l==="R"?x[s]++:(l==="AN"||l==="EN")&&(x[s]+=2):(l==="L"||l==="AN"||l==="EN")&&x[s]++}return x}function ve(e,t){let n=B0(e);if(n===null)return null;let i=new Int8Array(t.length);for(let r=0;r<t.length;r++)i[r]=n[t[r]];return i}var C0=/[ \t\n\r\f]+/g,p0=/[\t\n\r\f]| {2,}|^ | $/;function M0(e){let t=e??"normal";return t==="pre-wrap"?{mode:t,preserveOrdinarySpaces:!0,preserveHardBreaks:!0}:{mode:t,preserveOrdinarySpaces:!1,preserveHardBreaks:!1}}function m0(e){if(!p0.test(e))return e;let t=e.replace(C0," ");return t.charCodeAt(0)===32&&(t=t.slice(1)),t.length>0&&t.charCodeAt(t.length-1)===32&&(t=t.slice(0,-1)),t}function D0(e){return/[\r\f]/.test(e)?e.replace(/\r\n/g,`
-`).replace(/[\r\f]/g,`
-`):e}var de=null,L0;function k0(){return de===null&&(de=new Intl.Segmenter(L0,{granularity:"word"})),de}var O0=/\p{Script=Arabic}/u,$=/\p{M}/u,Ee=/\p{Nd}/u;function Ie(e){return O0.test(e)}function Re(e){return e>=19968&&e<=40959||e>=13312&&e<=19903||e>=131072&&e<=173791||e>=173824&&e<=177983||e>=177984&&e<=178207||e>=178208&&e<=183983||e>=183984&&e<=191471||e>=191472&&e<=192093||e>=194560&&e<=195103||e>=196608&&e<=201551||e>=201552&&e<=205743||e>=205744&&e<=210041||e>=63744&&e<=64255||e>=12288&&e<=12351||e>=12352&&e<=12447||e>=12448&&e<=12543||e>=12592&&e<=12687||e>=44032&&e<=55215||e>=65280&&e<=65519}function H(e){for(let t=0;t<e.length;t++){let n=e.charCodeAt(t);if(!(n<12288)){if(n>=55296&&n<=56319&&t+1<e.length){let i=e.charCodeAt(t+1);if(i>=56320&&i<=57343){let r=(n-55296<<10)+(i-56320)+65536;if(Re(r))return!0;t++;continue}}if(Re(n))return!0}}return!1}function b0(e){let t=ie(e);return t!==null&&(le.has(t)||q.has(t))}var y0=new Set(["\xA0","\u202F","\u2060","\uFEFF"]),W0=new Set(["-","\u2010","\u2013","\u2014"]);function w0(e){let t=ie(e);return t!==null&&y0.has(t)}function v0(e){let t=ie(e);return t!==null&&W0.has(t)}function Ae(e,t){return w0(e)?!1:t?!(b0(e)||v0(e)):!0}var le=new Set(["\uFF0C","\uFF0E","\uFF01","\uFF1A","\uFF1B","\uFF1F","\u3001","\u3002","\u30FB","\uFF09","\u3015","\u3009","\u300B","\u300D","\u300F","\u3011","\u3017","\u3019","\u301B","\u30FC","\u3005","\u303B","\u309D","\u309E","\u30FD","\u30FE"]),re=new Set(['"',"(","[","{","\xA1","\xBF","\u201C","\u2018","\u201A","\u201E","\xAB","\u2039","\u2E18","\uFF08","\u3014","\u3008","\u300A","\u300C","\u300E","\u3010","\u3016","\u3018","\u301A"]),ge=new Set(["'","\u2019"]),q=new Set([".",",","!","?",":",";","\u060C","\u061B","\u061F","\u0964","\u0965","\u104A","\u104B","\u104C","\u104D","\u104F",")","]","}","%",'"',"\u201D","\u2019","\xBB","\u203A","\u2026"]),I0=new Set([":",".","\u060C","\u061B"]),R0=new Set(["\u104F"]),P0=new Set(["\u201D","\u2019","\xBB","\u203A","\u300D","\u300F","\u3011","\u300B","\u3009","\u3015","\uFF09"]);function T0(e){if(Be(e))return!0;let t=!1;for(let n of e){if(q.has(n)||ue(n)){t=!0;continue}if(!(t&&$.test(n)))return!1}return t}function G0(e){for(let t of e)if(!le.has(t)&&!q.has(t))return!1;return e.length>0}function z0(e){if(Be(e))return!0;for(let t of e)if(!re.has(t)&&!ge.has(t)&&!$.test(t)&&!ue(t))return!1;return e.length>0}function Be(e){let t=!1;for(let n of e)if(!(n==="\\"||$.test(n))){if(re.has(n)||q.has(n)||ge.has(n)){t=!0;continue}return!1}return t}function oe(e,t){let n=t-1;if(n<=0)return Math.max(n,0);let i=e.charCodeAt(n);if(i<56320||i>57343)return n;let r=n-1;if(r<0)return n;let x=e.charCodeAt(r);return x>=55296&&x<=56319?r:n}function ie(e){if(e.length===0)return null;let t=oe(e,e.length);return e.slice(t)}function K0(e){for(let t of e)if(!$.test(t))return t;return null}function j0(e){for(let t=e.length;t>0;){let n=oe(e,t),i=e.slice(n,t);if(!$.test(i))return i;t=n}return null}var H0=[36,37,43,43,92,92,162,165,176,177,1423,1423,1545,1547,1642,1642,2046,2047,2546,2547,2553,2555,2801,2801,3065,3065,3449,3449,3647,3647,6107,6107,8240,8247,8279,8279,8352,8399,8451,8451,8457,8457,8470,8470,8722,8723,43064,43064,65020,65020,65129,65130,65284,65285,65504,65505,65509,65510,73693,73696,123647,123647,126124,126124,126128,126128];function J0(e,t){for(let n=0;n<t.length;n+=2)if(e>=t[n]&&e<=t[n+1])return!0;return!1}function ue(e){let t=e.codePointAt(0);return t!==void 0&&J0(t,H0)}function U0(e){let t=j0(e);return t!==null&&ue(t)}function Q0(e){let t=K0(e);return t!==null&&Ee.test(t)}function _0(e){let t=Array.from(e),n=t.length;for(;n>0;){let i=t[n-1];if($.test(i)){n--;continue}if(re.has(i)||ge.has(i)){n--;continue}break}return n<=0||n===t.length?null:{head:t.slice(0,n).join(""),tail:t.slice(n).join("")}}function $0(e,t,n){return n==="text"&&!t&&e.length===1&&e!=="-"&&e!=="\u2014"?e:null}function Pe(e,t,n,i){let r=t[i],x=e[i];if(r==null)return x;let o=n[i];if(x.length===o)return x;let a=r.repeat(o);return e[i]=a,a}function Te(e,t){return e&&t!==null&&I0.has(t)}function q0(e){let t=ie(e);return t!==null&&R0.has(t)}function X0(e){if(e.length<2||e[0]!==" ")return null;let t=e.slice(1);return/^\p{M}+$/u.test(t)?{space:" ",marks:t}:null}function ce(e){let t=e.length;for(;t>0;){let n=oe(e,t),i=e.slice(n,t);if(P0.has(i))return!0;if(!q.has(i))return!1;t=n}return!1}function Y0(e,t){if(t.preserveOrdinarySpaces||t.preserveHardBreaks){if(e===" ")return"preserved-space";if(e==="	")return"tab";if(t.preserveHardBreaks&&e===`
-`)return"hard-break"}return e===" "?"space":e==="\xA0"||e==="\u202F"||e==="\u2060"||e==="\uFEFF"?"glue":e==="\u200B"?"zero-width-break":e==="\xAD"?"soft-hyphen":"text"}var V0=/[\x20\t\n\xA0\xAD\u200B\u202F\u2060\uFEFF]/;function J(e){return e.length===1?e[0]:e.join("")}function Z0(e,t){let n=[];for(let i=e.length-1;i>=0;i--)n.push(e[i]);return n.push(t),J(n)}function et(e,t,n,i){if(!V0.test(e))return[{text:e,isWordLike:t,kind:"text",start:n}];let r=[],x=null,o=[],a=n,u=!1,s=0;for(let l of e){let h=Y0(l,i),c=h==="text"&&t;if(x!==null&&h===x&&c===u){o.push(l),s+=l.length;continue}x!==null&&r.push({text:J(o),isWordLike:u,kind:x,start:a}),x=h,o=[l],a=n+s,u=c,s+=l.length}return x!==null&&r.push({text:J(o),isWordLike:u,kind:x,start:a}),r}function Se(e){return e==="space"||e==="preserved-space"||e==="zero-width-break"||e==="hard-break"}var tt=/^[A-Za-z][A-Za-z0-9+.-]*:$/;function nt(e,t){let n=e.texts[t];return n.startsWith("www.")?!0:tt.test(n)&&t+1<e.len&&e.kinds[t+1]==="text"&&e.texts[t+1]==="//"}function xt(e){return e.includes("?")&&(e.includes("://")||e.startsWith("www."))}function rt(e){let t=e.texts.slice(),n=e.isWordLike.slice(),i=e.kinds.slice(),r=e.starts.slice();for(let o=0;o<e.len;o++){if(i[o]!=="text"||!nt(e,o))continue;let a=[t[o]],u=o+1;for(;u<e.len&&!Se(i[u]);){a.push(t[u]),n[o]=!0;let s=t[u].includes("?");if(i[u]="text",t[u]="",u++,s)break}t[o]=J(a)}let x=0;for(let o=0;o<t.length;o++){let a=t[o];a.length!==0&&(x!==o&&(t[x]=a,n[x]=n[o],i[x]=i[o],r[x]=r[o]),x++)}return t.length=x,n.length=x,i.length=x,r.length=x,{len:x,texts:t,isWordLike:n,kinds:i,starts:r}}function it(e){let t=[],n=[],i=[],r=[];for(let x=0;x<e.len;x++){let o=e.texts[x];if(t.push(o),n.push(e.isWordLike[x]),i.push(e.kinds[x]),r.push(e.starts[x]),!xt(o))continue;let a=x+1;if(a>=e.len||Se(e.kinds[a]))continue;let u=[],s=e.starts[a],l=a;for(;l<e.len&&!Se(e.kinds[l]);)u.push(e.texts[l]),l++;u.length>0&&(t.push(J(u)),n.push(!0),i.push("text"),r.push(s),x=l-1)}return{len:t.length,texts:t,isWordLike:n,kinds:i,starts:r}}var st=new Set([":","-","/","\xD7",",",".","+","\u2013","\u2014"]),lt=/[\p{P}\p{S}\p{Co}]/u,ot=/\p{Emoji_Presentation}/u,ut=new Set(["?","\u058A","-","\u2010","\u2012","\u2013","\u2014","\u2026","\u203C","\u203D","\u2049"]);function ct(e){return e>=33&&e<=47&&e!==45||e>=58&&e<=64&&e!==63||e>=91&&e<=96||e>=123&&e<=126}function ze(e){let t=e.charCodeAt(0);return t<128?ct(t):!ut.has(e)&&!ot.test(e)&&lt.test(e)}function Ge(e){let t=!1;for(let n of e)if(!$.test(n)){if(!ze(n))return!1;t=!0}return t}function at(e){for(let t=e.length;t>0;){let n=oe(e,t),i=e.slice(n,t);if($.test(i)){t=n;continue}return ze(i)||ue(i)}return!1}function Ft(e,t,n,i){let r=!t&&Ge(e),x=!i&&Ge(n),o=U0(e),a=(t||o)&&at(e);return!r&&!x&&!a||H(e)||H(n)?!1:(t||r||o)&&(i||x)}function Ke(e){for(let t of e)if(Ee.test(t))return!0;return!1}function xe(e){if(e.length===0)return!1;for(let t of e)if(!(Ee.test(t)||st.has(t)))return!1;return!0}function ft(e){let t=[],n=[],i=[],r=[];for(let x=0;x<e.len;x++){let o=e.texts[x],a=e.kinds[x];if(a==="text"&&xe(o)&&Ke(o)){let u=[o],s=x+1;for(;s<e.len&&e.kinds[s]==="text"&&xe(e.texts[s]);)u.push(e.texts[s]),s++;t.push(J(u)),n.push(!0),i.push("text"),r.push(e.starts[x]),x=s-1;continue}t.push(o),n.push(e.isWordLike[x]),i.push(a),r.push(e.starts[x])}return{len:t.length,texts:t,isWordLike:n,kinds:i,starts:r}}function Nt(e){let t=[],n=[],i=[],r=[],x=0;for(;x<e.len;){let o=e.texts[x],a=e.kinds[x],u=e.isWordLike[x];if(a==="text"){let s=[o],l=x+1,h=u;for(;l<e.len&&e.kinds[l]==="text"&&Ft(e.texts[l-1],e.isWordLike[l-1],e.texts[l],e.isWordLike[l]);){let c=e.texts[l];s.push(c),h=h||e.isWordLike[l],l++}if(l>x+1){t.push(J(s)),n.push(h),i.push("text"),r.push(e.starts[x]),x=l;continue}}t.push(o),n.push(u),i.push(a),r.push(e.starts[x]),x++}return{len:t.length,texts:t,isWordLike:n,kinds:i,starts:r}}function ht(e){let t=[],n=[],i=[],r=[];for(let x=0;x<e.len;x++){let o=e.texts[x];if(e.kinds[x]==="text"&&o.includes("-")){let a=o.split("-"),u=a.length>1;for(let s=0;s<a.length;s++){let l=a[s];if(!u)break;(l.length===0||!Ke(l)||!xe(l))&&(u=!1)}if(u){let s=0;for(let l=0;l<a.length;l++){let h=a[l],c=l<a.length-1?`${h}-`:h;t.push(c),n.push(!0),i.push("text"),r.push(e.starts[x]+s),s+=c.length}continue}}t.push(o),n.push(e.isWordLike[x]),i.push(e.kinds[x]),r.push(e.starts[x])}return{len:t.length,texts:t,isWordLike:n,kinds:i,starts:r}}function dt(e){let t=[],n=[],i=[],r=[],x=0;for(;x<e.len;){let o=[e.texts[x]],a=e.isWordLike[x],u=e.kinds[x],s=e.starts[x];if(u==="glue"){let l=[o[0]],h=s;for(x++;x<e.len&&e.kinds[x]==="glue";)l.push(e.texts[x]),x++;let c=J(l);if(x<e.len&&e.kinds[x]==="text")o[0]=c,o.push(e.texts[x]),a=e.isWordLike[x],u="text",s=h,x++;else{t.push(c),n.push(!1),i.push("glue"),r.push(h);continue}}else x++;if(u==="text")for(;x<e.len&&e.kinds[x]==="glue";){let l=[];for(;x<e.len&&e.kinds[x]==="glue";)l.push(e.texts[x]),x++;let h=J(l);if(x<e.len&&e.kinds[x]==="text"){o.push(h,e.texts[x]),a=a||e.isWordLike[x],x++;continue}o.push(h)}t.push(J(o)),n.push(a),i.push(u),r.push(s)}return{len:t.length,texts:t,isWordLike:n,kinds:i,starts:r}}function St(e){let t=e.texts.slice(),n=e.isWordLike.slice(),i=e.kinds.slice(),r=e.starts.slice();for(let x=0;x<t.length-1;x++){if(i[x]!=="text"||i[x+1]!=="text"||!H(t[x])||!H(t[x+1]))continue;let o=_0(t[x]);o!==null&&(t[x]=o.head,t[x+1]=o.tail+t[x+1],r[x+1]=r[x]+o.head.length)}return{len:t.length,texts:t,isWordLike:n,kinds:i,starts:r}}function Et(e,t,n){let i=k0(),r=0,x=[],o=[],a=[],u=[],s=[],l=[],h=[],c=[],f=[],E=[],A=[],S=[];for(let N of i.segment(e))for(let d of et(N.segment,N.isWordLike??!1,N.index,n)){let B=function(){l[F]!==null&&(o[F]=[Pe(x,l,h,F)],l[F]=null),o[F].push(d.text),a[F]=a[F]||d.isWordLike,c[F]=c[F]||z,f[F]=f[F]||m,E[F]=v,A[F]=w,S[F]=Te(f[F],M)},D=d.kind==="text",P=$0(d.text,d.isWordLike,d.kind),z=H(d.text),m=Ie(d.text),M=ie(d.text),v=ce(d.text),w=q0(d.text),F=r-1;t.carryCJKAfterClosingQuote&&D&&r>0&&u[F]==="text"&&z&&c[F]&&E[F]||D&&r>0&&u[F]==="text"&&G0(d.text)&&c[F]||D&&r>0&&u[F]==="text"&&A[F]?B():D&&r>0&&u[F]==="text"&&d.isWordLike&&m&&S[F]?(B(),a[F]=!0):P!==null&&r>0&&u[F]==="text"&&l[F]===P?h[F]=(h[F]??1)+1:D&&!d.isWordLike&&r>0&&u[F]==="text"&&!c[F]&&(T0(d.text)||d.text==="-"&&a[F])?B():(x[r]=d.text,o[r]=[d.text],a[r]=d.isWordLike,u[r]=d.kind,s[r]=d.start,l[r]=P,h[r]=P===null?0:1,c[r]=z,f[r]=m,E[r]=v,A[r]=w,S[r]=Te(m,M),r++)}for(let N=0;N<r;N++){if(l[N]!==null){x[N]=Pe(x,l,h,N);continue}x[N]=J(o[N])}for(let N=1;N<r;N++)u[N]==="text"&&!a[N]&&Be(x[N])&&u[N-1]==="text"&&!c[N-1]&&(x[N-1]+=x[N],a[N-1]=a[N-1]||a[N],x[N]="");let L=Array.from({length:r},()=>null),k=-1;for(let N=r-1;N>=0;N--){let d=x[N];if(d.length!==0){if(u[N]==="text"&&!a[N]&&k>=0&&u[k]==="text"&&(z0(d)||d==="-"&&Q0(x[k]))){let D=L[k]??[];D.push(d),L[k]=D,s[k]=s[N],x[N]="";continue}k=N}}for(let N=0;N<r;N++){let d=L[N];d!=null&&(x[N]=Z0(d,x[N]))}let p=0;for(let N=0;N<r;N++){let d=x[N];d.length!==0&&(p!==N&&(x[p]=d,a[p]=a[N],u[p]=u[N],s[p]=s[N]),p++)}x.length=p,a.length=p,u.length=p,s.length=p;let G=dt({len:p,texts:x,isWordLike:a,kinds:u,starts:s}),C=St(Nt(ht(ft(it(rt(G))))));for(let N=0;N<C.len-1;N++){let d=X0(C.texts[N]);d!==null&&(C.kinds[N]!=="space"&&C.kinds[N]!=="preserved-space"||C.kinds[N+1]!=="text"||!Ie(C.texts[N+1])||(C.texts[N]=d.space,C.isWordLike[N]=!1,C.kinds[N]=C.kinds[N]==="preserved-space"?"preserved-space":"space",C.texts[N+1]=d.marks+C.texts[N+1],C.starts[N+1]=C.starts[N]+d.space.length))}return C}function At(e,t){if(e.len===0)return[];if(!t.preserveHardBreaks)return[{startSegmentIndex:0,endSegmentIndex:e.len,consumedEndSegmentIndex:e.len}];let n=[],i=0;for(let r=0;r<e.len;r++)e.kinds[r]==="hard-break"&&(n.push({startSegmentIndex:i,endSegmentIndex:r,consumedEndSegmentIndex:r+1}),i=r+1);return i<e.len&&n.push({startSegmentIndex:i,endSegmentIndex:e.len,consumedEndSegmentIndex:e.len}),n}function gt(e,t,n){if(t.len<=1)return t;let i=[],r=[],x=[],o=[],a=-1,u=!1;function s(c){i.push(t.texts[c]),r.push(t.isWordLike[c]),x.push("text"),o.push(t.starts[c])}function l(c,f){let E=!1;for(let L=c;L<f;L++)E=E||t.isWordLike[L];let A=t.starts[c],S=f<t.len?t.starts[f]:e.length;i.push(e.slice(A,S)),r.push(E),x.push("text"),o.push(A)}function h(c){if(!(a<0)){if(u)a+1===c?s(a):l(a,c);else for(let f=a;f<c;f++)s(f);a=-1,u=!1}}for(let c=0;c<t.len;c++){let f=t.texts[c],E=t.kinds[c];if(E==="text"){a>=0&&!Ae(t.texts[c-1],n)&&h(c),a<0&&(a=c),u=u||H(f);continue}h(c),i.push(f),r.push(t.isWordLike[c]),x.push(E),o.push(t.starts[c])}return h(t.len),{len:i.length,texts:i,isWordLike:r,kinds:x,starts:o}}function je(e,t,n="normal",i="normal"){let r=M0(n),x=r.mode==="pre-wrap"?D0(e):m0(e);if(x.length===0)return{normalized:x,chunks:[],len:0,texts:[],isWordLike:[],kinds:[],starts:[]};let o=Et(x,t,r),a=i==="keep-all"?gt(x,o,t.breakKeepAllAfterPunctuation):o;return{normalized:x,chunks:At(a,r),...a}}var Z=null,He=new Map,ee=null,Bt=96,Ct=/\p{Emoji_Presentation}/u,pt=/[\p{Emoji_Presentation}\p{Extended_Pictographic}\p{Regional_Indicator}\uFE0F\u20E3]/u,Ce=null,Je=new Map;function pe(){if(Z!==null)return Z;if(typeof OffscreenCanvas<"u")return Z=new OffscreenCanvas(1,1).getContext("2d"),Z;if(typeof document<"u")return Z=document.createElement("canvas").getContext("2d"),Z;throw new Error("Text measurement requires OffscreenCanvas or a DOM canvas context.")}function Mt(e){let t=He.get(e);return t||(t=new Map,He.set(e,t)),t}function _(e,t){let n=t.get(e);return n===void 0&&(n={width:pe().measureText(e).width,containsCJK:H(e)},t.set(e,n)),n}function te(){if(ee!==null)return ee;if(typeof navigator>"u")return ee={lineFitEpsilon:.005,carryCJKAfterClosingQuote:!1,breakKeepAllAfterPunctuation:!0,preferPrefixWidthsForBreakableRuns:!1,preferEarlySoftHyphenBreak:!1},ee;let e=navigator.userAgent,n=navigator.vendor==="Apple Computer, Inc."&&e.includes("Safari/")&&!e.includes("Chrome/")&&!e.includes("Chromium/")&&!e.includes("CriOS/")&&!e.includes("FxiOS/")&&!e.includes("EdgiOS/"),i=e.includes("Chrome/")||e.includes("Chromium/")||e.includes("CriOS/")||e.includes("Edg/");return ee={lineFitEpsilon:n?1/64:.005,carryCJKAfterClosingQuote:i,breakKeepAllAfterPunctuation:!n,preferPrefixWidthsForBreakableRuns:n,preferEarlySoftHyphenBreak:n},ee}function mt(e){let t=e.match(/(\d+(?:\.\d+)?)\s*px/);return t?parseFloat(t[1]):16}function Ue(){return Ce===null&&(Ce=new Intl.Segmenter(void 0,{granularity:"grapheme"})),Ce}function Dt(e){return Ct.test(e)||e.includes("\uFE0F")}function Qe(e){return pt.test(e)}function Lt(e,t){let n=Je.get(e);if(n!==void 0)return n;let i=pe();i.font=e;let r=i.measureText("\u{1F600}").width;if(n=0,r>t+.5&&typeof document<"u"&&document.body!==null){let x=document.createElement("span");x.style.font=e,x.style.display="inline-block",x.style.visibility="hidden",x.style.position="absolute",x.textContent="\u{1F600}",document.body.appendChild(x);let o=x.getBoundingClientRect().width;document.body.removeChild(x),r-o>.5&&(n=r-o)}return Je.set(e,n),n}function kt(e){let t=0,n=Ue();for(let i of n.segment(e))Dt(i.segment)&&t++;return t}function Ot(e,t){return t.emojiCount===void 0&&(t.emojiCount=kt(e)),t.emojiCount}function X(e,t,n){return n===0?t.width:t.width-Ot(e,t)*n}function _e(e,t,n,i,r){if(t.breakableFitAdvances!==void 0&&t.breakableFitMode===r)return t.breakableFitAdvances;t.breakableFitMode=r;let x=Ue(),o=[];for(let l of x.segment(e))o.push(l.segment);if(o.length<=1)return t.breakableFitAdvances=null,t.breakableFitAdvances;if(r==="sum-graphemes"){let l=[];for(let h of o){let c=_(h,n);l.push(X(h,c,i))}return t.breakableFitAdvances=l,t.breakableFitAdvances}if(r==="pair-context"||o.length>Bt){let l=[],h=null,c=0;for(let f of o){let E=_(f,n),A=X(f,E,i);if(h===null)l.push(A);else{let S=h+f,L=_(S,n);l.push(X(S,L,i)-c)}h=f,c=A}return t.breakableFitAdvances=l,t.breakableFitAdvances}let a=[],u="",s=0;for(let l of o){u+=l;let h=_(u,n),c=X(u,h,i);a.push(c-s),s=c}return t.breakableFitAdvances=a,t.breakableFitAdvances}function $e(e,t){let n=pe();n.font=e;let i=Mt(e),r=mt(e),x=t?Lt(e,r):0;return{cache:i,fontSize:r,emojiCorrection:x}}function bt(e){return e==="space"||e==="zero-width-break"||e==="soft-hyphen"}function Ye(e){return e==="space"||e==="preserved-space"||e==="tab"||e==="zero-width-break"||e==="soft-hyphen"}function yt(e,t,n=e.widths.length){for(;t<n;){let i=e.kinds[t];if(!bt(i))break;t++}return t}function Wt(e,t){if(t<=0)return 0;let n=e%t;return Math.abs(n)<=1e-6?t:t-n}function wt(e,t,n){return e.letterSpacing!==0&&t&&e.spacingGraphemeCounts[n]>0?e.letterSpacing:0}function Me(e,t){return t===0?0:e+t}function vt(e,t){return e.letterSpacing!==0&&e.spacingGraphemeCounts[t]>0?e.letterSpacing:0}function It(e,t,n,i,r){let x=t==="tab"?r+vt(e,n):e.lineEndFitAdvances[n];return Me(i,x)}function qe(e,t,n,i){let r=t==="tab"?0:e.lineEndFitAdvances[n];return Me(i,r)}function Xe(e,t,n,i,r){let x=t==="tab"?r:e.lineEndPaintAdvances[n];return Me(i,x)}function Rt(e,t,n){return e.letterSpacing!==0&&t?n+e.letterSpacing:n}function Pt(e,t){return e.letterSpacing===0?t:t+e.letterSpacing}function Ve(e,t,n){let i=t;for(;i<e.length&&e[i]<n;)i++;return i}function Tt(e,t,n,i,r){if(e.letterSpacing===0)return 0;if(r>0)return e.spacingGraphemeCounts[i]>0?e.letterSpacing:0;for(let x=i-1;x>=t;x--){let o=e.kinds[x];if(!(o==="space"||o==="zero-width-break"||o==="hard-break")){if(o==="soft-hyphen"){if(x===i-1)return 0;continue}return x===t&&n>0||e.spacingGraphemeCounts[x]>0?e.letterSpacing:0}}return 0}function Gt(e,t,n,i,r,x){return t+Tt(e,n,i,r,x)}function zt(e,t){let n=0,i=e.chunks.length;for(;n<i;){let r=Math.floor((n+i)/2);t<e.chunks[r].consumedEndSegmentIndex?i=r:n=r+1}return n<e.chunks.length?n:-1}function Kt(e,t,n){let i=n.segmentIndex;if(n.graphemeIndex>0)return t;let r=e.chunks[t];return r.startSegmentIndex===r.endSegmentIndex&&i===r.startSegmentIndex||(i<r.startSegmentIndex&&(i=r.startSegmentIndex),i=yt(e,i,r.endSegmentIndex),i<r.endSegmentIndex)?(n.segmentIndex=i,n.graphemeIndex=0,t):r.consumedEndSegmentIndex>=e.widths.length?-1:(n.segmentIndex=r.consumedEndSegmentIndex,n.graphemeIndex=0,t+1)}function Ze(e,t){if(t.segmentIndex>=e.widths.length)return-1;let n=zt(e,t.segmentIndex);return n<0?-1:Kt(e,n,t)}function jt(e,t,n,i){let r=e.chunks[n];if(r.startSegmentIndex===r.endSegmentIndex)return t.segmentIndex=r.consumedEndSegmentIndex,t.graphemeIndex=0,0;let{widths:x,kinds:o,breakableFitAdvances:a,breakablePreferredBreaks:u,discretionaryHyphenWidth:s}=e,l=te(),h=l.lineFitEpsilon,c=i+h,f=t.segmentIndex,E=t.graphemeIndex,A=0,S=!1,L=t.segmentIndex,k=t.graphemeIndex,p=-1,G=0,C=0,N=null;function d(){return N==="soft-hyphen"&&p===L&&k===0?C:A}function D(F=L,B=k,O=d()){return S?(t.segmentIndex=F,t.graphemeIndex=B,Gt(e,O,f,E,F,B)):null}function P(F,B){S=!0,L=F+1,k=0,A=B}function z(F,B,O){S=!0,L=F,k=B+1,A=O}function m(F,B){if(!S){P(F,B);return}A+=B,L=F+1,k=0}function M(F,B,O,y,b,W){if(!B)return;let K=qe(e,F,O,b),I=Xe(e,F,O,b,y);p=O+1,G=A-W+K,C=A-W+I,N=F}function v(F,B){let O=a[F],y=u[F]??null,b=y===null?-1:Ve(y,0,B+1),W=-1,K=0;for(let I=B;I<O.length;I++){let V=O[I];if(!S)z(F,I,V);else{let Ne=Rt(e,!0,V),ne=A+Ne;if(Pt(e,ne)>c)return y!==null&&W>B?D(F,W,K):D();A=ne,L=F,k=I+1}let j=I+1;y!==null&&y[b]===j&&(W=j,K=A,b++)}return S&&L===F&&k===O.length&&(L=F+1,k=0),null}function w(){return N!=="soft-hyphen"||p<0?null:G<=c?D(p,0,C):null}for(let F=t.segmentIndex;F<r.endSegmentIndex;F++){let B=o[F],O=Ye(B),y=F===t.segmentIndex?t.graphemeIndex:0,b=wt(e,S,F),W=B==="tab"?Wt(A+b,e.tabStopAdvance):x[F],K=b+W,I=It(e,B,F,b,W);if(B==="soft-hyphen"&&y===0){S&&(L=F+1,k=0,p=F+1,G=A+s,C=A+s,N=B);continue}if(!S){if(y>0){let j=v(F,y);if(j!==null)return j}else if(I>c&&a[F]!==null){let j=v(F,0);if(j!==null)return j}else P(F,W);M(B,O,F,W,b,K);continue}if(A+I>c){let j=A+qe(e,B,F,b),Ne=A+Xe(e,B,F,b,W);if(N==="soft-hyphen"&&l.preferEarlySoftHyphenBreak&&G<=c)return D(p,0,C);let ne=w();if(ne!==null)return ne;if(O&&j<=c)return m(F,K),D(F+1,0,Ne);if(p>=0&&G<=c)return L>p||L===p&&k>0?D():D(p,0,C);if(I>c&&a[F]!==null){let ye=D();if(ye!==null)return ye;let We=v(F,0);if(We!==null)return We}return D()}m(F,K),M(B,O,F,W,b,K)}return p===r.consumedEndSegmentIndex&&k===0?D(r.consumedEndSegmentIndex,0,C):D(r.consumedEndSegmentIndex,0,A)}function Ht(e,t,n){let{widths:i,kinds:r,breakableFitAdvances:x,breakablePreferredBreaks:o}=e,u=te().lineFitEpsilon,s=n+u,l=0,h=!1,c=t.segmentIndex,f=t.graphemeIndex,E=-1,A=0;for(let S=t.segmentIndex;S<i.length;S++){let L=r[S],k=Ye(L),p=S===t.segmentIndex?t.graphemeIndex:0,G=x[S],C=i[S];if(!h){if(p>0||C>s&&G!==null){let N=G,d=o[S]??null,D=d===null?-1:Ve(d,0,p+1),P=-1,z=0,m=N[p];h=!0,l=m,c=S,f=p+1,d!==null&&d[D]===f&&(P=f,z=l,D++);for(let M=p+1;M<N.length;M++){let v=N[M];if(l+v>s)return d!==null&&P>p?(t.segmentIndex=S,t.graphemeIndex=P,z):(t.segmentIndex=c,t.graphemeIndex=f,l);l+=v,c=S,f=M+1,d!==null&&d[D]===f&&(P=f,z=l,D++)}c===S&&f===N.length&&(c=S+1,f=0)}else h=!0,l=C,c=S+1,f=0;k&&(E=S+1,A=l-C);continue}if(l+C>s)return k?(t.segmentIndex=S+1,t.graphemeIndex=0,l):E>=0?c>E||c===E&&f>0?(t.segmentIndex=c,t.graphemeIndex=f,l):(t.segmentIndex=E,t.graphemeIndex=0,A):(t.segmentIndex=c,t.graphemeIndex=f,l);l+=C,c=S+1,f=0,k&&(E=S+1,A=l-C)}return h?(t.segmentIndex=c,t.graphemeIndex=f,l):null}function e0(e,t,n,i){return e.simpleLineWalkFastPath?Ht(e,t,i):jt(e,t,n,i)}var me=null,t0=new WeakMap;function Jt(){return me===null&&(me=new Intl.Segmenter(void 0,{granularity:"grapheme"})),me}function n0(e,t,n){let i=n.get(e);if(i!==void 0)return i;i=[];let r=Jt();for(let x of r.segment(t[e]))i.push(x.segment);return n.set(e,i),i}function Ut(e,t,n){return n>t&&e[n-1]==="soft-hyphen"}function x0(e,t,n,i){for(let r=n;r<i;r++)e+=t[r];return e}function r0(e){let t=t0.get(e);return t!==void 0||(t=new Map,t0.set(e,t)),t}function i0(e,t,n,i,r,x){let o="",a=Ut(e.kinds,n,r);for(let u=n;u<r;u++)if(!(e.kinds[u]==="soft-hyphen"||e.kinds[u]==="hard-break"))if(u===n&&i>0){let s=n0(u,e.segments,t);o=x0(o,s,i,s.length)}else o+=e.segments[u];if(x>0){a&&(o+="-");let u=n0(r,e.segments,t);o=x0(o,u,n===r?i:0,x)}else a&&(o+="-");return o}var De=null;function Le(){return De===null&&(De=new Intl.Segmenter(void 0,{granularity:"grapheme"})),De}function Qt(e){return e?{widths:[],lineEndFitAdvances:[],lineEndPaintAdvances:[],kinds:[],simpleLineWalkFastPath:!0,segLevels:null,breakableFitAdvances:[],breakablePreferredBreaks:[],letterSpacing:0,spacingGraphemeCounts:[],discretionaryHyphenWidth:0,tabStopAdvance:0,chunks:[],segments:[]}:{widths:[],lineEndFitAdvances:[],lineEndPaintAdvances:[],kinds:[],simpleLineWalkFastPath:!0,segLevels:null,breakableFitAdvances:[],breakablePreferredBreaks:[],letterSpacing:0,spacingGraphemeCounts:[],discretionaryHyphenWidth:0,tabStopAdvance:0,chunks:[]}}function _t(e,t){let n=[],i=[],r=0,x=!1,o=!1,a=!1;function u(){i.length!==0&&(n.push({text:i.length===1?i[0]:i.join(""),start:r}),i=[],x=!1,o=!1,a=!1)}function s(h,c,f){i=[h],r=c,x=f,o=ce(h),a=re.has(h)}function l(h,c){i.push(h),x=x||c;let f=ce(h);h.length===1&&q.has(h)?o=o||f:o=f,a=!1}for(let h of Le().segment(e)){let c=h.segment,f=H(c);if(i.length===0){s(c,h.index,f);continue}if(a||le.has(c)||q.has(c)||t.carryCJKAfterClosingQuote&&f&&o){l(c,f);continue}if(!x&&!f){l(c,f);continue}u(),s(c,h.index,f)}return u(),n}function $t(e,t,n){if(t.length<=1)return t;let i=[],r=-1,x=!1;function o(u,s){let l=t[u].start,h=s<t.length?t[s].start:e.length;i.push({text:e.slice(l,h),start:l})}function a(u){if(!(r<0)){if(x)r+1===u?i.push(t[r]):o(r,u);else for(let s=r;s<u;s++)i.push(t[s]);r=-1,x=!1}}for(let u=0;u<t.length;u++){let s=t[u];r>=0&&!Ae(t[u-1].text,n)&&a(u),r<0&&(r=u),x=x||H(s.text)}return a(t.length),i}function s0(e,t){if(t==="zero-width-break"||t==="soft-hyphen"||t==="hard-break")return 0;if(t==="tab")return 1;let n=0,i=Le();for(let r of i.segment(e))n++;return n}function qt(e){return e==="-"||e==="\u058A"||e==="\u2010"||e==="\u2012"||e==="\u2013"||e==="\u2014"}function Xt(e){if(!/[-\u058A\u2010\u2012\u2013\u2014]/u.test(e))return null;let t=[],n=0;for(let i of Le().segment(e))n++,qt(i.segment)&&t.push(n);return t.length===0?null:t}function Yt(e,t,n){return t>1?e+(t-1)*n:e}function Vt(e,t,n,i,r){let x=te(),{cache:o,emojiCorrection:a}=$e(t,Qe(e.normalized)),u=X("-",_("-",o),a)+(r===0?0:r*2),l=X(" ",_(" ",o),a)*8,h=r!==0;if(e.len===0)return Qt(n);let c=[],f=[],E=[],A=[],S=e.chunks.length<=1&&!h,L=n?[]:null,k=[],p=[],G=[],C=n?[]:null,N=Array.from({length:e.len});function d(m,M,v,w,F,B,O,y,b){F!=="text"&&F!=="space"&&F!=="zero-width-break"&&(S=!1),c.push(M),f.push(v),E.push(w),A.push(F),L?.push(B),k.push(O),p.push(y),h&&G.push(b),C!==null&&C.push(m)}function D(m,M,v,w,F){let B=_(m,o),O=h?s0(m,M):0,y=Yt(X(m,B,a),O,r),b=M==="space"||M==="preserved-space"||M==="zero-width-break"?0:y,W=b===0?0:b+(O>0?r:0),K=M==="space"||M==="zero-width-break"?0:y;if(F&&w&&m.length>1){let I="sum-graphemes";r!==0?I="segment-prefixes":xe(m)?I="pair-context":x.preferPrefixWidthsForBreakableRuns&&(I="segment-prefixes");let V=_e(m,B,o,a,I),j=V===null||i==="keep-all"?null:Xt(m);d(m,y,W,K,M,v,V,j,O);return}d(m,y,W,K,M,v,null,null,O)}for(let m=0;m<e.len;m++){N[m]=c.length;let M=e.texts[m],v=e.isWordLike[m],w=e.kinds[m],F=e.starts[m];if(w==="soft-hyphen"){d(M,0,u,u,w,F,null,null,0);continue}if(w==="hard-break"){d(M,0,0,0,w,F,null,null,0);continue}if(w==="tab"){d(M,0,0,0,w,F,null,null,h?s0(M,w):0);continue}let B=_(M,o);if(w==="text"&&B.containsCJK){let O=_t(M,x),y=i==="keep-all"?$t(M,O,x.breakKeepAllAfterPunctuation):O;for(let b=0;b<y.length;b++){let W=y[b];D(W.text,"text",F+W.start,v,i==="keep-all"||!H(W.text))}continue}D(M,w,F,v,!0)}let P=Zt(e.chunks,N,c.length),z=L===null?null:ve(e.normalized,L);return C!==null?{widths:c,lineEndFitAdvances:f,lineEndPaintAdvances:E,kinds:A,simpleLineWalkFastPath:S,segLevels:z,breakableFitAdvances:k,breakablePreferredBreaks:p,letterSpacing:r,spacingGraphemeCounts:G,discretionaryHyphenWidth:u,tabStopAdvance:l,chunks:P,segments:C}:{widths:c,lineEndFitAdvances:f,lineEndPaintAdvances:E,kinds:A,simpleLineWalkFastPath:S,segLevels:z,breakableFitAdvances:k,breakablePreferredBreaks:p,letterSpacing:r,spacingGraphemeCounts:G,discretionaryHyphenWidth:u,tabStopAdvance:l,chunks:P}}function Zt(e,t,n){let i=[];for(let r=0;r<e.length;r++){let x=e[r],o=x.startSegmentIndex<t.length?t[x.startSegmentIndex]:n,a=x.endSegmentIndex<t.length?t[x.endSegmentIndex]:n,u=x.consumedEndSegmentIndex<t.length?t[x.consumedEndSegmentIndex]:n;i.push({startSegmentIndex:o,endSegmentIndex:a,consumedEndSegmentIndex:u})}return i}function en(e,t,n,i){let r=i?.wordBreak??"normal",x=i?.letterSpacing??0,o=je(e,te(),i?.whiteSpace,r);return Vt(o,t,n,r,x)}function l0(e,t,n){return en(e,t,!0,n)}function tn(e,t,n,i,r,x,o){return{text:i0(e,t,i,r,x,o),width:n,start:{segmentIndex:i,graphemeIndex:r},end:{segmentIndex:x,graphemeIndex:o}}}function nn(e,t,n,i,r){return{width:e,start:{segmentIndex:t,graphemeIndex:n},end:{segmentIndex:i,graphemeIndex:r}}}function o0(e,t){return tn(e,r0(e),t.width,t.start.segmentIndex,t.start.graphemeIndex,t.end.segmentIndex,t.end.graphemeIndex)}function u0(e,t,n){let i=e,r={segmentIndex:t.segmentIndex,graphemeIndex:t.graphemeIndex},x=Ze(i,r);if(x<0)return null;let o=r.segmentIndex,a=r.graphemeIndex,u=e0(i,r,x,n);return u===null?null:nn(u,o,a,r.segmentIndex,r.graphemeIndex)}var xn="\u805A\u7126\u8BA1\u7B97\u673A\u89C6\u89C9\u3001\u81EA\u52A8\u9A7E\u9A76\u611F\u77E5\u3001\u5E76\u884C\u8BA1\u7B97\u4E0E\u516C\u5F00\u5199\u4F5C\u3002\u516C\u5F00\u4ED3\u5E93 15 \u4E2A\uFF0C\u83B7\u5F97 1 \u4E2A Star\u3002\u6B63\u5728\u8D5E\u52A9\u5F00\u53D1\u8005\uFF1ALizardByte\u3001glenn-jocher\u3002\u8F66\u9053\u7EBF\u4E0E\u611F\u77E5\u5B9E\u9A8C\uFF1A\u6301\u7EED\u6574\u7406\u4F20\u7EDF\u89C6\u89C9\u6D41\u7A0B\u3001\u6DF1\u5EA6\u5B66\u4E60\u65B9\u6848\u4E0E\u573A\u666F\u611F\u77E5\u5B9E\u9A8C\u3002\u5E76\u884C\u8BA1\u7B97\u4E0E\u56F4\u7ED5 CUDA\u3001OpenMP \u548C\u56FE\u50CF/\u70B9\u4E91\u5904\u7406\u70ED\u70B9\u6D41\u7A0B\u505A\u6027\u80FD\u4F18\u5316\u3002\u6700\u65B0\u6587\u7AE0\uFF1A\u8BB0\u5F55GStreamer\u6253\u5F00JPEG\u7F16\u7801\u7684\u89C6\u9891\u65F6\u51FA\u73B0\u6BB5\u9519\u8BEF\u7684\u539F\u56E0\u3002CARLA\u4E2D\u7684\u5750\u6807\u7CFB\u4E0E\u6807\u51C6\u8F66\u8F86\u5750\u6807\u7CFB\u8F6C\u6362\u3002",rn='16px "Inter", "Noto Sans SC", system-ui, sans-serif',ke=26,sn=60,R=document.getElementById("pretext-output"),U,Q,ae,T=[],Y=[];function F0(){return ae||(ae=l0(xn,rn)),ae}function f0(){let e=R.parentElement.getBoundingClientRect();U=e.width,Q=e.height}function N0(){let e=Math.min(U,Q)*.08;T=[{x:U*.3,y:Q*.35,r:e,color:"#FF78B8",dragging:!1,vx:.3,vy:.2},{x:U*.7,y:Q*.6,r:e*1.2,color:"#00D4FF",dragging:!1,vx:-.2,vy:.3},{x:U*.5,y:Q*.8,r:e*.8,color:"#7C83FF",dragging:!1,vx:.25,vy:-.2}]}function Oe(){R.querySelectorAll(".pretext-line").forEach(x=>x.remove());let e=F0(),t={segmentIndex:0,graphemeIndex:0},n=30,i=(U-n*2-40)/2,r=[{start:n,end:n+i},{start:n+i+40,end:U-n}];for(let x of r){let o=ke*1.5,a=Q-20;for(;o<a&&t.segmentIndex<e.segments.length;){let u=o+ke/2,s=[];for(let f of T){let E=u-f.y;if(Math.abs(E)<f.r){let A=Math.sqrt(Math.max(0,f.r*f.r-E*E));s.push({left:f.x-A,right:f.x+A})}}s.sort((f,E)=>f.left-E.left);let l=[];for(let f of s)l.length&&f.left<=l[l.length-1].right?l[l.length-1].right=Math.max(l[l.length-1].right,f.right):l.push({...f});let h=[],c=x.start;for(let f of l)f.left>c&&h.push({x:c,w:f.left-c}),c=Math.max(c,f.right);c<x.end&&h.push({x:c,w:x.end-c});for(let f of h){if(f.w<sn)continue;if(t.segmentIndex>=e.segments.length)break;let E=u0(e,t,f.w-4);if(!E)break;let A=o0(e,E);if(!A.text.trim())break;let S=document.createElement("div");S.className="pretext-line",S.style.left=f.x+"px",S.style.top=o+"px",S.style.width=f.w+"px",S.textContent=A.text,R.appendChild(S),t=E.end}o+=ke}}}function h0(){Y=[],R.querySelectorAll(".pretext-orb").forEach(e=>e.remove());for(let e of T){let t=document.createElement("div");t.className="pretext-orb",t.style.width=e.r*2+"px",t.style.height=e.r*2+"px",t.style.borderColor=e.color,t.style.transform=`translate3d(${e.x-e.r}px, ${e.y-e.r}px, 0)`,R.appendChild(t),Y.push(t)}d0()}function ln(){for(let e=0;e<T.length;e++){let t=T[e],n=Y[e];n&&!t.dragging&&(n.style.transform=`translate3d(${t.x-t.r}px, ${t.y-t.r}px, 0)`)}}var se=null,on=0,Fe=[],c0=3;function un(){if(Fe.length!==T.length)return!0;for(let e=0;e<T.length;e++){let t=Math.abs(T[e].x-Fe[e].x),n=Math.abs(T[e].y-Fe[e].y);if(t>c0||n>c0)return!0}return!1}function d0(){Fe=T.map(e=>({x:e.x,y:e.y}))}function S0(){let e=performance.now();for(let t of T)t.dragging||(t.x+=t.vx,t.y+=t.vy,(t.x-t.r<0||t.x+t.r>U)&&(t.vx*=-1,t.x=Math.max(t.r,Math.min(U-t.r,t.x))),(t.y-t.r<0||t.y+t.r>Q)&&(t.vy*=-1,t.y=Math.max(t.r,Math.min(Q-t.r,t.y))));ln(),un()&&(Oe(),d0(),on=e),se=requestAnimationFrame(S0)}function E0(){se||S0()}function cn(){se&&(cancelAnimationFrame(se),se=null)}document.addEventListener("visibilitychange",()=>{document.hidden?cn():E0()});var g=null;function fe(e){let t=R.getBoundingClientRect(),n=e.touches?e.touches[0].clientX:e.clientX,i=e.touches?e.touches[0].clientY:e.clientY;return{x:n-t.left,y:i-t.top}}function be(e){for(let t=T.length-1;t>=0;t--){let n=T[t];if((e.x-n.x)**2+(e.y-n.y)**2<n.r*n.r)return n}return null}R.addEventListener("mousedown",e=>{g=be(fe(e)),g&&(g.dragging=!0,R.style.cursor="grabbing")});R.addEventListener("mousemove",e=>{let t=fe(e);if(!g){R.style.cursor=be(t)?"grab":"default";return}g.x=Math.max(g.r,Math.min(U-g.r,t.x)),g.y=Math.max(g.r,Math.min(Q-g.r,t.y));let n=T.indexOf(g);n>=0&&Y[n]&&(Y[n].style.transform=`translate3d(${g.x-g.r}px, ${g.y-g.r}px, 0)`)});R.addEventListener("mouseup",()=>{g&&(g.dragging=!1,g=null),R.style.cursor="default"});R.addEventListener("mouseleave",()=>{g&&(g.dragging=!1,g=null),R.style.cursor="default"});R.addEventListener("touchstart",e=>{g=be(fe(e)),g&&(g.dragging=!0)},{passive:!0});R.addEventListener("touchmove",e=>{if(!g)return;e.preventDefault();let t=fe(e);g.x=Math.max(g.r,Math.min(U-g.r,t.x)),g.y=Math.max(g.r,Math.min(Q-g.r,t.y));let n=T.indexOf(g);n>=0&&Y[n]&&(Y[n].style.transform=`translate3d(${g.x-g.r}px, ${g.y-g.r}px, 0)`)},{passive:!1});R.addEventListener("touchend",()=>{g&&(g.dragging=!1,g=null)});var a0;window.addEventListener("resize",()=>{clearTimeout(a0),a0=setTimeout(()=>{f0(),N0(),h0(),Oe()},200)});function A0(){f0(),N0(),ae=F0(),h0(),Oe(),E0()}window.addEventListener("load",A0);(document.readyState==="interactive"||document.readyState==="complete")&&A0();})();
+(() => {
+  // public/generated/bidi-data.js
+  var latin1BidiTypes = [
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "S",
+    "B",
+    "S",
+    "WS",
+    "B",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "B",
+    "B",
+    "B",
+    "S",
+    "WS",
+    "ON",
+    "ON",
+    "ET",
+    "ET",
+    "ET",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "ES",
+    "CS",
+    "ES",
+    "CS",
+    "CS",
+    "EN",
+    "EN",
+    "EN",
+    "EN",
+    "EN",
+    "EN",
+    "EN",
+    "EN",
+    "EN",
+    "EN",
+    "CS",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "B",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "BN",
+    "CS",
+    "ON",
+    "ET",
+    "ET",
+    "ET",
+    "ET",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "L",
+    "ON",
+    "ON",
+    "BN",
+    "ON",
+    "ON",
+    "ET",
+    "ET",
+    "EN",
+    "EN",
+    "ON",
+    "L",
+    "ON",
+    "ON",
+    "ON",
+    "EN",
+    "L",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "ON",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "ON",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "ON",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L",
+    "L"
+  ];
+  var nonLatin1BidiRanges = [
+    [697, 698, "ON"],
+    [706, 719, "ON"],
+    [722, 735, "ON"],
+    [741, 749, "ON"],
+    [751, 767, "ON"],
+    [768, 879, "NSM"],
+    [884, 885, "ON"],
+    [894, 894, "ON"],
+    [900, 901, "ON"],
+    [903, 903, "ON"],
+    [1014, 1014, "ON"],
+    [1155, 1161, "NSM"],
+    [1418, 1418, "ON"],
+    [1421, 1422, "ON"],
+    [1423, 1423, "ET"],
+    [1424, 1424, "R"],
+    [1425, 1469, "NSM"],
+    [1470, 1470, "R"],
+    [1471, 1471, "NSM"],
+    [1472, 1472, "R"],
+    [1473, 1474, "NSM"],
+    [1475, 1475, "R"],
+    [1476, 1477, "NSM"],
+    [1478, 1478, "R"],
+    [1479, 1479, "NSM"],
+    [1480, 1535, "R"],
+    [1536, 1541, "AN"],
+    [1542, 1543, "ON"],
+    [1544, 1544, "AL"],
+    [1545, 1546, "ET"],
+    [1547, 1547, "AL"],
+    [1548, 1548, "CS"],
+    [1549, 1549, "AL"],
+    [1550, 1551, "ON"],
+    [1552, 1562, "NSM"],
+    [1563, 1610, "AL"],
+    [1611, 1631, "NSM"],
+    [1632, 1641, "AN"],
+    [1642, 1642, "ET"],
+    [1643, 1644, "AN"],
+    [1645, 1647, "AL"],
+    [1648, 1648, "NSM"],
+    [1649, 1749, "AL"],
+    [1750, 1756, "NSM"],
+    [1757, 1757, "AN"],
+    [1758, 1758, "ON"],
+    [1759, 1764, "NSM"],
+    [1765, 1766, "AL"],
+    [1767, 1768, "NSM"],
+    [1769, 1769, "ON"],
+    [1770, 1773, "NSM"],
+    [1774, 1775, "AL"],
+    [1776, 1785, "EN"],
+    [1786, 1808, "AL"],
+    [1809, 1809, "NSM"],
+    [1810, 1839, "AL"],
+    [1840, 1866, "NSM"],
+    [1867, 1957, "AL"],
+    [1958, 1968, "NSM"],
+    [1969, 1983, "AL"],
+    [1984, 2026, "R"],
+    [2027, 2035, "NSM"],
+    [2036, 2037, "R"],
+    [2038, 2041, "ON"],
+    [2042, 2044, "R"],
+    [2045, 2045, "NSM"],
+    [2046, 2069, "R"],
+    [2070, 2073, "NSM"],
+    [2074, 2074, "R"],
+    [2075, 2083, "NSM"],
+    [2084, 2084, "R"],
+    [2085, 2087, "NSM"],
+    [2088, 2088, "R"],
+    [2089, 2093, "NSM"],
+    [2094, 2136, "R"],
+    [2137, 2139, "NSM"],
+    [2140, 2143, "R"],
+    [2144, 2191, "AL"],
+    [2192, 2193, "AN"],
+    [2194, 2198, "AL"],
+    [2199, 2207, "NSM"],
+    [2208, 2249, "AL"],
+    [2250, 2273, "NSM"],
+    [2274, 2274, "AN"],
+    [2275, 2306, "NSM"],
+    [2362, 2362, "NSM"],
+    [2364, 2364, "NSM"],
+    [2369, 2376, "NSM"],
+    [2381, 2381, "NSM"],
+    [2385, 2391, "NSM"],
+    [2402, 2403, "NSM"],
+    [2433, 2433, "NSM"],
+    [2492, 2492, "NSM"],
+    [2497, 2500, "NSM"],
+    [2509, 2509, "NSM"],
+    [2530, 2531, "NSM"],
+    [2546, 2547, "ET"],
+    [2555, 2555, "ET"],
+    [2558, 2558, "NSM"],
+    [2561, 2562, "NSM"],
+    [2620, 2620, "NSM"],
+    [2625, 2626, "NSM"],
+    [2631, 2632, "NSM"],
+    [2635, 2637, "NSM"],
+    [2641, 2641, "NSM"],
+    [2672, 2673, "NSM"],
+    [2677, 2677, "NSM"],
+    [2689, 2690, "NSM"],
+    [2748, 2748, "NSM"],
+    [2753, 2757, "NSM"],
+    [2759, 2760, "NSM"],
+    [2765, 2765, "NSM"],
+    [2786, 2787, "NSM"],
+    [2801, 2801, "ET"],
+    [2810, 2815, "NSM"],
+    [2817, 2817, "NSM"],
+    [2876, 2876, "NSM"],
+    [2879, 2879, "NSM"],
+    [2881, 2884, "NSM"],
+    [2893, 2893, "NSM"],
+    [2901, 2902, "NSM"],
+    [2914, 2915, "NSM"],
+    [2946, 2946, "NSM"],
+    [3008, 3008, "NSM"],
+    [3021, 3021, "NSM"],
+    [3059, 3064, "ON"],
+    [3065, 3065, "ET"],
+    [3066, 3066, "ON"],
+    [3072, 3072, "NSM"],
+    [3076, 3076, "NSM"],
+    [3132, 3132, "NSM"],
+    [3134, 3136, "NSM"],
+    [3142, 3144, "NSM"],
+    [3146, 3149, "NSM"],
+    [3157, 3158, "NSM"],
+    [3170, 3171, "NSM"],
+    [3192, 3198, "ON"],
+    [3201, 3201, "NSM"],
+    [3260, 3260, "NSM"],
+    [3276, 3277, "NSM"],
+    [3298, 3299, "NSM"],
+    [3328, 3329, "NSM"],
+    [3387, 3388, "NSM"],
+    [3393, 3396, "NSM"],
+    [3405, 3405, "NSM"],
+    [3426, 3427, "NSM"],
+    [3457, 3457, "NSM"],
+    [3530, 3530, "NSM"],
+    [3538, 3540, "NSM"],
+    [3542, 3542, "NSM"],
+    [3633, 3633, "NSM"],
+    [3636, 3642, "NSM"],
+    [3647, 3647, "ET"],
+    [3655, 3662, "NSM"],
+    [3761, 3761, "NSM"],
+    [3764, 3772, "NSM"],
+    [3784, 3790, "NSM"],
+    [3864, 3865, "NSM"],
+    [3893, 3893, "NSM"],
+    [3895, 3895, "NSM"],
+    [3897, 3897, "NSM"],
+    [3898, 3901, "ON"],
+    [3953, 3966, "NSM"],
+    [3968, 3972, "NSM"],
+    [3974, 3975, "NSM"],
+    [3981, 3991, "NSM"],
+    [3993, 4028, "NSM"],
+    [4038, 4038, "NSM"],
+    [4141, 4144, "NSM"],
+    [4146, 4151, "NSM"],
+    [4153, 4154, "NSM"],
+    [4157, 4158, "NSM"],
+    [4184, 4185, "NSM"],
+    [4190, 4192, "NSM"],
+    [4209, 4212, "NSM"],
+    [4226, 4226, "NSM"],
+    [4229, 4230, "NSM"],
+    [4237, 4237, "NSM"],
+    [4253, 4253, "NSM"],
+    [4957, 4959, "NSM"],
+    [5008, 5017, "ON"],
+    [5120, 5120, "ON"],
+    [5760, 5760, "WS"],
+    [5787, 5788, "ON"],
+    [5906, 5908, "NSM"],
+    [5938, 5939, "NSM"],
+    [5970, 5971, "NSM"],
+    [6002, 6003, "NSM"],
+    [6068, 6069, "NSM"],
+    [6071, 6077, "NSM"],
+    [6086, 6086, "NSM"],
+    [6089, 6099, "NSM"],
+    [6107, 6107, "ET"],
+    [6109, 6109, "NSM"],
+    [6128, 6137, "ON"],
+    [6144, 6154, "ON"],
+    [6155, 6157, "NSM"],
+    [6158, 6158, "BN"],
+    [6159, 6159, "NSM"],
+    [6277, 6278, "NSM"],
+    [6313, 6313, "NSM"],
+    [6432, 6434, "NSM"],
+    [6439, 6440, "NSM"],
+    [6450, 6450, "NSM"],
+    [6457, 6459, "NSM"],
+    [6464, 6464, "ON"],
+    [6468, 6469, "ON"],
+    [6622, 6655, "ON"],
+    [6679, 6680, "NSM"],
+    [6683, 6683, "NSM"],
+    [6742, 6742, "NSM"],
+    [6744, 6750, "NSM"],
+    [6752, 6752, "NSM"],
+    [6754, 6754, "NSM"],
+    [6757, 6764, "NSM"],
+    [6771, 6780, "NSM"],
+    [6783, 6783, "NSM"],
+    [6832, 6877, "NSM"],
+    [6880, 6891, "NSM"],
+    [6912, 6915, "NSM"],
+    [6964, 6964, "NSM"],
+    [6966, 6970, "NSM"],
+    [6972, 6972, "NSM"],
+    [6978, 6978, "NSM"],
+    [7019, 7027, "NSM"],
+    [7040, 7041, "NSM"],
+    [7074, 7077, "NSM"],
+    [7080, 7081, "NSM"],
+    [7083, 7085, "NSM"],
+    [7142, 7142, "NSM"],
+    [7144, 7145, "NSM"],
+    [7149, 7149, "NSM"],
+    [7151, 7153, "NSM"],
+    [7212, 7219, "NSM"],
+    [7222, 7223, "NSM"],
+    [7376, 7378, "NSM"],
+    [7380, 7392, "NSM"],
+    [7394, 7400, "NSM"],
+    [7405, 7405, "NSM"],
+    [7412, 7412, "NSM"],
+    [7416, 7417, "NSM"],
+    [7616, 7679, "NSM"],
+    [8125, 8125, "ON"],
+    [8127, 8129, "ON"],
+    [8141, 8143, "ON"],
+    [8157, 8159, "ON"],
+    [8173, 8175, "ON"],
+    [8189, 8190, "ON"],
+    [8192, 8202, "WS"],
+    [8203, 8205, "BN"],
+    [8207, 8207, "R"],
+    [8208, 8231, "ON"],
+    [8232, 8232, "WS"],
+    [8233, 8233, "B"],
+    [8234, 8238, "BN"],
+    [8239, 8239, "CS"],
+    [8240, 8244, "ET"],
+    [8245, 8259, "ON"],
+    [8260, 8260, "CS"],
+    [8261, 8286, "ON"],
+    [8287, 8287, "WS"],
+    [8288, 8303, "BN"],
+    [8304, 8304, "EN"],
+    [8308, 8313, "EN"],
+    [8314, 8315, "ES"],
+    [8316, 8318, "ON"],
+    [8320, 8329, "EN"],
+    [8330, 8331, "ES"],
+    [8332, 8334, "ON"],
+    [8352, 8399, "ET"],
+    [8400, 8432, "NSM"],
+    [8448, 8449, "ON"],
+    [8451, 8454, "ON"],
+    [8456, 8457, "ON"],
+    [8468, 8468, "ON"],
+    [8470, 8472, "ON"],
+    [8478, 8483, "ON"],
+    [8485, 8485, "ON"],
+    [8487, 8487, "ON"],
+    [8489, 8489, "ON"],
+    [8494, 8494, "ET"],
+    [8506, 8507, "ON"],
+    [8512, 8516, "ON"],
+    [8522, 8525, "ON"],
+    [8528, 8543, "ON"],
+    [8585, 8587, "ON"],
+    [8592, 8721, "ON"],
+    [8722, 8722, "ES"],
+    [8723, 8723, "ET"],
+    [8724, 9013, "ON"],
+    [9083, 9108, "ON"],
+    [9110, 9257, "ON"],
+    [9280, 9290, "ON"],
+    [9312, 9351, "ON"],
+    [9352, 9371, "EN"],
+    [9450, 9899, "ON"],
+    [9901, 10239, "ON"],
+    [10496, 11123, "ON"],
+    [11126, 11263, "ON"],
+    [11493, 11498, "ON"],
+    [11503, 11505, "NSM"],
+    [11513, 11519, "ON"],
+    [11647, 11647, "NSM"],
+    [11744, 11775, "NSM"],
+    [11776, 11869, "ON"],
+    [11904, 11929, "ON"],
+    [11931, 12019, "ON"],
+    [12032, 12245, "ON"],
+    [12272, 12287, "ON"],
+    [12288, 12288, "WS"],
+    [12289, 12292, "ON"],
+    [12296, 12320, "ON"],
+    [12330, 12333, "NSM"],
+    [12336, 12336, "ON"],
+    [12342, 12343, "ON"],
+    [12349, 12351, "ON"],
+    [12441, 12442, "NSM"],
+    [12443, 12444, "ON"],
+    [12448, 12448, "ON"],
+    [12539, 12539, "ON"],
+    [12736, 12773, "ON"],
+    [12783, 12783, "ON"],
+    [12829, 12830, "ON"],
+    [12880, 12895, "ON"],
+    [12924, 12926, "ON"],
+    [12977, 12991, "ON"],
+    [13004, 13007, "ON"],
+    [13175, 13178, "ON"],
+    [13278, 13279, "ON"],
+    [13311, 13311, "ON"],
+    [19904, 19967, "ON"],
+    [42128, 42182, "ON"],
+    [42509, 42511, "ON"],
+    [42607, 42610, "NSM"],
+    [42611, 42611, "ON"],
+    [42612, 42621, "NSM"],
+    [42622, 42623, "ON"],
+    [42654, 42655, "NSM"],
+    [42736, 42737, "NSM"],
+    [42752, 42785, "ON"],
+    [42888, 42888, "ON"],
+    [43010, 43010, "NSM"],
+    [43014, 43014, "NSM"],
+    [43019, 43019, "NSM"],
+    [43045, 43046, "NSM"],
+    [43048, 43051, "ON"],
+    [43052, 43052, "NSM"],
+    [43064, 43065, "ET"],
+    [43124, 43127, "ON"],
+    [43204, 43205, "NSM"],
+    [43232, 43249, "NSM"],
+    [43263, 43263, "NSM"],
+    [43302, 43309, "NSM"],
+    [43335, 43345, "NSM"],
+    [43392, 43394, "NSM"],
+    [43443, 43443, "NSM"],
+    [43446, 43449, "NSM"],
+    [43452, 43453, "NSM"],
+    [43493, 43493, "NSM"],
+    [43561, 43566, "NSM"],
+    [43569, 43570, "NSM"],
+    [43573, 43574, "NSM"],
+    [43587, 43587, "NSM"],
+    [43596, 43596, "NSM"],
+    [43644, 43644, "NSM"],
+    [43696, 43696, "NSM"],
+    [43698, 43700, "NSM"],
+    [43703, 43704, "NSM"],
+    [43710, 43711, "NSM"],
+    [43713, 43713, "NSM"],
+    [43756, 43757, "NSM"],
+    [43766, 43766, "NSM"],
+    [43882, 43883, "ON"],
+    [44005, 44005, "NSM"],
+    [44008, 44008, "NSM"],
+    [44013, 44013, "NSM"],
+    [64285, 64285, "R"],
+    [64286, 64286, "NSM"],
+    [64287, 64296, "R"],
+    [64297, 64297, "ES"],
+    [64298, 64335, "R"],
+    [64336, 64450, "AL"],
+    [64451, 64466, "ON"],
+    [64467, 64829, "AL"],
+    [64830, 64847, "ON"],
+    [64848, 64911, "AL"],
+    [64912, 64913, "ON"],
+    [64914, 64967, "AL"],
+    [64968, 64975, "ON"],
+    [64976, 65007, "BN"],
+    [65008, 65020, "AL"],
+    [65021, 65023, "ON"],
+    [65024, 65039, "NSM"],
+    [65040, 65049, "ON"],
+    [65056, 65071, "NSM"],
+    [65072, 65103, "ON"],
+    [65104, 65104, "CS"],
+    [65105, 65105, "ON"],
+    [65106, 65106, "CS"],
+    [65108, 65108, "ON"],
+    [65109, 65109, "CS"],
+    [65110, 65118, "ON"],
+    [65119, 65119, "ET"],
+    [65120, 65121, "ON"],
+    [65122, 65123, "ES"],
+    [65124, 65126, "ON"],
+    [65128, 65128, "ON"],
+    [65129, 65130, "ET"],
+    [65131, 65131, "ON"],
+    [65136, 65278, "AL"],
+    [65279, 65279, "BN"],
+    [65281, 65282, "ON"],
+    [65283, 65285, "ET"],
+    [65286, 65290, "ON"],
+    [65291, 65291, "ES"],
+    [65292, 65292, "CS"],
+    [65293, 65293, "ES"],
+    [65294, 65295, "CS"],
+    [65296, 65305, "EN"],
+    [65306, 65306, "CS"],
+    [65307, 65312, "ON"],
+    [65339, 65344, "ON"],
+    [65371, 65381, "ON"],
+    [65504, 65505, "ET"],
+    [65506, 65508, "ON"],
+    [65509, 65510, "ET"],
+    [65512, 65518, "ON"],
+    [65520, 65528, "BN"],
+    [65529, 65533, "ON"],
+    [65534, 65535, "BN"],
+    [65793, 65793, "ON"],
+    [65856, 65932, "ON"],
+    [65936, 65948, "ON"],
+    [65952, 65952, "ON"],
+    [66045, 66045, "NSM"],
+    [66272, 66272, "NSM"],
+    [66273, 66299, "EN"],
+    [66422, 66426, "NSM"],
+    [67584, 67870, "R"],
+    [67871, 67871, "ON"],
+    [67872, 68096, "R"],
+    [68097, 68099, "NSM"],
+    [68100, 68100, "R"],
+    [68101, 68102, "NSM"],
+    [68103, 68107, "R"],
+    [68108, 68111, "NSM"],
+    [68112, 68151, "R"],
+    [68152, 68154, "NSM"],
+    [68155, 68158, "R"],
+    [68159, 68159, "NSM"],
+    [68160, 68324, "R"],
+    [68325, 68326, "NSM"],
+    [68327, 68408, "R"],
+    [68409, 68415, "ON"],
+    [68416, 68863, "R"],
+    [68864, 68899, "AL"],
+    [68900, 68903, "NSM"],
+    [68904, 68911, "AL"],
+    [68912, 68921, "AN"],
+    [68922, 68927, "AL"],
+    [68928, 68937, "AN"],
+    [68938, 68968, "R"],
+    [68969, 68973, "NSM"],
+    [68974, 68974, "ON"],
+    [68975, 69215, "R"],
+    [69216, 69246, "AN"],
+    [69247, 69290, "R"],
+    [69291, 69292, "NSM"],
+    [69293, 69311, "R"],
+    [69312, 69327, "AL"],
+    [69328, 69336, "ON"],
+    [69337, 69369, "AL"],
+    [69370, 69375, "NSM"],
+    [69376, 69423, "R"],
+    [69424, 69445, "AL"],
+    [69446, 69456, "NSM"],
+    [69457, 69487, "AL"],
+    [69488, 69505, "R"],
+    [69506, 69509, "NSM"],
+    [69510, 69631, "R"],
+    [69633, 69633, "NSM"],
+    [69688, 69702, "NSM"],
+    [69714, 69733, "ON"],
+    [69744, 69744, "NSM"],
+    [69747, 69748, "NSM"],
+    [69759, 69761, "NSM"],
+    [69811, 69814, "NSM"],
+    [69817, 69818, "NSM"],
+    [69826, 69826, "NSM"],
+    [69888, 69890, "NSM"],
+    [69927, 69931, "NSM"],
+    [69933, 69940, "NSM"],
+    [70003, 70003, "NSM"],
+    [70016, 70017, "NSM"],
+    [70070, 70078, "NSM"],
+    [70089, 70092, "NSM"],
+    [70095, 70095, "NSM"],
+    [70191, 70193, "NSM"],
+    [70196, 70196, "NSM"],
+    [70198, 70199, "NSM"],
+    [70206, 70206, "NSM"],
+    [70209, 70209, "NSM"],
+    [70367, 70367, "NSM"],
+    [70371, 70378, "NSM"],
+    [70400, 70401, "NSM"],
+    [70459, 70460, "NSM"],
+    [70464, 70464, "NSM"],
+    [70502, 70508, "NSM"],
+    [70512, 70516, "NSM"],
+    [70587, 70592, "NSM"],
+    [70606, 70606, "NSM"],
+    [70608, 70608, "NSM"],
+    [70610, 70610, "NSM"],
+    [70625, 70626, "NSM"],
+    [70712, 70719, "NSM"],
+    [70722, 70724, "NSM"],
+    [70726, 70726, "NSM"],
+    [70750, 70750, "NSM"],
+    [70835, 70840, "NSM"],
+    [70842, 70842, "NSM"],
+    [70847, 70848, "NSM"],
+    [70850, 70851, "NSM"],
+    [71090, 71093, "NSM"],
+    [71100, 71101, "NSM"],
+    [71103, 71104, "NSM"],
+    [71132, 71133, "NSM"],
+    [71219, 71226, "NSM"],
+    [71229, 71229, "NSM"],
+    [71231, 71232, "NSM"],
+    [71264, 71276, "ON"],
+    [71339, 71339, "NSM"],
+    [71341, 71341, "NSM"],
+    [71344, 71349, "NSM"],
+    [71351, 71351, "NSM"],
+    [71453, 71453, "NSM"],
+    [71455, 71455, "NSM"],
+    [71458, 71461, "NSM"],
+    [71463, 71467, "NSM"],
+    [71727, 71735, "NSM"],
+    [71737, 71738, "NSM"],
+    [71995, 71996, "NSM"],
+    [71998, 71998, "NSM"],
+    [72003, 72003, "NSM"],
+    [72148, 72151, "NSM"],
+    [72154, 72155, "NSM"],
+    [72160, 72160, "NSM"],
+    [72193, 72198, "NSM"],
+    [72201, 72202, "NSM"],
+    [72243, 72248, "NSM"],
+    [72251, 72254, "NSM"],
+    [72263, 72263, "NSM"],
+    [72273, 72278, "NSM"],
+    [72281, 72283, "NSM"],
+    [72330, 72342, "NSM"],
+    [72344, 72345, "NSM"],
+    [72544, 72544, "NSM"],
+    [72546, 72548, "NSM"],
+    [72550, 72550, "NSM"],
+    [72752, 72758, "NSM"],
+    [72760, 72765, "NSM"],
+    [72850, 72871, "NSM"],
+    [72874, 72880, "NSM"],
+    [72882, 72883, "NSM"],
+    [72885, 72886, "NSM"],
+    [73009, 73014, "NSM"],
+    [73018, 73018, "NSM"],
+    [73020, 73021, "NSM"],
+    [73023, 73029, "NSM"],
+    [73031, 73031, "NSM"],
+    [73104, 73105, "NSM"],
+    [73109, 73109, "NSM"],
+    [73111, 73111, "NSM"],
+    [73459, 73460, "NSM"],
+    [73472, 73473, "NSM"],
+    [73526, 73530, "NSM"],
+    [73536, 73536, "NSM"],
+    [73538, 73538, "NSM"],
+    [73562, 73562, "NSM"],
+    [73685, 73692, "ON"],
+    [73693, 73696, "ET"],
+    [73697, 73713, "ON"],
+    [78912, 78912, "NSM"],
+    [78919, 78933, "NSM"],
+    [90398, 90409, "NSM"],
+    [90413, 90415, "NSM"],
+    [92912, 92916, "NSM"],
+    [92976, 92982, "NSM"],
+    [94031, 94031, "NSM"],
+    [94095, 94098, "NSM"],
+    [94178, 94178, "ON"],
+    [94180, 94180, "NSM"],
+    [113821, 113822, "NSM"],
+    [113824, 113827, "BN"],
+    [117760, 117973, "ON"],
+    [118e3, 118009, "EN"],
+    [118010, 118012, "ON"],
+    [118016, 118451, "ON"],
+    [118458, 118480, "ON"],
+    [118496, 118512, "ON"],
+    [118528, 118573, "NSM"],
+    [118576, 118598, "NSM"],
+    [119143, 119145, "NSM"],
+    [119155, 119162, "BN"],
+    [119163, 119170, "NSM"],
+    [119173, 119179, "NSM"],
+    [119210, 119213, "NSM"],
+    [119273, 119274, "ON"],
+    [119296, 119361, "ON"],
+    [119362, 119364, "NSM"],
+    [119365, 119365, "ON"],
+    [119552, 119638, "ON"],
+    [120513, 120513, "ON"],
+    [120539, 120539, "ON"],
+    [120571, 120571, "ON"],
+    [120597, 120597, "ON"],
+    [120629, 120629, "ON"],
+    [120655, 120655, "ON"],
+    [120687, 120687, "ON"],
+    [120713, 120713, "ON"],
+    [120745, 120745, "ON"],
+    [120771, 120771, "ON"],
+    [120782, 120831, "EN"],
+    [121344, 121398, "NSM"],
+    [121403, 121452, "NSM"],
+    [121461, 121461, "NSM"],
+    [121476, 121476, "NSM"],
+    [121499, 121503, "NSM"],
+    [121505, 121519, "NSM"],
+    [122880, 122886, "NSM"],
+    [122888, 122904, "NSM"],
+    [122907, 122913, "NSM"],
+    [122915, 122916, "NSM"],
+    [122918, 122922, "NSM"],
+    [123023, 123023, "NSM"],
+    [123184, 123190, "NSM"],
+    [123566, 123566, "NSM"],
+    [123628, 123631, "NSM"],
+    [123647, 123647, "ET"],
+    [124140, 124143, "NSM"],
+    [124398, 124399, "NSM"],
+    [124643, 124643, "NSM"],
+    [124646, 124646, "NSM"],
+    [124654, 124655, "NSM"],
+    [124661, 124661, "NSM"],
+    [124928, 125135, "R"],
+    [125136, 125142, "NSM"],
+    [125143, 125251, "R"],
+    [125252, 125258, "NSM"],
+    [125259, 126063, "R"],
+    [126064, 126143, "AL"],
+    [126144, 126207, "R"],
+    [126208, 126287, "AL"],
+    [126288, 126463, "R"],
+    [126464, 126703, "AL"],
+    [126704, 126705, "ON"],
+    [126706, 126719, "AL"],
+    [126720, 126975, "R"],
+    [126976, 127019, "ON"],
+    [127024, 127123, "ON"],
+    [127136, 127150, "ON"],
+    [127153, 127167, "ON"],
+    [127169, 127183, "ON"],
+    [127185, 127221, "ON"],
+    [127232, 127242, "EN"],
+    [127243, 127247, "ON"],
+    [127279, 127279, "ON"],
+    [127338, 127343, "ON"],
+    [127405, 127405, "ON"],
+    [127584, 127589, "ON"],
+    [127744, 128728, "ON"],
+    [128732, 128748, "ON"],
+    [128752, 128764, "ON"],
+    [128768, 128985, "ON"],
+    [128992, 129003, "ON"],
+    [129008, 129008, "ON"],
+    [129024, 129035, "ON"],
+    [129040, 129095, "ON"],
+    [129104, 129113, "ON"],
+    [129120, 129159, "ON"],
+    [129168, 129197, "ON"],
+    [129200, 129211, "ON"],
+    [129216, 129217, "ON"],
+    [129232, 129240, "ON"],
+    [129280, 129623, "ON"],
+    [129632, 129645, "ON"],
+    [129648, 129660, "ON"],
+    [129664, 129674, "ON"],
+    [129678, 129734, "ON"],
+    [129736, 129736, "ON"],
+    [129741, 129756, "ON"],
+    [129759, 129770, "ON"],
+    [129775, 129784, "ON"],
+    [129792, 129938, "ON"],
+    [129940, 130031, "ON"],
+    [130032, 130041, "EN"],
+    [130042, 130042, "ON"],
+    [131070, 131071, "BN"],
+    [196606, 196607, "BN"],
+    [262142, 262143, "BN"],
+    [327678, 327679, "BN"],
+    [393214, 393215, "BN"],
+    [458750, 458751, "BN"],
+    [524286, 524287, "BN"],
+    [589822, 589823, "BN"],
+    [655358, 655359, "BN"],
+    [720894, 720895, "BN"],
+    [786430, 786431, "BN"],
+    [851966, 851967, "BN"],
+    [917502, 917759, "BN"],
+    [917760, 917999, "NSM"],
+    [918e3, 921599, "BN"],
+    [983038, 983039, "BN"],
+    [1048574, 1048575, "BN"],
+    [1114110, 1114111, "BN"]
+  ];
+
+  // public/bidi.js
+  function classifyCodePoint(codePoint) {
+    if (codePoint <= 255)
+      return latin1BidiTypes[codePoint];
+    let lo = 0;
+    let hi = nonLatin1BidiRanges.length - 1;
+    while (lo <= hi) {
+      const mid = lo + hi >> 1;
+      const range = nonLatin1BidiRanges[mid];
+      if (codePoint < range[0]) {
+        hi = mid - 1;
+        continue;
+      }
+      if (codePoint > range[1]) {
+        lo = mid + 1;
+        continue;
+      }
+      return range[2];
+    }
+    return "L";
+  }
+  function computeBidiLevels(str) {
+    const len = str.length;
+    if (len === 0)
+      return null;
+    const types = new Array(len);
+    let sawBidi = false;
+    for (let i = 0; i < len; ) {
+      const first = str.charCodeAt(i);
+      let codePoint = first;
+      let codeUnitLength = 1;
+      if (first >= 55296 && first <= 56319 && i + 1 < len) {
+        const second = str.charCodeAt(i + 1);
+        if (second >= 56320 && second <= 57343) {
+          codePoint = (first - 55296 << 10) + (second - 56320) + 65536;
+          codeUnitLength = 2;
+        }
+      }
+      const t = classifyCodePoint(codePoint);
+      if (t === "R" || t === "AL" || t === "AN")
+        sawBidi = true;
+      for (let j = 0; j < codeUnitLength; j++) {
+        types[i + j] = t;
+      }
+      i += codeUnitLength;
+    }
+    if (!sawBidi)
+      return null;
+    let startLevel = 0;
+    for (let i = 0; i < len; i++) {
+      const t = types[i];
+      if (t === "L") {
+        startLevel = 0;
+        break;
+      }
+      if (t === "R" || t === "AL") {
+        startLevel = 1;
+        break;
+      }
+    }
+    const levels = new Int8Array(len);
+    for (let i = 0; i < len; i++)
+      levels[i] = startLevel;
+    const e = startLevel & 1 ? "R" : "L";
+    const sor = e;
+    let lastType = sor;
+    for (let i = 0; i < len; i++) {
+      if (types[i] === "NSM")
+        types[i] = lastType;
+      else
+        lastType = types[i];
+    }
+    lastType = sor;
+    for (let i = 0; i < len; i++) {
+      const t = types[i];
+      if (t === "EN")
+        types[i] = lastType === "AL" ? "AN" : "EN";
+      else if (t === "R" || t === "L" || t === "AL")
+        lastType = t;
+    }
+    for (let i = 0; i < len; i++) {
+      if (types[i] === "AL")
+        types[i] = "R";
+    }
+    for (let i = 1; i < len - 1; i++) {
+      if (types[i] === "ES" && types[i - 1] === "EN" && types[i + 1] === "EN") {
+        types[i] = "EN";
+      }
+      if (types[i] === "CS" && (types[i - 1] === "EN" || types[i - 1] === "AN") && types[i + 1] === types[i - 1]) {
+        types[i] = types[i - 1];
+      }
+    }
+    for (let i = 0; i < len; i++) {
+      if (types[i] !== "EN")
+        continue;
+      let j;
+      for (j = i - 1; j >= 0 && types[j] === "ET"; j--)
+        types[j] = "EN";
+      for (j = i + 1; j < len && types[j] === "ET"; j++)
+        types[j] = "EN";
+    }
+    for (let i = 0; i < len; i++) {
+      const t = types[i];
+      if (t === "WS" || t === "ES" || t === "ET" || t === "CS")
+        types[i] = "ON";
+    }
+    lastType = sor;
+    for (let i = 0; i < len; i++) {
+      const t = types[i];
+      if (t === "EN")
+        types[i] = lastType === "L" ? "L" : "EN";
+      else if (t === "R" || t === "L")
+        lastType = t;
+    }
+    for (let i = 0; i < len; i++) {
+      if (types[i] !== "ON")
+        continue;
+      let end = i + 1;
+      while (end < len && types[end] === "ON")
+        end++;
+      const before = i > 0 ? types[i - 1] : sor;
+      const after = end < len ? types[end] : sor;
+      const bDir = before !== "L" ? "R" : "L";
+      const aDir = after !== "L" ? "R" : "L";
+      if (bDir === aDir) {
+        for (let j = i; j < end; j++)
+          types[j] = bDir;
+      }
+      i = end - 1;
+    }
+    for (let i = 0; i < len; i++) {
+      if (types[i] === "ON")
+        types[i] = e;
+    }
+    for (let i = 0; i < len; i++) {
+      const t = types[i];
+      if ((levels[i] & 1) === 0) {
+        if (t === "R")
+          levels[i]++;
+        else if (t === "AN" || t === "EN")
+          levels[i] += 2;
+      } else if (t === "L" || t === "AN" || t === "EN") {
+        levels[i]++;
+      }
+    }
+    return levels;
+  }
+  function computeSegmentLevels(normalized, segStarts) {
+    const bidiLevels = computeBidiLevels(normalized);
+    if (bidiLevels === null)
+      return null;
+    const segLevels = new Int8Array(segStarts.length);
+    for (let i = 0; i < segStarts.length; i++) {
+      segLevels[i] = bidiLevels[segStarts[i]];
+    }
+    return segLevels;
+  }
+
+  // public/analysis.js
+  var collapsibleWhitespaceRunRe = /[ \t\n\r\f]+/g;
+  var needsWhitespaceNormalizationRe = /[\t\n\r\f]| {2,}|^ | $/;
+  function getWhiteSpaceProfile(whiteSpace) {
+    const mode = whiteSpace ?? "normal";
+    return mode === "pre-wrap" ? { mode, preserveOrdinarySpaces: true, preserveHardBreaks: true } : { mode, preserveOrdinarySpaces: false, preserveHardBreaks: false };
+  }
+  function normalizeWhitespaceNormal(text) {
+    if (!needsWhitespaceNormalizationRe.test(text))
+      return text;
+    let normalized = text.replace(collapsibleWhitespaceRunRe, " ");
+    if (normalized.charCodeAt(0) === 32) {
+      normalized = normalized.slice(1);
+    }
+    if (normalized.length > 0 && normalized.charCodeAt(normalized.length - 1) === 32) {
+      normalized = normalized.slice(0, -1);
+    }
+    return normalized;
+  }
+  function normalizeWhitespacePreWrap(text) {
+    if (!/[\r\f]/.test(text))
+      return text;
+    return text.replace(/\r\n/g, "\n").replace(/[\r\f]/g, "\n");
+  }
+  var sharedWordSegmenter = null;
+  var segmenterLocale;
+  function getSharedWordSegmenter() {
+    if (sharedWordSegmenter === null) {
+      sharedWordSegmenter = new Intl.Segmenter(segmenterLocale, { granularity: "word" });
+    }
+    return sharedWordSegmenter;
+  }
+  var arabicScriptRe = /\p{Script=Arabic}/u;
+  var combiningMarkRe = /\p{M}/u;
+  var decimalDigitRe = /\p{Nd}/u;
+  function containsArabicScript(text) {
+    return arabicScriptRe.test(text);
+  }
+  function isCJKCodePoint(codePoint) {
+    return codePoint >= 19968 && codePoint <= 40959 || codePoint >= 13312 && codePoint <= 19903 || codePoint >= 131072 && codePoint <= 173791 || codePoint >= 173824 && codePoint <= 177983 || codePoint >= 177984 && codePoint <= 178207 || codePoint >= 178208 && codePoint <= 183983 || codePoint >= 183984 && codePoint <= 191471 || codePoint >= 191472 && codePoint <= 192093 || codePoint >= 194560 && codePoint <= 195103 || codePoint >= 196608 && codePoint <= 201551 || codePoint >= 201552 && codePoint <= 205743 || codePoint >= 205744 && codePoint <= 210041 || codePoint >= 63744 && codePoint <= 64255 || codePoint >= 12288 && codePoint <= 12351 || codePoint >= 12352 && codePoint <= 12447 || codePoint >= 12448 && codePoint <= 12543 || codePoint >= 12592 && codePoint <= 12687 || codePoint >= 44032 && codePoint <= 55215 || codePoint >= 65280 && codePoint <= 65519;
+  }
+  function isCJK(s) {
+    for (let i = 0; i < s.length; i++) {
+      const first = s.charCodeAt(i);
+      if (first < 12288)
+        continue;
+      if (first >= 55296 && first <= 56319 && i + 1 < s.length) {
+        const second = s.charCodeAt(i + 1);
+        if (second >= 56320 && second <= 57343) {
+          const codePoint = (first - 55296 << 10) + (second - 56320) + 65536;
+          if (isCJKCodePoint(codePoint))
+            return true;
+          i++;
+          continue;
+        }
+      }
+      if (isCJKCodePoint(first))
+        return true;
+    }
+    return false;
+  }
+  function endsWithLineStartProhibitedText(text) {
+    const last = getLastCodePoint(text);
+    return last !== null && (kinsokuStart.has(last) || leftStickyPunctuation.has(last));
+  }
+  var keepAllGlueChars = /* @__PURE__ */ new Set([
+    "\xA0",
+    "\u202F",
+    "\u2060",
+    "\uFEFF"
+  ]);
+  var keepAllDashBreakChars = /* @__PURE__ */ new Set([
+    "-",
+    "\u2010",
+    "\u2013",
+    "\u2014"
+  ]);
+  function endsWithKeepAllGlueText(text) {
+    const last = getLastCodePoint(text);
+    return last !== null && keepAllGlueChars.has(last);
+  }
+  function endsWithKeepAllDashBreakText(text) {
+    const last = getLastCodePoint(text);
+    return last !== null && keepAllDashBreakChars.has(last);
+  }
+  function canContinueKeepAllTextRun(previousText, breakAfterPunctuation) {
+    if (endsWithKeepAllGlueText(previousText))
+      return false;
+    if (!breakAfterPunctuation)
+      return true;
+    if (endsWithLineStartProhibitedText(previousText))
+      return false;
+    if (endsWithKeepAllDashBreakText(previousText))
+      return false;
+    return true;
+  }
+  var kinsokuStart = /* @__PURE__ */ new Set([
+    "\uFF0C",
+    "\uFF0E",
+    "\uFF01",
+    "\uFF1A",
+    "\uFF1B",
+    "\uFF1F",
+    "\u3001",
+    "\u3002",
+    "\u30FB",
+    "\uFF09",
+    "\u3015",
+    "\u3009",
+    "\u300B",
+    "\u300D",
+    "\u300F",
+    "\u3011",
+    "\u3017",
+    "\u3019",
+    "\u301B",
+    "\u30FC",
+    "\u3005",
+    "\u303B",
+    "\u309D",
+    "\u309E",
+    "\u30FD",
+    "\u30FE"
+  ]);
+  var kinsokuEnd = /* @__PURE__ */ new Set([
+    '"',
+    "(",
+    "[",
+    "{",
+    "\xA1",
+    "\xBF",
+    "\u201C",
+    "\u2018",
+    "\u201A",
+    "\u201E",
+    "\xAB",
+    "\u2039",
+    "\u2E18",
+    "\uFF08",
+    "\u3014",
+    "\u3008",
+    "\u300A",
+    "\u300C",
+    "\u300E",
+    "\u3010",
+    "\u3016",
+    "\u3018",
+    "\u301A"
+  ]);
+  var forwardStickyGlue = /* @__PURE__ */ new Set([
+    "'",
+    "\u2019"
+  ]);
+  var leftStickyPunctuation = /* @__PURE__ */ new Set([
+    ".",
+    ",",
+    "!",
+    "?",
+    ":",
+    ";",
+    "\u060C",
+    "\u061B",
+    "\u061F",
+    "\u0964",
+    "\u0965",
+    "\u104A",
+    "\u104B",
+    "\u104C",
+    "\u104D",
+    "\u104F",
+    ")",
+    "]",
+    "}",
+    "%",
+    '"',
+    "\u201D",
+    "\u2019",
+    "\xBB",
+    "\u203A",
+    "\u2026"
+  ]);
+  var arabicNoSpaceTrailingPunctuation = /* @__PURE__ */ new Set([
+    ":",
+    ".",
+    "\u060C",
+    "\u061B"
+  ]);
+  var myanmarMedialGlue = /* @__PURE__ */ new Set([
+    "\u104F"
+  ]);
+  var closingQuoteChars = /* @__PURE__ */ new Set([
+    "\u201D",
+    "\u2019",
+    "\xBB",
+    "\u203A",
+    "\u300D",
+    "\u300F",
+    "\u3011",
+    "\u300B",
+    "\u3009",
+    "\u3015",
+    "\uFF09"
+  ]);
+  function isLeftStickyPunctuationSegment(segment) {
+    if (isEscapedQuoteClusterSegment(segment))
+      return true;
+    let sawPunctuation = false;
+    for (const ch of segment) {
+      if (leftStickyPunctuation.has(ch) || isLineBreakNumericAffix(ch)) {
+        sawPunctuation = true;
+        continue;
+      }
+      if (sawPunctuation && combiningMarkRe.test(ch))
+        continue;
+      return false;
+    }
+    return sawPunctuation;
+  }
+  function isCJKLineStartProhibitedSegment(segment) {
+    for (const ch of segment) {
+      if (!kinsokuStart.has(ch) && !leftStickyPunctuation.has(ch))
+        return false;
+    }
+    return segment.length > 0;
+  }
+  function isForwardStickyClusterSegment(segment) {
+    if (isEscapedQuoteClusterSegment(segment))
+      return true;
+    for (const ch of segment) {
+      if (!kinsokuEnd.has(ch) && !forwardStickyGlue.has(ch) && !combiningMarkRe.test(ch) && !isLineBreakNumericAffix(ch)) {
+        return false;
+      }
+    }
+    return segment.length > 0;
+  }
+  function isEscapedQuoteClusterSegment(segment) {
+    let sawQuote = false;
+    for (const ch of segment) {
+      if (ch === "\\" || combiningMarkRe.test(ch))
+        continue;
+      if (kinsokuEnd.has(ch) || leftStickyPunctuation.has(ch) || forwardStickyGlue.has(ch)) {
+        sawQuote = true;
+        continue;
+      }
+      return false;
+    }
+    return sawQuote;
+  }
+  function previousCodePointStart(text, end) {
+    const last = end - 1;
+    if (last <= 0)
+      return Math.max(last, 0);
+    const lastCodeUnit = text.charCodeAt(last);
+    if (lastCodeUnit < 56320 || lastCodeUnit > 57343)
+      return last;
+    const maybeHigh = last - 1;
+    if (maybeHigh < 0)
+      return last;
+    const highCodeUnit = text.charCodeAt(maybeHigh);
+    return highCodeUnit >= 55296 && highCodeUnit <= 56319 ? maybeHigh : last;
+  }
+  function getLastCodePoint(text) {
+    if (text.length === 0)
+      return null;
+    const start = previousCodePointStart(text, text.length);
+    return text.slice(start);
+  }
+  function getFirstSignificantCodePoint(text) {
+    for (const ch of text) {
+      if (!combiningMarkRe.test(ch))
+        return ch;
+    }
+    return null;
+  }
+  function getLastSignificantCodePoint(text) {
+    for (let end = text.length; end > 0; ) {
+      const start = previousCodePointStart(text, end);
+      const ch = text.slice(start, end);
+      if (!combiningMarkRe.test(ch))
+        return ch;
+      end = start;
+    }
+    return null;
+  }
+  var lineBreakNumericAffixRanges = [
+    36,
+    37,
+    43,
+    43,
+    92,
+    92,
+    162,
+    165,
+    176,
+    177,
+    1423,
+    1423,
+    1545,
+    1547,
+    1642,
+    1642,
+    2046,
+    2047,
+    2546,
+    2547,
+    2553,
+    2555,
+    2801,
+    2801,
+    3065,
+    3065,
+    3449,
+    3449,
+    3647,
+    3647,
+    6107,
+    6107,
+    8240,
+    8247,
+    8279,
+    8279,
+    8352,
+    8399,
+    8451,
+    8451,
+    8457,
+    8457,
+    8470,
+    8470,
+    8722,
+    8723,
+    43064,
+    43064,
+    65020,
+    65020,
+    65129,
+    65130,
+    65284,
+    65285,
+    65504,
+    65505,
+    65509,
+    65510,
+    73693,
+    73696,
+    123647,
+    123647,
+    126124,
+    126124,
+    126128,
+    126128
+  ];
+  function isCodePointInRanges(codePoint, ranges) {
+    for (let i = 0; i < ranges.length; i += 2) {
+      if (codePoint >= ranges[i] && codePoint <= ranges[i + 1])
+        return true;
+    }
+    return false;
+  }
+  function isLineBreakNumericAffix(ch) {
+    const codePoint = ch.codePointAt(0);
+    return codePoint !== void 0 && isCodePointInRanges(codePoint, lineBreakNumericAffixRanges);
+  }
+  function endsWithLineBreakNumericAffix(text) {
+    const last = getLastSignificantCodePoint(text);
+    return last !== null && isLineBreakNumericAffix(last);
+  }
+  function startsWithDecimalDigit(text) {
+    const first = getFirstSignificantCodePoint(text);
+    return first !== null && decimalDigitRe.test(first);
+  }
+  function splitTrailingForwardStickyCluster(text) {
+    const chars = Array.from(text);
+    let splitIndex = chars.length;
+    while (splitIndex > 0) {
+      const ch = chars[splitIndex - 1];
+      if (combiningMarkRe.test(ch)) {
+        splitIndex--;
+        continue;
+      }
+      if (kinsokuEnd.has(ch) || forwardStickyGlue.has(ch)) {
+        splitIndex--;
+        continue;
+      }
+      break;
+    }
+    if (splitIndex <= 0 || splitIndex === chars.length)
+      return null;
+    return {
+      head: chars.slice(0, splitIndex).join(""),
+      tail: chars.slice(splitIndex).join("")
+    };
+  }
+  function getRepeatableSingleCharRunChar(text, isWordLike, kind) {
+    return kind === "text" && !isWordLike && text.length === 1 && text !== "-" && text !== "\u2014" ? text : null;
+  }
+  function materializeDeferredSingleCharRun(texts, chars, lengths, index) {
+    const ch = chars[index];
+    const text = texts[index];
+    if (ch == null)
+      return text;
+    const length = lengths[index];
+    if (text.length === length)
+      return text;
+    const materialized = ch.repeat(length);
+    texts[index] = materialized;
+    return materialized;
+  }
+  function hasArabicNoSpacePunctuation(containsArabic, lastCodePoint) {
+    return containsArabic && lastCodePoint !== null && arabicNoSpaceTrailingPunctuation.has(lastCodePoint);
+  }
+  function endsWithMyanmarMedialGlue(segment) {
+    const lastCodePoint = getLastCodePoint(segment);
+    return lastCodePoint !== null && myanmarMedialGlue.has(lastCodePoint);
+  }
+  function splitLeadingSpaceAndMarks(segment) {
+    if (segment.length < 2 || segment[0] !== " ")
+      return null;
+    const marks = segment.slice(1);
+    if (/^\p{M}+$/u.test(marks)) {
+      return { space: " ", marks };
+    }
+    return null;
+  }
+  function endsWithClosingQuote(text) {
+    let end = text.length;
+    while (end > 0) {
+      const start = previousCodePointStart(text, end);
+      const ch = text.slice(start, end);
+      if (closingQuoteChars.has(ch))
+        return true;
+      if (!leftStickyPunctuation.has(ch))
+        return false;
+      end = start;
+    }
+    return false;
+  }
+  function classifySegmentBreakChar(ch, whiteSpaceProfile) {
+    if (whiteSpaceProfile.preserveOrdinarySpaces || whiteSpaceProfile.preserveHardBreaks) {
+      if (ch === " ")
+        return "preserved-space";
+      if (ch === "	")
+        return "tab";
+      if (whiteSpaceProfile.preserveHardBreaks && ch === "\n")
+        return "hard-break";
+    }
+    if (ch === " ")
+      return "space";
+    if (ch === "\xA0" || ch === "\u202F" || ch === "\u2060" || ch === "\uFEFF") {
+      return "glue";
+    }
+    if (ch === "\u200B")
+      return "zero-width-break";
+    if (ch === "\xAD")
+      return "soft-hyphen";
+    return "text";
+  }
+  var breakCharRe = /[\x20\t\n\xA0\xAD\u200B\u202F\u2060\uFEFF]/;
+  function joinTextParts(parts) {
+    return parts.length === 1 ? parts[0] : parts.join("");
+  }
+  function joinReversedPrefixParts(prefixParts, tail) {
+    const parts = [];
+    for (let i = prefixParts.length - 1; i >= 0; i--) {
+      parts.push(prefixParts[i]);
+    }
+    parts.push(tail);
+    return joinTextParts(parts);
+  }
+  function splitSegmentByBreakKind(segment, isWordLike, start, whiteSpaceProfile) {
+    if (!breakCharRe.test(segment)) {
+      return [{ text: segment, isWordLike, kind: "text", start }];
+    }
+    const pieces = [];
+    let currentKind = null;
+    let currentTextParts = [];
+    let currentStart = start;
+    let currentWordLike = false;
+    let offset = 0;
+    for (const ch of segment) {
+      const kind = classifySegmentBreakChar(ch, whiteSpaceProfile);
+      const wordLike = kind === "text" && isWordLike;
+      if (currentKind !== null && kind === currentKind && wordLike === currentWordLike) {
+        currentTextParts.push(ch);
+        offset += ch.length;
+        continue;
+      }
+      if (currentKind !== null) {
+        pieces.push({
+          text: joinTextParts(currentTextParts),
+          isWordLike: currentWordLike,
+          kind: currentKind,
+          start: currentStart
+        });
+      }
+      currentKind = kind;
+      currentTextParts = [ch];
+      currentStart = start + offset;
+      currentWordLike = wordLike;
+      offset += ch.length;
+    }
+    if (currentKind !== null) {
+      pieces.push({
+        text: joinTextParts(currentTextParts),
+        isWordLike: currentWordLike,
+        kind: currentKind,
+        start: currentStart
+      });
+    }
+    return pieces;
+  }
+  function isTextRunBoundary(kind) {
+    return kind === "space" || kind === "preserved-space" || kind === "zero-width-break" || kind === "hard-break";
+  }
+  var urlSchemeSegmentRe = /^[A-Za-z][A-Za-z0-9+.-]*:$/;
+  function isUrlLikeRunStart(segmentation, index) {
+    const text = segmentation.texts[index];
+    if (text.startsWith("www."))
+      return true;
+    return urlSchemeSegmentRe.test(text) && index + 1 < segmentation.len && segmentation.kinds[index + 1] === "text" && segmentation.texts[index + 1] === "//";
+  }
+  function isUrlQueryBoundarySegment(text) {
+    return text.includes("?") && (text.includes("://") || text.startsWith("www."));
+  }
+  function mergeUrlLikeRuns(segmentation) {
+    const texts = segmentation.texts.slice();
+    const isWordLike = segmentation.isWordLike.slice();
+    const kinds = segmentation.kinds.slice();
+    const starts = segmentation.starts.slice();
+    for (let i = 0; i < segmentation.len; i++) {
+      if (kinds[i] !== "text" || !isUrlLikeRunStart(segmentation, i))
+        continue;
+      const mergedParts = [texts[i]];
+      let j = i + 1;
+      while (j < segmentation.len && !isTextRunBoundary(kinds[j])) {
+        mergedParts.push(texts[j]);
+        isWordLike[i] = true;
+        const endsQueryPrefix = texts[j].includes("?");
+        kinds[j] = "text";
+        texts[j] = "";
+        j++;
+        if (endsQueryPrefix)
+          break;
+      }
+      texts[i] = joinTextParts(mergedParts);
+    }
+    let compactLen = 0;
+    for (let read = 0; read < texts.length; read++) {
+      const text = texts[read];
+      if (text.length === 0)
+        continue;
+      if (compactLen !== read) {
+        texts[compactLen] = text;
+        isWordLike[compactLen] = isWordLike[read];
+        kinds[compactLen] = kinds[read];
+        starts[compactLen] = starts[read];
+      }
+      compactLen++;
+    }
+    texts.length = compactLen;
+    isWordLike.length = compactLen;
+    kinds.length = compactLen;
+    starts.length = compactLen;
+    return {
+      len: compactLen,
+      texts,
+      isWordLike,
+      kinds,
+      starts
+    };
+  }
+  function mergeUrlQueryRuns(segmentation) {
+    const texts = [];
+    const isWordLike = [];
+    const kinds = [];
+    const starts = [];
+    for (let i = 0; i < segmentation.len; i++) {
+      const text = segmentation.texts[i];
+      texts.push(text);
+      isWordLike.push(segmentation.isWordLike[i]);
+      kinds.push(segmentation.kinds[i]);
+      starts.push(segmentation.starts[i]);
+      if (!isUrlQueryBoundarySegment(text))
+        continue;
+      const nextIndex = i + 1;
+      if (nextIndex >= segmentation.len || isTextRunBoundary(segmentation.kinds[nextIndex])) {
+        continue;
+      }
+      const queryParts = [];
+      const queryStart = segmentation.starts[nextIndex];
+      let j = nextIndex;
+      while (j < segmentation.len && !isTextRunBoundary(segmentation.kinds[j])) {
+        queryParts.push(segmentation.texts[j]);
+        j++;
+      }
+      if (queryParts.length > 0) {
+        texts.push(joinTextParts(queryParts));
+        isWordLike.push(true);
+        kinds.push("text");
+        starts.push(queryStart);
+        i = j - 1;
+      }
+    }
+    return {
+      len: texts.length,
+      texts,
+      isWordLike,
+      kinds,
+      starts
+    };
+  }
+  var numericJoinerChars = /* @__PURE__ */ new Set([
+    ":",
+    "-",
+    "/",
+    "\xD7",
+    ",",
+    ".",
+    "+",
+    "\u2013",
+    "\u2014"
+  ]);
+  var wordInternalSymbolRe = /[\p{P}\p{S}\p{Co}]/u;
+  var emojiPresentationRe = /\p{Emoji_Presentation}/u;
+  var noSpaceWordBreakAfterChars = /* @__PURE__ */ new Set([
+    "?",
+    "\u058A",
+    "-",
+    "\u2010",
+    "\u2012",
+    "\u2013",
+    "\u2014",
+    "\u2026",
+    "\u203C",
+    "\u203D",
+    "\u2049"
+  ]);
+  function isAsciiWordInternalSymbolCode(code) {
+    return code >= 33 && code <= 47 && code !== 45 || code >= 58 && code <= 64 && code !== 63 || code >= 91 && code <= 96 || code >= 123 && code <= 126;
+  }
+  function isNoSpaceWordInternalSymbol(ch) {
+    const code = ch.charCodeAt(0);
+    if (code < 128)
+      return isAsciiWordInternalSymbolCode(code);
+    return !noSpaceWordBreakAfterChars.has(ch) && !emojiPresentationRe.test(ch) && wordInternalSymbolRe.test(ch);
+  }
+  function isNoSpaceWordInternalSymbolSegment(text) {
+    let sawSymbol = false;
+    for (const ch of text) {
+      if (combiningMarkRe.test(ch))
+        continue;
+      if (!isNoSpaceWordInternalSymbol(ch))
+        return false;
+      sawSymbol = true;
+    }
+    return sawSymbol;
+  }
+  function endsWithNoSpaceWordJoiner(text) {
+    for (let end = text.length; end > 0; ) {
+      const start = previousCodePointStart(text, end);
+      const ch = text.slice(start, end);
+      if (combiningMarkRe.test(ch)) {
+        end = start;
+        continue;
+      }
+      return isNoSpaceWordInternalSymbol(ch) || isLineBreakNumericAffix(ch);
+    }
+    return false;
+  }
+  function canJoinNoSpaceWordBoundary(leftText, leftWordLike, rightText, rightWordLike) {
+    const leftSymbol = !leftWordLike && isNoSpaceWordInternalSymbolSegment(leftText);
+    const rightSymbol = !rightWordLike && isNoSpaceWordInternalSymbolSegment(rightText);
+    const leftAffix = endsWithLineBreakNumericAffix(leftText);
+    const leftEndsJoiner = (leftWordLike || leftAffix) && endsWithNoSpaceWordJoiner(leftText);
+    if (!leftSymbol && !rightSymbol && !leftEndsJoiner)
+      return false;
+    if (isCJK(leftText) || isCJK(rightText))
+      return false;
+    return (leftWordLike || leftSymbol || leftAffix) && (rightWordLike || rightSymbol);
+  }
+  function segmentContainsDecimalDigit(text) {
+    for (const ch of text) {
+      if (decimalDigitRe.test(ch))
+        return true;
+    }
+    return false;
+  }
+  function isNumericRunSegment(text) {
+    if (text.length === 0)
+      return false;
+    for (const ch of text) {
+      if (decimalDigitRe.test(ch) || numericJoinerChars.has(ch))
+        continue;
+      return false;
+    }
+    return true;
+  }
+  function mergeNumericRuns(segmentation) {
+    const texts = [];
+    const isWordLike = [];
+    const kinds = [];
+    const starts = [];
+    for (let i = 0; i < segmentation.len; i++) {
+      const text = segmentation.texts[i];
+      const kind = segmentation.kinds[i];
+      if (kind === "text" && isNumericRunSegment(text) && segmentContainsDecimalDigit(text)) {
+        const mergedParts = [text];
+        let j = i + 1;
+        while (j < segmentation.len && segmentation.kinds[j] === "text" && isNumericRunSegment(segmentation.texts[j])) {
+          mergedParts.push(segmentation.texts[j]);
+          j++;
+        }
+        texts.push(joinTextParts(mergedParts));
+        isWordLike.push(true);
+        kinds.push("text");
+        starts.push(segmentation.starts[i]);
+        i = j - 1;
+        continue;
+      }
+      texts.push(text);
+      isWordLike.push(segmentation.isWordLike[i]);
+      kinds.push(kind);
+      starts.push(segmentation.starts[i]);
+    }
+    return {
+      len: texts.length,
+      texts,
+      isWordLike,
+      kinds,
+      starts
+    };
+  }
+  function mergeNoSpaceWordChains(segmentation) {
+    const texts = [];
+    const isWordLike = [];
+    const kinds = [];
+    const starts = [];
+    let i = 0;
+    while (i < segmentation.len) {
+      const text = segmentation.texts[i];
+      const kind = segmentation.kinds[i];
+      const wordLike = segmentation.isWordLike[i];
+      if (kind === "text") {
+        const mergedParts = [text];
+        let j = i + 1;
+        let mergedWordLike = wordLike;
+        while (j < segmentation.len && segmentation.kinds[j] === "text" && canJoinNoSpaceWordBoundary(segmentation.texts[j - 1], segmentation.isWordLike[j - 1], segmentation.texts[j], segmentation.isWordLike[j])) {
+          const nextText = segmentation.texts[j];
+          mergedParts.push(nextText);
+          mergedWordLike = mergedWordLike || segmentation.isWordLike[j];
+          j++;
+        }
+        if (j > i + 1) {
+          texts.push(joinTextParts(mergedParts));
+          isWordLike.push(mergedWordLike);
+          kinds.push("text");
+          starts.push(segmentation.starts[i]);
+          i = j;
+          continue;
+        }
+      }
+      texts.push(text);
+      isWordLike.push(wordLike);
+      kinds.push(kind);
+      starts.push(segmentation.starts[i]);
+      i++;
+    }
+    return {
+      len: texts.length,
+      texts,
+      isWordLike,
+      kinds,
+      starts
+    };
+  }
+  function splitHyphenatedNumericRuns(segmentation) {
+    const texts = [];
+    const isWordLike = [];
+    const kinds = [];
+    const starts = [];
+    for (let i = 0; i < segmentation.len; i++) {
+      const text = segmentation.texts[i];
+      if (segmentation.kinds[i] === "text" && text.includes("-")) {
+        const parts = text.split("-");
+        let shouldSplit = parts.length > 1;
+        for (let j = 0; j < parts.length; j++) {
+          const part = parts[j];
+          if (!shouldSplit)
+            break;
+          if (part.length === 0 || !segmentContainsDecimalDigit(part) || !isNumericRunSegment(part)) {
+            shouldSplit = false;
+          }
+        }
+        if (shouldSplit) {
+          let offset = 0;
+          for (let j = 0; j < parts.length; j++) {
+            const part = parts[j];
+            const splitText = j < parts.length - 1 ? `${part}-` : part;
+            texts.push(splitText);
+            isWordLike.push(true);
+            kinds.push("text");
+            starts.push(segmentation.starts[i] + offset);
+            offset += splitText.length;
+          }
+          continue;
+        }
+      }
+      texts.push(text);
+      isWordLike.push(segmentation.isWordLike[i]);
+      kinds.push(segmentation.kinds[i]);
+      starts.push(segmentation.starts[i]);
+    }
+    return {
+      len: texts.length,
+      texts,
+      isWordLike,
+      kinds,
+      starts
+    };
+  }
+  function mergeGlueConnectedTextRuns(segmentation) {
+    const texts = [];
+    const isWordLike = [];
+    const kinds = [];
+    const starts = [];
+    let read = 0;
+    while (read < segmentation.len) {
+      const textParts = [segmentation.texts[read]];
+      let wordLike = segmentation.isWordLike[read];
+      let kind = segmentation.kinds[read];
+      let start = segmentation.starts[read];
+      if (kind === "glue") {
+        const glueParts = [textParts[0]];
+        const glueStart = start;
+        read++;
+        while (read < segmentation.len && segmentation.kinds[read] === "glue") {
+          glueParts.push(segmentation.texts[read]);
+          read++;
+        }
+        const glueText = joinTextParts(glueParts);
+        if (read < segmentation.len && segmentation.kinds[read] === "text") {
+          textParts[0] = glueText;
+          textParts.push(segmentation.texts[read]);
+          wordLike = segmentation.isWordLike[read];
+          kind = "text";
+          start = glueStart;
+          read++;
+        } else {
+          texts.push(glueText);
+          isWordLike.push(false);
+          kinds.push("glue");
+          starts.push(glueStart);
+          continue;
+        }
+      } else {
+        read++;
+      }
+      if (kind === "text") {
+        while (read < segmentation.len && segmentation.kinds[read] === "glue") {
+          const glueParts = [];
+          while (read < segmentation.len && segmentation.kinds[read] === "glue") {
+            glueParts.push(segmentation.texts[read]);
+            read++;
+          }
+          const glueText = joinTextParts(glueParts);
+          if (read < segmentation.len && segmentation.kinds[read] === "text") {
+            textParts.push(glueText, segmentation.texts[read]);
+            wordLike = wordLike || segmentation.isWordLike[read];
+            read++;
+            continue;
+          }
+          textParts.push(glueText);
+        }
+      }
+      texts.push(joinTextParts(textParts));
+      isWordLike.push(wordLike);
+      kinds.push(kind);
+      starts.push(start);
+    }
+    return {
+      len: texts.length,
+      texts,
+      isWordLike,
+      kinds,
+      starts
+    };
+  }
+  function carryTrailingForwardStickyAcrossCJKBoundary(segmentation) {
+    const texts = segmentation.texts.slice();
+    const isWordLike = segmentation.isWordLike.slice();
+    const kinds = segmentation.kinds.slice();
+    const starts = segmentation.starts.slice();
+    for (let i = 0; i < texts.length - 1; i++) {
+      if (kinds[i] !== "text" || kinds[i + 1] !== "text")
+        continue;
+      if (!isCJK(texts[i]) || !isCJK(texts[i + 1]))
+        continue;
+      const split = splitTrailingForwardStickyCluster(texts[i]);
+      if (split === null)
+        continue;
+      texts[i] = split.head;
+      texts[i + 1] = split.tail + texts[i + 1];
+      starts[i + 1] = starts[i] + split.head.length;
+    }
+    return {
+      len: texts.length,
+      texts,
+      isWordLike,
+      kinds,
+      starts
+    };
+  }
+  function buildMergedSegmentation(normalized, profile, whiteSpaceProfile) {
+    const wordSegmenter = getSharedWordSegmenter();
+    let mergedLen = 0;
+    const mergedTexts = [];
+    const mergedTextParts = [];
+    const mergedWordLike = [];
+    const mergedKinds = [];
+    const mergedStarts = [];
+    const mergedSingleCharRunChars = [];
+    const mergedSingleCharRunLengths = [];
+    const mergedContainsCJK = [];
+    const mergedContainsArabicScript = [];
+    const mergedEndsWithClosingQuote = [];
+    const mergedEndsWithMyanmarMedialGlue = [];
+    const mergedHasArabicNoSpacePunctuation = [];
+    for (const s of wordSegmenter.segment(normalized)) {
+      for (const piece of splitSegmentByBreakKind(s.segment, s.isWordLike ?? false, s.index, whiteSpaceProfile)) {
+        let appendPieceToPrevious = function() {
+          if (mergedSingleCharRunChars[prevIndex] !== null) {
+            mergedTextParts[prevIndex] = [
+              materializeDeferredSingleCharRun(mergedTexts, mergedSingleCharRunChars, mergedSingleCharRunLengths, prevIndex)
+            ];
+            mergedSingleCharRunChars[prevIndex] = null;
+          }
+          mergedTextParts[prevIndex].push(piece.text);
+          mergedWordLike[prevIndex] = mergedWordLike[prevIndex] || piece.isWordLike;
+          mergedContainsCJK[prevIndex] = mergedContainsCJK[prevIndex] || pieceContainsCJK;
+          mergedContainsArabicScript[prevIndex] = mergedContainsArabicScript[prevIndex] || pieceContainsArabicScript;
+          mergedEndsWithClosingQuote[prevIndex] = pieceEndsWithClosingQuote;
+          mergedEndsWithMyanmarMedialGlue[prevIndex] = pieceEndsWithMyanmarMedialGlue;
+          mergedHasArabicNoSpacePunctuation[prevIndex] = hasArabicNoSpacePunctuation(mergedContainsArabicScript[prevIndex], pieceLastCodePoint);
+        };
+        const isText = piece.kind === "text";
+        const repeatableSingleCharRunChar = getRepeatableSingleCharRunChar(piece.text, piece.isWordLike, piece.kind);
+        const pieceContainsCJK = isCJK(piece.text);
+        const pieceContainsArabicScript = containsArabicScript(piece.text);
+        const pieceLastCodePoint = getLastCodePoint(piece.text);
+        const pieceEndsWithClosingQuote = endsWithClosingQuote(piece.text);
+        const pieceEndsWithMyanmarMedialGlue = endsWithMyanmarMedialGlue(piece.text);
+        const prevIndex = mergedLen - 1;
+        if (profile.carryCJKAfterClosingQuote && isText && mergedLen > 0 && mergedKinds[prevIndex] === "text" && pieceContainsCJK && mergedContainsCJK[prevIndex] && mergedEndsWithClosingQuote[prevIndex]) {
+          appendPieceToPrevious();
+        } else if (isText && mergedLen > 0 && mergedKinds[prevIndex] === "text" && isCJKLineStartProhibitedSegment(piece.text) && mergedContainsCJK[prevIndex]) {
+          appendPieceToPrevious();
+        } else if (isText && mergedLen > 0 && mergedKinds[prevIndex] === "text" && mergedEndsWithMyanmarMedialGlue[prevIndex]) {
+          appendPieceToPrevious();
+        } else if (isText && mergedLen > 0 && mergedKinds[prevIndex] === "text" && piece.isWordLike && pieceContainsArabicScript && mergedHasArabicNoSpacePunctuation[prevIndex]) {
+          appendPieceToPrevious();
+          mergedWordLike[prevIndex] = true;
+        } else if (repeatableSingleCharRunChar !== null && mergedLen > 0 && mergedKinds[prevIndex] === "text" && mergedSingleCharRunChars[prevIndex] === repeatableSingleCharRunChar) {
+          mergedSingleCharRunLengths[prevIndex] = (mergedSingleCharRunLengths[prevIndex] ?? 1) + 1;
+        } else if (isText && !piece.isWordLike && mergedLen > 0 && mergedKinds[prevIndex] === "text" && !mergedContainsCJK[prevIndex] && (isLeftStickyPunctuationSegment(piece.text) || piece.text === "-" && mergedWordLike[prevIndex])) {
+          appendPieceToPrevious();
+        } else {
+          mergedTexts[mergedLen] = piece.text;
+          mergedTextParts[mergedLen] = [piece.text];
+          mergedWordLike[mergedLen] = piece.isWordLike;
+          mergedKinds[mergedLen] = piece.kind;
+          mergedStarts[mergedLen] = piece.start;
+          mergedSingleCharRunChars[mergedLen] = repeatableSingleCharRunChar;
+          mergedSingleCharRunLengths[mergedLen] = repeatableSingleCharRunChar === null ? 0 : 1;
+          mergedContainsCJK[mergedLen] = pieceContainsCJK;
+          mergedContainsArabicScript[mergedLen] = pieceContainsArabicScript;
+          mergedEndsWithClosingQuote[mergedLen] = pieceEndsWithClosingQuote;
+          mergedEndsWithMyanmarMedialGlue[mergedLen] = pieceEndsWithMyanmarMedialGlue;
+          mergedHasArabicNoSpacePunctuation[mergedLen] = hasArabicNoSpacePunctuation(pieceContainsArabicScript, pieceLastCodePoint);
+          mergedLen++;
+        }
+      }
+    }
+    for (let i = 0; i < mergedLen; i++) {
+      if (mergedSingleCharRunChars[i] !== null) {
+        mergedTexts[i] = materializeDeferredSingleCharRun(mergedTexts, mergedSingleCharRunChars, mergedSingleCharRunLengths, i);
+        continue;
+      }
+      mergedTexts[i] = joinTextParts(mergedTextParts[i]);
+    }
+    for (let i = 1; i < mergedLen; i++) {
+      if (mergedKinds[i] === "text" && !mergedWordLike[i] && isEscapedQuoteClusterSegment(mergedTexts[i]) && mergedKinds[i - 1] === "text" && !mergedContainsCJK[i - 1]) {
+        mergedTexts[i - 1] += mergedTexts[i];
+        mergedWordLike[i - 1] = mergedWordLike[i - 1] || mergedWordLike[i];
+        mergedTexts[i] = "";
+      }
+    }
+    const forwardStickyPrefixParts = Array.from({ length: mergedLen }, () => null);
+    let nextLiveIndex = -1;
+    for (let i = mergedLen - 1; i >= 0; i--) {
+      const text = mergedTexts[i];
+      if (text.length === 0)
+        continue;
+      if (mergedKinds[i] === "text" && !mergedWordLike[i] && nextLiveIndex >= 0 && mergedKinds[nextLiveIndex] === "text" && (isForwardStickyClusterSegment(text) || text === "-" && startsWithDecimalDigit(mergedTexts[nextLiveIndex]))) {
+        const prefixParts = forwardStickyPrefixParts[nextLiveIndex] ?? [];
+        prefixParts.push(text);
+        forwardStickyPrefixParts[nextLiveIndex] = prefixParts;
+        mergedStarts[nextLiveIndex] = mergedStarts[i];
+        mergedTexts[i] = "";
+        continue;
+      }
+      nextLiveIndex = i;
+    }
+    for (let i = 0; i < mergedLen; i++) {
+      const prefixParts = forwardStickyPrefixParts[i];
+      if (prefixParts == null)
+        continue;
+      mergedTexts[i] = joinReversedPrefixParts(prefixParts, mergedTexts[i]);
+    }
+    let compactLen = 0;
+    for (let read = 0; read < mergedLen; read++) {
+      const text = mergedTexts[read];
+      if (text.length === 0)
+        continue;
+      if (compactLen !== read) {
+        mergedTexts[compactLen] = text;
+        mergedWordLike[compactLen] = mergedWordLike[read];
+        mergedKinds[compactLen] = mergedKinds[read];
+        mergedStarts[compactLen] = mergedStarts[read];
+      }
+      compactLen++;
+    }
+    mergedTexts.length = compactLen;
+    mergedWordLike.length = compactLen;
+    mergedKinds.length = compactLen;
+    mergedStarts.length = compactLen;
+    const compacted = mergeGlueConnectedTextRuns({
+      len: compactLen,
+      texts: mergedTexts,
+      isWordLike: mergedWordLike,
+      kinds: mergedKinds,
+      starts: mergedStarts
+    });
+    const withMergedUrls = carryTrailingForwardStickyAcrossCJKBoundary(mergeNoSpaceWordChains(splitHyphenatedNumericRuns(mergeNumericRuns(mergeUrlQueryRuns(mergeUrlLikeRuns(compacted))))));
+    for (let i = 0; i < withMergedUrls.len - 1; i++) {
+      const split = splitLeadingSpaceAndMarks(withMergedUrls.texts[i]);
+      if (split === null)
+        continue;
+      if (withMergedUrls.kinds[i] !== "space" && withMergedUrls.kinds[i] !== "preserved-space" || withMergedUrls.kinds[i + 1] !== "text" || !containsArabicScript(withMergedUrls.texts[i + 1])) {
+        continue;
+      }
+      withMergedUrls.texts[i] = split.space;
+      withMergedUrls.isWordLike[i] = false;
+      withMergedUrls.kinds[i] = withMergedUrls.kinds[i] === "preserved-space" ? "preserved-space" : "space";
+      withMergedUrls.texts[i + 1] = split.marks + withMergedUrls.texts[i + 1];
+      withMergedUrls.starts[i + 1] = withMergedUrls.starts[i] + split.space.length;
+    }
+    return withMergedUrls;
+  }
+  function compileAnalysisChunks(segmentation, whiteSpaceProfile) {
+    if (segmentation.len === 0)
+      return [];
+    if (!whiteSpaceProfile.preserveHardBreaks) {
+      return [{
+        startSegmentIndex: 0,
+        endSegmentIndex: segmentation.len,
+        consumedEndSegmentIndex: segmentation.len
+      }];
+    }
+    const chunks = [];
+    let startSegmentIndex = 0;
+    for (let i = 0; i < segmentation.len; i++) {
+      if (segmentation.kinds[i] !== "hard-break")
+        continue;
+      chunks.push({
+        startSegmentIndex,
+        endSegmentIndex: i,
+        consumedEndSegmentIndex: i + 1
+      });
+      startSegmentIndex = i + 1;
+    }
+    if (startSegmentIndex < segmentation.len) {
+      chunks.push({
+        startSegmentIndex,
+        endSegmentIndex: segmentation.len,
+        consumedEndSegmentIndex: segmentation.len
+      });
+    }
+    return chunks;
+  }
+  function mergeKeepAllTextSegments(normalized, segmentation, breakAfterPunctuation) {
+    if (segmentation.len <= 1)
+      return segmentation;
+    const texts = [];
+    const isWordLike = [];
+    const kinds = [];
+    const starts = [];
+    let groupStart = -1;
+    let groupContainsCJK = false;
+    function pushOriginalText(index) {
+      texts.push(segmentation.texts[index]);
+      isWordLike.push(segmentation.isWordLike[index]);
+      kinds.push("text");
+      starts.push(segmentation.starts[index]);
+    }
+    function pushMergedText(start, end) {
+      let wordLike = false;
+      for (let i = start; i < end; i++) {
+        wordLike = wordLike || segmentation.isWordLike[i];
+      }
+      const sourceStart = segmentation.starts[start];
+      const sourceEnd = end < segmentation.len ? segmentation.starts[end] : normalized.length;
+      texts.push(normalized.slice(sourceStart, sourceEnd));
+      isWordLike.push(wordLike);
+      kinds.push("text");
+      starts.push(sourceStart);
+    }
+    function flushGroup(end) {
+      if (groupStart < 0)
+        return;
+      if (groupContainsCJK) {
+        if (groupStart + 1 === end) {
+          pushOriginalText(groupStart);
+        } else {
+          pushMergedText(groupStart, end);
+        }
+      } else {
+        for (let i = groupStart; i < end; i++)
+          pushOriginalText(i);
+      }
+      groupStart = -1;
+      groupContainsCJK = false;
+    }
+    for (let i = 0; i < segmentation.len; i++) {
+      const text = segmentation.texts[i];
+      const kind = segmentation.kinds[i];
+      if (kind === "text") {
+        if (groupStart >= 0 && !canContinueKeepAllTextRun(segmentation.texts[i - 1], breakAfterPunctuation)) {
+          flushGroup(i);
+        }
+        if (groupStart < 0)
+          groupStart = i;
+        groupContainsCJK = groupContainsCJK || isCJK(text);
+        continue;
+      }
+      flushGroup(i);
+      texts.push(text);
+      isWordLike.push(segmentation.isWordLike[i]);
+      kinds.push(kind);
+      starts.push(segmentation.starts[i]);
+    }
+    flushGroup(segmentation.len);
+    return {
+      len: texts.length,
+      texts,
+      isWordLike,
+      kinds,
+      starts
+    };
+  }
+  function analyzeText(text, profile, whiteSpace = "normal", wordBreak = "normal") {
+    const whiteSpaceProfile = getWhiteSpaceProfile(whiteSpace);
+    const normalized = whiteSpaceProfile.mode === "pre-wrap" ? normalizeWhitespacePreWrap(text) : normalizeWhitespaceNormal(text);
+    if (normalized.length === 0) {
+      return {
+        normalized,
+        chunks: [],
+        len: 0,
+        texts: [],
+        isWordLike: [],
+        kinds: [],
+        starts: []
+      };
+    }
+    const mergedSegmentation = buildMergedSegmentation(normalized, profile, whiteSpaceProfile);
+    const segmentation = wordBreak === "keep-all" ? mergeKeepAllTextSegments(normalized, mergedSegmentation, profile.breakKeepAllAfterPunctuation) : mergedSegmentation;
+    return {
+      normalized,
+      chunks: compileAnalysisChunks(segmentation, whiteSpaceProfile),
+      ...segmentation
+    };
+  }
+
+  // public/measurement.js
+  var measureContext = null;
+  var segmentMetricCaches = /* @__PURE__ */ new Map();
+  var cachedEngineProfile = null;
+  var MAX_PREFIX_FIT_GRAPHEMES = 96;
+  var emojiPresentationRe2 = /\p{Emoji_Presentation}/u;
+  var maybeEmojiRe = /[\p{Emoji_Presentation}\p{Extended_Pictographic}\p{Regional_Indicator}\uFE0F\u20E3]/u;
+  var sharedGraphemeSegmenter = null;
+  var emojiCorrectionCache = /* @__PURE__ */ new Map();
+  function getMeasureContext() {
+    if (measureContext !== null)
+      return measureContext;
+    if (typeof OffscreenCanvas !== "undefined") {
+      measureContext = new OffscreenCanvas(1, 1).getContext("2d");
+      return measureContext;
+    }
+    if (typeof document !== "undefined") {
+      measureContext = document.createElement("canvas").getContext("2d");
+      return measureContext;
+    }
+    throw new Error("Text measurement requires OffscreenCanvas or a DOM canvas context.");
+  }
+  function getSegmentMetricCache(font) {
+    let cache = segmentMetricCaches.get(font);
+    if (!cache) {
+      cache = /* @__PURE__ */ new Map();
+      segmentMetricCaches.set(font, cache);
+    }
+    return cache;
+  }
+  function getSegmentMetrics(seg, cache) {
+    let metrics = cache.get(seg);
+    if (metrics === void 0) {
+      const ctx = getMeasureContext();
+      metrics = {
+        width: ctx.measureText(seg).width,
+        containsCJK: isCJK(seg)
+      };
+      cache.set(seg, metrics);
+    }
+    return metrics;
+  }
+  function getEngineProfile() {
+    if (cachedEngineProfile !== null)
+      return cachedEngineProfile;
+    if (typeof navigator === "undefined") {
+      cachedEngineProfile = {
+        lineFitEpsilon: 5e-3,
+        carryCJKAfterClosingQuote: false,
+        breakKeepAllAfterPunctuation: true,
+        preferPrefixWidthsForBreakableRuns: false,
+        preferEarlySoftHyphenBreak: false
+      };
+      return cachedEngineProfile;
+    }
+    const ua = navigator.userAgent;
+    const vendor = navigator.vendor;
+    const isSafari = vendor === "Apple Computer, Inc." && ua.includes("Safari/") && !ua.includes("Chrome/") && !ua.includes("Chromium/") && !ua.includes("CriOS/") && !ua.includes("FxiOS/") && !ua.includes("EdgiOS/");
+    const isChromium = ua.includes("Chrome/") || ua.includes("Chromium/") || ua.includes("CriOS/") || ua.includes("Edg/");
+    cachedEngineProfile = {
+      lineFitEpsilon: isSafari ? 1 / 64 : 5e-3,
+      carryCJKAfterClosingQuote: isChromium,
+      breakKeepAllAfterPunctuation: !isSafari,
+      preferPrefixWidthsForBreakableRuns: isSafari,
+      preferEarlySoftHyphenBreak: isSafari
+    };
+    return cachedEngineProfile;
+  }
+  function parseFontSize(font) {
+    const m = font.match(/(\d+(?:\.\d+)?)\s*px/);
+    return m ? parseFloat(m[1]) : 16;
+  }
+  function getSharedGraphemeSegmenter() {
+    if (sharedGraphemeSegmenter === null) {
+      sharedGraphemeSegmenter = new Intl.Segmenter(void 0, { granularity: "grapheme" });
+    }
+    return sharedGraphemeSegmenter;
+  }
+  function isEmojiGrapheme(g) {
+    return emojiPresentationRe2.test(g) || g.includes("\uFE0F");
+  }
+  function textMayContainEmoji(text) {
+    return maybeEmojiRe.test(text);
+  }
+  function getEmojiCorrection(font, fontSize) {
+    let correction = emojiCorrectionCache.get(font);
+    if (correction !== void 0)
+      return correction;
+    const ctx = getMeasureContext();
+    ctx.font = font;
+    const canvasW = ctx.measureText("\u{1F600}").width;
+    correction = 0;
+    if (canvasW > fontSize + 0.5 && typeof document !== "undefined" && document.body !== null) {
+      const span = document.createElement("span");
+      span.style.font = font;
+      span.style.display = "inline-block";
+      span.style.visibility = "hidden";
+      span.style.position = "absolute";
+      span.textContent = "\u{1F600}";
+      document.body.appendChild(span);
+      const domW = span.getBoundingClientRect().width;
+      document.body.removeChild(span);
+      if (canvasW - domW > 0.5) {
+        correction = canvasW - domW;
+      }
+    }
+    emojiCorrectionCache.set(font, correction);
+    return correction;
+  }
+  function countEmojiGraphemes(text) {
+    let count = 0;
+    const graphemeSegmenter = getSharedGraphemeSegmenter();
+    for (const g of graphemeSegmenter.segment(text)) {
+      if (isEmojiGrapheme(g.segment))
+        count++;
+    }
+    return count;
+  }
+  function getEmojiCount(seg, metrics) {
+    if (metrics.emojiCount === void 0) {
+      metrics.emojiCount = countEmojiGraphemes(seg);
+    }
+    return metrics.emojiCount;
+  }
+  function getCorrectedSegmentWidth(seg, metrics, emojiCorrection) {
+    if (emojiCorrection === 0)
+      return metrics.width;
+    return metrics.width - getEmojiCount(seg, metrics) * emojiCorrection;
+  }
+  function getSegmentBreakableFitAdvances(seg, metrics, cache, emojiCorrection, mode) {
+    if (metrics.breakableFitAdvances !== void 0 && metrics.breakableFitMode === mode) {
+      return metrics.breakableFitAdvances;
+    }
+    metrics.breakableFitMode = mode;
+    const graphemeSegmenter = getSharedGraphemeSegmenter();
+    const graphemes = [];
+    for (const gs of graphemeSegmenter.segment(seg)) {
+      graphemes.push(gs.segment);
+    }
+    if (graphemes.length <= 1) {
+      metrics.breakableFitAdvances = null;
+      return metrics.breakableFitAdvances;
+    }
+    if (mode === "sum-graphemes") {
+      const advances2 = [];
+      for (const grapheme of graphemes) {
+        const graphemeMetrics = getSegmentMetrics(grapheme, cache);
+        advances2.push(getCorrectedSegmentWidth(grapheme, graphemeMetrics, emojiCorrection));
+      }
+      metrics.breakableFitAdvances = advances2;
+      return metrics.breakableFitAdvances;
+    }
+    if (mode === "pair-context" || graphemes.length > MAX_PREFIX_FIT_GRAPHEMES) {
+      const advances2 = [];
+      let previousGrapheme = null;
+      let previousWidth = 0;
+      for (const grapheme of graphemes) {
+        const graphemeMetrics = getSegmentMetrics(grapheme, cache);
+        const currentWidth = getCorrectedSegmentWidth(grapheme, graphemeMetrics, emojiCorrection);
+        if (previousGrapheme === null) {
+          advances2.push(currentWidth);
+        } else {
+          const pair = previousGrapheme + grapheme;
+          const pairMetrics = getSegmentMetrics(pair, cache);
+          advances2.push(getCorrectedSegmentWidth(pair, pairMetrics, emojiCorrection) - previousWidth);
+        }
+        previousGrapheme = grapheme;
+        previousWidth = currentWidth;
+      }
+      metrics.breakableFitAdvances = advances2;
+      return metrics.breakableFitAdvances;
+    }
+    const advances = [];
+    let prefix = "";
+    let prefixWidth = 0;
+    for (const grapheme of graphemes) {
+      prefix += grapheme;
+      const prefixMetrics = getSegmentMetrics(prefix, cache);
+      const nextPrefixWidth = getCorrectedSegmentWidth(prefix, prefixMetrics, emojiCorrection);
+      advances.push(nextPrefixWidth - prefixWidth);
+      prefixWidth = nextPrefixWidth;
+    }
+    metrics.breakableFitAdvances = advances;
+    return metrics.breakableFitAdvances;
+  }
+  function getFontMeasurementState(font, needsEmojiCorrection) {
+    const ctx = getMeasureContext();
+    ctx.font = font;
+    const cache = getSegmentMetricCache(font);
+    const fontSize = parseFontSize(font);
+    const emojiCorrection = needsEmojiCorrection ? getEmojiCorrection(font, fontSize) : 0;
+    return { cache, fontSize, emojiCorrection };
+  }
+
+  // public/line-break.js
+  function consumesAtLineStart(kind) {
+    return kind === "space" || kind === "zero-width-break" || kind === "soft-hyphen";
+  }
+  function breaksAfter(kind) {
+    return kind === "space" || kind === "preserved-space" || kind === "tab" || kind === "zero-width-break" || kind === "soft-hyphen";
+  }
+  function normalizeLineStartSegmentIndex(prepared2, segmentIndex, endSegmentIndex = prepared2.widths.length) {
+    while (segmentIndex < endSegmentIndex) {
+      const kind = prepared2.kinds[segmentIndex];
+      if (!consumesAtLineStart(kind))
+        break;
+      segmentIndex++;
+    }
+    return segmentIndex;
+  }
+  function getTabAdvance(lineWidth, tabStopAdvance) {
+    if (tabStopAdvance <= 0)
+      return 0;
+    const remainder = lineWidth % tabStopAdvance;
+    if (Math.abs(remainder) <= 1e-6)
+      return tabStopAdvance;
+    return tabStopAdvance - remainder;
+  }
+  function getLeadingLetterSpacing(prepared2, hasContent, segmentIndex) {
+    return prepared2.letterSpacing !== 0 && hasContent && prepared2.spacingGraphemeCounts[segmentIndex] > 0 ? prepared2.letterSpacing : 0;
+  }
+  function getLineEndContribution(leadingSpacing, segmentContribution) {
+    return segmentContribution === 0 ? 0 : leadingSpacing + segmentContribution;
+  }
+  function getTabTrailingLetterSpacing(prepared2, segmentIndex) {
+    return prepared2.letterSpacing !== 0 && prepared2.spacingGraphemeCounts[segmentIndex] > 0 ? prepared2.letterSpacing : 0;
+  }
+  function getWholeSegmentFitContribution(prepared2, kind, segmentIndex, leadingSpacing, segmentWidth) {
+    const segmentContribution = kind === "tab" ? segmentWidth + getTabTrailingLetterSpacing(prepared2, segmentIndex) : prepared2.lineEndFitAdvances[segmentIndex];
+    return getLineEndContribution(leadingSpacing, segmentContribution);
+  }
+  function getBreakOpportunityFitContribution(prepared2, kind, segmentIndex, leadingSpacing) {
+    const segmentContribution = kind === "tab" ? 0 : prepared2.lineEndFitAdvances[segmentIndex];
+    return getLineEndContribution(leadingSpacing, segmentContribution);
+  }
+  function getLineEndPaintContribution(prepared2, kind, segmentIndex, leadingSpacing, segmentWidth) {
+    const segmentContribution = kind === "tab" ? segmentWidth : prepared2.lineEndPaintAdvances[segmentIndex];
+    return getLineEndContribution(leadingSpacing, segmentContribution);
+  }
+  function getBreakableGraphemeAdvance(prepared2, hasContent, baseAdvance) {
+    return prepared2.letterSpacing !== 0 && hasContent ? baseAdvance + prepared2.letterSpacing : baseAdvance;
+  }
+  function getBreakableCandidateFitWidth(prepared2, candidatePaintWidth) {
+    return prepared2.letterSpacing === 0 ? candidatePaintWidth : candidatePaintWidth + prepared2.letterSpacing;
+  }
+  function getNextPreferredBreakIndex(preferredBreaks, preferredBreakIndex, graphemeEnd) {
+    let index = preferredBreakIndex;
+    while (index < preferredBreaks.length && preferredBreaks[index] < graphemeEnd) {
+      index++;
+    }
+    return index;
+  }
+  function getTerminalLetterSpacing(prepared2, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
+    if (prepared2.letterSpacing === 0)
+      return 0;
+    if (endGraphemeIndex > 0) {
+      return prepared2.spacingGraphemeCounts[endSegmentIndex] > 0 ? prepared2.letterSpacing : 0;
+    }
+    for (let i = endSegmentIndex - 1; i >= startSegmentIndex; i--) {
+      const kind = prepared2.kinds[i];
+      if (kind === "space" || kind === "zero-width-break" || kind === "hard-break")
+        continue;
+      if (kind === "soft-hyphen") {
+        if (i === endSegmentIndex - 1)
+          return 0;
+        continue;
+      }
+      if (i === startSegmentIndex && startGraphemeIndex > 0) {
+        return prepared2.letterSpacing;
+      }
+      return prepared2.spacingGraphemeCounts[i] > 0 ? prepared2.letterSpacing : 0;
+    }
+    return 0;
+  }
+  function finalizeLinePaintWidth(prepared2, width, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
+    return width + getTerminalLetterSpacing(prepared2, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex);
+  }
+  function findChunkIndexForStart(prepared2, segmentIndex) {
+    let lo = 0;
+    let hi = prepared2.chunks.length;
+    while (lo < hi) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (segmentIndex < prepared2.chunks[mid].consumedEndSegmentIndex) {
+        hi = mid;
+      } else {
+        lo = mid + 1;
+      }
+    }
+    return lo < prepared2.chunks.length ? lo : -1;
+  }
+  function normalizeLineStartInChunk(prepared2, chunkIndex, cursor) {
+    let segmentIndex = cursor.segmentIndex;
+    if (cursor.graphemeIndex > 0)
+      return chunkIndex;
+    const chunk = prepared2.chunks[chunkIndex];
+    if (chunk.startSegmentIndex === chunk.endSegmentIndex && segmentIndex === chunk.startSegmentIndex) {
+      cursor.segmentIndex = segmentIndex;
+      cursor.graphemeIndex = 0;
+      return chunkIndex;
+    }
+    if (segmentIndex < chunk.startSegmentIndex)
+      segmentIndex = chunk.startSegmentIndex;
+    segmentIndex = normalizeLineStartSegmentIndex(prepared2, segmentIndex, chunk.endSegmentIndex);
+    if (segmentIndex < chunk.endSegmentIndex) {
+      cursor.segmentIndex = segmentIndex;
+      cursor.graphemeIndex = 0;
+      return chunkIndex;
+    }
+    if (chunk.consumedEndSegmentIndex >= prepared2.widths.length)
+      return -1;
+    cursor.segmentIndex = chunk.consumedEndSegmentIndex;
+    cursor.graphemeIndex = 0;
+    return chunkIndex + 1;
+  }
+  function normalizePreparedLineStart(prepared2, cursor) {
+    if (cursor.segmentIndex >= prepared2.widths.length)
+      return -1;
+    const chunkIndex = findChunkIndexForStart(prepared2, cursor.segmentIndex);
+    if (chunkIndex < 0)
+      return -1;
+    return normalizeLineStartInChunk(prepared2, chunkIndex, cursor);
+  }
+  function stepPreparedChunkLineGeometry(prepared2, cursor, chunkIndex, maxWidth) {
+    const chunk = prepared2.chunks[chunkIndex];
+    if (chunk.startSegmentIndex === chunk.endSegmentIndex) {
+      cursor.segmentIndex = chunk.consumedEndSegmentIndex;
+      cursor.graphemeIndex = 0;
+      return 0;
+    }
+    const { widths, kinds, breakableFitAdvances, breakablePreferredBreaks, discretionaryHyphenWidth } = prepared2;
+    const engineProfile = getEngineProfile();
+    const lineFitEpsilon = engineProfile.lineFitEpsilon;
+    const fitLimit = maxWidth + lineFitEpsilon;
+    const lineStartSegmentIndex = cursor.segmentIndex;
+    const lineStartGraphemeIndex = cursor.graphemeIndex;
+    let lineW = 0;
+    let hasContent = false;
+    let lineEndSegmentIndex = cursor.segmentIndex;
+    let lineEndGraphemeIndex = cursor.graphemeIndex;
+    let pendingBreakSegmentIndex = -1;
+    let pendingBreakFitWidth = 0;
+    let pendingBreakPaintWidth = 0;
+    let pendingBreakKind = null;
+    function getCurrentLinePaintWidth() {
+      return pendingBreakKind === "soft-hyphen" && pendingBreakSegmentIndex === lineEndSegmentIndex && lineEndGraphemeIndex === 0 ? pendingBreakPaintWidth : lineW;
+    }
+    function finishLine(endSegmentIndex = lineEndSegmentIndex, endGraphemeIndex = lineEndGraphemeIndex, width = getCurrentLinePaintWidth()) {
+      if (!hasContent)
+        return null;
+      cursor.segmentIndex = endSegmentIndex;
+      cursor.graphemeIndex = endGraphemeIndex;
+      return finalizeLinePaintWidth(prepared2, width, lineStartSegmentIndex, lineStartGraphemeIndex, endSegmentIndex, endGraphemeIndex);
+    }
+    function startLineAtSegment(segmentIndex, width) {
+      hasContent = true;
+      lineEndSegmentIndex = segmentIndex + 1;
+      lineEndGraphemeIndex = 0;
+      lineW = width;
+    }
+    function startLineAtGrapheme(segmentIndex, graphemeIndex, width) {
+      hasContent = true;
+      lineEndSegmentIndex = segmentIndex;
+      lineEndGraphemeIndex = graphemeIndex + 1;
+      lineW = width;
+    }
+    function appendWholeSegment(segmentIndex, advance) {
+      if (!hasContent) {
+        startLineAtSegment(segmentIndex, advance);
+        return;
+      }
+      lineW += advance;
+      lineEndSegmentIndex = segmentIndex + 1;
+      lineEndGraphemeIndex = 0;
+    }
+    function updatePendingBreakForWholeSegment(kind, breakAfter, segmentIndex, segmentWidth, leadingSpacing, advance) {
+      if (!breakAfter)
+        return;
+      const fitAdvance = getBreakOpportunityFitContribution(prepared2, kind, segmentIndex, leadingSpacing);
+      const paintAdvance = getLineEndPaintContribution(prepared2, kind, segmentIndex, leadingSpacing, segmentWidth);
+      pendingBreakSegmentIndex = segmentIndex + 1;
+      pendingBreakFitWidth = lineW - advance + fitAdvance;
+      pendingBreakPaintWidth = lineW - advance + paintAdvance;
+      pendingBreakKind = kind;
+    }
+    function appendBreakableSegmentFrom(segmentIndex, startGraphemeIndex) {
+      const fitAdvances = breakableFitAdvances[segmentIndex];
+      const preferredBreaks = breakablePreferredBreaks[segmentIndex] ?? null;
+      let preferredBreakIndex = preferredBreaks === null ? -1 : getNextPreferredBreakIndex(preferredBreaks, 0, startGraphemeIndex + 1);
+      let lastPreferredBreakEnd = -1;
+      let lastPreferredBreakWidth = 0;
+      for (let g = startGraphemeIndex; g < fitAdvances.length; g++) {
+        const baseGw = fitAdvances[g];
+        if (!hasContent) {
+          startLineAtGrapheme(segmentIndex, g, baseGw);
+        } else {
+          const gw = getBreakableGraphemeAdvance(prepared2, true, baseGw);
+          const candidatePaintWidth = lineW + gw;
+          if (getBreakableCandidateFitWidth(prepared2, candidatePaintWidth) > fitLimit) {
+            if (preferredBreaks !== null && lastPreferredBreakEnd > startGraphemeIndex) {
+              return finishLine(segmentIndex, lastPreferredBreakEnd, lastPreferredBreakWidth);
+            }
+            return finishLine();
+          }
+          lineW = candidatePaintWidth;
+          lineEndSegmentIndex = segmentIndex;
+          lineEndGraphemeIndex = g + 1;
+        }
+        const graphemeEnd = g + 1;
+        if (preferredBreaks !== null && preferredBreaks[preferredBreakIndex] === graphemeEnd) {
+          lastPreferredBreakEnd = graphemeEnd;
+          lastPreferredBreakWidth = lineW;
+          preferredBreakIndex++;
+        }
+      }
+      if (hasContent && lineEndSegmentIndex === segmentIndex && lineEndGraphemeIndex === fitAdvances.length) {
+        lineEndSegmentIndex = segmentIndex + 1;
+        lineEndGraphemeIndex = 0;
+      }
+      return null;
+    }
+    function maybeFinishAtSoftHyphen() {
+      if (pendingBreakKind !== "soft-hyphen" || pendingBreakSegmentIndex < 0)
+        return null;
+      if (pendingBreakFitWidth <= fitLimit) {
+        return finishLine(pendingBreakSegmentIndex, 0, pendingBreakPaintWidth);
+      }
+      return null;
+    }
+    for (let i = cursor.segmentIndex; i < chunk.endSegmentIndex; i++) {
+      const kind = kinds[i];
+      const breakAfter = breaksAfter(kind);
+      const startGraphemeIndex = i === cursor.segmentIndex ? cursor.graphemeIndex : 0;
+      const leadingSpacing = getLeadingLetterSpacing(prepared2, hasContent, i);
+      const w = kind === "tab" ? getTabAdvance(lineW + leadingSpacing, prepared2.tabStopAdvance) : widths[i];
+      const advance = leadingSpacing + w;
+      const fitAdvance = getWholeSegmentFitContribution(prepared2, kind, i, leadingSpacing, w);
+      if (kind === "soft-hyphen" && startGraphemeIndex === 0) {
+        if (hasContent) {
+          lineEndSegmentIndex = i + 1;
+          lineEndGraphemeIndex = 0;
+          pendingBreakSegmentIndex = i + 1;
+          pendingBreakFitWidth = lineW + discretionaryHyphenWidth;
+          pendingBreakPaintWidth = lineW + discretionaryHyphenWidth;
+          pendingBreakKind = kind;
+        }
+        continue;
+      }
+      if (!hasContent) {
+        if (startGraphemeIndex > 0) {
+          const line = appendBreakableSegmentFrom(i, startGraphemeIndex);
+          if (line !== null)
+            return line;
+        } else if (fitAdvance > fitLimit && breakableFitAdvances[i] !== null) {
+          const line = appendBreakableSegmentFrom(i, 0);
+          if (line !== null)
+            return line;
+        } else {
+          startLineAtSegment(i, w);
+        }
+        updatePendingBreakForWholeSegment(kind, breakAfter, i, w, leadingSpacing, advance);
+        continue;
+      }
+      const newFitW = lineW + fitAdvance;
+      if (newFitW > fitLimit) {
+        const currentBreakFitWidth = lineW + getBreakOpportunityFitContribution(prepared2, kind, i, leadingSpacing);
+        const currentBreakPaintWidth = lineW + getLineEndPaintContribution(prepared2, kind, i, leadingSpacing, w);
+        if (pendingBreakKind === "soft-hyphen" && engineProfile.preferEarlySoftHyphenBreak && pendingBreakFitWidth <= fitLimit) {
+          return finishLine(pendingBreakSegmentIndex, 0, pendingBreakPaintWidth);
+        }
+        const softBreakLine = maybeFinishAtSoftHyphen();
+        if (softBreakLine !== null)
+          return softBreakLine;
+        if (breakAfter && currentBreakFitWidth <= fitLimit) {
+          appendWholeSegment(i, advance);
+          return finishLine(i + 1, 0, currentBreakPaintWidth);
+        }
+        if (pendingBreakSegmentIndex >= 0 && pendingBreakFitWidth <= fitLimit) {
+          if (lineEndSegmentIndex > pendingBreakSegmentIndex || lineEndSegmentIndex === pendingBreakSegmentIndex && lineEndGraphemeIndex > 0) {
+            return finishLine();
+          }
+          return finishLine(pendingBreakSegmentIndex, 0, pendingBreakPaintWidth);
+        }
+        if (fitAdvance > fitLimit && breakableFitAdvances[i] !== null) {
+          const currentLine = finishLine();
+          if (currentLine !== null)
+            return currentLine;
+          const line = appendBreakableSegmentFrom(i, 0);
+          if (line !== null)
+            return line;
+        }
+        return finishLine();
+      }
+      appendWholeSegment(i, advance);
+      updatePendingBreakForWholeSegment(kind, breakAfter, i, w, leadingSpacing, advance);
+    }
+    if (pendingBreakSegmentIndex === chunk.consumedEndSegmentIndex && lineEndGraphemeIndex === 0) {
+      return finishLine(chunk.consumedEndSegmentIndex, 0, pendingBreakPaintWidth);
+    }
+    return finishLine(chunk.consumedEndSegmentIndex, 0, lineW);
+  }
+  function stepPreparedSimpleLineGeometry(prepared2, cursor, maxWidth) {
+    const { widths, kinds, breakableFitAdvances, breakablePreferredBreaks } = prepared2;
+    const engineProfile = getEngineProfile();
+    const lineFitEpsilon = engineProfile.lineFitEpsilon;
+    const fitLimit = maxWidth + lineFitEpsilon;
+    let lineW = 0;
+    let hasContent = false;
+    let lineEndSegmentIndex = cursor.segmentIndex;
+    let lineEndGraphemeIndex = cursor.graphemeIndex;
+    let pendingBreakSegmentIndex = -1;
+    let pendingBreakPaintWidth = 0;
+    for (let i = cursor.segmentIndex; i < widths.length; i++) {
+      const kind = kinds[i];
+      const breakAfter = breaksAfter(kind);
+      const startGraphemeIndex = i === cursor.segmentIndex ? cursor.graphemeIndex : 0;
+      const breakableFitAdvance = breakableFitAdvances[i];
+      const w = widths[i];
+      if (!hasContent) {
+        if (startGraphemeIndex > 0 || w > fitLimit && breakableFitAdvance !== null) {
+          const fitAdvances = breakableFitAdvance;
+          const preferredBreaks = breakablePreferredBreaks[i] ?? null;
+          let preferredBreakIndex = preferredBreaks === null ? -1 : getNextPreferredBreakIndex(preferredBreaks, 0, startGraphemeIndex + 1);
+          let lastPreferredBreakEnd = -1;
+          let lastPreferredBreakWidth = 0;
+          const firstGraphemeWidth = fitAdvances[startGraphemeIndex];
+          hasContent = true;
+          lineW = firstGraphemeWidth;
+          lineEndSegmentIndex = i;
+          lineEndGraphemeIndex = startGraphemeIndex + 1;
+          if (preferredBreaks !== null && preferredBreaks[preferredBreakIndex] === lineEndGraphemeIndex) {
+            lastPreferredBreakEnd = lineEndGraphemeIndex;
+            lastPreferredBreakWidth = lineW;
+            preferredBreakIndex++;
+          }
+          for (let g = startGraphemeIndex + 1; g < fitAdvances.length; g++) {
+            const gw = fitAdvances[g];
+            if (lineW + gw > fitLimit) {
+              if (preferredBreaks !== null && lastPreferredBreakEnd > startGraphemeIndex) {
+                cursor.segmentIndex = i;
+                cursor.graphemeIndex = lastPreferredBreakEnd;
+                return lastPreferredBreakWidth;
+              }
+              cursor.segmentIndex = lineEndSegmentIndex;
+              cursor.graphemeIndex = lineEndGraphemeIndex;
+              return lineW;
+            }
+            lineW += gw;
+            lineEndSegmentIndex = i;
+            lineEndGraphemeIndex = g + 1;
+            if (preferredBreaks !== null && preferredBreaks[preferredBreakIndex] === lineEndGraphemeIndex) {
+              lastPreferredBreakEnd = lineEndGraphemeIndex;
+              lastPreferredBreakWidth = lineW;
+              preferredBreakIndex++;
+            }
+          }
+          if (lineEndSegmentIndex === i && lineEndGraphemeIndex === fitAdvances.length) {
+            lineEndSegmentIndex = i + 1;
+            lineEndGraphemeIndex = 0;
+          }
+        } else {
+          hasContent = true;
+          lineW = w;
+          lineEndSegmentIndex = i + 1;
+          lineEndGraphemeIndex = 0;
+        }
+        if (breakAfter) {
+          pendingBreakSegmentIndex = i + 1;
+          pendingBreakPaintWidth = lineW - w;
+        }
+        continue;
+      }
+      if (lineW + w > fitLimit) {
+        if (breakAfter) {
+          cursor.segmentIndex = i + 1;
+          cursor.graphemeIndex = 0;
+          return lineW;
+        }
+        if (pendingBreakSegmentIndex >= 0) {
+          if (lineEndSegmentIndex > pendingBreakSegmentIndex || lineEndSegmentIndex === pendingBreakSegmentIndex && lineEndGraphemeIndex > 0) {
+            cursor.segmentIndex = lineEndSegmentIndex;
+            cursor.graphemeIndex = lineEndGraphemeIndex;
+            return lineW;
+          }
+          cursor.segmentIndex = pendingBreakSegmentIndex;
+          cursor.graphemeIndex = 0;
+          return pendingBreakPaintWidth;
+        }
+        cursor.segmentIndex = lineEndSegmentIndex;
+        cursor.graphemeIndex = lineEndGraphemeIndex;
+        return lineW;
+      }
+      lineW += w;
+      lineEndSegmentIndex = i + 1;
+      lineEndGraphemeIndex = 0;
+      if (breakAfter) {
+        pendingBreakSegmentIndex = i + 1;
+        pendingBreakPaintWidth = lineW - w;
+      }
+    }
+    if (!hasContent)
+      return null;
+    cursor.segmentIndex = lineEndSegmentIndex;
+    cursor.graphemeIndex = lineEndGraphemeIndex;
+    return lineW;
+  }
+  function stepPreparedLineGeometryFromChunk(prepared2, cursor, chunkIndex, maxWidth) {
+    if (prepared2.simpleLineWalkFastPath) {
+      return stepPreparedSimpleLineGeometry(prepared2, cursor, maxWidth);
+    }
+    return stepPreparedChunkLineGeometry(prepared2, cursor, chunkIndex, maxWidth);
+  }
+
+  // public/line-text.js
+  var sharedGraphemeSegmenter2 = null;
+  var sharedLineTextCaches = /* @__PURE__ */ new WeakMap();
+  function getSharedGraphemeSegmenter2() {
+    if (sharedGraphemeSegmenter2 === null) {
+      sharedGraphemeSegmenter2 = new Intl.Segmenter(void 0, { granularity: "grapheme" });
+    }
+    return sharedGraphemeSegmenter2;
+  }
+  function getSegmentGraphemes(segmentIndex, segments, cache) {
+    let graphemes = cache.get(segmentIndex);
+    if (graphemes !== void 0)
+      return graphemes;
+    graphemes = [];
+    const graphemeSegmenter = getSharedGraphemeSegmenter2();
+    for (const gs of graphemeSegmenter.segment(segments[segmentIndex])) {
+      graphemes.push(gs.segment);
+    }
+    cache.set(segmentIndex, graphemes);
+    return graphemes;
+  }
+  function lineHasDiscretionaryHyphen(kinds, startSegmentIndex, endSegmentIndex) {
+    return endSegmentIndex > startSegmentIndex && kinds[endSegmentIndex - 1] === "soft-hyphen";
+  }
+  function appendSegmentGraphemeRange(text, graphemes, startGraphemeIndex, endGraphemeIndex) {
+    for (let i = startGraphemeIndex; i < endGraphemeIndex; i++) {
+      text += graphemes[i];
+    }
+    return text;
+  }
+  function getLineTextCache(prepared2) {
+    let cache = sharedLineTextCaches.get(prepared2);
+    if (cache !== void 0)
+      return cache;
+    cache = /* @__PURE__ */ new Map();
+    sharedLineTextCaches.set(prepared2, cache);
+    return cache;
+  }
+  function buildLineTextFromRange(prepared2, cache, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
+    let text = "";
+    const endsWithDiscretionaryHyphen = lineHasDiscretionaryHyphen(prepared2.kinds, startSegmentIndex, endSegmentIndex);
+    for (let i = startSegmentIndex; i < endSegmentIndex; i++) {
+      if (prepared2.kinds[i] === "soft-hyphen" || prepared2.kinds[i] === "hard-break")
+        continue;
+      if (i === startSegmentIndex && startGraphemeIndex > 0) {
+        const graphemes = getSegmentGraphemes(i, prepared2.segments, cache);
+        text = appendSegmentGraphemeRange(text, graphemes, startGraphemeIndex, graphemes.length);
+      } else {
+        text += prepared2.segments[i];
+      }
+    }
+    if (endGraphemeIndex > 0) {
+      if (endsWithDiscretionaryHyphen)
+        text += "-";
+      const graphemes = getSegmentGraphemes(endSegmentIndex, prepared2.segments, cache);
+      text = appendSegmentGraphemeRange(text, graphemes, startSegmentIndex === endSegmentIndex ? startGraphemeIndex : 0, endGraphemeIndex);
+    } else if (endsWithDiscretionaryHyphen) {
+      text += "-";
+    }
+    return text;
+  }
+
+  // public/layout.js
+  var sharedGraphemeSegmenter3 = null;
+  function getSharedGraphemeSegmenter3() {
+    if (sharedGraphemeSegmenter3 === null) {
+      sharedGraphemeSegmenter3 = new Intl.Segmenter(void 0, { granularity: "grapheme" });
+    }
+    return sharedGraphemeSegmenter3;
+  }
+  function createEmptyPrepared(includeSegments) {
+    if (includeSegments) {
+      return {
+        widths: [],
+        lineEndFitAdvances: [],
+        lineEndPaintAdvances: [],
+        kinds: [],
+        simpleLineWalkFastPath: true,
+        segLevels: null,
+        breakableFitAdvances: [],
+        breakablePreferredBreaks: [],
+        letterSpacing: 0,
+        spacingGraphemeCounts: [],
+        discretionaryHyphenWidth: 0,
+        tabStopAdvance: 0,
+        chunks: [],
+        segments: []
+      };
+    }
+    return {
+      widths: [],
+      lineEndFitAdvances: [],
+      lineEndPaintAdvances: [],
+      kinds: [],
+      simpleLineWalkFastPath: true,
+      segLevels: null,
+      breakableFitAdvances: [],
+      breakablePreferredBreaks: [],
+      letterSpacing: 0,
+      spacingGraphemeCounts: [],
+      discretionaryHyphenWidth: 0,
+      tabStopAdvance: 0,
+      chunks: []
+    };
+  }
+  function buildBaseCjkUnits(segText, engineProfile) {
+    const units = [];
+    let unitParts = [];
+    let unitStart = 0;
+    let unitContainsCJK = false;
+    let unitEndsWithClosingQuote = false;
+    let unitIsSingleKinsokuEnd = false;
+    function pushUnit() {
+      if (unitParts.length === 0)
+        return;
+      units.push({
+        text: unitParts.length === 1 ? unitParts[0] : unitParts.join(""),
+        start: unitStart
+      });
+      unitParts = [];
+      unitContainsCJK = false;
+      unitEndsWithClosingQuote = false;
+      unitIsSingleKinsokuEnd = false;
+    }
+    function startUnit(grapheme, start, graphemeContainsCJK) {
+      unitParts = [grapheme];
+      unitStart = start;
+      unitContainsCJK = graphemeContainsCJK;
+      unitEndsWithClosingQuote = endsWithClosingQuote(grapheme);
+      unitIsSingleKinsokuEnd = kinsokuEnd.has(grapheme);
+    }
+    function appendToUnit(grapheme, graphemeContainsCJK) {
+      unitParts.push(grapheme);
+      unitContainsCJK = unitContainsCJK || graphemeContainsCJK;
+      const graphemeEndsWithClosingQuote = endsWithClosingQuote(grapheme);
+      if (grapheme.length === 1 && leftStickyPunctuation.has(grapheme)) {
+        unitEndsWithClosingQuote = unitEndsWithClosingQuote || graphemeEndsWithClosingQuote;
+      } else {
+        unitEndsWithClosingQuote = graphemeEndsWithClosingQuote;
+      }
+      unitIsSingleKinsokuEnd = false;
+    }
+    for (const gs of getSharedGraphemeSegmenter3().segment(segText)) {
+      const grapheme = gs.segment;
+      const graphemeContainsCJK = isCJK(grapheme);
+      if (unitParts.length === 0) {
+        startUnit(grapheme, gs.index, graphemeContainsCJK);
+        continue;
+      }
+      if (unitIsSingleKinsokuEnd || kinsokuStart.has(grapheme) || leftStickyPunctuation.has(grapheme) || engineProfile.carryCJKAfterClosingQuote && graphemeContainsCJK && unitEndsWithClosingQuote) {
+        appendToUnit(grapheme, graphemeContainsCJK);
+        continue;
+      }
+      if (!unitContainsCJK && !graphemeContainsCJK) {
+        appendToUnit(grapheme, graphemeContainsCJK);
+        continue;
+      }
+      pushUnit();
+      startUnit(grapheme, gs.index, graphemeContainsCJK);
+    }
+    pushUnit();
+    return units;
+  }
+  function mergeKeepAllTextUnits(segText, units, breakAfterPunctuation) {
+    if (units.length <= 1)
+      return units;
+    const merged = [];
+    let groupStart = -1;
+    let groupContainsCJK = false;
+    function pushMergedUnit(start, end) {
+      const sourceStart = units[start].start;
+      const sourceEnd = end < units.length ? units[end].start : segText.length;
+      merged.push({
+        text: segText.slice(sourceStart, sourceEnd),
+        start: sourceStart
+      });
+    }
+    function flushGroup(end) {
+      if (groupStart < 0)
+        return;
+      if (groupContainsCJK) {
+        if (groupStart + 1 === end) {
+          merged.push(units[groupStart]);
+        } else {
+          pushMergedUnit(groupStart, end);
+        }
+      } else {
+        for (let i = groupStart; i < end; i++)
+          merged.push(units[i]);
+      }
+      groupStart = -1;
+      groupContainsCJK = false;
+    }
+    for (let i = 0; i < units.length; i++) {
+      const unit = units[i];
+      if (groupStart >= 0 && !canContinueKeepAllTextRun(units[i - 1].text, breakAfterPunctuation)) {
+        flushGroup(i);
+      }
+      if (groupStart < 0)
+        groupStart = i;
+      groupContainsCJK = groupContainsCJK || isCJK(unit.text);
+    }
+    flushGroup(units.length);
+    return merged;
+  }
+  function countRenderedSpacingGraphemes(text, kind) {
+    if (kind === "zero-width-break" || kind === "soft-hyphen" || kind === "hard-break") {
+      return 0;
+    }
+    if (kind === "tab")
+      return 1;
+    let count = 0;
+    const graphemeSegmenter = getSharedGraphemeSegmenter3();
+    for (const _ of graphemeSegmenter.segment(text))
+      count++;
+    return count;
+  }
+  function isPreferredBreakGrapheme(grapheme) {
+    return grapheme === "-" || grapheme === "\u058A" || grapheme === "\u2010" || grapheme === "\u2012" || grapheme === "\u2013" || grapheme === "\u2014";
+  }
+  function getBreakablePreferredBreaks(text) {
+    if (!/[-\u058A\u2010\u2012\u2013\u2014]/u.test(text))
+      return null;
+    const breaks = [];
+    let graphemeIndex = 0;
+    for (const gs of getSharedGraphemeSegmenter3().segment(text)) {
+      graphemeIndex++;
+      if (isPreferredBreakGrapheme(gs.segment))
+        breaks.push(graphemeIndex);
+    }
+    return breaks.length === 0 ? null : breaks;
+  }
+  function addInternalLetterSpacing(width, graphemeCount, letterSpacing) {
+    return graphemeCount > 1 ? width + (graphemeCount - 1) * letterSpacing : width;
+  }
+  function measureAnalysis(analysis, font, includeSegments, wordBreak, letterSpacing) {
+    const engineProfile = getEngineProfile();
+    const { cache, emojiCorrection } = getFontMeasurementState(font, textMayContainEmoji(analysis.normalized));
+    const discretionaryHyphenWidth = getCorrectedSegmentWidth("-", getSegmentMetrics("-", cache), emojiCorrection) + (letterSpacing === 0 ? 0 : letterSpacing * 2);
+    const spaceWidth = getCorrectedSegmentWidth(" ", getSegmentMetrics(" ", cache), emojiCorrection);
+    const tabStopAdvance = spaceWidth * 8;
+    const hasLetterSpacing = letterSpacing !== 0;
+    if (analysis.len === 0)
+      return createEmptyPrepared(includeSegments);
+    const widths = [];
+    const lineEndFitAdvances = [];
+    const lineEndPaintAdvances = [];
+    const kinds = [];
+    let simpleLineWalkFastPath = analysis.chunks.length <= 1 && !hasLetterSpacing;
+    const segStarts = includeSegments ? [] : null;
+    const breakableFitAdvances = [];
+    const breakablePreferredBreaks = [];
+    const spacingGraphemeCounts = [];
+    const segments = includeSegments ? [] : null;
+    const preparedStartByAnalysisIndex = Array.from({ length: analysis.len });
+    function pushMeasuredSegment(text, width, lineEndFitAdvance, lineEndPaintAdvance, kind, start, breakableFitAdvance, breakablePreferredBreak, spacingGraphemeCount) {
+      if (kind !== "text" && kind !== "space" && kind !== "zero-width-break") {
+        simpleLineWalkFastPath = false;
+      }
+      widths.push(width);
+      lineEndFitAdvances.push(lineEndFitAdvance);
+      lineEndPaintAdvances.push(lineEndPaintAdvance);
+      kinds.push(kind);
+      segStarts?.push(start);
+      breakableFitAdvances.push(breakableFitAdvance);
+      breakablePreferredBreaks.push(breakablePreferredBreak);
+      if (hasLetterSpacing)
+        spacingGraphemeCounts.push(spacingGraphemeCount);
+      if (segments !== null)
+        segments.push(text);
+    }
+    function pushMeasuredTextSegment(text, kind, start, wordLike, allowOverflowBreaks) {
+      const textMetrics = getSegmentMetrics(text, cache);
+      const spacingGraphemeCount = hasLetterSpacing ? countRenderedSpacingGraphemes(text, kind) : 0;
+      const width = addInternalLetterSpacing(getCorrectedSegmentWidth(text, textMetrics, emojiCorrection), spacingGraphemeCount, letterSpacing);
+      const baseLineEndFitAdvance = kind === "space" || kind === "preserved-space" || kind === "zero-width-break" ? 0 : width;
+      const lineEndFitAdvance = baseLineEndFitAdvance === 0 ? 0 : baseLineEndFitAdvance + (spacingGraphemeCount > 0 ? letterSpacing : 0);
+      const lineEndPaintAdvance = kind === "space" || kind === "zero-width-break" ? 0 : width;
+      if (allowOverflowBreaks && wordLike && text.length > 1) {
+        let fitMode = "sum-graphemes";
+        if (letterSpacing !== 0) {
+          fitMode = "segment-prefixes";
+        } else if (isNumericRunSegment(text)) {
+          fitMode = "pair-context";
+        } else if (engineProfile.preferPrefixWidthsForBreakableRuns) {
+          fitMode = "segment-prefixes";
+        }
+        const fitAdvances = getSegmentBreakableFitAdvances(text, textMetrics, cache, emojiCorrection, fitMode);
+        const preferredBreaks = fitAdvances === null || wordBreak === "keep-all" ? null : getBreakablePreferredBreaks(text);
+        pushMeasuredSegment(text, width, lineEndFitAdvance, lineEndPaintAdvance, kind, start, fitAdvances, preferredBreaks, spacingGraphemeCount);
+        return;
+      }
+      pushMeasuredSegment(text, width, lineEndFitAdvance, lineEndPaintAdvance, kind, start, null, null, spacingGraphemeCount);
+    }
+    for (let mi = 0; mi < analysis.len; mi++) {
+      preparedStartByAnalysisIndex[mi] = widths.length;
+      const segText = analysis.texts[mi];
+      const segWordLike = analysis.isWordLike[mi];
+      const segKind = analysis.kinds[mi];
+      const segStart = analysis.starts[mi];
+      if (segKind === "soft-hyphen") {
+        pushMeasuredSegment(segText, 0, discretionaryHyphenWidth, discretionaryHyphenWidth, segKind, segStart, null, null, 0);
+        continue;
+      }
+      if (segKind === "hard-break") {
+        pushMeasuredSegment(segText, 0, 0, 0, segKind, segStart, null, null, 0);
+        continue;
+      }
+      if (segKind === "tab") {
+        pushMeasuredSegment(segText, 0, 0, 0, segKind, segStart, null, null, hasLetterSpacing ? countRenderedSpacingGraphemes(segText, segKind) : 0);
+        continue;
+      }
+      const segMetrics = getSegmentMetrics(segText, cache);
+      if (segKind === "text" && segMetrics.containsCJK) {
+        const baseUnits = buildBaseCjkUnits(segText, engineProfile);
+        const measuredUnits = wordBreak === "keep-all" ? mergeKeepAllTextUnits(segText, baseUnits, engineProfile.breakKeepAllAfterPunctuation) : baseUnits;
+        for (let i = 0; i < measuredUnits.length; i++) {
+          const unit = measuredUnits[i];
+          pushMeasuredTextSegment(unit.text, "text", segStart + unit.start, segWordLike, wordBreak === "keep-all" || !isCJK(unit.text));
+        }
+        continue;
+      }
+      pushMeasuredTextSegment(segText, segKind, segStart, segWordLike, true);
+    }
+    const chunks = mapAnalysisChunksToPreparedChunks(analysis.chunks, preparedStartByAnalysisIndex, widths.length);
+    const segLevels = segStarts === null ? null : computeSegmentLevels(analysis.normalized, segStarts);
+    if (segments !== null) {
+      return {
+        widths,
+        lineEndFitAdvances,
+        lineEndPaintAdvances,
+        kinds,
+        simpleLineWalkFastPath,
+        segLevels,
+        breakableFitAdvances,
+        breakablePreferredBreaks,
+        letterSpacing,
+        spacingGraphemeCounts,
+        discretionaryHyphenWidth,
+        tabStopAdvance,
+        chunks,
+        segments
+      };
+    }
+    return {
+      widths,
+      lineEndFitAdvances,
+      lineEndPaintAdvances,
+      kinds,
+      simpleLineWalkFastPath,
+      segLevels,
+      breakableFitAdvances,
+      breakablePreferredBreaks,
+      letterSpacing,
+      spacingGraphemeCounts,
+      discretionaryHyphenWidth,
+      tabStopAdvance,
+      chunks
+    };
+  }
+  function mapAnalysisChunksToPreparedChunks(chunks, preparedStartByAnalysisIndex, preparedEndSegmentIndex) {
+    const preparedChunks = [];
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      const startSegmentIndex = chunk.startSegmentIndex < preparedStartByAnalysisIndex.length ? preparedStartByAnalysisIndex[chunk.startSegmentIndex] : preparedEndSegmentIndex;
+      const endSegmentIndex = chunk.endSegmentIndex < preparedStartByAnalysisIndex.length ? preparedStartByAnalysisIndex[chunk.endSegmentIndex] : preparedEndSegmentIndex;
+      const consumedEndSegmentIndex = chunk.consumedEndSegmentIndex < preparedStartByAnalysisIndex.length ? preparedStartByAnalysisIndex[chunk.consumedEndSegmentIndex] : preparedEndSegmentIndex;
+      preparedChunks.push({
+        startSegmentIndex,
+        endSegmentIndex,
+        consumedEndSegmentIndex
+      });
+    }
+    return preparedChunks;
+  }
+  function prepareInternal(text, font, includeSegments, options) {
+    const wordBreak = options?.wordBreak ?? "normal";
+    const letterSpacing = options?.letterSpacing ?? 0;
+    const analysis = analyzeText(text, getEngineProfile(), options?.whiteSpace, wordBreak);
+    return measureAnalysis(analysis, font, includeSegments, wordBreak, letterSpacing);
+  }
+  function prepareWithSegments(text, font, options) {
+    return prepareInternal(text, font, true, options);
+  }
+  function getInternalPrepared(prepared2) {
+    return prepared2;
+  }
+  function createLayoutLine(prepared2, cache, width, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
+    return {
+      text: buildLineTextFromRange(prepared2, cache, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex),
+      width,
+      start: {
+        segmentIndex: startSegmentIndex,
+        graphemeIndex: startGraphemeIndex
+      },
+      end: {
+        segmentIndex: endSegmentIndex,
+        graphemeIndex: endGraphemeIndex
+      }
+    };
+  }
+  function createLayoutLineRange(width, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
+    return {
+      width,
+      start: {
+        segmentIndex: startSegmentIndex,
+        graphemeIndex: startGraphemeIndex
+      },
+      end: {
+        segmentIndex: endSegmentIndex,
+        graphemeIndex: endGraphemeIndex
+      }
+    };
+  }
+  function materializeLineRange(prepared2, line) {
+    return createLayoutLine(prepared2, getLineTextCache(prepared2), line.width, line.start.segmentIndex, line.start.graphemeIndex, line.end.segmentIndex, line.end.graphemeIndex);
+  }
+  function layoutNextLineRange(prepared2, start, maxWidth) {
+    const internal = getInternalPrepared(prepared2);
+    const end = {
+      segmentIndex: start.segmentIndex,
+      graphemeIndex: start.graphemeIndex
+    };
+    const chunkIndex = normalizePreparedLineStart(internal, end);
+    if (chunkIndex < 0)
+      return null;
+    const lineStartSegmentIndex = end.segmentIndex;
+    const lineStartGraphemeIndex = end.graphemeIndex;
+    const width = stepPreparedLineGeometryFromChunk(internal, end, chunkIndex, maxWidth);
+    if (width === null)
+      return null;
+    return createLayoutLineRange(width, lineStartSegmentIndex, lineStartGraphemeIndex, end.segmentIndex, end.graphemeIndex);
+  }
+
+  // public/pretext-effect.js
+  var TEXT = `\u805A\u7126\u8BA1\u7B97\u673A\u89C6\u89C9\u3001\u81EA\u52A8\u9A7E\u9A76\u611F\u77E5\u3001\u5E76\u884C\u8BA1\u7B97\u4E0E\u516C\u5F00\u5199\u4F5C\u3002\u516C\u5F00\u4ED3\u5E93 15 \u4E2A\uFF0C\u83B7\u5F97 1 \u4E2A Star\u3002\u6B63\u5728\u8D5E\u52A9\u5F00\u53D1\u8005\uFF1ALizardByte\u3001glenn-jocher\u3002\u8F66\u9053\u7EBF\u4E0E\u611F\u77E5\u5B9E\u9A8C\uFF1A\u6301\u7EED\u6574\u7406\u4F20\u7EDF\u89C6\u89C9\u6D41\u7A0B\u3001\u6DF1\u5EA6\u5B66\u4E60\u65B9\u6848\u4E0E\u573A\u666F\u611F\u77E5\u5B9E\u9A8C\u3002\u5E76\u884C\u8BA1\u7B97\u4E0E\u56F4\u7ED5 CUDA\u3001OpenMP \u548C\u56FE\u50CF/\u70B9\u4E91\u5904\u7406\u70ED\u70B9\u6D41\u7A0B\u505A\u6027\u80FD\u4F18\u5316\u3002\u6700\u65B0\u6587\u7AE0\uFF1AWindows \u4E0B\u7528 Python \u52A0 GStreamer \u63A8 RTSP \u6D41\u5E76\u6CE8\u5165 SEI \u4EE5\u53CA pyinstaller \u6253\u5305\u3002123\u4E91\u76D8\u62A5\u9519\uFF1A\u68C0\u6D4B\u5230\u672C\u5730\u901A\u4FE1\u88AB\u9632\u706B\u5899\u6216 VPN \u62E6\u622A\u3002`;
+  var FONT = '16px "Inter", "Noto Sans SC", system-ui, sans-serif';
+  var LINE_HEIGHT = 26;
+  var MIN_SLOT_WIDTH = 60;
+  var container = document.getElementById("pretext-output");
+  var W;
+  var H;
+  var prepared;
+  var orbs = [];
+  var orbElements = [];
+  function getPrepared() {
+    if (!prepared) prepared = prepareWithSegments(TEXT, FONT);
+    return prepared;
+  }
+  function resize() {
+    const r = container.parentElement.getBoundingClientRect();
+    W = r.width;
+    H = r.height;
+  }
+  function initOrbs() {
+    const r = Math.min(W, H) * 0.08;
+    orbs = [
+      { x: W * 0.3, y: H * 0.35, r, color: "#FF78B8", dragging: false, vx: 0.3, vy: 0.2 },
+      { x: W * 0.7, y: H * 0.6, r: r * 1.2, color: "#00D4FF", dragging: false, vx: -0.2, vy: 0.3 },
+      { x: W * 0.5, y: H * 0.8, r: r * 0.8, color: "#7C83FF", dragging: false, vx: 0.25, vy: -0.2 }
+    ];
+  }
+  function renderText() {
+    container.querySelectorAll(".pretext-line").forEach((el) => el.remove());
+    const prepared2 = getPrepared();
+    let cursor = { segmentIndex: 0, graphemeIndex: 0 };
+    const padding = 30;
+    const colW = (W - padding * 2 - 40) / 2;
+    const columns = [
+      { start: padding, end: padding + colW },
+      { start: padding + colW + 40, end: W - padding }
+    ];
+    for (const col of columns) {
+      let y = LINE_HEIGHT * 1.5;
+      const colBottom = H - 20;
+      while (y < colBottom && cursor.segmentIndex < prepared2.segments.length) {
+        const lineCY = y + LINE_HEIGHT / 2;
+        const blocks = [];
+        for (const orb of orbs) {
+          const dy = lineCY - orb.y;
+          if (Math.abs(dy) < orb.r) {
+            const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
+            blocks.push({ left: orb.x - half, right: orb.x + half });
+          }
+        }
+        blocks.sort((a, b) => a.left - b.left);
+        const merged = [];
+        for (const b of blocks) {
+          if (merged.length && b.left <= merged[merged.length - 1].right) {
+            merged[merged.length - 1].right = Math.max(merged[merged.length - 1].right, b.right);
+          } else merged.push({ ...b });
+        }
+        const segments = [];
+        let segStart = col.start;
+        for (const block of merged) {
+          if (block.left > segStart) segments.push({ x: segStart, w: block.left - segStart });
+          segStart = Math.max(segStart, block.right);
+        }
+        if (segStart < col.end) segments.push({ x: segStart, w: col.end - segStart });
+        for (const seg of segments) {
+          if (seg.w < MIN_SLOT_WIDTH) continue;
+          if (cursor.segmentIndex >= prepared2.segments.length) break;
+          const range = layoutNextLineRange(prepared2, cursor, seg.w - 4);
+          if (!range) break;
+          const line = materializeLineRange(prepared2, range);
+          if (!line.text.trim()) break;
+          const el = document.createElement("div");
+          el.className = "pretext-line";
+          el.style.left = seg.x + "px";
+          el.style.top = y + "px";
+          el.style.width = seg.w + "px";
+          el.textContent = line.text;
+          container.appendChild(el);
+          cursor = range.end;
+        }
+        y += LINE_HEIGHT;
+      }
+    }
+  }
+  function createOrbElements() {
+    orbElements = [];
+    container.querySelectorAll(".pretext-orb").forEach((el) => el.remove());
+    for (const orb of orbs) {
+      const el = document.createElement("div");
+      el.className = "pretext-orb";
+      el.style.width = orb.r * 2 + "px";
+      el.style.height = orb.r * 2 + "px";
+      el.style.borderColor = orb.color;
+      el.style.transform = `translate3d(${orb.x - orb.r}px, ${orb.y - orb.r}px, 0)`;
+      container.appendChild(el);
+      orbElements.push(el);
+    }
+    saveOrbPositions();
+  }
+  function updateOrbPositions() {
+    for (let i = 0; i < orbs.length; i++) {
+      const orb = orbs[i];
+      const el = orbElements[i];
+      if (el && !orb.dragging) {
+        el.style.transform = `translate3d(${orb.x - orb.r}px, ${orb.y - orb.r}px, 0)`;
+      }
+    }
+  }
+  var animationId = null;
+  var lastTextRender = 0;
+  var lastOrbPositions = [];
+  var MOVE_THRESHOLD = 3;
+  function orbMovedSignificantly() {
+    if (lastOrbPositions.length !== orbs.length) return true;
+    for (let i = 0; i < orbs.length; i++) {
+      const dx = Math.abs(orbs[i].x - lastOrbPositions[i].x);
+      const dy = Math.abs(orbs[i].y - lastOrbPositions[i].y);
+      if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) return true;
+    }
+    return false;
+  }
+  function saveOrbPositions() {
+    lastOrbPositions = orbs.map((o) => ({ x: o.x, y: o.y }));
+  }
+  function animate() {
+    const now = performance.now();
+    for (const orb of orbs) {
+      if (orb.dragging) continue;
+      orb.x += orb.vx;
+      orb.y += orb.vy;
+      if (orb.x - orb.r < 0 || orb.x + orb.r > W) {
+        orb.vx *= -1;
+        orb.x = Math.max(orb.r, Math.min(W - orb.r, orb.x));
+      }
+      if (orb.y - orb.r < 0 || orb.y + orb.r > H) {
+        orb.vy *= -1;
+        orb.y = Math.max(orb.r, Math.min(H - orb.r, orb.y));
+      }
+    }
+    updateOrbPositions();
+    if (orbMovedSignificantly()) {
+      renderText();
+      saveOrbPositions();
+      lastTextRender = now;
+    }
+    animationId = requestAnimationFrame(animate);
+  }
+  function startAnimation() {
+    if (!animationId) animate();
+  }
+  function stopAnimation() {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopAnimation();
+    } else {
+      startAnimation();
+    }
+  });
+  var dragOrb = null;
+  function getPos(e) {
+    const r = container.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: cx - r.left, y: cy - r.top };
+  }
+  function hitTest(p) {
+    for (let i = orbs.length - 1; i >= 0; i--) {
+      const o = orbs[i];
+      if ((p.x - o.x) ** 2 + (p.y - o.y) ** 2 < o.r * o.r) return o;
+    }
+    return null;
+  }
+  container.addEventListener("mousedown", (e) => {
+    dragOrb = hitTest(getPos(e));
+    if (dragOrb) {
+      dragOrb.dragging = true;
+      container.style.cursor = "grabbing";
+    }
+  });
+  container.addEventListener("mousemove", (e) => {
+    const p = getPos(e);
+    if (!dragOrb) {
+      container.style.cursor = hitTest(p) ? "grab" : "default";
+      return;
+    }
+    dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
+    dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
+    const idx = orbs.indexOf(dragOrb);
+    if (idx >= 0 && orbElements[idx]) {
+      orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
+    }
+  });
+  container.addEventListener("mouseup", () => {
+    if (dragOrb) {
+      dragOrb.dragging = false;
+      dragOrb = null;
+    }
+    container.style.cursor = "default";
+  });
+  container.addEventListener("mouseleave", () => {
+    if (dragOrb) {
+      dragOrb.dragging = false;
+      dragOrb = null;
+    }
+    container.style.cursor = "default";
+  });
+  container.addEventListener("touchstart", (e) => {
+    dragOrb = hitTest(getPos(e));
+    if (dragOrb) {
+      dragOrb.dragging = true;
+    }
+  }, { passive: true });
+  container.addEventListener("touchmove", (e) => {
+    if (!dragOrb) return;
+    e.preventDefault();
+    const p = getPos(e);
+    dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
+    dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
+    const idx = orbs.indexOf(dragOrb);
+    if (idx >= 0 && orbElements[idx]) {
+      orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
+    }
+  }, { passive: false });
+  container.addEventListener("touchend", () => {
+    if (dragOrb) {
+      dragOrb.dragging = false;
+      dragOrb = null;
+    }
+  });
+  var resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      resize();
+      initOrbs();
+      createOrbElements();
+      renderText();
+    }, 200);
+  });
+  function init() {
+    resize();
+    initOrbs();
+    prepared = getPrepared();
+    createOrbElements();
+    renderText();
+    startAnimation();
+  }
+  window.addEventListener("load", init);
+  if (document.readyState === "interactive" || document.readyState === "complete") init();
+})();
