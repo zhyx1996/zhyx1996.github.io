@@ -15,6 +15,13 @@ const ctx = canvas.getContext('2d');
 let dpr = window.devicePixelRatio || 1;
 let W, H;
 
+// ─── 缓存 prepared（只计算一次）────────────────────────────────
+let prepared = null;
+function getPrepared() {
+    if (!prepared) prepared = prepareWithSegments(TEXT, FONT);
+    return prepared;
+}
+
 function resize() {
   const r = canvas.parentElement.getBoundingClientRect();
   W = r.width; H = r.height;
@@ -48,7 +55,7 @@ function colWidth(startX, endX) {
 }
 
 function flowText() {
-  const prepared = prepareWithSegments(TEXT, FONT);
+  prepared = getPrepared();
   let cursor = { segmentIndex: 0, graphemeIndex: 0 };
   const padding = 30;
   const cols = 2;
@@ -147,11 +154,17 @@ function drawOrbs() {
   }
 }
 
+let needsRedraw = true;
+
 function draw() {
+  if (!needsRedraw) return;
+  needsRedraw = false;
   ctx.clearRect(0, 0, W, H);
   drawOrbs();
   flowText();
 }
+
+function requestDraw() { needsRedraw = true; requestDraw(); }
 
 // ─── 拖拽交互 ───────────────────────────────────────────────────
 let dragOrb = null;
@@ -177,7 +190,7 @@ canvas.addEventListener('mousedown', e => {
   if (dragOrb) {
     dragOrb.dragging = true;
     canvas.style.cursor = 'grabbing';
-    draw(); // 立即响应
+    requestDraw();
   }
 });
 
@@ -190,7 +203,7 @@ canvas.addEventListener('mousemove', e => {
   const p = getPos(e);
   dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
   dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-  requestAnimationFrame(draw);
+  requestDraw();
 });
 
 canvas.addEventListener('mouseup', () => {
@@ -207,7 +220,7 @@ canvas.addEventListener('mouseleave', () => {
 canvas.addEventListener('touchstart', e => {
   const p = getPos(e);
   dragOrb = hitTest(p);
-  if (dragOrb) { dragOrb.dragging = true; draw(); }
+  if (dragOrb) { dragOrb.dragging = true; requestDraw(); }
 }, { passive: true });
 
 canvas.addEventListener('touchmove', e => {
@@ -216,7 +229,7 @@ canvas.addEventListener('touchmove', e => {
   const p = getPos(e);
   dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
   dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-  requestAnimationFrame(draw);
+  requestDraw();
 }, { passive: false });
 
 canvas.addEventListener('touchend', () => {
@@ -240,22 +253,18 @@ function autoFloat() {
       orb.x = Math.max(orb.r, Math.min(W - orb.r, orb.x));
       orb.y = Math.max(orb.r, Math.min(H - orb.r, orb.y));
     });
-    requestAnimationFrame(draw);
+    requestDraw();
   }
   setTimeout(autoFloat, 33); // ~30fps idle
 }
 autoFloat();
 
 // ─── 初始化 ──────────────────────────────────────────────────────
-function init() {
-  resize();
-  initOrbs();
-  canvas.style.cursor = 'grab';
-  draw();
-}
+function init() { resize(); initOrbs(); canvas.style.cursor = "grab"; requestDraw(); }
 
-window.addEventListener('resize', () => { resize(); initOrbs(); draw(); });
+window.addEventListener('resize', () => { resize(); initOrbs(); requestDraw(); });
 window.addEventListener('load', init);
 // 如果 DOM 已就绪则立即执行
 if (document.readyState === 'interactive' || document.readyState === 'complete') init();
+
 
