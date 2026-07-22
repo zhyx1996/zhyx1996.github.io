@@ -1,0 +1,64 @@
+{
+  "date": "2026-07-22",
+  "runs": [
+    {
+      "time": "2026-07-22 03:33:55",
+      "links": {
+        "total": 16,
+        "ok": 8,
+        "failed": [
+          "GitHub 仓库列表",
+          "GitHub Stars",
+          "博客园文章 123云盘",
+          "lane2seq 仓库",
+          "pcl-boundary_omp 仓库",
+          "cuda_test 仓库",
+          "utils 仓库",
+          "GStreamer-SEI 仓库"
+        ]
+      },
+      "apis": {
+        "total": 7,
+        "ok": 6,
+        "failed": [
+          "CoinGecko BTC"
+        ]
+      },
+      "changes": {
+        "github": false,
+        "articles": false,
+        "css": false
+      }
+    },
+    {
+      "time": "2026-07-22 03:35:30",
+      "links": {
+        "total": 16,
+        "ok": 7,
+        "failed": [
+          "GitHub 个人主页",
+          "GitHub 仓库列表",
+          "GitHub Stars",
+          "博客园文章 123云盘",
+          "lane2seq 仓库",
+          "pcl-boundary_omp 仓库",
+          "cuda_test 仓库",
+          "utils 仓库",
+          "GStreamer-SEI 仓库"
+        ]
+      },
+      "apis": {
+        "total": 7,
+        "ok": 6,
+        "failed": [
+          "CoinGecko BTC"
+        ]
+      },
+      "changes": {
+        "github": false,
+        "articles": false,
+        "css": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "date": "2026-07-21",
+  "runs": [
+    {
+      "time": "2026-07-21 15:37:51",
+      "links": {
+        "total": 16,
+        "ok": 15,
+        "failed": [
+          "博客园文章 123云盘"
+        ]
+      },
+      "apis": {
+        "total": 7,
+        "ok": 6,
+        "failed": [
+          "CoinGecko BTC"
+        ]
+      },
+      "changes": {
+        "github": false,
+        "articles": false,
+        "css": true
+      }
+    },
+    {
+      "time": "2026-07-21 15:39:20",
+      "links": {
+        "total": 16,
+        "ok": 15,
+        "failed": [
+          "博客园文章 123云盘"
+        ]
+      },
+      "apis": {
+        "total": 7,
+        "ok": 6,
+        "failed": [
+          "CoinGecko BTC"
+        ]
+      },
+      "changes": {
+        "github": false,
+        "articles": false,
+        "css": true
+      }
+    },
+    {
+      "time": "2026-07-21 15:55:10",
+      "links": {
+        "total": 16,
+        "ok": 15,
+        "failed": [
+          "博客园文章 123云盘"
+        ]
+      },
+      "apis": {
+        "total": 7,
+        "ok": 5,
+        "failed": [
+          "CoinGecko BTC",
+          "Gold-API"
+        ]
+      },
+      "changes": {
+        "github": false,
+        "articles": true,
+        "css": true
+      }
+    },
+    {
+      "time": "2026-07-21 15:58:26",
+      "links": {
+        "total": 16,
+        "ok": 15,
+        "failed": [
+          "博客园文章 123云盘"
+        ]
+      },
+      "apis": {
+        "total": 7,
+        "ok": 5,
+        "failed": [
+          "CoinGecko BTC",
+          "Gold-API"
+        ]
+      },
+      "changes": {
+        "github": false,
+        "articles": true,
+        "css": true
+      }
+    },
+    {
+      "time": "2026-07-21 16:00:12",
+      "links": {
+        "total": 16,
+        "ok": 15,
+        "failed": [
+          "博客园文章 123云盘"
+        ]
+      },
+      "apis": {
+        "total": 7,
+        "ok": 6,
+        "failed": [
+          "CoinGecko BTC"
+        ]
+      },
+      "changes": {
+        "github": true,
+        "articles": true,
+        "css": true
+      }
+    }
+  ]
+}

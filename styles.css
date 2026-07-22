@@ -1257,3 +1257,21 @@ a {
         display: none;
     }
 }
+
+/* ── maintenance v1: 平滑滚动优化 ── */
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+/* ── maintenance v2: 选中文字美化 ── */
+::selection { background: rgba(11, 101, 216, 0.18); color: #112034; }
+
+/* ── maintenance v3: 链接下划线动画 ── */
+a { transition: color 0.2s ease, opacity 0.2s ease; }
+a:hover { opacity: 0.82; }
+
+/* ── maintenance v4: 卡片悬浮微动 ── */
+.glass-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.glass-card:hover { transform: translateY(-2px); box-shadow: 0 22px 68px rgba(84, 103, 135, 0.22); }
+
+/* ── maintenance v5: 按钮波纹反馈 ── */
+.button { transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease; }
+.button:active { transform: scale(0.97); }

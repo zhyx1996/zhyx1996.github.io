@@ -1,14 +1,14 @@
 const profileFallback = {
-    name: 'zhyx1996',
-    login: 'zhyx1996',
-    bio: '围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。',
-    html_url: 'https://github.com/zhyx1996',
-    avatar_url: 'https://avatars.githubusercontent.com/u/74281356?v=4',
-    public_repos: 4,
-    followers: 0,
-    following: 0,
-    updated_at: '2026-04-11T12:30:07Z'
-};
+          "name": "ZYX",
+          "login": "zhyx1996",
+          "bio": "围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。",
+          "html_url": "https://github.com/zhyx1996",
+          "avatar_url": "https://avatars.githubusercontent.com/u/74281356?v=4",
+          "public_repos": 15,
+          "followers": 2,
+          "following": 12,
+          "updated_at": "2026-07-19T02:28:31Z"
+    };
 
 const repoFallback = [
     {
@@ -94,26 +94,32 @@ const CNBLOGS_HOME_URL = `https://www.cnblogs.com/${CNBLOGS_BLOG_APP}`;
 
 const articleFallback = [
     {
-        title: '记录GStreamer打开JPEG编码的视频时出现段错误的原因',
-        link: `${CNBLOGS_HOME_URL}/p/19914336`,
-        summary: '排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。',
-        content: [
-            '文章围绕一个实际排障问题展开：同一进程里同时使用 OpenCV 的 VideoCapture / VideoWriter 和 GStreamer 管线处理 JPEG 编码视频时，会在解码阶段触发段错误。作者把现象收敛到 JPEG / MJPEG 场景，并逐步排除普通文件损坏、接口误用等表面因素。',
-            '定位后发现，问题核心是 OpenCV 依赖的 libjpeg.so.8 与 GStreamer 中 nvjpegdec 依赖的 libnvjpeg.so 在同进程下的解码链路冲突。文章进一步给出三种可落地方案：改用 nvv4l2decoder、退回 jpegdec，或先把原始视频转换成 H264，再进入后续处理流程。'
-        ].join('\n\n'),
-        published_at: '2026-04-23T00:00:00Z',
-        source: '博客园 · 扶摇接海'
+        title: "Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及pyinstaller打包",
+        link: "https://www.cnblogs.com/fix-me/p/20968815",
+        summary: "代码仓库：https://github.com/zhyx1996/GStreamer-SEI 网上 Windows + Python + GStreamer + 打包 的攻略比较少，踩了好多坑，简单记录一下。 1. 环境安装 有两种方式。 方式一：直接 pip 安装 需要 Python  3.8：",
+        published_at: "2026-06-30T08:22:00Z",
+        source: "博客园 · 扶摇接海"
     },
     {
-        title: 'CARLA中的坐标系与标准车辆坐标系',
-        link: `${CNBLOGS_HOME_URL}/p/19882892`,
-        summary: '梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。',
-        content: [
-            '文章先把 CARLA 里的坐标定义讲清楚：它采用左手坐标系，车辆前向通常沿 X 轴，Y 轴朝右，姿态角遵循 Z-Y-X 的欧拉角顺序。对于做自动驾驶感知、控制或仿真数据回放的人来说，这些约定如果没有先统一，后续计算很容易出现方向和符号错误。',
-            '在此基础上，作者把 CARLA 坐标和常见标准车辆坐标系做了对照，重点说明 Y 轴方向、左右手系差异以及姿态角转换时的注意点，帮助读者在仿真平台、算法模块和车辆工程表达之间建立一致的坐标转换关系。'
-        ].join('\n\n'),
-        published_at: null,
-        source: '博客园 · 扶摇接海'
+        title: "123云盘报错：检测到本地通信被防火墙或vpn拦截",
+        link: "https://www.cnblogs.com/fix-me/p/20194105",
+        summary: "联系客服，查看日志C:\\ProgramData\\123SyncCloud\\Logs\\SyncCloud.MaintenanceServer.log [2026-05-26 13:10:32.632] [123SyncCloud_MaintenanceService] [error] process ",
+        published_at: "2026-05-28T00:53:00Z",
+        source: "博客园 · 扶摇接海"
+    },
+    {
+        title: "记录 GStreamer 打开 JPEG 编码的视频时出现段错误的原因",
+        link: "https://www.cnblogs.com/fix-me/p/19914336",
+        summary: "问题现象 在 C++ 中，使用 gst_parse_launch 创建 GStreamer 管道，并通过 decodebin 解码 JPEG 编码的 .avi 视频时，程序会出现段错误，但没有其他明显报错信息。 排查结果 程序中同时使用了 OpenCV 的 VideoCapture 和 VideoW",
+        published_at: "2026-04-23T03:47:00Z",
+        source: "博客园 · 扶摇接海"
+    },
+    {
+        title: "CARLA 中的坐标系与标准车辆坐标系转换",
+        link: "https://www.cnblogs.com/fix-me/p/19882892",
+        summary: "标准车辆坐标系 常见的车辆坐标系通常采用“前、左、上”的定义，也就是右手系。 在这种坐标系下，各轴对应的旋转正方向均为逆时针，符合右手系。 CARLA 坐标系 参考 CARLA 文档： CARLA 使用的是左手坐标系，其中 Y 轴指向右侧。 它的欧拉角同样按照 Z-Y-X 顺序、绕自身坐标轴依次旋转",
+        published_at: "2026-04-17T05:47:00Z",
+        source: "博客园 · 扶摇接海"
     }
 ];
 
