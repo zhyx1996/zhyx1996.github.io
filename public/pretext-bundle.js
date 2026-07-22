@@ -2516,9 +2516,9 @@
   function breaksAfter(kind) {
     return kind === "space" || kind === "preserved-space" || kind === "tab" || kind === "zero-width-break" || kind === "soft-hyphen";
   }
-  function normalizeLineStartSegmentIndex(prepared, segmentIndex, endSegmentIndex = prepared.widths.length) {
+  function normalizeLineStartSegmentIndex(prepared2, segmentIndex, endSegmentIndex = prepared2.widths.length) {
     while (segmentIndex < endSegmentIndex) {
-      const kind = prepared.kinds[segmentIndex];
+      const kind = prepared2.kinds[segmentIndex];
       if (!consumesAtLineStart(kind))
         break;
       segmentIndex++;
@@ -2533,32 +2533,32 @@
       return tabStopAdvance;
     return tabStopAdvance - remainder;
   }
-  function getLeadingLetterSpacing(prepared, hasContent, segmentIndex) {
-    return prepared.letterSpacing !== 0 && hasContent && prepared.spacingGraphemeCounts[segmentIndex] > 0 ? prepared.letterSpacing : 0;
+  function getLeadingLetterSpacing(prepared2, hasContent, segmentIndex) {
+    return prepared2.letterSpacing !== 0 && hasContent && prepared2.spacingGraphemeCounts[segmentIndex] > 0 ? prepared2.letterSpacing : 0;
   }
   function getLineEndContribution(leadingSpacing, segmentContribution) {
     return segmentContribution === 0 ? 0 : leadingSpacing + segmentContribution;
   }
-  function getTabTrailingLetterSpacing(prepared, segmentIndex) {
-    return prepared.letterSpacing !== 0 && prepared.spacingGraphemeCounts[segmentIndex] > 0 ? prepared.letterSpacing : 0;
+  function getTabTrailingLetterSpacing(prepared2, segmentIndex) {
+    return prepared2.letterSpacing !== 0 && prepared2.spacingGraphemeCounts[segmentIndex] > 0 ? prepared2.letterSpacing : 0;
   }
-  function getWholeSegmentFitContribution(prepared, kind, segmentIndex, leadingSpacing, segmentWidth) {
-    const segmentContribution = kind === "tab" ? segmentWidth + getTabTrailingLetterSpacing(prepared, segmentIndex) : prepared.lineEndFitAdvances[segmentIndex];
+  function getWholeSegmentFitContribution(prepared2, kind, segmentIndex, leadingSpacing, segmentWidth) {
+    const segmentContribution = kind === "tab" ? segmentWidth + getTabTrailingLetterSpacing(prepared2, segmentIndex) : prepared2.lineEndFitAdvances[segmentIndex];
     return getLineEndContribution(leadingSpacing, segmentContribution);
   }
-  function getBreakOpportunityFitContribution(prepared, kind, segmentIndex, leadingSpacing) {
-    const segmentContribution = kind === "tab" ? 0 : prepared.lineEndFitAdvances[segmentIndex];
+  function getBreakOpportunityFitContribution(prepared2, kind, segmentIndex, leadingSpacing) {
+    const segmentContribution = kind === "tab" ? 0 : prepared2.lineEndFitAdvances[segmentIndex];
     return getLineEndContribution(leadingSpacing, segmentContribution);
   }
-  function getLineEndPaintContribution(prepared, kind, segmentIndex, leadingSpacing, segmentWidth) {
-    const segmentContribution = kind === "tab" ? segmentWidth : prepared.lineEndPaintAdvances[segmentIndex];
+  function getLineEndPaintContribution(prepared2, kind, segmentIndex, leadingSpacing, segmentWidth) {
+    const segmentContribution = kind === "tab" ? segmentWidth : prepared2.lineEndPaintAdvances[segmentIndex];
     return getLineEndContribution(leadingSpacing, segmentContribution);
   }
-  function getBreakableGraphemeAdvance(prepared, hasContent, baseAdvance) {
-    return prepared.letterSpacing !== 0 && hasContent ? baseAdvance + prepared.letterSpacing : baseAdvance;
+  function getBreakableGraphemeAdvance(prepared2, hasContent, baseAdvance) {
+    return prepared2.letterSpacing !== 0 && hasContent ? baseAdvance + prepared2.letterSpacing : baseAdvance;
   }
-  function getBreakableCandidateFitWidth(prepared, candidatePaintWidth) {
-    return prepared.letterSpacing === 0 ? candidatePaintWidth : candidatePaintWidth + prepared.letterSpacing;
+  function getBreakableCandidateFitWidth(prepared2, candidatePaintWidth) {
+    return prepared2.letterSpacing === 0 ? candidatePaintWidth : candidatePaintWidth + prepared2.letterSpacing;
   }
   function getNextPreferredBreakIndex(preferredBreaks, preferredBreakIndex, graphemeEnd) {
     let index = preferredBreakIndex;
@@ -2567,14 +2567,14 @@
     }
     return index;
   }
-  function getTerminalLetterSpacing(prepared, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
-    if (prepared.letterSpacing === 0)
+  function getTerminalLetterSpacing(prepared2, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
+    if (prepared2.letterSpacing === 0)
       return 0;
     if (endGraphemeIndex > 0) {
-      return prepared.spacingGraphemeCounts[endSegmentIndex] > 0 ? prepared.letterSpacing : 0;
+      return prepared2.spacingGraphemeCounts[endSegmentIndex] > 0 ? prepared2.letterSpacing : 0;
     }
     for (let i = endSegmentIndex - 1; i >= startSegmentIndex; i--) {
-      const kind = prepared.kinds[i];
+      const kind = prepared2.kinds[i];
       if (kind === "space" || kind === "zero-width-break" || kind === "hard-break")
         continue;
       if (kind === "soft-hyphen") {
@@ -2583,33 +2583,33 @@
         continue;
       }
       if (i === startSegmentIndex && startGraphemeIndex > 0) {
-        return prepared.letterSpacing;
+        return prepared2.letterSpacing;
       }
-      return prepared.spacingGraphemeCounts[i] > 0 ? prepared.letterSpacing : 0;
+      return prepared2.spacingGraphemeCounts[i] > 0 ? prepared2.letterSpacing : 0;
     }
     return 0;
   }
-  function finalizeLinePaintWidth(prepared, width, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
-    return width + getTerminalLetterSpacing(prepared, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex);
+  function finalizeLinePaintWidth(prepared2, width, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
+    return width + getTerminalLetterSpacing(prepared2, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex);
   }
-  function findChunkIndexForStart(prepared, segmentIndex) {
+  function findChunkIndexForStart(prepared2, segmentIndex) {
     let lo = 0;
-    let hi = prepared.chunks.length;
+    let hi = prepared2.chunks.length;
     while (lo < hi) {
       const mid = Math.floor((lo + hi) / 2);
-      if (segmentIndex < prepared.chunks[mid].consumedEndSegmentIndex) {
+      if (segmentIndex < prepared2.chunks[mid].consumedEndSegmentIndex) {
         hi = mid;
       } else {
         lo = mid + 1;
       }
     }
-    return lo < prepared.chunks.length ? lo : -1;
+    return lo < prepared2.chunks.length ? lo : -1;
   }
-  function normalizeLineStartInChunk(prepared, chunkIndex, cursor) {
+  function normalizeLineStartInChunk(prepared2, chunkIndex, cursor) {
     let segmentIndex = cursor.segmentIndex;
     if (cursor.graphemeIndex > 0)
       return chunkIndex;
-    const chunk = prepared.chunks[chunkIndex];
+    const chunk = prepared2.chunks[chunkIndex];
     if (chunk.startSegmentIndex === chunk.endSegmentIndex && segmentIndex === chunk.startSegmentIndex) {
       cursor.segmentIndex = segmentIndex;
       cursor.graphemeIndex = 0;
@@ -2617,34 +2617,34 @@
     }
     if (segmentIndex < chunk.startSegmentIndex)
       segmentIndex = chunk.startSegmentIndex;
-    segmentIndex = normalizeLineStartSegmentIndex(prepared, segmentIndex, chunk.endSegmentIndex);
+    segmentIndex = normalizeLineStartSegmentIndex(prepared2, segmentIndex, chunk.endSegmentIndex);
     if (segmentIndex < chunk.endSegmentIndex) {
       cursor.segmentIndex = segmentIndex;
       cursor.graphemeIndex = 0;
       return chunkIndex;
     }
-    if (chunk.consumedEndSegmentIndex >= prepared.widths.length)
+    if (chunk.consumedEndSegmentIndex >= prepared2.widths.length)
       return -1;
     cursor.segmentIndex = chunk.consumedEndSegmentIndex;
     cursor.graphemeIndex = 0;
     return chunkIndex + 1;
   }
-  function normalizePreparedLineStart(prepared, cursor) {
-    if (cursor.segmentIndex >= prepared.widths.length)
+  function normalizePreparedLineStart(prepared2, cursor) {
+    if (cursor.segmentIndex >= prepared2.widths.length)
       return -1;
-    const chunkIndex = findChunkIndexForStart(prepared, cursor.segmentIndex);
+    const chunkIndex = findChunkIndexForStart(prepared2, cursor.segmentIndex);
     if (chunkIndex < 0)
       return -1;
-    return normalizeLineStartInChunk(prepared, chunkIndex, cursor);
+    return normalizeLineStartInChunk(prepared2, chunkIndex, cursor);
   }
-  function stepPreparedChunkLineGeometry(prepared, cursor, chunkIndex, maxWidth) {
-    const chunk = prepared.chunks[chunkIndex];
+  function stepPreparedChunkLineGeometry(prepared2, cursor, chunkIndex, maxWidth) {
+    const chunk = prepared2.chunks[chunkIndex];
     if (chunk.startSegmentIndex === chunk.endSegmentIndex) {
       cursor.segmentIndex = chunk.consumedEndSegmentIndex;
       cursor.graphemeIndex = 0;
       return 0;
     }
-    const { widths, kinds, breakableFitAdvances, breakablePreferredBreaks, discretionaryHyphenWidth } = prepared;
+    const { widths, kinds, breakableFitAdvances, breakablePreferredBreaks, discretionaryHyphenWidth } = prepared2;
     const engineProfile = getEngineProfile();
     const lineFitEpsilon = engineProfile.lineFitEpsilon;
     const fitLimit = maxWidth + lineFitEpsilon;
@@ -2666,7 +2666,7 @@
         return null;
       cursor.segmentIndex = endSegmentIndex;
       cursor.graphemeIndex = endGraphemeIndex;
-      return finalizeLinePaintWidth(prepared, width, lineStartSegmentIndex, lineStartGraphemeIndex, endSegmentIndex, endGraphemeIndex);
+      return finalizeLinePaintWidth(prepared2, width, lineStartSegmentIndex, lineStartGraphemeIndex, endSegmentIndex, endGraphemeIndex);
     }
     function startLineAtSegment(segmentIndex, width) {
       hasContent = true;
@@ -2692,8 +2692,8 @@
     function updatePendingBreakForWholeSegment(kind, breakAfter, segmentIndex, segmentWidth, leadingSpacing, advance) {
       if (!breakAfter)
         return;
-      const fitAdvance = getBreakOpportunityFitContribution(prepared, kind, segmentIndex, leadingSpacing);
-      const paintAdvance = getLineEndPaintContribution(prepared, kind, segmentIndex, leadingSpacing, segmentWidth);
+      const fitAdvance = getBreakOpportunityFitContribution(prepared2, kind, segmentIndex, leadingSpacing);
+      const paintAdvance = getLineEndPaintContribution(prepared2, kind, segmentIndex, leadingSpacing, segmentWidth);
       pendingBreakSegmentIndex = segmentIndex + 1;
       pendingBreakFitWidth = lineW - advance + fitAdvance;
       pendingBreakPaintWidth = lineW - advance + paintAdvance;
@@ -2710,9 +2710,9 @@
         if (!hasContent) {
           startLineAtGrapheme(segmentIndex, g, baseGw);
         } else {
-          const gw = getBreakableGraphemeAdvance(prepared, true, baseGw);
+          const gw = getBreakableGraphemeAdvance(prepared2, true, baseGw);
           const candidatePaintWidth = lineW + gw;
-          if (getBreakableCandidateFitWidth(prepared, candidatePaintWidth) > fitLimit) {
+          if (getBreakableCandidateFitWidth(prepared2, candidatePaintWidth) > fitLimit) {
             if (preferredBreaks !== null && lastPreferredBreakEnd > startGraphemeIndex) {
               return finishLine(segmentIndex, lastPreferredBreakEnd, lastPreferredBreakWidth);
             }
@@ -2747,10 +2747,10 @@
       const kind = kinds[i];
       const breakAfter = breaksAfter(kind);
       const startGraphemeIndex = i === cursor.segmentIndex ? cursor.graphemeIndex : 0;
-      const leadingSpacing = getLeadingLetterSpacing(prepared, hasContent, i);
-      const w = kind === "tab" ? getTabAdvance(lineW + leadingSpacing, prepared.tabStopAdvance) : widths[i];
+      const leadingSpacing = getLeadingLetterSpacing(prepared2, hasContent, i);
+      const w = kind === "tab" ? getTabAdvance(lineW + leadingSpacing, prepared2.tabStopAdvance) : widths[i];
       const advance = leadingSpacing + w;
-      const fitAdvance = getWholeSegmentFitContribution(prepared, kind, i, leadingSpacing, w);
+      const fitAdvance = getWholeSegmentFitContribution(prepared2, kind, i, leadingSpacing, w);
       if (kind === "soft-hyphen" && startGraphemeIndex === 0) {
         if (hasContent) {
           lineEndSegmentIndex = i + 1;
@@ -2779,8 +2779,8 @@
       }
       const newFitW = lineW + fitAdvance;
       if (newFitW > fitLimit) {
-        const currentBreakFitWidth = lineW + getBreakOpportunityFitContribution(prepared, kind, i, leadingSpacing);
-        const currentBreakPaintWidth = lineW + getLineEndPaintContribution(prepared, kind, i, leadingSpacing, w);
+        const currentBreakFitWidth = lineW + getBreakOpportunityFitContribution(prepared2, kind, i, leadingSpacing);
+        const currentBreakPaintWidth = lineW + getLineEndPaintContribution(prepared2, kind, i, leadingSpacing, w);
         if (pendingBreakKind === "soft-hyphen" && engineProfile.preferEarlySoftHyphenBreak && pendingBreakFitWidth <= fitLimit) {
           return finishLine(pendingBreakSegmentIndex, 0, pendingBreakPaintWidth);
         }
@@ -2815,8 +2815,8 @@
     }
     return finishLine(chunk.consumedEndSegmentIndex, 0, lineW);
   }
-  function stepPreparedSimpleLineGeometry(prepared, cursor, maxWidth) {
-    const { widths, kinds, breakableFitAdvances, breakablePreferredBreaks } = prepared;
+  function stepPreparedSimpleLineGeometry(prepared2, cursor, maxWidth) {
+    const { widths, kinds, breakableFitAdvances, breakablePreferredBreaks } = prepared2;
     const engineProfile = getEngineProfile();
     const lineFitEpsilon = engineProfile.lineFitEpsilon;
     const fitLimit = maxWidth + lineFitEpsilon;
@@ -2920,11 +2920,11 @@
     cursor.graphemeIndex = lineEndGraphemeIndex;
     return lineW;
   }
-  function stepPreparedLineGeometryFromChunk(prepared, cursor, chunkIndex, maxWidth) {
-    if (prepared.simpleLineWalkFastPath) {
-      return stepPreparedSimpleLineGeometry(prepared, cursor, maxWidth);
+  function stepPreparedLineGeometryFromChunk(prepared2, cursor, chunkIndex, maxWidth) {
+    if (prepared2.simpleLineWalkFastPath) {
+      return stepPreparedSimpleLineGeometry(prepared2, cursor, maxWidth);
     }
-    return stepPreparedChunkLineGeometry(prepared, cursor, chunkIndex, maxWidth);
+    return stepPreparedChunkLineGeometry(prepared2, cursor, chunkIndex, maxWidth);
   }
 
   // public/line-text.js
@@ -2957,31 +2957,31 @@
     }
     return text;
   }
-  function getLineTextCache(prepared) {
-    let cache = sharedLineTextCaches.get(prepared);
+  function getLineTextCache(prepared2) {
+    let cache = sharedLineTextCaches.get(prepared2);
     if (cache !== void 0)
       return cache;
     cache = /* @__PURE__ */ new Map();
-    sharedLineTextCaches.set(prepared, cache);
+    sharedLineTextCaches.set(prepared2, cache);
     return cache;
   }
-  function buildLineTextFromRange(prepared, cache, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
+  function buildLineTextFromRange(prepared2, cache, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
     let text = "";
-    const endsWithDiscretionaryHyphen = lineHasDiscretionaryHyphen(prepared.kinds, startSegmentIndex, endSegmentIndex);
+    const endsWithDiscretionaryHyphen = lineHasDiscretionaryHyphen(prepared2.kinds, startSegmentIndex, endSegmentIndex);
     for (let i = startSegmentIndex; i < endSegmentIndex; i++) {
-      if (prepared.kinds[i] === "soft-hyphen" || prepared.kinds[i] === "hard-break")
+      if (prepared2.kinds[i] === "soft-hyphen" || prepared2.kinds[i] === "hard-break")
         continue;
       if (i === startSegmentIndex && startGraphemeIndex > 0) {
-        const graphemes = getSegmentGraphemes(i, prepared.segments, cache);
+        const graphemes = getSegmentGraphemes(i, prepared2.segments, cache);
         text = appendSegmentGraphemeRange(text, graphemes, startGraphemeIndex, graphemes.length);
       } else {
-        text += prepared.segments[i];
+        text += prepared2.segments[i];
       }
     }
     if (endGraphemeIndex > 0) {
       if (endsWithDiscretionaryHyphen)
         text += "-";
-      const graphemes = getSegmentGraphemes(endSegmentIndex, prepared.segments, cache);
+      const graphemes = getSegmentGraphemes(endSegmentIndex, prepared2.segments, cache);
       text = appendSegmentGraphemeRange(text, graphemes, startSegmentIndex === endSegmentIndex ? startGraphemeIndex : 0, endGraphemeIndex);
     } else if (endsWithDiscretionaryHyphen) {
       text += "-";
@@ -3311,12 +3311,12 @@
   function prepareWithSegments(text, font, options) {
     return prepareInternal(text, font, true, options);
   }
-  function getInternalPrepared(prepared) {
-    return prepared;
+  function getInternalPrepared(prepared2) {
+    return prepared2;
   }
-  function createLayoutLine(prepared, cache, width, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
+  function createLayoutLine(prepared2, cache, width, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex) {
     return {
-      text: buildLineTextFromRange(prepared, cache, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex),
+      text: buildLineTextFromRange(prepared2, cache, startSegmentIndex, startGraphemeIndex, endSegmentIndex, endGraphemeIndex),
       width,
       start: {
         segmentIndex: startSegmentIndex,
@@ -3341,11 +3341,11 @@
       }
     };
   }
-  function materializeLineRange(prepared, line) {
-    return createLayoutLine(prepared, getLineTextCache(prepared), line.width, line.start.segmentIndex, line.start.graphemeIndex, line.end.segmentIndex, line.end.graphemeIndex);
+  function materializeLineRange(prepared2, line) {
+    return createLayoutLine(prepared2, getLineTextCache(prepared2), line.width, line.start.segmentIndex, line.start.graphemeIndex, line.end.segmentIndex, line.end.graphemeIndex);
   }
-  function layoutNextLineRange(prepared, start, maxWidth) {
-    const internal = getInternalPrepared(prepared);
+  function layoutNextLineRange(prepared2, start, maxWidth) {
+    const internal = getInternalPrepared(prepared2);
     const end = {
       segmentIndex: start.segmentIndex,
       graphemeIndex: start.graphemeIndex
@@ -3362,7 +3362,7 @@
   }
 
   // public/pretext-effect.js
-  var TEXT = `\u805A\u7126\u8BA1\u7B97\u673A\u89C6\u89C9\u3001\u81EA\u52A8\u9A7E\u9A76\u611F\u77E5\u3001\u5E76\u884C\u8BA1\u7B97\u4E0E\u516C\u5F00\u5199\u4F5C\u3002\u56F4\u7ED5\u8F66\u9053\u7EBF\u68C0\u6D4B\u3001CUDA \u5E76\u884C\u52A0\u901F\u3001\u70B9\u4E91\u5904\u7406\u7B49\u65B9\u5411\u6301\u7EED\u5B9E\u8DF5\uFF0C\u628A\u5B9E\u9A8C\u7ED3\u679C\u6C89\u6DC0\u4E3A\u53EF\u590D\u7528\u7684\u5DE5\u7A0B\u7ECF\u9A8C\u3002\u4EE3\u7801\u4ED3\u5E93\uFF1Agithub.com/zhyx1996\u3002\u535A\u5BA2\u56ED\uFF1Acnblogs.com/fix-me\u3002`;
+  var TEXT = `\u805A\u7126\u8BA1\u7B97\u673A\u89C6\u89C9\u3001\u81EA\u52A8\u9A7E\u9A76\u611F\u77E5\u3001\u5E76\u884C\u8BA1\u7B97\u4E0E\u516C\u5F00\u5199\u4F5C\u3002\u56F4\u7ED5\u8F66\u9053\u7EBF\u68C0\u6D4B\u3001CUDA \u5E76\u884C\u52A0\u901F\u3001\u70B9\u4E91\u5904\u7406\u7B49\u65B9\u5411\u6301\u7EED\u5B9E\u8DF5\uFF0C\u628A\u5B9E\u9A8C\u7ED3\u679C\u6C89\u6DC0\u4E3A\u53EF\u590D\u7528\u7684\u5DE5\u7A0B\u7ECF\u9A8C\u3002`;
   var FONT = '16px "Inter", "Noto Sans SC", system-ui, sans-serif';
   var LINE_HEIGHT = 28;
   var COLUMN_GAP = 40;
@@ -3373,6 +3373,11 @@
   var dpr = window.devicePixelRatio || 1;
   var W;
   var H;
+  var prepared = null;
+  function getPrepared() {
+    if (!prepared) prepared = prepareWithSegments(TEXT, FONT);
+    return prepared;
+  }
   function resize() {
     const r = canvas.parentElement.getBoundingClientRect();
     W = r.width;
@@ -3393,7 +3398,7 @@
     ];
   }
   function flowText() {
-    const prepared = prepareWithSegments(TEXT, FONT);
+    prepared = getPrepared();
     let cursor = { segmentIndex: 0, graphemeIndex: 0 };
     const padding = 30;
     const cols = 2;
@@ -3472,10 +3477,17 @@
       ctx.fill();
     }
   }
+  var needsRedraw = true;
   function draw() {
+    if (!needsRedraw) return;
+    needsRedraw = false;
     ctx.clearRect(0, 0, W, H);
     drawOrbs();
     flowText();
+  }
+  function requestDraw() {
+    needsRedraw = true;
+    requestAnimationFrame(draw);
   }
   var dragOrb = null;
   function getPos(e) {
@@ -3497,7 +3509,7 @@
     if (dragOrb) {
       dragOrb.dragging = true;
       canvas.style.cursor = "grabbing";
-      draw();
+      requestDraw();
     }
   });
   canvas.addEventListener("mousemove", (e) => {
@@ -3509,7 +3521,7 @@
     const p = getPos(e);
     dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
     dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-    requestAnimationFrame(draw);
+    requestDraw();
   });
   canvas.addEventListener("mouseup", () => {
     if (dragOrb) {
@@ -3530,7 +3542,7 @@
     dragOrb = hitTest(p);
     if (dragOrb) {
       dragOrb.dragging = true;
-      draw();
+      requestDraw();
     }
   }, { passive: true });
   canvas.addEventListener("touchmove", (e) => {
@@ -3539,7 +3551,7 @@
     const p = getPos(e);
     dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
     dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-    requestAnimationFrame(draw);
+    requestDraw();
   }, { passive: false });
   canvas.addEventListener("touchend", () => {
     if (dragOrb) {
@@ -3561,7 +3573,7 @@
         orb.x = Math.max(orb.r, Math.min(W - orb.r, orb.x));
         orb.y = Math.max(orb.r, Math.min(H - orb.r, orb.y));
       });
-      requestAnimationFrame(draw);
+      requestDraw();
     }
     setTimeout(autoFloat, 33);
   }
@@ -3570,12 +3582,12 @@
     resize();
     initOrbs();
     canvas.style.cursor = "grab";
-    draw();
+    requestDraw();
   }
   window.addEventListener("resize", () => {
     resize();
     initOrbs();
-    draw();
+    requestDraw();
   });
   window.addEventListener("load", init);
   if (document.readyState === "interactive" || document.readyState === "complete") init();

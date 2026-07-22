@@ -185,7 +185,8 @@ async function checkApis() {
         { label: 'GitHub Starred API', url: 'https://api.github.com/users/zhyx1996/starred?sort=updated&per_page=100' },
         { label: 'ER-API 汇率', url: 'https://open.er-api.com/v6/latest/USD' },
         { label: 'CoinGecko BTC', url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,cny&include_24hr_change=true', retries: 3, timeout: 12000 },
-        { label: 'Gold-API', url: 'https://data-asg.goldprice.org/dbXRates/USD', retries: 2 },
+        { label: 'Gold-API', url: 'https://api.gold-api.com/price/XAU', retries: 2 },
+        { label: 'FreeGoldAPI 日线', url: 'https://freegoldapi.com/data/latest.json', retries: 2 },
         { label: '博客园 RSS Feed', url: 'https://feed.cnblogs.com/blog/u/836363/rss/' },
     ];
 
@@ -493,8 +494,17 @@ async function main() {
         changes.css = applyCssImprovements();
     }
 
-    // 6. 报告
-    const { run } = await generateReport(linkResults, apiResults, changes);
+    // 6. 摘要；仅在显式传入 --report 时写入报告，避免普通检查弄脏工作树
+    let run;
+    if (doReport) {
+        ({ run } = await generateReport(linkResults, apiResults, changes));
+    } else {
+        run = {
+            links: { total: linkResults.length, ok: linkResults.filter(l => l.ok).length, failed: linkResults.filter(l => !l.ok).map(l => l.label) },
+            apis: { total: apiResults.length, ok: apiResults.filter(a => a.ok).length, failed: apiResults.filter(a => !a.ok).map(a => a.label) },
+            changes
+        };
+    }
 
     // 摘要
     process.stdout.write(`\n${'═'.repeat(50)}\n`);
