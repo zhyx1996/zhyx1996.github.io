@@ -1,152 +1,260 @@
 import { prepareWithSegments, layoutNextLineRange, materializeLineRange } from '/public/layout.js';
 
 // ─── 配置 ────────────────────────────────────────────────────────
-const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。围绕车道线检测、CUDA 并行加速、点云处理等方向持续实践，把实验结果沉淀为可复用的工程经验。`;
+const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。围绕车道线检测、CUDA 并行加速、点云处理等方向持续实践，把实验结果沉淀为可复用的工程经验。代码仓库：github.com/zhyx1996。博客园：cnblogs.com/fix-me。`;
 const FONT = '16px "Inter", "Noto Sans SC", system-ui, sans-serif';
 const LINE_HEIGHT = 28;
-const FONT_COLOR = 'rgba(255, 255, 255, 0.9)';
-const ACCENT_COLOR = 'rgba(100, 200, 255, 0.8)';
+const COLUMN_GAP = 40;
+const FONT_COLOR = 'rgba(255, 255, 255, 0.92)';
+const ACCENT = 'rgba(100, 220, 255, 0.85)';
+const ACCENT_SOFT = 'rgba(100, 220, 255, 0.12)';
 
-// ─── Canvas 设置 ──────────────────────────────────────────────────
+// ─── Canvas ─────────────────────────────────────────────────────
 const canvas = document.getElementById('pretext-canvas');
 const ctx = canvas.getContext('2d');
 let dpr = window.devicePixelRatio || 1;
-let width, height;
+let W, H;
 
 function resize() {
-  const rect = canvas.parentElement.getBoundingClientRect();
-  width = rect.width;
-  height = rect.height;
-  canvas.width = width * dpr;
-  canvas.height = height * dpr;
-  canvas.style.width = width + 'px';
-  canvas.style.height = height + 'px';
+  const r = canvas.parentElement.getBoundingClientRect();
+  W = r.width; H = r.height;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
-// ─── 障碍物（可拖拽） ────────────────────────────────────────────
-const obstacle = { x: 0, y: 0, r: 60, dragging: false };
-
-function initObstacle() {
-  obstacle.x = width * 0.7;
-  obstacle.y = height * 0.5;
-  obstacle.r = Math.min(width, height) * 0.12;
+// ─── 可拖拽障碍物 ───────────────────────────────────────────────
+let orbs = [];
+function initOrbs() {
+  const r = Math.min(W, H) * 0.09;
+  orbs = [
+    { x: W * 0.35, y: H * 0.3, r, color: 'rgba(255, 120, 180, 0.85)', dragging: false, vx: 0, vy: 0 },
+    { x: W * 0.65, y: H * 0.65, r: r * 1.3, color: 'rgba(100, 220, 255, 0.85)', dragging: false, vx: 0, vy: 0 },
+    { x: W * 0.8, y: H * 0.25, r: r * 0.7, color: 'rgba(200, 160, 255, 0.85)', dragging: false, vx: 0, vy: 0 },
+  ];
 }
 
-// ─── 文字布局 + 渲染 ─────────────────────────────────────────────
-function getTextWidth(line) {
-  ctx.font = FONT;
-  return ctx.measureText(line).text.length * 8; // fallback
+// ─── 文字布局 ───────────────────────────────────────────────────
+function colWidth(startX, endX) {
+  // 计算该列中所有障碍物占用的空间
+  let left = startX;
+  let right = endX;
+  for (const orb of orbs) {
+    if (orb.x - orb.r > startX && orb.x + orb.r < endX) {
+      // 障碍物完全在列内：文字需要避让
+    }
+  }
+  return endX - startX;
 }
 
-function draw() {
-  ctx.clearRect(0, 0, width, height);
-
-  // 绘制障碍物
-  ctx.beginPath();
-  ctx.arc(obstacle.x, obstacle.y, obstacle.r, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(100, 200, 255, 0.08)';
-  ctx.fill();
-  ctx.strokeStyle = ACCENT_COLOR;
-  ctx.lineWidth = 2;
-  ctx.setLineDash([6, 4]);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // 使用 Pretext 布局文字
+function flowText() {
   const prepared = prepareWithSegments(TEXT, FONT);
   let cursor = { segmentIndex: 0, graphemeIndex: 0 };
-  let y = LINE_HEIGHT;
-  const padding = 20;
-  const maxWidth = width - padding * 2;
+  const padding = 30;
+  const cols = 2;
+  const colW = (W - padding * 2 - COLUMN_GAP) / cols;
+  const positions = [
+    { x: padding, availStart: padding, availEnd: padding + colW },
+    { x: padding + colW + COLUMN_GAP, availStart: padding + colW + COLUMN_GAP, availEnd: W - padding },
+  ];
+
+  let y = LINE_HEIGHT * 1.5;
+  let colIdx = 0;
+  const colBottoms = [H - 20, H - 20];
 
   ctx.font = FONT;
   ctx.fillStyle = FONT_COLOR;
   ctx.textBaseline = 'top';
 
-  while (y < height - LINE_HEIGHT) {
-    // 计算当前行是否与障碍物相交
-    const lineCenterY = y + LINE_HEIGHT / 2;
-    const dy = lineCenterY - obstacle.y;
-    const intersects = Math.abs(dy) < obstacle.r;
+  while (cursor.segmentIndex < prepared.segments.length) {
+    const pos = positions[colIdx];
+    const yBottom = colBottoms[colIdx];
+    if (y >= yBottom) {
+      colIdx++;
+      if (colIdx >= cols) break;
+      y = LINE_HEIGHT * 1.5;
+      continue;
+    }
 
-    let lineWidth = maxWidth;
-    if (intersects) {
-      // 障碍物在这一行：计算可用宽度
-      const halfChord = Math.sqrt(Math.max(0, obstacle.r * obstacle.r - dy * dy));
-      const obsLeft = obstacle.x - halfChord;
-      const obsRight = obstacle.x + halfChord;
+    // 计算当前行可用宽度（避让障碍物）
+    let lineW = pos.availEnd - pos.availStart;
+    const lineCY = y + LINE_HEIGHT / 2;
 
-      // 文字从左侧开始，到障碍物前停止
-      if (obsLeft > padding + 100) {
-        lineWidth = obsLeft - padding - 10;
-      } else {
-        // 障碍物太靠左，文字从障碍物右侧开始
-        lineWidth = maxWidth - (obsRight - padding) - 10;
-        // 跳过这一行到障碍物右侧（简化处理）
-        y += LINE_HEIGHT;
-        continue;
+    for (const orb of orbs) {
+      const dy = lineCY - orb.y;
+      if (Math.abs(dy) < orb.r) {
+        const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
+        const orbLeft = orb.x - half;
+        const orbRight = orb.x + half;
+
+        // 障碍物与本行重叠
+        if (orbLeft > pos.availStart && orbRight < pos.availEnd) {
+          // 选择较宽的一侧
+          const leftW = orbLeft - pos.availStart;
+          const rightW = pos.availEnd - orbRight;
+          if (leftW >= rightW && leftW > 80) {
+            lineW = leftW - 8;
+          } else if (rightW > 80) {
+            lineW = rightW - 8;
+            // 保持起点不变，文字只占右侧
+          }
+        } else if (orbLeft <= pos.availStart && orbRight > pos.availStart && orbRight < pos.availEnd) {
+          // 障碍物遮挡左侧
+          const newStart = orbRight + 8;
+          if (pos.availEnd - newStart > 80) {
+            lineW = pos.availEnd - newStart;
+          }
+        } else if (orbRight >= pos.availEnd && orbLeft > pos.availStart && orbLeft < pos.availEnd) {
+          // 障碍物遮挡右侧
+          lineW = orbLeft - pos.availStart - 8;
+        } else if (orbLeft <= pos.availStart && orbRight >= pos.availEnd) {
+          // 整行覆盖，跳过
+          lineW = 0;
+        }
       }
     }
 
-    const range = layoutNextLineRange(prepared, cursor, lineWidth);
-    if (range === null) break;
+    if (lineW > 60) {
+      const range = layoutNextLineRange(prepared, cursor, lineW);
+      if (range === null) break;
+      const line = materializeLineRange(prepared, range);
+      ctx.fillText(line.text, pos.availStart, y);
+      cursor = range.end;
+    }
 
-    const line = materializeLineRange(prepared, range);
-    ctx.fillText(line.text, padding, y);
-
-    cursor = range.end;
     y += LINE_HEIGHT;
   }
 }
 
-// ─── 拖拽交互 ────────────────────────────────────────────────────
-function getPos(e) {
-  const rect = canvas.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  return { x: clientX - rect.left, y: clientY - rect.top };
-}
+// ─── 渲染 ───────────────────────────────────────────────────────
+function drawOrbs() {
+  for (const orb of orbs) {
+    ctx.beginPath();
+    ctx.arc(orb.x, orb.y, orb.r, 0, Math.PI * 2);
+    ctx.fillStyle = ACCENT_SOFT;
+    ctx.fill();
+    ctx.strokeStyle = orb.color;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
 
-canvas.addEventListener('mousedown', startDrag);
-canvas.addEventListener('mousemove', moveDrag);
-canvas.addEventListener('mouseup', endDrag);
-canvas.addEventListener('mouseleave', endDrag);
-canvas.addEventListener('touchstart', startDrag, { passive: true });
-canvas.addEventListener('touchmove', moveDrag, { passive: true });
-canvas.addEventListener('touchend', endDrag);
-
-function startDrag(e) {
-  const pos = getPos(e);
-  const dx = pos.x - obstacle.x;
-  const dy = pos.y - obstacle.y;
-  if (dx * dx + dy * dy < obstacle.r * obstacle.r) {
-    obstacle.dragging = true;
-    canvas.style.cursor = 'grabbing';
+    // 圆心小点
+    ctx.beginPath();
+    ctx.arc(orb.x, orb.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = orb.color;
+    ctx.fill();
   }
 }
 
-function moveDrag(e) {
-  if (!obstacle.dragging) return;
-  e.preventDefault();
-  const pos = getPos(e);
-  obstacle.x = Math.max(obstacle.r, Math.min(width - obstacle.r, pos.x));
-  obstacle.y = Math.max(obstacle.r, Math.min(height - obstacle.r, pos.y));
-  requestAnimationFrame(draw);
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  drawOrbs();
+  flowText();
 }
 
-function endDrag() {
-  obstacle.dragging = false;
-  canvas.style.cursor = 'grab';
+// ─── 拖拽交互 ───────────────────────────────────────────────────
+let dragOrb = null;
+
+function getPos(e) {
+  const r = canvas.getBoundingClientRect();
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: cx - r.left, y: cy - r.top };
 }
+
+function hitTest(p) {
+  for (let i = orbs.length - 1; i >= 0; i--) {
+    const o = orbs[i];
+    if ((p.x - o.x) ** 2 + (p.y - o.y) ** 2 < o.r * o.r) return o;
+  }
+  return null;
+}
+
+canvas.addEventListener('mousedown', e => {
+  const p = getPos(e);
+  dragOrb = hitTest(p);
+  if (dragOrb) {
+    dragOrb.dragging = true;
+    canvas.style.cursor = 'grabbing';
+    draw(); // 立即响应
+  }
+});
+
+canvas.addEventListener('mousemove', e => {
+  if (!dragOrb) {
+    const p = getPos(e);
+    canvas.style.cursor = hitTest(p) ? 'grab' : 'default';
+    return;
+  }
+  const p = getPos(e);
+  dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
+  dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
+  requestAnimationFrame(draw);
+});
+
+canvas.addEventListener('mouseup', () => {
+  if (dragOrb) { dragOrb.dragging = false; dragOrb = null; }
+  canvas.style.cursor = 'default';
+});
+
+canvas.addEventListener('mouseleave', () => {
+  if (dragOrb) { dragOrb.dragging = false; dragOrb = null; }
+  canvas.style.cursor = 'default';
+});
+
+// 触摸
+canvas.addEventListener('touchstart', e => {
+  const p = getPos(e);
+  dragOrb = hitTest(p);
+  if (dragOrb) { dragOrb.dragging = true; draw(); }
+}, { passive: true });
+
+canvas.addEventListener('touchmove', e => {
+  if (!dragOrb) return;
+  e.preventDefault();
+  const p = getPos(e);
+  dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
+  dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
+  requestAnimationFrame(draw);
+}, { passive: false });
+
+canvas.addEventListener('touchend', () => {
+  if (dragOrb) { dragOrb.dragging = false; dragOrb = null; }
+});
+
+// ─── 自动浮动动画（空闲时圆球缓慢飘动）──────────────────────────
+let lastInteraction = Date.now();
+canvas.addEventListener('mousedown', () => lastInteraction = Date.now());
+canvas.addEventListener('touchstart', () => lastInteraction = Date.now());
+
+function autoFloat() {
+  const idle = Date.now() - lastInteraction;
+  if (idle > 3000) {
+    // 3秒无交互后开始缓慢浮动
+    orbs.forEach((orb, i) => {
+      if (orb.dragging) return;
+      const t = Date.now() * 0.0003 + i * 2.1;
+      orb.x += Math.sin(t + i) * 0.3;
+      orb.y += Math.cos(t * 0.7 + i) * 0.3;
+      orb.x = Math.max(orb.r, Math.min(W - orb.r, orb.x));
+      orb.y = Math.max(orb.r, Math.min(H - orb.r, orb.y));
+    });
+    requestAnimationFrame(draw);
+  }
+  setTimeout(autoFloat, 33); // ~30fps idle
+}
+autoFloat();
 
 // ─── 初始化 ──────────────────────────────────────────────────────
 function init() {
   resize();
-  initObstacle();
+  initOrbs();
   canvas.style.cursor = 'grab';
   draw();
 }
 
-window.addEventListener('resize', () => { resize(); initObstacle(); draw(); });
-init();
+window.addEventListener('resize', () => { resize(); initOrbs(); draw(); });
+window.addEventListener('load', init);
+// 如果 DOM 已就绪则立即执行
+if (document.readyState === 'interactive' || document.readyState === 'complete') init();
