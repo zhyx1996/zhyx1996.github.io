@@ -131,10 +131,10 @@ a:hover { opacity: 0.8; }
     max-width: 800px;
 }
 
-/* ── Hero ── */
+/* ─ Hero ── */
 .hero {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 1fr;
     gap: 40px;
     align-items: start;
     margin-bottom: 64px;
@@ -144,8 +144,8 @@ a:hover { opacity: 0.8; }
 
 .hero-side {
     position: relative;
-    width: 480px;
-    height: 360px;
+    width: 100%;
+    min-height: 320px;
     overflow: hidden;
 }
 
