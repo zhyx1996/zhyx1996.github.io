@@ -205,11 +205,57 @@ function updateThemeToggle(theme) {
   if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
 }
 
+// ── Sakana Widget 拖拽 ──
+function initSakanaDrag() {
+  const widget = document.getElementById('sakana-widget');
+  if (!widget) return;
+
+  let isDragging = false;
+  let startX, startY, startRight, startBottom;
+
+  const onStart = (e) => {
+    const target = e.touches ? e.touches[0] : e;
+    if (target.target && target.target.closest && target.target.closest('.sakana-widget-ctrl')) return;
+    isDragging = true;
+    startX = target.clientX;
+    startY = target.clientY;
+    const rect = widget.getBoundingClientRect();
+    startRight = window.innerWidth - rect.right;
+    startBottom = window.innerHeight - rect.bottom;
+    widget.style.transition = 'none';
+    e.preventDefault();
+  };
+
+  const onMove = (e) => {
+    if (!isDragging) return;
+    const target = e.touches ? e.touches[0] : e;
+    const dx = target.clientX - startX;
+    const dy = target.clientY - startY;
+    const newRight = Math.max(0, Math.min(window.innerWidth - widget.offsetWidth, startRight - dx));
+    const newBottom = Math.max(0, Math.min(window.innerHeight - widget.offsetHeight, startBottom - dy));
+    widget.style.right = newRight + 'px';
+    widget.style.bottom = newBottom + 'px';
+  };
+
+  const onEnd = () => {
+    isDragging = false;
+    widget.style.transition = '';
+  };
+
+  widget.addEventListener('mousedown', onStart);
+  widget.addEventListener('touchstart', onStart, { passive: false });
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('mouseup', onEnd);
+  document.addEventListener('touchend', onEnd);
+}
+
 // ── 初始化 ──
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   loadProfile();
   loadMarket();
+  initSakanaDrag();
 
   const themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) themeToggle.addEventListener('click', toggleTheme);

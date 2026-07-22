@@ -245,8 +245,8 @@ body::after {
 /* Pretext DOM 文字环绕 */
 #pretext-output {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    top: 0; right: 0;
+    width: 50%; height: 100%;
     z-index: 1;
     pointer-events: auto;
     overflow: hidden;
@@ -1065,6 +1065,13 @@ body::after {
     height: 200px;
     z-index: 9999;
     pointer-events: auto;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+#sakana-widget:active {
+    cursor: grabbing;
 }
 
 #sakana-widget canvas {
