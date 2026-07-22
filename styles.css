@@ -1,3 +1,47 @@
+
+/* ── 离线 Google Fonts ── */
+@font-face {
+    font-family: "Space Grotesk";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url("/public/fonts/space-grotesk-latin-500-normal.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Space Grotesk";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("/public/fonts/space-grotesk-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+    font-family: "JetBrains Mono";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/public/fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+    font-family: "JetBrains Mono";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("/public/fonts/jetbrains-mono-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/public/fonts/inter-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("/public/fonts/inter-latin-600-normal.woff2") format("woff2");
+}
 /* ═══════════════════════════════════════════════════════════════════
    扶摇接海 · 个人主页 —「感知栈」主题
    深色背景 + 电光蓝/琥珀/柔紫 语义分割美学
@@ -89,7 +133,7 @@ body::after {
     gap: 0.6rem;
     color: var(--text);
     font-weight: 700;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     font-size: 1.1rem;
     text-decoration: none;
 }
@@ -169,7 +213,7 @@ body::after {
 }
 
 .kicker {
-    font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", "Noto Sans SC", monospace;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.15em;
@@ -184,7 +228,7 @@ body::after {
 }
 
 .hero-copy h1 {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     font-size: clamp(2rem, 5vw, 3.2rem);
     font-weight: 700;
     line-height: 1.1;
@@ -225,7 +269,7 @@ body::after {
     backdrop-filter: blur(8px);
 }
 .banner-meta-card small {
-    font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", "Noto Sans SC", monospace;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -233,7 +277,7 @@ body::after {
 }
 .banner-meta-card strong {
     display: block;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     font-size: 1.05rem;
     color: var(--text);
     margin: 0.3rem 0;
@@ -292,21 +336,21 @@ body::after {
     border-bottom: 1px solid var(--border);
 }
 .section-heading h2 {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     font-size: 1.4rem;
     font-weight: 600;
     color: var(--text);
 }
 .section-subheading { margin-top: 1.5rem; margin-bottom: 1rem; }
 .section-subheading h3 {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     font-size: 1.1rem;
     color: var(--text-dim);
 }
 
 /* ── 标签 ── */
 .tag {
-    font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", "Noto Sans SC", monospace;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -317,7 +361,7 @@ body::after {
     border: 1px solid rgba(0,212,255,0.15);
 }
 .pill {
-    font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", "Noto Sans SC", monospace;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.7rem;
     color: var(--text-muted);
     padding: 0.15rem 0.5rem;
@@ -326,7 +370,7 @@ body::after {
     border: 1px solid var(--border);
 }
 .badge {
-    font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", "Noto Sans SC", monospace;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -365,7 +409,7 @@ body::after {
 }
 .card .badge { margin-bottom: 0.6rem; }
 .card h3 {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     font-size: 1rem;
     font-weight: 600;
     color: var(--text);
@@ -389,7 +433,7 @@ body::after {
 }
 
 .repo-stats {
-    font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", "Noto Sans SC", monospace;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.75rem;
     color: var(--text-muted);
     margin: 0.5rem 0;
@@ -405,7 +449,7 @@ body::after {
 
 .article-digest-text { color: var(--text-dim); font-size: 0.88rem; }
 .article-digest-meta {
-    font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", "Noto Sans SC", monospace;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.72rem;
     color: var(--text-muted);
     margin-top: 0.5rem;
@@ -444,12 +488,12 @@ body::after {
 .avatar-sm { width: 48px; height: 48px; }
 
 .profile-summary h2 {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     font-size: 1.2rem;
     color: var(--text);
 }
 .profile-login {
-    font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", "Noto Sans SC", monospace;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.8rem;
     color: var(--lane);
     margin: 0.3rem 0 0.8rem;
@@ -465,7 +509,7 @@ body::after {
     text-align: left;
 }
 .meta-label {
-    font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", "Noto Sans SC", monospace;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.65rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -496,7 +540,7 @@ body::after {
     box-shadow: var(--glow-lane);
 }
 .link-card h3 {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     font-size: 1rem;
     color: var(--text);
     margin: 0.5rem 0;
@@ -512,7 +556,7 @@ body::after {
     padding: 1.3rem;
 }
 .embed-card h3 {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    font-family: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     font-size: 1rem;
     color: var(--text);
     margin: 0.5rem 0;
@@ -558,7 +602,7 @@ body::after {
     width: min(1280px, calc(100% - 2rem));
     margin: 0 auto;
     text-align: center;
-    font-family: "SF Mono", "Fira Code", "Consolas", "Monaco", "Noto Sans SC", monospace;
+    font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
     font-size: 0.78rem;
     color: var(--text-muted);
 }
@@ -590,4 +634,6 @@ body::after {
     outline: 2px solid var(--lane);
     outline-offset: 2px;
 }
+
+
 
