@@ -566,6 +566,82 @@ a:hover { opacity: 0.8; }
     }
 }
 
+/* ── Pretext 文字流 ── */
+#pretext-output {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+#pretext-orbs {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: auto;
+    overflow: hidden;
+    cursor: default;
+}
+
+.pretext-line {
+    position: absolute;
+    white-space: pre;
+    pointer-events: none;
+    font-size: 13px;
+    line-height: 22px;
+    color: var(--text-muted);
+    overflow: hidden;
+    opacity: 0.6;
+}
+
+.pretext-orb {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px dashed var(--accent);
+    background: var(--accent-dim);
+    pointer-events: auto;
+    z-index: 4;
+    will-change: transform;
+    cursor: grab;
+}
+
+.pretext-orb:active {
+    cursor: grabbing;
+}
+
+/* ── Sakana 拖拽小球 ── */
+#sakana-drag-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    left: auto;
+    top: auto;
+    width: 130px;
+    height: 150px;
+    z-index: 9999;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+#sakana-drag-widget:active,
+#sakana-drag-widget.dragging {
+    cursor: grabbing;
+}
+
+#sakana-drag-widget canvas {
+    display: block;
+}
+
+#sakana-drag-widget .sakana-widget-ctrl {
+    background: transparent !important;
+}
 :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;

@@ -279,6 +279,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const widget = document.getElementById('sakana-drag-widget');
     if (widget && widget.querySelector('canvas')) {
       clearInterval(checkSakana);
+      // 确保初始位置在右下角
+      widget.style.right = '20px';
+      widget.style.bottom = '20px';
+      widget.style.left = 'auto';
+      widget.style.top = 'auto';
       initSakanaDrag();
     }
   }, 200);
