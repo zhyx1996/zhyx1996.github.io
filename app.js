@@ -18,25 +18,9 @@ const escapeHtml = (value) => String(value ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-// ── 个人资料 ──
+// ── 个人资料（GitHub）──
 async function loadProfile() {
-  const nameEl = document.getElementById('profile-name');
-  const loginEl = document.getElementById('profile-login');
-  const bioEl = document.getElementById('profile-bio');
-  const avatarEl = document.getElementById('profile-avatar');
-
-  try {
-    const res = await fetch(GITHUB_API);
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    if (nameEl) nameEl.textContent = data.name || GITHUB_USERNAME;
-    if (loginEl) loginEl.textContent = '@' + data.login;
-    if (bioEl) bioEl.textContent = data.bio || '围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。';
-    if (avatarEl && data.avatar_url) avatarEl.src = data.avatar_url;
-  } catch {
-    if (nameEl) nameEl.textContent = '扶摇接海';
-    if (loginEl) loginEl.textContent = '@' + GITHUB_USERNAME;
-  }
+  // 新设计不再需要填充个人资料元素，保留函数以备将来使用
 }
 
 // ── 市场快照（实时数据）──
@@ -251,10 +235,9 @@ async function loadSteamProfile() {
   const container = document.querySelector('.steam-card');
   if (!container) return;
 
-  // Steam 自定义 URL ID（不是账号名）
-  const STEAM_CUSTOM_ID = 'zhyx490991014';
+  const STEAM_ID64 = '76561198450256742';
   const proxyUrl = 'https://corsproxy.io/?';
-  const steamUrl = `https://steamcommunity.com/id/${STEAM_CUSTOM_ID}/?xml=1`;
+  const steamUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/?xml=1`;
 
   try {
     const res = await fetchWithTimeout(proxyUrl + encodeURIComponent(steamUrl));
@@ -264,17 +247,13 @@ async function loadSteamProfile() {
     const xml = parser.parseFromString(text, 'text/xml');
 
     const steamID = xml.querySelector('steamID')?.textContent || '扶摇接海';
-    const steamID64 = xml.querySelector('steamID64')?.textContent || '';
     const avatarFull = xml.querySelector('avatarFull')?.textContent || 'https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg';
     const onlineState = xml.querySelector('onlineState')?.textContent || 'offline';
     const stateMessage = xml.querySelector('stateMessage')?.textContent || '';
-    const visibilityState = xml.querySelector('visibilityState')?.textContent || '3';
 
     const isOnline = onlineState === 'online';
     const statusText = isOnline ? (stateMessage || '在线') : '离线';
-    const profileUrl = steamID64
-      ? `https://steamcommunity.com/profiles/${steamID64}/`
-      : `https://steamcommunity.com/id/${STEAM_CUSTOM_ID}/`;
+    const profileUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/`;
 
     container.innerHTML = `
       <a href="${escapeHtml(profileUrl)}" target="_blank" rel="noreferrer" style="display:flex;align-items:center;gap:12px;">
@@ -300,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSteamProfile();
   // Sakana widget 加载完成后初始化拖拽
   const checkSakana = setInterval(() => {
-    const widget = document.getElementById('sakana-widget');
+    const widget = document.getElementById('sakana-drag-widget');
     if (widget && widget.querySelector('canvas')) {
       clearInterval(checkSakana);
       initSakanaDrag();
