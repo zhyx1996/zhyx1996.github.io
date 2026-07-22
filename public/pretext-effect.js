@@ -51,12 +51,12 @@ function renderText() {
     let cursor = { segmentIndex: 0, graphemeIndex: 0 };
     const padding = 30;
     
-    // 获取 hero-copy 的边界，用于文字避让
-    const heroCopy = container.parentElement.querySelector('.hero-copy');
+    // 获取 hero-content 的边界，用于文字避让
+    const heroContent = container.parentElement.querySelector('.hero-content');
     let heroCopyRect = { left: 0, right: 0, top: 0, bottom: 0 };
-    if (heroCopy) {
+    if (heroContent) {
         const parentRect = container.parentElement.getBoundingClientRect();
-        const copyRect = heroCopy.getBoundingClientRect();
+        const copyRect = heroContent.getBoundingClientRect();
         heroCopyRect = {
             left: copyRect.left - parentRect.left,
             right: copyRect.right - parentRect.left,
