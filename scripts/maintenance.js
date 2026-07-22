@@ -39,7 +39,7 @@ const STYLES_CSS = path.join(SITE_DIR, 'styles.css');
 function needsProxy(url) {
     try {
         const host = new URL(url).hostname;
-        const bypass = ['localhost', '127.0.0.1', 'cnblogs.com', 'feed.cnblogs.com', 'github.com', 'api.github.com', 'avatars.githubusercontent.com'];
+        const bypass = ['localhost', '127.0.0.1', 'cnblogs.com', 'feed.cnblogs.com', 'api.github.com'];
         return !bypass.some(h => host === h || host.endsWith('.' + h));
     } catch { return false; }
 }
@@ -100,8 +100,15 @@ function head(url) {
             }
             resolve({ status: res.statusCode, ok: res.statusCode >= 200 && res.statusCode < 400 });
         });
-        req.on('error', () => resolve({ status: 0, ok: false }));
-        req.on('timeout', () => { req.destroy(); resolve({ status: 0, ok: false }); });
+        req.on('error', () => {
+            // 网络错误时尝试 GET fallback
+            headGetFallback(url).then(resolve);
+        });
+        req.on('timeout', () => {
+            req.destroy();
+            // 超时时也尝试 GET fallback
+            headGetFallback(url).then(resolve);
+        });
         req.end();
     });
 }
@@ -155,11 +162,17 @@ async function checkLinks() {
         { label: 'GStreamer-SEI 仓库', url: 'https://github.com/zhyx1996/GStreamer-SEI' },
     ];
 
+    // 并发检查（限制并发数避免被封）
+    const CONCURRENCY = 5;
     const results = [];
-    for (const link of links) {
-        const r = await head(link.url);
-        results.push({ ...link, ...r });
-        process.stdout.write(`  ${r.ok ? '✅' : '❌'} ${link.label} (${r.status})\n`);
+    for (let i = 0; i < links.length; i += CONCURRENCY) {
+        const batch = links.slice(i, i + CONCURRENCY);
+        const batchResults = await Promise.all(batch.map(async link => {
+            const r = await head(link.url);
+            process.stdout.write(`  ${r.ok ? '✅' : '❌'} ${link.label} (${r.status})\n`);
+            return { ...link, ...r };
+        }));
+        results.push(...batchResults);
     }
     return results;
 }
@@ -318,10 +331,11 @@ async function updateArticleFallback() {
             const link = (entry.match(/<link rel="alternate" href="([^"]+)"/) || [])[1] || '';
             const summary = (entry.match(/<summary type="text">([\s\S]*?)<\/summary>/) || [])[1] || '';
             const published = (entry.match(/<published>([^<]+)/) || [])[1] || null;
+            const rawSummary = decodeXml(summary).replace(/&[a-z]+;/gi, '').trim();
             return {
                 title: decodeXml(title).replace(/ - 扶摇接海$/, ''),
                 link: decodeXml(link),
-                summary: decodeXml(summary).replace(/&#(\d+);/g, (_, c) => String.fromCharCode(c)).replace(/&[a-z]+;/gi, ''),
+                summary: rawSummary.length > 180 ? rawSummary.slice(0, 180) + '…' : rawSummary,
                 published_at: published,
                 source: '博客园 · 扶摇接海'
             };
@@ -329,8 +343,8 @@ async function updateArticleFallback() {
 
         if (!articles.length) { process.stdout.write('  ⚠️ 无文章\n'); return false; }
 
-        // 取前 4 篇
-        const top = articles.slice(0, 4);
+        // 取前 8 篇（RSS 返回全部随笔，可以适当增加）
+        const top = articles.slice(0, 8);
         let appjs = fs.readFileSync(APP_JS, 'utf8');
 
         // 构建 fallback 条目
@@ -364,8 +378,17 @@ async function updateArticleFallback() {
 }
 
 function decodeXml(s) {
-    return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
-        .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#(\d+);/g, (_, c) => String.fromCharCode(c));
+    // 循环解码直到没有实体为止（处理 &amp;gt; → &gt; > 嵌套情况）
+    let prev = '';
+    let result = s;
+    while (result !== prev) {
+        prev = result;
+        result = result
+            .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&').replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'").replace(/&#(\d+);/g, (_, c) => String.fromCharCode(c));
+    }
+    return result;
 }
 
 // ─── 5. CSS 美化增量改进 ─────────────────────────────────────────
@@ -488,3 +511,4 @@ async function main() {
 }
 
 main().catch(e => { console.error('❌ 致命错误:', e); process.exit(2); });
+
