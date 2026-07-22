@@ -10,28 +10,28 @@ const articleFallback = [
     {
         title: "Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及pyinstaller打包",
         link: "https://www.cnblogs.com/fix-me/p/20968815",
-        summary: "代码仓库：https://github.com/zhyx1996/GStreamer-SEI 网上 Windows + Python + GStreamer + 打包 的攻略比较少，踩了好多坑，简单记录一下。",
+        summary: "代码仓库：https://github.com/zhyx1996/GStreamer-SEI 网上 Windows + Python + GStreamer + 打包 的攻略比较少，踩了好多坑，简单记录一下。 1. 环境安装 有两种方式。 方式一：直接 pip 安装 需要 Python  3.8：",
         published_at: "2026-06-30T08:22:00Z",
         source: "博客园 · 扶摇接海"
     },
     {
         title: "123云盘报错：检测到本地通信被防火墙或vpn拦截",
         link: "https://www.cnblogs.com/fix-me/p/20194105",
-        summary: "联系客服，查看日志C:\\ProgramData\\123SyncCloud\\Logs\\SyncCloud.MaintenanceServer.log",
+        summary: "联系客服，查看日志C:\\ProgramData\\123SyncCloud\\Logs\\SyncCloud.MaintenanceServer.log [2026-05-26 13:10:32.632] [123SyncCloud_MaintenanceService] [error] process ",
         published_at: "2026-05-28T00:53:00Z",
         source: "博客园 · 扶摇接海"
     },
     {
         title: "记录 GStreamer 打开 JPEG 编码的视频时出现段错误的原因",
         link: "https://www.cnblogs.com/fix-me/p/19914336",
-        summary: "排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。",
+        summary: "问题现象 在 C++ 中，使用 gst_parse_launch 创建 GStreamer 管道，并通过 decodebin 解码 JPEG 编码的 .avi 视频时，程序会出现段错误，但没有其他明显报错信息。 排查结果 程序中同时使用了 OpenCV 的 VideoCapture 和 VideoW",
         published_at: "2026-04-23T03:47:00Z",
         source: "博客园 · 扶摇接海"
     },
     {
         title: "CARLA 中的坐标系与标准车辆坐标系转换",
         link: "https://www.cnblogs.com/fix-me/p/19882892",
-        summary: "梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。",
+        summary: "标准车辆坐标系 常见的车辆坐标系通常采用“前、左、上”的定义，也就是右手系。 在这种坐标系下，各轴对应的旋转正方向均为逆时针，符合右手系。 CARLA 坐标系 参考 CARLA 文档： CARLA 使用的是左手坐标系，其中 Y 轴指向右侧。 它的欧拉角同样按照 Z-Y-X 顺序、绕自身坐标轴依次旋转",
         published_at: "2026-04-17T05:47:00Z",
         source: "博客园 · 扶摇接海"
     }

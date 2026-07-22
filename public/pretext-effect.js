@@ -117,6 +117,7 @@ function createOrbElements() {
         container.appendChild(el);
         orbElements.push(el);
     }
+    saveOrbPositions();
 }
 
 function updateOrbPositions() {
@@ -132,6 +133,22 @@ function updateOrbPositions() {
 // ─── 动画循环（仅移动圆球，不重绘文字）──────────────────────────
 let animationId = null;
 let lastTextRender = 0;
+let lastOrbPositions = [];
+const MOVE_THRESHOLD = 3; // 像素位移阈值，超过才重绘文字
+
+function orbMovedSignificantly() {
+    if (lastOrbPositions.length !== orbs.length) return true;
+    for (let i = 0; i < orbs.length; i++) {
+        const dx = Math.abs(orbs[i].x - lastOrbPositions[i].x);
+        const dy = Math.abs(orbs[i].y - lastOrbPositions[i].y);
+        if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) return true;
+    }
+    return false;
+}
+
+function saveOrbPositions() {
+    lastOrbPositions = orbs.map(o => ({ x: o.x, y: o.y }));
+}
 
 function animate() {
     const now = performance.now();
@@ -149,9 +166,10 @@ function animate() {
     // 更新圆球位置（GPU 加速，不触发重排）
     updateOrbPositions();
     
-    // 文字渲染节流（每 100ms 一次）
-    if (now - lastTextRender > 100) {
+    // 文字渲染：仅在圆球位移超过阈值时重绘（避免无意义的 DOM 操作）
+    if (orbMovedSignificantly()) {
         renderText();
+        saveOrbPositions();
         lastTextRender = now;
     }
     
@@ -165,6 +183,15 @@ function startAnimation() {
 function stopAnimation() {
     if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
 }
+
+// 页面隐藏时暂停动画，节省 CPU/GPU
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        stopAnimation();
+    } else {
+        startAnimation();
+    }
+});
 
 // ─── 拖拽 ────────────────────────────────────────────────────────
 let dragOrb = null;
