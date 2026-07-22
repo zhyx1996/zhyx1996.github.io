@@ -161,6 +161,11 @@ body::after {
     flex-direction: column;
     justify-content: center;
     pointer-events: none;
+    background: rgba(10, 13, 18, 0.82);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    margin: -2rem;
+    padding-right: 2.5rem;
 }
 
 .kicker {
@@ -205,6 +210,11 @@ body::after {
     gap: 0.8rem;
     padding: 1.5rem;
     pointer-events: none;
+    background: rgba(10, 13, 18, 0.75);
+    backdrop-filter: blur(8px);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    margin: -2rem -2rem -2rem 0;
+    padding-left: 2.5rem;
 }
 
 .banner-meta-card {

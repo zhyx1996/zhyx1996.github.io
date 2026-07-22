@@ -1,7 +1,7 @@
 import { prepareWithSegments, layoutNextLineRange, materializeLineRange } from './layout.js';
 
 // ─── 配置 ────────────────────────────────────────────────────────
-const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。围绕车道线检测、CUDA 并行加速、点云处理等方向持续实践，把实验结果沉淀为可复用的工程经验。代码仓库：github.com/zhyx1996。博客园：cnblogs.com/fix-me。`;
+const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。围绕车道线检测、CUDA 并行加速、点云处理等方向持续实践，把实验结果沉淀为可复用的工程经验。`;
 const FONT = '16px "Inter", "Noto Sans SC", system-ui, sans-serif';
 const LINE_HEIGHT = 28;
 const COLUMN_GAP = 40;
