@@ -1,5 +1,5 @@
 /**
- * site-maintenance.js — zhyx1996.github.io 自愈式维护脚本
+ * site-maintenance.js — 博客站 自愈式维护脚本
  *
  * 功能：
  *   1. 检测所有外部链接可用性
@@ -242,7 +242,7 @@ async function updateGithubFallback() {
         // 更新 profileFallback
         if (profile) {
             const newProfile = {
-                name: profile.name || 'zhyx1996',
+                name: profile.name || '扶摇接海',
                 login: profile.login,
                 bio: profile.bio || '围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。',
                 html_url: profile.html_url,
@@ -475,7 +475,7 @@ async function main() {
     const doFix = args.includes('--fix');
     const doReport = args.includes('--report');
 
-    process.stdout.write(`\n🔧 zhyx1996.github.io 维护脚本 — ${ts()}\n${'═'.repeat(50)}\n`);
+    process.stdout.write(`\n🔧 博客站维护脚本 — ${ts()}\n${'═'.repeat(50)}\n`);
 
     // 1. 链接检查
     process.stdout.write('\n🔗 检查外部链接...\n');
@@ -511,4 +511,7 @@ async function main() {
 }
 
 main().catch(e => { console.error('❌ 致命错误:', e); process.exit(2); });
+
+
+
 

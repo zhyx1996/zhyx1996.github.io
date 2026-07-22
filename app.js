@@ -1,5 +1,5 @@
 const profileFallback = {
-          "name": "ZYX",
+          "name": "扶摇接海",
           "login": "zhyx1996",
           "bio": "围绕计算机视觉、自动驾驶感知、并行计算与公开写作做持续实践。",
           "html_url": "https://github.com/zhyx1996",
@@ -478,7 +478,7 @@ function renderRepos(repos) {
             <article class="repo-card glass-card">
                 <span class="tag">Repositories</span>
                 <h3>GitHub Repositories</h3>
-                <p class="repo-description">查看 zhyx1996 的公开仓库集合。</p>
+                <p class="repo-description">查看公开仓库集合。</p>
             </article>
         `);
         renderRepoSummary(repoFallback);
@@ -1794,3 +1794,4 @@ window.addEventListener('DOMContentLoaded', () => {
     hydrateArticles();
     hydrateMarketData();
 });
+
