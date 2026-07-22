@@ -7,6 +7,9 @@ const MIN_SLOT_WIDTH = 60;
 
 const container = document.getElementById('pretext-output');
 let W, H, prepared, orbs = [];
+let orbElements = []; // 缓存 DOM 元素
+let lastRenderTime = 0;
+let renderPending = false;
 
 function getPrepared() {
     if (!prepared) prepared = prepareWithSegments(TEXT, FONT);
@@ -21,12 +24,13 @@ function resize() {
 function initOrbs() {
     const r = Math.min(W, H) * 0.08;
     orbs = [
-        { x: W * 0.3, y: H * 0.35, r, color: '#FF78B8', dragging: false },
-        { x: W * 0.7, y: H * 0.6, r: r * 1.2, color: '#00D4FF', dragging: false },
-        { x: W * 0.5, y: H * 0.8, r: r * 0.8, color: '#7C83FF', dragging: false },
+        { x: W * 0.3, y: H * 0.35, r, color: '#FF78B8', dragging: false, vx: 0.3, vy: 0.2 },
+        { x: W * 0.7, y: H * 0.6, r: r * 1.2, color: '#00D4FF', dragging: false, vx: -0.2, vy: 0.3 },
+        { x: W * 0.5, y: H * 0.8, r: r * 0.8, color: '#7C83FF', dragging: false, vx: 0.25, vy: -0.2 },
     ];
 }
 
+// ─── 文字渲染（节流） ────────────────────────────────────────────
 function carveSlots(baseLeft, baseRight, blocked) {
     let slots = [{ left: baseLeft, right: baseRight }];
     for (const iv of blocked) {
@@ -41,7 +45,7 @@ function carveSlots(baseLeft, baseRight, blocked) {
     return slots.filter(s => s.right - s.left >= MIN_SLOT_WIDTH);
 }
 
-function renderLines() {
+function renderText() {
     container.querySelectorAll('.pretext-line').forEach(el => el.remove());
     const prepared = getPrepared();
     let cursor = { segmentIndex: 0, graphemeIndex: 0 };
@@ -99,33 +103,79 @@ function renderLines() {
     }
 }
 
-function renderOrbs() {
+// ─── 圆球渲染（CSS transform，GPU 加速）─────────────────────────
+function createOrbElements() {
+    orbElements = [];
     container.querySelectorAll('.pretext-orb').forEach(el => el.remove());
     for (const orb of orbs) {
         const el = document.createElement('div');
         el.className = 'pretext-orb';
-        el.style.left = (orb.x - orb.r) + 'px';
-        el.style.top = (orb.y - orb.r) + 'px';
         el.style.width = (orb.r * 2) + 'px';
         el.style.height = (orb.r * 2) + 'px';
         el.style.borderColor = orb.color;
+        el.style.transform = `translate3d(${orb.x - orb.r}px, ${orb.y - orb.r}px, 0)`;
         container.appendChild(el);
+        orbElements.push(el);
     }
 }
 
-function renderAll() {
-    if (!prepared) return;
-    renderLines();
-    renderOrbs();
+function updateOrbPositions() {
+    for (let i = 0; i < orbs.length; i++) {
+        const orb = orbs[i];
+        const el = orbElements[i];
+        if (el && !orb.dragging) {
+            el.style.transform = `translate3d(${orb.x - orb.r}px, ${orb.y - orb.r}px, 0)`;
+        }
+    }
 }
 
+// ─── 动画循环（仅移动圆球，不重绘文字）──────────────────────────
+let animationId = null;
+let lastTextRender = 0;
+
+function animate() {
+    const now = performance.now();
+    
+    // 圆球自动浮动（每帧都更新，但只用 CSS transform）
+    for (const orb of orbs) {
+        if (orb.dragging) continue;
+        orb.x += orb.vx;
+        orb.y += orb.vy;
+        // 边界反弹
+        if (orb.x - orb.r < 0 || orb.x + orb.r > W) { orb.vx *= -1; orb.x = Math.max(orb.r, Math.min(W - orb.r, orb.x)); }
+        if (orb.y - orb.r < 0 || orb.y + orb.r > H) { orb.vy *= -1; orb.y = Math.max(orb.r, Math.min(H - orb.r, orb.y)); }
+    }
+    
+    // 更新圆球位置（GPU 加速，不触发重排）
+    updateOrbPositions();
+    
+    // 文字渲染节流（每 100ms 一次）
+    if (now - lastTextRender > 100) {
+        renderText();
+        lastTextRender = now;
+    }
+    
+    animationId = requestAnimationFrame(animate);
+}
+
+function startAnimation() {
+    if (!animationId) animate();
+}
+
+function stopAnimation() {
+    if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+}
+
+// ─── 拖拽 ────────────────────────────────────────────────────────
 let dragOrb = null;
+
 function getPos(e) {
     const r = container.getBoundingClientRect();
     const cx = e.touches ? e.touches[0].clientX : e.clientX;
     const cy = e.touches ? e.touches[0].clientY : e.clientY;
     return { x: cx - r.left, y: cy - r.top };
 }
+
 function hitTest(p) {
     for (let i = orbs.length - 1; i >= 0; i--) {
         const o = orbs[i];
@@ -133,24 +183,50 @@ function hitTest(p) {
     }
     return null;
 }
+
 container.addEventListener('mousedown', e => {
     dragOrb = hitTest(getPos(e));
-    if (dragOrb) { dragOrb.dragging = true; container.style.cursor = 'grabbing'; renderAll(); }
+    if (dragOrb) { dragOrb.dragging = true; container.style.cursor = 'grabbing'; }
 });
+
 container.addEventListener('mousemove', e => {
     const p = getPos(e);
     if (!dragOrb) { container.style.cursor = hitTest(p) ? 'grab' : 'default'; return; }
     dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
     dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-    requestAnimationFrame(renderAll);
+    // 拖拽时实时更新圆球位置
+    const idx = orbs.indexOf(dragOrb);
+    if (idx >= 0 && orbElements[idx]) {
+        orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
+    }
 });
+
 container.addEventListener('mouseup', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } container.style.cursor = 'default'; });
 container.addEventListener('mouseleave', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } container.style.cursor = 'default'; });
-container.addEventListener('touchstart', e => { dragOrb = hitTest(getPos(e)); if (dragOrb) { dragOrb.dragging = true; renderAll(); } }, { passive: true });
-container.addEventListener('touchmove', e => { if (!dragOrb) return; e.preventDefault(); const p = getPos(e); dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x)); dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y)); requestAnimationFrame(renderAll); }, { passive: false });
+
+container.addEventListener('touchstart', e => {
+    dragOrb = hitTest(getPos(e));
+    if (dragOrb) { dragOrb.dragging = true; }
+}, { passive: true });
+
+container.addEventListener('touchmove', e => {
+    if (!dragOrb) return;
+    e.preventDefault();
+    const p = getPos(e);
+    dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
+    dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
+    const idx = orbs.indexOf(dragOrb);
+    if (idx >= 0 && orbElements[idx]) {
+        orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
+    }
+}, { passive: false });
+
 container.addEventListener('touchend', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } });
+
+// ─── 初始化 ──────────────────────────────────────────────────────
 let resizeTimer;
-window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { resize(); initOrbs(); renderAll(); }, 200); });
-function init() { resize(); initOrbs(); prepared = getPrepared(); renderAll(); }
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { resize(); initOrbs(); createOrbElements(); renderText(); }, 200); });
+
+function init() { resize(); initOrbs(); prepared = getPrepared(); createOrbElements(); renderText(); startAnimation(); }
 window.addEventListener('load', init);
 if (document.readyState === 'interactive' || document.readyState === 'complete') init();

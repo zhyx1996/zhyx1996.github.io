@@ -3371,6 +3371,7 @@
   var H;
   var prepared;
   var orbs = [];
+  var orbElements = [];
   function getPrepared() {
     if (!prepared) prepared = prepareWithSegments(TEXT, FONT);
     return prepared;
@@ -3383,12 +3384,12 @@
   function initOrbs() {
     const r = Math.min(W, H) * 0.08;
     orbs = [
-      { x: W * 0.3, y: H * 0.35, r, color: "#FF78B8", dragging: false },
-      { x: W * 0.7, y: H * 0.6, r: r * 1.2, color: "#00D4FF", dragging: false },
-      { x: W * 0.5, y: H * 0.8, r: r * 0.8, color: "#7C83FF", dragging: false }
+      { x: W * 0.3, y: H * 0.35, r, color: "#FF78B8", dragging: false, vx: 0.3, vy: 0.2 },
+      { x: W * 0.7, y: H * 0.6, r: r * 1.2, color: "#00D4FF", dragging: false, vx: -0.2, vy: 0.3 },
+      { x: W * 0.5, y: H * 0.8, r: r * 0.8, color: "#7C83FF", dragging: false, vx: 0.25, vy: -0.2 }
     ];
   }
-  function renderLines() {
+  function renderText() {
     container.querySelectorAll(".pretext-line").forEach((el) => el.remove());
     const prepared2 = getPrepared();
     let cursor = { segmentIndex: 0, graphemeIndex: 0 };
@@ -3445,23 +3446,55 @@
       }
     }
   }
-  function renderOrbs() {
+  function createOrbElements() {
+    orbElements = [];
     container.querySelectorAll(".pretext-orb").forEach((el) => el.remove());
     for (const orb of orbs) {
       const el = document.createElement("div");
       el.className = "pretext-orb";
-      el.style.left = orb.x - orb.r + "px";
-      el.style.top = orb.y - orb.r + "px";
       el.style.width = orb.r * 2 + "px";
       el.style.height = orb.r * 2 + "px";
       el.style.borderColor = orb.color;
+      el.style.transform = `translate3d(${orb.x - orb.r}px, ${orb.y - orb.r}px, 0)`;
       container.appendChild(el);
+      orbElements.push(el);
     }
   }
-  function renderAll() {
-    if (!prepared) return;
-    renderLines();
-    renderOrbs();
+  function updateOrbPositions() {
+    for (let i = 0; i < orbs.length; i++) {
+      const orb = orbs[i];
+      const el = orbElements[i];
+      if (el && !orb.dragging) {
+        el.style.transform = `translate3d(${orb.x - orb.r}px, ${orb.y - orb.r}px, 0)`;
+      }
+    }
+  }
+  var animationId = null;
+  var lastTextRender = 0;
+  function animate() {
+    const now = performance.now();
+    for (const orb of orbs) {
+      if (orb.dragging) continue;
+      orb.x += orb.vx;
+      orb.y += orb.vy;
+      if (orb.x - orb.r < 0 || orb.x + orb.r > W) {
+        orb.vx *= -1;
+        orb.x = Math.max(orb.r, Math.min(W - orb.r, orb.x));
+      }
+      if (orb.y - orb.r < 0 || orb.y + orb.r > H) {
+        orb.vy *= -1;
+        orb.y = Math.max(orb.r, Math.min(H - orb.r, orb.y));
+      }
+    }
+    updateOrbPositions();
+    if (now - lastTextRender > 100) {
+      renderText();
+      lastTextRender = now;
+    }
+    animationId = requestAnimationFrame(animate);
+  }
+  function startAnimation() {
+    if (!animationId) animate();
   }
   var dragOrb = null;
   function getPos(e) {
@@ -3482,7 +3515,6 @@
     if (dragOrb) {
       dragOrb.dragging = true;
       container.style.cursor = "grabbing";
-      renderAll();
     }
   });
   container.addEventListener("mousemove", (e) => {
@@ -3493,7 +3525,10 @@
     }
     dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
     dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-    requestAnimationFrame(renderAll);
+    const idx = orbs.indexOf(dragOrb);
+    if (idx >= 0 && orbElements[idx]) {
+      orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
+    }
   });
   container.addEventListener("mouseup", () => {
     if (dragOrb) {
@@ -3513,7 +3548,6 @@
     dragOrb = hitTest(getPos(e));
     if (dragOrb) {
       dragOrb.dragging = true;
-      renderAll();
     }
   }, { passive: true });
   container.addEventListener("touchmove", (e) => {
@@ -3522,7 +3556,10 @@
     const p = getPos(e);
     dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
     dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-    requestAnimationFrame(renderAll);
+    const idx = orbs.indexOf(dragOrb);
+    if (idx >= 0 && orbElements[idx]) {
+      orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
+    }
   }, { passive: false });
   container.addEventListener("touchend", () => {
     if (dragOrb) {
@@ -3536,14 +3573,17 @@
     resizeTimer = setTimeout(() => {
       resize();
       initOrbs();
-      renderAll();
+      createOrbElements();
+      renderText();
     }, 200);
   });
   function init() {
     resize();
     initOrbs();
     prepared = getPrepared();
-    renderAll();
+    createOrbElements();
+    renderText();
+    startAnimation();
   }
   window.addEventListener("load", init);
   if (document.readyState === "interactive" || document.readyState === "complete") init();
