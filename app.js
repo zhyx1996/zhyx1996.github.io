@@ -139,6 +139,14 @@ function initSakanaDrag() {
     if (e.target.closest('.sakana-widget-ctrl')) return;
     isDragging = true;
     widget.classList.add('dragging');
+    // 首次点击时根据当前位置初始化 left/top
+    if (!widget.style.left || !widget.style.top) {
+      const rect = widget.getBoundingClientRect();
+      widget.style.left = rect.left + 'px';
+      widget.style.top = rect.top + 'px';
+      widget.style.right = 'auto';
+      widget.style.bottom = 'auto';
+    }
     lastX = e.clientX;
     lastY = e.clientY;
     lastTime = Date.now();
