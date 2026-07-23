@@ -696,6 +696,27 @@ a:hover { opacity: 0.8; }
     min-height: 200px;
 }
 
+.steam-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.steam-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+}
+
+.steam-username {
+    font-size: 15px;
+    font-weight: 600;
+}
+
 .steam-loading, .steam-empty {
     display: flex;
     align-items: center;

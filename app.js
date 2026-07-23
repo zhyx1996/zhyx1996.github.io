@@ -303,6 +303,11 @@ async function loadSteamProfile() {
     if (!res.ok) throw new Error('fetch failed');
     const html = await res.text();
 
+    const avatarMatch = html.match(/avatars\.cloudflare\.steamstatic\.com\/([a-f0-9]+)_full\.jpg/);
+    const avatarUrl = avatarMatch ? `https://avatars.cloudflare.steamstatic.com/${avatarMatch[1]}_full.jpg` : '';
+    const nameMatch = html.match(/actual_persona_name">([^<]+)</);
+    const username = nameMatch ? nameMatch[1].trim() : '';
+
     const names = [...html.matchAll(/class="game_name"><a[^>]*>([^<]+)<\/a>/g)].map(m => m[1]);
     const hours = [...html.matchAll(/总时数 ([\d.]+) 小时/g)].map(m => parseFloat(m[1]));
     const covers = [...html.matchAll(/game_capsule" src="([^"]+)"/g)].map(m => m[1]);
@@ -319,6 +324,10 @@ async function loadSteamProfile() {
     }
 
     container.innerHTML = `
+      <div class="steam-header">
+        <img class="steam-avatar" src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(username)}" width="48" height="48">
+        <span class="steam-username">${escapeHtml(username)}</span>
+      </div>
       <div class="steam-games-list">
         ${games.map(g => `
           <div class="steam-game-card">
