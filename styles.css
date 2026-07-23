@@ -163,6 +163,7 @@ a:hover { opacity: 0.8; }
     width: 100%;
     min-height: 380px;
     overflow: hidden;
+    background: radial-gradient(ellipse at 50% 40%, rgba(217, 119, 6, 0.04) 0%, transparent 65%);
 }
 
 #pretext-output {
