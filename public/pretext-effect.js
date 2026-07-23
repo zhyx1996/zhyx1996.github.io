@@ -1,51 +1,43 @@
+import { layoutNextLine, prepareWithSegments } from './layout.js';
+
 const TEXT = `公开仓库 15 个，主要围绕计算机视觉、自动驾驶感知、并行计算与公开写作。lane2seq 做实时车道检测，结合 Canny/Hough 变换、CLAHE、HLS 等传统流程与 Lane2Seq-ViT 序列生成模型，并用 ENet 分割在 TuSimple 和 LLAMAS 数据集上训练与验证。pcl 仓库给 PCL 的 BoundaryEstimation 加了 OMP 并行加速，提升点云边界估计速度。GStreamer 仓库整理 RTSP 推流、自定义 SEI 注入、Carla 多相机管理与 pyinstaller 打包 exe 的完整踩坑记录。auto_calib_v2 在 PJLab-ADG/SensorsCalibration 的 lidar2camera 方案上做改进，方便自动驾驶多传感器联合标定。stars 仓库收集关注过的有意思项目。维护的 gkd 订阅用于广告过滤与规则分享。Jupyter 笔记记录车道检测实验的迭代过程。近期也在看 BEV 感知、Occupancy 估计与端到端自动驾驶方向。`;
 
 const DEFAULT_LINE_HEIGHT = 24;
 const ORB_TEXT_GAP = 1;
+const MIN_SLOT_WIDTH = 32;
 
 const container = document.getElementById('pretext-output');
-let W, H, graphemes = [], graphemeWidths = [], orbs = [];
+let W, H, prepared, orbs = [];
 let lineHeight = DEFAULT_LINE_HEIGHT;
 let fontSize = 13;
 let orbElements = [];
+const lineElements = [];
 
-function splitGraphemes(text) {
-    if (typeof Intl.Segmenter === 'function') {
-        return [...new Intl.Segmenter('zh-CN', { granularity: 'grapheme' }).segment(text)]
-            .map(item => item.segment);
-    }
-    return Array.from(text);
-}
-
-function measureRenderedText() {
+function prepareRenderedText() {
     const probe = document.createElement('span');
     probe.className = 'pretext-line';
     probe.style.visibility = 'hidden';
-    probe.style.width = 'auto';
     probe.textContent = '测';
     container.appendChild(probe);
 
     const style = getComputedStyle(probe);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
     const fontParts = [
         style.fontStyle !== 'normal' ? style.fontStyle : '',
         style.fontWeight,
         style.fontSize,
         style.fontFamily
     ].filter(Boolean);
-    ctx.font = fontParts.join(' ');
+    const font = fontParts.join(' ');
 
     lineHeight = Number.parseFloat(style.lineHeight) || DEFAULT_LINE_HEIGHT;
     fontSize = Number.parseFloat(style.fontSize) || 13;
     const letterSpacing = Number.parseFloat(style.letterSpacing) || 0;
-    graphemes = splitGraphemes(TEXT);
-    graphemeWidths = graphemes.map(grapheme => Math.max(0, ctx.measureText(grapheme).width + letterSpacing));
+    prepared = prepareWithSegments(TEXT, font, { letterSpacing });
     probe.remove();
 }
 
 function ensureTextMetrics() {
-    if (!graphemes.length) measureRenderedText();
+    if (!prepared) prepareRenderedText();
 }
 
 function resize() {
@@ -62,77 +54,92 @@ function initOrbs() {
     ];
 }
 
+function circleIntervalForBand(orb, bandTop, bandBottom) {
+    if (bandTop >= orb.y + orb.r || bandBottom <= orb.y - orb.r) return null;
+    const minDy = orb.y >= bandTop && orb.y <= bandBottom
+        ? 0
+        : orb.y < bandTop ? bandTop - orb.y : orb.y - bandBottom;
+    if (minDy >= orb.r) return null;
+    const halfWidth = Math.sqrt(orb.r * orb.r - minDy * minDy);
+    return {
+        left: orb.x - halfWidth - ORB_TEXT_GAP,
+        right: orb.x + halfWidth + ORB_TEXT_GAP,
+    };
+}
+
+function carveTextLineSlots(base, blocked) {
+    let slots = [base];
+    for (const interval of blocked.sort((a, b) => a.left - b.left)) {
+        const next = [];
+        for (const slot of slots) {
+            if (interval.right <= slot.left || interval.left >= slot.right) {
+                next.push(slot);
+                continue;
+            }
+            if (interval.left > slot.left) next.push({ left: slot.left, right: interval.left });
+            if (interval.right < slot.right) next.push({ left: interval.right, right: slot.right });
+        }
+        slots = next;
+    }
+    const minimumWidth = Math.max(MIN_SLOT_WIDTH, fontSize * 2);
+    return slots.filter(slot => slot.right - slot.left >= minimumWidth);
+}
+
+function syncTextLines(lines) {
+    while (lineElements.length < lines.length) {
+        const element = document.createElement('span');
+        element.className = 'pretext-line';
+        container.appendChild(element);
+        lineElements.push(element);
+    }
+
+    for (let index = 0; index < lineElements.length; index++) {
+        const element = lineElements[index];
+        const line = lines[index];
+        if (!line) {
+            element.style.display = 'none';
+            continue;
+        }
+        element.style.display = '';
+        if (element.textContent !== line.text) element.textContent = line.text;
+        const left = `${Math.round(line.left)}px`;
+        const top = `${Math.round(line.top)}px`;
+        if (element.style.left !== left) element.style.left = left;
+        if (element.style.top !== top) element.style.top = top;
+    }
+}
+
 function renderText() {
-    container.querySelectorAll('.pretext-line').forEach(el => el.remove());
     ensureTextMetrics();
-    
+
     const padding = 30;
     const colStart = padding;
     const colEnd = W - padding;
-    let graphemeIndex = 0;
-    
-    for (let y = lineHeight * 1.5; y < H - 20 && graphemeIndex < graphemes.length; y += lineHeight) {
-        let x = colStart;
-        let segmentStart = x;
-        let segmentText = '';
-        let segmentWidth = 0;
-        const segments = [];
-        const glyphTop = y + Math.max(0, (lineHeight - fontSize) / 2);
-        const glyphBottom = glyphTop + fontSize;
+    const lines = [];
+    let cursor = { segmentIndex: 0, graphemeIndex: 0 };
+    let textExhausted = false;
 
-        const flushSegment = () => {
-            if (!segmentText) return;
-            segments.push({ left: segmentStart, width: segmentWidth, text: segmentText });
-            segmentText = '';
-            segmentWidth = 0;
-        };
-        
-        while (x < colEnd && graphemeIndex < graphemes.length) {
-            const gw = Math.max(graphemeWidths[graphemeIndex], 1);
-            const charLeft = x;
-            const charRight = x + gw;
-            
-            // Check if this character collides with any orb
-            let collides = false;
-            for (const orb of orbs) {
-                const collisionRadius = orb.r + ORB_TEXT_GAP;
-                const closestX = Math.max(charLeft, Math.min(orb.x, charRight));
-                const closestY = Math.max(glyphTop, Math.min(orb.y, glyphBottom));
-                const dx = orb.x - closestX;
-                const dy = orb.y - closestY;
-                if (dx * dx + dy * dy < collisionRadius * collisionRadius) {
-                    collides = true;
-                    break;
-                }
-            }
-            
-            if (collides) {
-                // Preserve the skipped position by ending the current DOM segment.
-                flushSegment();
-                x += gw;
-            } else if (charRight > colEnd) {
-                flushSegment();
-                break;
-            } else {
-                if (!segmentText) segmentStart = x;
-                segmentText += graphemes[graphemeIndex];
-                x += gw;
-                segmentWidth = x - segmentStart;
-                graphemeIndex++;
-            }
+    for (let y = lineHeight * 1.5; y + lineHeight < H - 20 && !textExhausted; y += lineHeight) {
+        const blocked = [];
+        for (const orb of orbs) {
+            const interval = circleIntervalForBand(orb, y, y + lineHeight);
+            if (interval) blocked.push(interval);
         }
-        flushSegment();
-        
-        for (const segment of segments) {
-            const el = document.createElement('div');
-            el.className = 'pretext-line';
-            el.style.left = segment.left + 'px';
-            el.style.top = y + 'px';
-            el.style.width = Math.min(segment.width + 1, colEnd - segment.left) + 'px';
-            el.textContent = segment.text;
-            container.appendChild(el);
+
+        const slots = carveTextLineSlots({ left: colStart, right: colEnd }, blocked);
+        for (const slot of slots) {
+            const line = layoutNextLine(prepared, cursor, slot.right - slot.left);
+            if (!line) {
+                textExhausted = true;
+                break;
+            }
+            cursor = line.end;
+            if (!line.text) continue;
+            lines.push({ left: slot.left, top: y, text: line.text });
         }
     }
+
+    syncTextLines(lines);
 }
 
 // ─── 圆球渲染（CSS transform，GPU 加速）─────────────────────────
@@ -290,10 +297,20 @@ function attachDragEvents() {
 
 // ─── 初始化 ──────────────────────────────────────────────────────
 let resizeTimer;
-window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { resize(); initOrbs(); graphemes = []; graphemeWidths = []; createOrbElements(); renderText(); }, 200); });
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        resize();
+        initOrbs();
+        prepared = null;
+        createOrbElements();
+        renderText();
+    }, 200);
+});
 
-function init() {
+async function init() {
     orbsLayer = document.getElementById('pretext-orbs');
+    if (document.fonts?.ready) await document.fonts.ready;
     resize(); initOrbs(); ensureTextMetrics(); createOrbElements(); renderText(); attachDragEvents(); startAnimation();
 }
 if (document.readyState === 'loading') {
