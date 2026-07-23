@@ -291,15 +291,13 @@ function initSakanaDrag() {
   document.addEventListener('mouseleave', onPointerLeave);
 }
 
-// ── Steam 资料（动态获取）──
+// ── Steam 资料（内嵌展示）──
 async function loadSteamProfile() {
   const container = document.getElementById('steam-profile');
   if (!container) return;
 
   const STEAM_ID64 = '76561198391062314';
-  const profileUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/`;
 
-  // 先尝试获取完整资料（头像+游戏）
   try {
     const gamesUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/games/?xml=1`;
     const res = await fetchWithTimeout(`https://api.allorigins.win/raw?url=${encodeURIComponent(gamesUrl)}`, 10000);
@@ -310,7 +308,6 @@ async function loadSteamProfile() {
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, 'text/xml');
 
-    // 解析游戏列表
     const games = [];
     xml.querySelectorAll('game').forEach(g => {
       const name = g.querySelector('name')?.textContent || '';
@@ -320,40 +317,28 @@ async function loadSteamProfile() {
     });
 
     games.sort((a, b) => b.hours - a.hours);
-    const topGames = games.slice(0, 5);
+    const topGames = games.slice(0, 8);
 
-    let gamesHtml = '';
-    if (topGames.length > 0) {
-      gamesHtml = `
-        <div class="steam-games">
-          <div class="steam-games-title">常玩的游戏</div>
-          ${topGames.map(g => `
-            <div class="steam-game">
-              <img class="steam-game-icon" src="${escapeHtml(g.logo)}" alt="" width="24" height="24">
-              <span class="steam-game-name">${escapeHtml(g.name)}</span>
-              <span class="steam-game-hours">${g.hours.toFixed(1)}h</span>
-            </div>
-          `).join('')}
-        </div>
-      `;
+    if (topGames.length === 0) {
+      container.innerHTML = '<div class="steam-empty">暂无游戏数据</div>';
+      return;
     }
 
     container.innerHTML = `
-      ${gamesHtml}
-      <a class="steam-link" href="${profileUrl}" target="_blank" rel="noreferrer">查看完整资料 →</a>
+      <div class="steam-games-list">
+        ${topGames.map(g => `
+          <div class="steam-game-card">
+            <img class="steam-game-cover" src="${escapeHtml(g.logo)}" alt="${escapeHtml(g.name)}" loading="lazy">
+            <div class="steam-game-info">
+              <span class="steam-game-title">${escapeHtml(g.name)}</span>
+              <span class="steam-game-hours">${g.hours.toFixed(1)} 小时</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
     `;
   } catch {
-    // 失败时显示带头像的简化版
-    container.innerHTML = `
-      <div class="steam-header">
-        <img class="steam-avatar" src="https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg" alt="Steam avatar" width="56" height="56">
-        <div class="steam-id">
-          <strong>扶摇接海</strong>
-          <span class="steam-status offline">○ 离线</span>
-        </div>
-      </div>
-      <a class="steam-link" href="${profileUrl}" target="_blank" rel="noreferrer">查看完整资料 →</a>
-    `;
+    container.innerHTML = '<div class="steam-empty">无法加载游戏数据</div>';
   }
 }
 

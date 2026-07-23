@@ -692,71 +692,67 @@ a:hover { opacity: 0.8; }
     background: var(--bg);
 }
 
-.steam-card {
-    padding: 16px;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
-    background: var(--bg-surface);
+.steam-embed {
+    min-height: 200px;
+}
+
+.steam-loading, .steam-empty {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.steam-games-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 12px;
 }
 
-.steam-games {
+.steam-game-card {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    cursor: default;
 }
 
-.steam-games-title {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-    margin-bottom: 4px;
+.steam-game-card:hover {
+    transform: translateY(-2px);
 }
 
-.steam-game {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border-light);
-}
-
-.steam-game:last-child {
-    border-bottom: none;
-}
-
-.steam-game-icon {
+.steam-game-cover {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
     border-radius: 4px;
-    flex-shrink: 0;
+    background: var(--bg-inset);
 }
 
-.steam-game-name {
-    flex: 1;
-    font-size: 13px;
+.steam-game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 2px;
+}
+
+.steam-game-title {
+    font-size: 12px;
     color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.4;
 }
 
 .steam-game-hours {
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 10px;
     color: var(--text-muted);
-    flex-shrink: 0;
-}
-
-.steam-link {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--accent);
-    text-align: center;
-    padding-top: 8px;
-    border-top: 1px solid var(--border-light);
 }
 
 /* ── Footer ── */
