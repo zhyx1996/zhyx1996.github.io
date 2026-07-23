@@ -15,11 +15,6 @@ const escapeHtml = (value) => String(value ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-// ── 个人资料（GitHub）──
-async function loadProfile() {
-  // 新设计不再需要填充个人资料元素，保留函数以备将来使用
-}
-
 // ── 市场快照（实时数据）──
 const PROXY = 'https://corsproxy.io/?';
 
@@ -372,7 +367,6 @@ function initScrollAnimations() {
 
 // ── 初始化 ──
 document.addEventListener('DOMContentLoaded', () => {
-  loadProfile();
   loadMarket();
   loadSteamProfile();
   initScrollAnimations();
