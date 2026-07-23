@@ -14,9 +14,16 @@ let renderPending = false;
 function getPrepared() {
     if (!prepared) {
         prepared = prepareWithSegments(TEXT, FONT);
-        // Extract grapheme widths from prepared segments
-        graphemes = prepared.segments.slice();
-        graphemeWidths = prepared.widths.slice();
+        // Manually split into individual characters for CJK
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.font = FONT;
+        graphemes = [];
+        graphemeWidths = [];
+        for (const char of TEXT) {
+            graphemes.push(char);
+            graphemeWidths.push(ctx.measureText(char).width);
+        }
     }
     return prepared;
 }
