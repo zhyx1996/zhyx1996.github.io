@@ -243,18 +243,21 @@ a:hover { opacity: 0.8; }
 }
 
 .hero-ai-note {
-    position: absolute;
-    bottom: 56px;
-    right: 45%;
+    display: inline-block;
+    margin-top: 28px;
     font-size: 11px;
     color: var(--text-muted);
     font-family: var(--font-mono);
-    opacity: 0.5;
+    opacity: 0.6;
+    padding: 3px 8px;
+    border: 1px dashed var(--border);
+    border-radius: 3px;
+    letter-spacing: 0.03em;
 }
 
 @media (max-width: 800px) {
     .hero-ai-note {
-        display: none;
+        margin-top: 20px;
     }
 }
 
