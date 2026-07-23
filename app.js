@@ -307,6 +307,13 @@ async function loadSteamProfile() {
     const avatarUrl = avatarMatch ? `https://avatars.cloudflare.steamstatic.com/${avatarMatch[1]}_full.jpg` : '';
     const nameMatch = html.match(/actual_persona_name">([^<]+)</);
     const username = nameMatch ? nameMatch[1].trim() : '';
+    const levelMatch = html.match(/friendPlayerLevelNum[^>]*>(\d+)</);
+    const level = levelMatch ? levelMatch[1] : '';
+
+    const badgeCounts = [...html.matchAll(/profile_count_link_total[^>]*>([^<]+)</g)].map(m => m[1].trim());
+    const badgeLabels = [...html.matchAll(/count_link_label[^>]*>([^<]+)</g)].map(m => m[1].trim());
+    const stats = {};
+    badgeLabels.forEach((label, i) => { stats[label] = badgeCounts[i] || ''; });
 
     const names = [...html.matchAll(/class="game_name"><a[^>]*>([^<]+)<\/a>/g)].map(m => m[1]);
     const hours = [...html.matchAll(/总时数 ([\d.]+) 小时/g)].map(m => parseFloat(m[1]));
@@ -318,6 +325,8 @@ async function loadSteamProfile() {
       cover: covers[i] || ''
     })).filter(g => g.name && g.hours > 0);
 
+    const totalHours = games.reduce((sum, g) => sum + g.hours, 0);
+
     if (games.length === 0) {
       container.innerHTML = '<div class="steam-empty">暂无游戏数据</div>';
       return;
@@ -326,7 +335,16 @@ async function loadSteamProfile() {
     container.innerHTML = `
       <div class="steam-header">
         <img class="steam-avatar" src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(username)}" width="48" height="48">
-        <span class="steam-username">${escapeHtml(username)}</span>
+        <div class="steam-id">
+          <span class="steam-username">${escapeHtml(username)}</span>
+          ${level ? `<span class="steam-level">Lv.${escapeHtml(level)}</span>` : ''}
+        </div>
+      </div>
+      <div class="steam-stats">
+        <span class="steam-stat">🎮 ${escapeHtml(stats['游戏'] || '-')} 款游戏</span>
+        <span class="steam-stat">🏅 ${escapeHtml(stats['徽章'] || '-')} 枚徽章</span>
+        <span class="steam-stat">⏱️ ${totalHours.toFixed(0)} 小时</span>
+        <span class="steam-stat">👥 ${escapeHtml(stats['好友'] || '-')} 位好友</span>
       </div>
       <div class="steam-games-list">
         ${games.map(g => `

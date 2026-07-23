@@ -700,9 +700,7 @@ a:hover { opacity: 0.8; }
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 12px;
 }
 
 .steam-avatar {
@@ -712,9 +710,38 @@ a:hover { opacity: 0.8; }
     border: 1px solid var(--border-light);
 }
 
+.steam-id {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 .steam-username {
     font-size: 15px;
     font-weight: 600;
+}
+
+.steam-level {
+    font-size: 12px;
+    color: var(--accent);
+    font-family: var(--font-mono);
+}
+
+.steam-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: var(--bg-inset);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
+}
+
+.steam-stat {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
 }
 
 .steam-loading, .steam-empty {
