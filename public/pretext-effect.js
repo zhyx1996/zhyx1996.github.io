@@ -56,9 +56,9 @@ function resize() {
 function initOrbs() {
     const r = Math.min(W, H) * 0.08;
     orbs = [
-        { x: W * 0.3, y: H * 0.35, r, color: '#D97706', dragging: false },
-        { x: W * 0.7, y: H * 0.6, r: r * 1.2, color: '#0D9488', dragging: false },
-        { x: W * 0.5, y: H * 0.8, r: r * 0.8, color: '#B45309', dragging: false },
+        { x: W * 0.3, y: H * 0.35, r, color: '#D97706', dragging: false, vx: 18, vy: 12 },
+        { x: W * 0.7, y: H * 0.6, r: r * 1.2, color: '#0D9488', dragging: false, vx: -12, vy: 18 },
+        { x: W * 0.5, y: H * 0.8, r: r * 0.8, color: '#B45309', dragging: false, vx: 15, vy: -12 },
     ];
 }
 
@@ -150,17 +150,81 @@ function createOrbElements() {
         orbsLayer.appendChild(el);
         orbElements.push(el);
     }
+    saveOrbPositions();
 }
 
-// 拖动事件可能在一帧内触发多次，只安排一次文字重排。
-let textRenderFrame = null;
-function requestTextRender() {
-    if (textRenderFrame !== null) return;
-    textRenderFrame = requestAnimationFrame(() => {
-        textRenderFrame = null;
-        renderText();
-    });
+function updateOrbPositions() {
+    for (let i = 0; i < orbs.length; i++) {
+        const orb = orbs[i];
+        const el = orbElements[i];
+        if (el && !orb.dragging) {
+            el.style.transform = `translate3d(${orb.x - orb.r}px, ${orb.y - orb.r}px, 0)`;
+        }
+    }
 }
+
+// 圆球持续移动；文字最多落后 1px 就在同一动画帧内同步重排。
+let animationId = null;
+let lastAnimationTime = null;
+let lastOrbPositions = [];
+const TEXT_SYNC_THRESHOLD = 1;
+
+function orbNeedsTextSync() {
+    if (lastOrbPositions.length !== orbs.length) return true;
+    return orbs.some((orb, index) => (
+        Math.abs(orb.x - lastOrbPositions[index].x) >= TEXT_SYNC_THRESHOLD
+        || Math.abs(orb.y - lastOrbPositions[index].y) >= TEXT_SYNC_THRESHOLD
+    ));
+}
+
+function saveOrbPositions() {
+    lastOrbPositions = orbs.map(orb => ({ x: orb.x, y: orb.y }));
+}
+
+function animate(now) {
+    if (lastAnimationTime === null) lastAnimationTime = now;
+    const deltaSeconds = Math.min((now - lastAnimationTime) / 1000, 0.05);
+    lastAnimationTime = now;
+
+    for (const orb of orbs) {
+        if (orb.dragging) continue;
+        orb.x += orb.vx * deltaSeconds;
+        orb.y += orb.vy * deltaSeconds;
+        if (orb.x - orb.r < 0 || orb.x + orb.r > W) {
+            orb.vx *= -1;
+            orb.x = Math.max(orb.r, Math.min(W - orb.r, orb.x));
+        }
+        if (orb.y - orb.r < 0 || orb.y + orb.r > H) {
+            orb.vy *= -1;
+            orb.y = Math.max(orb.r, Math.min(H - orb.r, orb.y));
+        }
+    }
+
+    updateOrbPositions();
+    if (orbNeedsTextSync()) {
+        renderText();
+        saveOrbPositions();
+    }
+    animationId = requestAnimationFrame(animate);
+}
+
+function startAnimation() {
+    if (animationId !== null) return;
+    lastAnimationTime = null;
+    animationId = requestAnimationFrame(animate);
+}
+
+function stopAnimation() {
+    if (animationId === null) return;
+    cancelAnimationFrame(animationId);
+    animationId = null;
+    lastAnimationTime = null;
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopAnimation();
+    else startAnimation();
+});
 
 // ─── 拖拽 ────────────────────────────────────────────────────────
 let dragOrb = null;
@@ -194,10 +258,18 @@ function attachDragEvents() {
         if (idx >= 0 && orbElements[idx]) {
             orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
         }
-        requestTextRender();
     });
-    orbsLayer.addEventListener('mouseup', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } orbsLayer.style.cursor = 'default'; });
-    orbsLayer.addEventListener('mouseleave', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } orbsLayer.style.cursor = 'default'; });
+    const finishDrag = () => {
+        if (dragOrb) {
+            dragOrb.dragging = false;
+            dragOrb = null;
+            renderText();
+            saveOrbPositions();
+        }
+        orbsLayer.style.cursor = 'default';
+    };
+    orbsLayer.addEventListener('mouseup', finishDrag);
+    orbsLayer.addEventListener('mouseleave', finishDrag);
     orbsLayer.addEventListener('touchstart', e => {
         dragOrb = hitTest(getPos(e));
         if (dragOrb) { dragOrb.dragging = true; }
@@ -212,9 +284,8 @@ function attachDragEvents() {
         if (idx >= 0 && orbElements[idx]) {
             orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
         }
-        requestTextRender();
     }, { passive: false });
-    orbsLayer.addEventListener('touchend', () => { if (dragOrb) { dragOrb.dragging = false; dragOrb = null; } });
+    orbsLayer.addEventListener('touchend', finishDrag);
 }
 
 // ─── 初始化 ──────────────────────────────────────────────────────
@@ -223,7 +294,7 @@ window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer
 
 function init() {
     orbsLayer = document.getElementById('pretext-orbs');
-    resize(); initOrbs(); ensureTextMetrics(); createOrbElements(); renderText(); attachDragEvents();
+    resize(); initOrbs(); ensureTextMetrics(); createOrbElements(); renderText(); attachDragEvents(); startAnimation();
 }
 if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', () => { setTimeout(init, 100); });
