@@ -42,19 +42,19 @@ function initOrbs() {
     ];
 }
 
-// Check if a character at position (x, y) collides with any orb
-function collidesWithOrb(x, y, w, h) {
-    for (const orb of orbs) {
-        // Find closest point on rectangle to circle center
-        const closestX = Math.max(x, Math.min(orb.x, x + w));
-        const closestY = Math.max(y, Math.min(orb.y, y + h));
-        const dx = orb.x - closestX;
-        const dy = orb.y - closestY;
-        if (dx * dx + dy * dy < orb.r * orb.r) {
-            return true;
+// Calculate available slots by subtracting blocked regions
+function carveSlots(baseLeft, baseRight, blocked) {
+    let slots = [{ left: baseLeft, right: baseRight }];
+    for (const iv of blocked) {
+        const next = [];
+        for (const s of slots) {
+            if (iv.right <= s.left || iv.left >= s.right) { next.push(s); continue; }
+            if (iv.left > s.left) next.push({ left: s.left, right: iv.left });
+            if (iv.right < s.right) next.push({ left: iv.right, right: s.right });
         }
+        slots = next;
     }
-    return false;
+    return slots.filter(s => s.right - s.left >= 20);
 }
 
 function renderText() {
@@ -66,42 +66,48 @@ function renderText() {
     const colEnd = W - padding;
     const colWidth = colEnd - colStart;
     
-    let graphemeIndex = 0;
+    let cursor = { segmentIndex: 0, graphemeIndex: 0 };
     
-    for (let y = LINE_HEIGHT * 1.5; y < H - 20 && graphemeIndex < graphemes.length; y += LINE_HEIGHT) {
-        let x = colStart;
-        let lineText = '';
+    for (let y = LINE_HEIGHT * 1.5; y < H - 20 && cursor.segmentIndex < prepared.segments.length; y += LINE_HEIGHT) {
+        const bandTop = y;
+        const bandBottom = y + LINE_HEIGHT;
         
-        while (x < colEnd && graphemeIndex < graphemes.length) {
-            const gw = graphemeWidths[graphemeIndex];
-            const graphemeLeft = x;
-            const graphemeRight = x + gw;
-            const graphemeTop = y;
-            const graphemeBottom = y + LINE_HEIGHT;
-            
-            // Check if this grapheme collides with any orb
-            if (collidesWithOrb(graphemeLeft, graphemeTop, gw, LINE_HEIGHT)) {
-                // Skip this position (leave empty space for the orb)
-                x += gw;
-            } else if (graphemeRight > colEnd) {
-                // Grapheme doesn't fit in the remaining space, move to next line
-                break;
-            } else {
-                // Place the grapheme
-                lineText += graphemes[graphemeIndex];
-                x += gw;
-                graphemeIndex++;
-            }
+        // Calculate blocked regions for this line (circle-rectangle intersection)
+        const blocked = [];
+        for (const orb of orbs) {
+            // Find the minimum distance from orb center to the band
+            const minDy = orb.y >= bandTop && orb.y <= bandBottom ? 0 
+                : orb.y < bandTop ? bandTop - orb.y 
+                : orb.y - bandBottom;
+            if (minDy >= orb.r) continue;
+            const maxDx = Math.sqrt(Math.max(0, orb.r * orb.r - minDy * minDy));
+            blocked.push({ left: orb.x - maxDx, right: orb.x + maxDx });
         }
         
-        if (lineText) {
+        // Carve slots from available space
+        const slots = carveSlots(colStart, colEnd, blocked);
+        if (slots.length === 0) continue;
+        
+        // Sort slots by left position (left to right)
+        slots.sort((a, b) => a.left - b.left);
+        
+        // Fill each slot with text
+        for (const slot of slots) {
+            if (cursor.segmentIndex >= prepared.segments.length) break;
+            const slotWidth = slot.right - slot.left;
+            if (slotWidth < 20) continue;
+            
+            const line = layoutNextLine(prepared, cursor, slotWidth);
+            if (!line || !line.text.trim()) break;
+            
             const el = document.createElement('div');
             el.className = 'pretext-line';
-            el.style.left = colStart + 'px';
+            el.style.left = slot.left + 'px';
             el.style.top = y + 'px';
-            el.style.width = colWidth + 'px';
-            el.textContent = lineText;
+            el.style.width = slotWidth + 'px';
+            el.textContent = line.text;
             container.appendChild(el);
+            cursor = line.end;
         }
     }
 }
