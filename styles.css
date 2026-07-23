@@ -707,7 +707,7 @@ a:hover { opacity: 0.8; }
 
 .steam-games-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
 }
 
@@ -727,7 +727,7 @@ a:hover { opacity: 0.8; }
 
 .steam-game-cover {
     width: 100%;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 184 / 69;
     object-fit: cover;
     border-radius: 4px;
     background: var(--bg-inset);
