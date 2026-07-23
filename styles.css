@@ -800,13 +800,27 @@ a:hover { opacity: 0.8; }
     font-family: var(--font-mono);
 }
 
-.steam-loading, .steam-empty {
+.steam-loading {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 200px;
     color: var(--text-muted);
     font-size: 14px;
+}
+.steam-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--text-muted);
+    font-size: 14px;
+    gap: 8px;
+}
+.steam-empty a {
+    font-size: 13px;
+    font-weight: 500;
 }
 
 .steam-games-list {

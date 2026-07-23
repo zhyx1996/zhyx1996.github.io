@@ -383,7 +383,7 @@ async function loadSteamProfile() {
     const totalHours = games.reduce((sum, g) => sum + g.hours, 0);
 
     if (games.length === 0) {
-      container.innerHTML = '<div class="steam-empty">暂无游戏数据</div>';
+      container.innerHTML = '<div class="steam-empty"><span>暂无游戏数据</span><a href="https://steamcommunity.com/profiles/76561198391062314/" target="_blank" rel="noreferrer">在 Steam 上查看 \u2192</a></div>';
       return;
     }
 
@@ -416,7 +416,7 @@ async function loadSteamProfile() {
       </div>
     `;
   } catch {
-    container.innerHTML = '<div class="steam-empty">无法加载游戏数据</div>';
+    container.innerHTML = '<div class="steam-empty"><span>无法加载游戏数据</span><a href="https://steamcommunity.com/profiles/76561198391062314/" target="_blank" rel="noreferrer">在 Steam 上查看 \u2192</a></div>';
   }
 }
 
