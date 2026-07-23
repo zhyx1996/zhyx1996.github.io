@@ -243,14 +243,13 @@ a:hover { opacity: 0.8; }
 }
 
 .hero-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    padding-bottom: 40px;
 }
 
 .hero-ai-note {
     position: absolute;
-    bottom: 20px;
+    bottom: 0;
     right: 0;
     font-size: 11px;
     color: var(--text-muted);
