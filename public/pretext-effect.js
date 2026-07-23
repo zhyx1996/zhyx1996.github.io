@@ -1,20 +1,23 @@
-import { prepareWithSegments, layoutNextLineRange, materializeLineRange } from './layout.js';
+import { prepareWithSegments, layoutNextLine } from './layout.js';
 
-const TEXT = `公开仓库 15 个，主要围绕计算机视觉、自动驾驶感知、并行计算与公开写作。lane2seq 做实时车道检测，结合 Canny/Hough 变换、CLAHE、HLS 等传统流程与 Lane2Seq-ViT 序列生成模型，并用 ENet 分割在 TuSimple 和 LLAMAS 数据集上训练与验证。pcl 仓库给 PCL 的 BoundaryEstimation 加了 OMP 并行加速，提升点云边界估计速度。GStreamer 仓库整理 RTSP 推流、自定义 SEI 注入、Carla 多相机管理与 pyinstaller 打包 exe 的完整踩坑记录。auto_calib_v2 在 PJLab-ADG/SensorsCalibration 的 lidar2camera 方案上做改进，方便自动驾驶多传感器联合标定。achievements 是一个 GitHub 成就徽章追踪小工具。stars 仓库收集我在 GitHub 上关注过的有意思项目。Jupyter 笔记记录车道检测实验的迭代过程。近期也在看 BEV 感知、Occupancy 估计与端到端自动驾驶方向，把论文笔记和实验数据整理进博客。文章方面会写 Windows 下 Python 加 GStreamer 推 RTSP 并注入 SEI、123 云盘本地通信被防火墙拦截、JPEG 解码触发段错误、CARLA 坐标系转换、Jetson 部署与多路视频编解码等实战笔记，尽量把环境安装、命令参数与报错信息都写成可复现的文档。除了项目本身，我也在意把过程写清楚：从问题背景、环境版本、关键命令到最终验证，尽量让看到的人能直接复现，少踩一些我踩过的坑。`;
+const TEXT = `公开仓库 15 个，主要围绕计算机视觉、自动驾驶感知、并行计算与公开写作。lane2seq 做实时车道检测，结合 Canny/Hough 变换、CLAHE、HLS 等传统流程与 Lane2Seq-ViT 序列生成模型，并用 ENet 分割在 TuSimple 和 LLAMAS 数据集上训练与验证。pcl 仓库给 PCL 的 BoundaryEstimation 加了 OMP 并行加速，提升点云边界估计速度。GStreamer 仓库整理 RTSP 推流、自定义 SEI 注入、Carla 多相机管理与 pyinstaller 打包 exe 的完整踩坑记录。auto_calib_v2 在 PJLab-ADG/SensorsCalibration 的 lidar2camera 方案上做改进，方便自动驾驶多传感器联合标定。stars 仓库收集关注过的有意思项目。维护的 gkd 订阅用于广告过滤与规则分享。Jupyter 笔记记录车道检测实验的迭代过程。近期也在看 BEV 感知、Occupancy 估计与端到端自动驾驶方向。`;
 
 const FONT = '16px "Inter", "Noto Sans SC", system-ui, sans-serif';
 const LINE_HEIGHT = 26;
-const MIN_SLOT_WIDTH = 60;
 
 const container = document.getElementById('pretext-output');
-let W, H, prepared, orbs = [];
-let orbElements = []; // 缓存 DOM 元素
+let W, H, prepared, graphemes = [], graphemeWidths = [], orbs = [];
+let orbElements = [];
 let lastRenderTime = 0;
 let renderPending = false;
 
 function getPrepared() {
-    if (!prepared) prepared = prepareWithSegments(TEXT, FONT);
-    if (!window._pretextPrepared) window._pretextPrepared = prepared;
+    if (!prepared) {
+        prepared = prepareWithSegments(TEXT, FONT);
+        // Extract grapheme widths from prepared segments
+        graphemes = prepared.segments.slice();
+        graphemeWidths = prepared.widths.slice();
+    }
     return prepared;
 }
 
@@ -32,61 +35,66 @@ function initOrbs() {
     ];
 }
 
-// ─── 文字渲染（节流） ────────────────────────────────────────────
-function carveSlots(baseLeft, baseRight, blocked) {
-    let slots = [{ left: baseLeft, right: baseRight }];
-    for (const iv of blocked) {
-        const next = [];
-        for (const s of slots) {
-            if (iv.right <= s.left || iv.left >= s.right) { next.push(s); continue; }
-            if (iv.left > s.left) next.push({ left: s.left, right: iv.left });
-            if (iv.right < s.right) next.push({ left: iv.right, right: s.right });
+// Check if a character at position (x, y) collides with any orb
+function collidesWithOrb(x, y, w, h) {
+    for (const orb of orbs) {
+        // Find closest point on rectangle to circle center
+        const closestX = Math.max(x, Math.min(orb.x, x + w));
+        const closestY = Math.max(y, Math.min(orb.y, y + h));
+        const dx = orb.x - closestX;
+        const dy = orb.y - closestY;
+        if (dx * dx + dy * dy < orb.r * orb.r) {
+            return true;
         }
-        slots = next;
     }
-    return slots.filter(s => s.right - s.left >= MIN_SLOT_WIDTH);
+    return false;
 }
 
 function renderText() {
     container.querySelectorAll('.pretext-line').forEach(el => el.remove());
-    const prepared = getPrepared();
-    let cursor = { segmentIndex: 0, graphemeIndex: 0 };
+    getPrepared();
+    
     const padding = 30;
     const colStart = padding;
     const colEnd = W - padding;
     const colWidth = colEnd - colStart;
     
-    for (let y = LINE_HEIGHT * 1.5; y < H - 20 && cursor.segmentIndex < prepared.segments.length; y += LINE_HEIGHT) {
-        const lineCY = y + LINE_HEIGHT / 2;
+    let graphemeIndex = 0;
+    
+    for (let y = LINE_HEIGHT * 1.5; y < H - 20 && graphemeIndex < graphemes.length; y += LINE_HEIGHT) {
+        let x = colStart;
+        let lineText = '';
         
-        // 计算小球在这一行的阻挡区域（可能有多个小球）
-        const blocked = [];
-        for (const orb of orbs) {
-            const dy = lineCY - orb.y;
-            if (Math.abs(dy) < orb.r) {
-                const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
-                blocked.push({ left: orb.x - half, right: orb.x + half });
+        while (x < colEnd && graphemeIndex < graphemes.length) {
+            const gw = graphemeWidths[graphemeIndex];
+            const graphemeLeft = x;
+            const graphemeRight = x + gw;
+            const graphemeTop = y;
+            const graphemeBottom = y + LINE_HEIGHT;
+            
+            // Check if this grapheme collides with any orb
+            if (collidesWithOrb(graphemeLeft, graphemeTop, gw, LINE_HEIGHT)) {
+                // Skip this position (leave empty space for the orb)
+                x += gw;
+            } else if (graphemeRight > colEnd) {
+                // Grapheme doesn't fit in the remaining space, move to next line
+                break;
+            } else {
+                // Place the grapheme
+                lineText += graphemes[graphemeIndex];
+                x += gw;
+                graphemeIndex++;
             }
         }
         
-        // 计算可用的槽位
-        const slots = carveSlots(colStart, colEnd, blocked);
-        
-        // 在每个槽位中渲染文字
-        for (const slot of slots) {
-            if (cursor.segmentIndex >= prepared.segments.length) break;
-            const range = layoutNextLineRange(prepared, cursor, slot.right - slot.left - 4);
-            if (!range) break;
-            const line = materializeLineRange(prepared, range);
-            if (!line.text.trim()) break;
+        if (lineText) {
             const el = document.createElement('div');
             el.className = 'pretext-line';
-            el.style.left = slot.left + 'px';
+            el.style.left = colStart + 'px';
             el.style.top = y + 'px';
-            el.style.width = (slot.right - slot.left) + 'px';
-            el.textContent = line.text;
+            el.style.width = colWidth + 'px';
+            el.textContent = lineText;
             container.appendChild(el);
-            cursor = range.end;
         }
     }
 }
@@ -237,7 +245,7 @@ function attachDragEvents() {
 
 // ─── 初始化 ──────────────────────────────────────────────────────
 let resizeTimer;
-window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { resize(); initOrbs(); createOrbElements(); renderText(); }, 200); });
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { resize(); initOrbs(); prepared = null; graphemes = []; graphemeWidths = []; createOrbElements(); renderText(); }, 200); });
 
 function init() {
     orbsLayer = document.getElementById('pretext-orbs');
