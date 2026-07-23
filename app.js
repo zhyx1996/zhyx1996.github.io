@@ -333,18 +333,20 @@ async function loadSteamProfile() {
     }
 
     container.innerHTML = `
-      <div class="steam-header">
-        <img class="steam-avatar" src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(username)}" width="48" height="48">
-        <div class="steam-id">
-          <span class="steam-username">${escapeHtml(username)}</span>
-          ${level ? `<span class="steam-level">Lv.${escapeHtml(level)}</span>` : ''}
+      <div class="steam-profile-card">
+        <div class="steam-header">
+          <img class="steam-avatar" src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(username)}" width="48" height="48">
+          <div class="steam-id">
+            <span class="steam-username">${escapeHtml(username)}</span>
+            ${level ? `<span class="steam-level">Lv.${escapeHtml(level)}</span>` : ''}
+          </div>
         </div>
-      </div>
-      <div class="steam-stats">
-        <span class="steam-stat">🎮 ${escapeHtml(stats['游戏'] || '-')} 款游戏</span>
-        <span class="steam-stat">🏅 ${escapeHtml(stats['徽章'] || '-')} 枚徽章</span>
-        <span class="steam-stat">⏱️ ${totalHours.toFixed(0)} 小时</span>
-        <span class="steam-stat">👥 ${escapeHtml(stats['好友'] || '-')} 位好友</span>
+        <div class="steam-stats">
+          <span class="steam-stat">🎮 ${escapeHtml(stats['游戏'] || '-')} 款游戏</span>
+          <span class="steam-stat">🏅 ${escapeHtml(stats['徽章'] || '-')} 枚徽章</span>
+          <span class="steam-stat">⏱️ ${totalHours.toFixed(0)} 小时</span>
+          <span class="steam-stat">👥 ${escapeHtml(stats['好友'] || '-')} 位好友</span>
+        </div>
       </div>
       <div class="steam-games-list">
         ${games.map(g => `

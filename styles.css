@@ -696,6 +696,14 @@ a:hover { opacity: 0.8; }
     min-height: 200px;
 }
 
+.steam-profile-card {
+    padding: 16px;
+    background: var(--bg-inset);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
+    margin-bottom: 16px;
+}
+
 .steam-header {
     display: flex;
     align-items: center;
@@ -717,7 +725,7 @@ a:hover { opacity: 0.8; }
 }
 
 .steam-username {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
 }
 
@@ -731,11 +739,6 @@ a:hover { opacity: 0.8; }
     display: flex;
     flex-wrap: wrap;
     gap: 8px 16px;
-    margin-bottom: 16px;
-    padding: 10px 14px;
-    background: var(--bg-inset);
-    border-radius: var(--radius);
-    border: 1px solid var(--border-light);
 }
 
 .steam-stat {
