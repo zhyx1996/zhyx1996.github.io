@@ -1,11 +1,10 @@
 import { prepareWithSegments, layoutNextLineRange, materializeLineRange } from './layout.js';
 
-const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。公开仓库 15 个。车道线与感知实验：持续整理传统视觉流程、深度学习方案与场景感知实验。并行计算围绕 CUDA、OpenMP 和图像/点云处理做性能优化。记录 GStreamer 推流与 SEI 注入、CARLA 坐标系转换、Jetson 部署、多路视频编解码等实战经验。`;
+const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。公开仓库 15 个，长期维护车道检测、点云处理与多路视频编解码相关工具。车道线与感知实验：持续整理传统视觉流程、深度学习方案与场景感知实验，对比 Canny/Hough、CLANE、Transformer 序列生成等不同路线的精度与速度。并行计算围绕 CUDA、OpenMP 和图像/点云处理热点流程做性能优化，覆盖体素下采样、近邻搜索与边界估计的加速。记录 GStreamer 推流与 SEI 注入、CARLA 坐标系转换、Jetson 部署、多路视频编解码等实战经验，并把踩坑过程整理成可复现的工程笔记。也会写一些关于开发环境、构建打包与性能剖析的短文，希望这些零散的实践对路过的同行有一点帮助。`;
 
 const FONT = '16px "Inter", "Noto Sans SC", system-ui, sans-serif';
 const LINE_HEIGHT = 26;
 const MIN_SLOT_WIDTH = 60;
-const ORB_BORDER = 2; // CSS border width for .pretext-orb
 
 const container = document.getElementById('pretext-output');
 let W, H, prepared, orbs = [];
