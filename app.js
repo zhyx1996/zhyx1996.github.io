@@ -110,11 +110,23 @@ function renderMarket(rates, btcPrice, goldPrice) {
     ...buildCryptoFacts(btcPrice),
     ...buildGoldFacts(goldPrice),
   ];
+
+  // 移除已有的更新时间戳，避免重复
+  const existingUpdated = container.parentNode.querySelector('.market-updated');
+  if (existingUpdated) existingUpdated.remove();
+
   if (parts.length === 0) {
     container.innerHTML = '<div class="market-card" style="grid-column:1/-1;text-align:center;"><div class="label">数据暂不可用</div><div class="value" style="font-size:13px;">请稍后刷新页面重试</div></div>';
-    return;
+  } else {
+    container.innerHTML = renderMarketFacts(parts);
   }
-  container.innerHTML = renderMarketFacts(parts);
+
+  // 添加数据更新时间戳
+  const updated = document.createElement('div');
+  updated.className = 'market-updated';
+  const now = new Date();
+  updated.textContent = `更新于 ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  container.parentNode.appendChild(updated);
 }
 
 function fetchWithTimeout(url, timeout = 8000) {

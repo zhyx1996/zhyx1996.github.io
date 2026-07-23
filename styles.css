@@ -696,6 +696,16 @@ a:hover { opacity: 0.8; }
     50% { opacity: 0.5; }
 }
 
+/* 市场快照更新时间 */
+.market-updated {
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+    opacity: 0.7;
+}
+
 /* ── 游戏展示 ── */
 .showcase-grid {
     display: grid;
