@@ -2,6 +2,53 @@
 
 const GITHUB_USERNAME = 'zhyx1996';
 
+// ── 文章数据（博客园同步）──
+const articleFallback = [
+  {
+    date: '2026年6月30日',
+    title: 'Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及 pyinstaller 打包',
+    url: 'https://www.cnblogs.com/fix-me/p/20968815',
+    summary: 'Windows + Python + GStreamer + 打包的实战记录，涵盖环境安装、RTSP 推流、SEI 注入与 pyinstaller 打包的完整流程与踩坑经验。'
+  },
+  {
+    date: '2026年5月28日',
+    title: '123云盘报错：检测到本地通信被防火墙或 VPN 拦截',
+    url: 'https://www.cnblogs.com/fix-me/p/20194105',
+    summary: '排查 123 云盘因本地通信被防火墙或 VPN 拦截导致的报错问题，通过日志定位根因并给出解决方案。'
+  },
+  {
+    date: '2026年4月23日',
+    title: '记录 GStreamer 打开 JPEG 编码的视频时出现段错误的原因',
+    url: 'https://www.cnblogs.com/fix-me/p/19914336',
+    summary: '排查 OpenCV 与 GStreamer 在同一进程处理 JPEG/MJPEG 视频时触发段错误的问题，定位到 libjpeg 与 nvjpeg 解码链路冲突，并给出替代解码与转码方案。'
+  },
+  {
+    date: '2026年4月17日',
+    title: 'CARLA 中的坐标系与标准车辆坐标系转换',
+    url: 'https://www.cnblogs.com/fix-me/p/19882892',
+    summary: '梳理 CARLA 的左手坐标系、Y 轴朝右和 Z-Y-X 欧拉角约定，并总结与标准车辆坐标系之间的位置、姿态与符号转换关系。'
+  }
+];
+
+function renderArticles() {
+  const container = document.querySelector('.article-list');
+  if (!container) return;
+
+  container.innerHTML = articleFallback.map(article => `
+    <article class="article-card">
+      <div class="article-meta">
+        <span class="article-date">${escapeHtml(article.date)}</span>
+      </div>
+      <h3><a href="${escapeHtml(article.url)}" target="_blank" rel="noreferrer">${escapeHtml(article.title)}</a></h3>
+      <p>${escapeHtml(article.summary)}</p>
+    </article>
+  `).join('');
+
+  // 更新文章计数
+  const statNum = document.querySelector('.stat-num');
+  if (statNum) statNum.textContent = articleFallback.length;
+}
+
 // ── 工具函数 ──
 const fmtDate = (value) => {
   if (!value) return '暂无';
@@ -409,6 +456,7 @@ function initScrollAnimations() {
 document.addEventListener('DOMContentLoaded', () => {
   loadMarket();
   loadSteamProfile();
+  renderArticles();
   initScrollAnimations();
   initBackToTop();
   // Sakana widget 加载完成后初始化拖拽
