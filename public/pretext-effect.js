@@ -63,9 +63,8 @@ function renderText() {
         const blocked = [];
         for (const orb of orbs) {
             const dy = lineCY - orb.y;
-            const effectiveR = orb.r + ORB_BORDER; // 加上边框宽度
-            if (Math.abs(dy) < effectiveR) {
-                const half = Math.sqrt(Math.max(0, effectiveR * effectiveR - dy * dy));
+            if (Math.abs(dy) < orb.r) {
+                const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
                 blocked.push({ left: orb.x - half, right: orb.x + half });
             }
         }
