@@ -14,6 +14,7 @@ let renderPending = false;
 
 function getPrepared() {
     if (!prepared) prepared = prepareWithSegments(TEXT, FONT);
+    if (!window._pretextPrepared) window._pretextPrepared = prepared;
     return prepared;
 }
 

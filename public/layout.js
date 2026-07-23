@@ -323,7 +323,7 @@ function measureAnalysis(analysis, font, includeSegments, wordBreak, letterSpaci
                 : baseUnits;
             for (let i = 0; i < measuredUnits.length; i++) {
                 const unit = measuredUnits[i];
-                pushMeasuredTextSegment(unit.text, 'text', segStart + unit.start, segWordLike, wordBreak === 'keep-all' || !isCJK(unit.text));
+                pushMeasuredTextSegment(unit.text, 'text', segStart + unit.start, segWordLike, true);
             }
             continue;
         }
