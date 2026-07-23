@@ -68,6 +68,10 @@ function renderMarket(rates, btcPrice, goldPrice) {
     ...buildCryptoFacts(btcPrice),
     ...buildGoldFacts(goldPrice),
   ];
+  if (parts.length === 0) {
+    container.innerHTML = '<div class="market-card" style="grid-column:1/-1;text-align:center;"><div class="label">数据暂不可用</div><div class="value" style="font-size:13px;">请稍后刷新页面重试</div></div>';
+    return;
+  }
   container.innerHTML = renderMarketFacts(parts);
 }
 

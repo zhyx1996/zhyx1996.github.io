@@ -630,6 +630,18 @@ a:hover { opacity: 0.8; }
 .market-card .change.up { color: var(--teal); }
 .market-card .change.down { color: #DC2626; }
 
+/* 市场快照加载状态 */
+.market-loading {
+    animation: market-pulse 1.5s ease-in-out infinite;
+}
+.market-loading .value {
+    color: var(--text-muted) !important;
+}
+@keyframes market-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
 /* ── 游戏展示 ── */
 .showcase-grid {
     display: grid;
