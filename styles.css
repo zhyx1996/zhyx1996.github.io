@@ -245,11 +245,17 @@ a:hover { opacity: 0.8; }
 .hero-ai-note {
     position: absolute;
     bottom: 56px;
-    right: 440px;
+    right: 45%;
     font-size: 11px;
     color: var(--text-muted);
     font-family: var(--font-mono);
     opacity: 0.5;
+}
+
+@media (max-width: 800px) {
+    .hero-ai-note {
+        display: none;
+    }
 }
 
 .hero-actions {
