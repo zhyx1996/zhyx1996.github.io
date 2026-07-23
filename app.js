@@ -291,7 +291,7 @@ function initSakanaDrag() {
   document.addEventListener('mouseleave', onPointerLeave);
 }
 
-// ── Steam 资料（内嵌展示）──
+// ── Steam 资料（解析个人主页 HTML）──
 async function loadSteamProfile() {
   const container = document.getElementById('steam-profile');
   if (!container) return;
@@ -299,36 +299,30 @@ async function loadSteamProfile() {
   const STEAM_ID64 = '76561198391062314';
 
   try {
-    const gamesUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/games/?xml=1`;
-    const res = await fetchWithTimeout(`https://api.allorigins.win/raw?url=${encodeURIComponent(gamesUrl)}`, 10000);
-    if (!res.ok) throw new Error('Steam API error');
-    const text = await res.text();
-    if (!text || !text.includes('game')) throw new Error('Empty response');
+    const res = await fetchWithTimeout(`https://corsproxy.io/?${encodeURIComponent('https://steamcommunity.com/profiles/' + STEAM_ID64 + '/')}`, 15000);
+    if (!res.ok) throw new Error('fetch failed');
+    const html = await res.text();
 
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(text, 'text/xml');
+    const names = [...html.matchAll(/class="game_name"><a[^>]*>([^<]+)<\/a>/g)].map(m => m[1]);
+    const hours = [...html.matchAll(/总时数 ([\d.]+) 小时/g)].map(m => parseFloat(m[1]));
+    const covers = [...html.matchAll(/game_capsule" src="([^"]+)"/g)].map(m => m[1]);
 
-    const games = [];
-    xml.querySelectorAll('game').forEach(g => {
-      const name = g.querySelector('name')?.textContent || '';
-      const logo = g.querySelector('logo')?.textContent || '';
-      const hours = parseFloat(g.querySelector('hoursOnRecord')?.textContent || 0);
-      if (name && hours > 0) games.push({ name, logo, hours });
-    });
+    const games = names.map((name, i) => ({
+      name,
+      hours: hours[i] || 0,
+      cover: covers[i] || ''
+    })).filter(g => g.name && g.hours > 0);
 
-    games.sort((a, b) => b.hours - a.hours);
-    const topGames = games.slice(0, 8);
-
-    if (topGames.length === 0) {
+    if (games.length === 0) {
       container.innerHTML = '<div class="steam-empty">暂无游戏数据</div>';
       return;
     }
 
     container.innerHTML = `
       <div class="steam-games-list">
-        ${topGames.map(g => `
+        ${games.map(g => `
           <div class="steam-game-card">
-            <img class="steam-game-cover" src="${escapeHtml(g.logo)}" alt="${escapeHtml(g.name)}" loading="lazy">
+            <img class="steam-game-cover" src="${escapeHtml(g.cover)}" alt="${escapeHtml(g.name)}" loading="lazy">
             <div class="steam-game-info">
               <span class="steam-game-title">${escapeHtml(g.name)}</span>
               <span class="steam-game-hours">${g.hours.toFixed(1)} 小时</span>
