@@ -297,13 +297,28 @@ async function loadSteamProfile() {
   if (!container) return;
 
   const STEAM_ID64 = '76561198391062314';
-  const proxyUrl = 'https://corsproxy.io/?';
   const steamUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/?xml=1`;
 
   try {
-    const res = await fetchWithTimeout(proxyUrl + encodeURIComponent(steamUrl));
-    if (!res.ok) throw new Error('Steam API error');
-    const text = await res.text();
+    // 尝试多个 CORS 代理
+    const proxies = [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(steamUrl)}`,
+      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(steamUrl)}`,
+    ];
+
+    let text = null;
+    for (const proxyUrl of proxies) {
+      try {
+        const res = await fetchWithTimeout(proxyUrl, 8000);
+        if (res.ok) {
+          text = await res.text();
+          if (text && text.includes('steamID64')) break;
+        }
+      } catch { continue; }
+    }
+
+    if (!text) throw new Error('Steam API error');
+
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, 'text/xml');
 
@@ -311,22 +326,29 @@ async function loadSteamProfile() {
     const avatarFull = xml.querySelector('avatarFull')?.textContent || 'https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg';
     const onlineState = xml.querySelector('onlineState')?.textContent || 'offline';
     const stateMessage = xml.querySelector('stateMessage')?.textContent || '';
+    const customURL = xml.querySelector('customURL')?.textContent || '';
+    const location = xml.querySelector('location')?.textContent || '';
+    const realName = xml.querySelector('realname')?.textContent || '';
 
     const isOnline = onlineState === 'online';
     const statusText = isOnline ? (stateMessage || '在线') : '离线';
-    const profileUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/`;
+    const profileUrl = customURL
+      ? `https://steamcommunity.com/id/${customURL}/`
+      : `https://steamcommunity.com/profiles/${STEAM_ID64}/`;
 
     container.innerHTML = `
-      <a href="${escapeHtml(profileUrl)}" target="_blank" rel="noreferrer" style="display:flex;align-items:center;gap:12px;">
-        <img class="steam-avatar" src="${escapeHtml(avatarFull)}" alt="Steam avatar" width="64" height="64">
-        <div>
+      <div class="steam-header">
+        <img class="steam-avatar" src="${escapeHtml(avatarFull)}" alt="Steam avatar" width="56" height="56">
+        <div class="steam-id">
           <strong>${escapeHtml(steamID)}</strong>
-          <span style="display:flex;align-items:center;gap:6px;">
-            <span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${isOnline ? '#4ADE80' : '#888'}"></span>
-            ${escapeHtml(statusText)}
-          </span>
+            <span class="steam-status ${isOnline ? 'online' : 'offline'}">
+              ${isOnline ? '● 在线' : '○ 离线'}
+            </span>
         </div>
-      </a>
+      </div>
+      ${realName ? `<div class="steam-detail"><span class="steam-label">真实姓名</span><span>${escapeHtml(realName)}</span></div>` : ''}
+      ${location ? `<div class="steam-detail"><span class="steam-label">所在地</span><span>${escapeHtml(location)}</span></div>` : ''}
+      <a class="steam-link" href="${escapeHtml(profileUrl)}" target="_blank" rel="noreferrer">查看完整资料 →</a>
     `;
   } catch {
     // 失败时保持原有静态内容
