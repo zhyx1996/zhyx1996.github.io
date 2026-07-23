@@ -1,5 +1,3 @@
-import { layoutNextLine, prepareWithSegments } from './layout.js';
-
 const TEXT = `公开仓库 15 个，主要围绕计算机视觉、自动驾驶感知、并行计算与公开写作。lane2seq 做实时车道检测，结合 Canny/Hough 变换、CLAHE、HLS 等传统流程与 Lane2Seq-ViT 序列生成模型，并用 ENet 分割在 TuSimple 和 LLAMAS 数据集上训练与验证。pcl 仓库给 PCL 的 BoundaryEstimation 加了 OMP 并行加速，提升点云边界估计速度。GStreamer 仓库整理 RTSP 推流、自定义 SEI 注入、Carla 多相机管理与 pyinstaller 打包 exe 的完整踩坑记录。auto_calib_v2 在 PJLab-ADG/SensorsCalibration 的 lidar2camera 方案上做改进，方便自动驾驶多传感器联合标定。stars 仓库收集关注过的有意思项目。维护的 gkd 订阅用于广告过滤与规则分享。Jupyter 笔记记录车道检测实验的迭代过程。近期也在看 BEV 感知、Occupancy 估计与端到端自动驾驶方向。`;
 
 const DEFAULT_LINE_HEIGHT = 24;
@@ -7,17 +5,26 @@ const ORB_TEXT_GAP = 1;
 const MIN_SLOT_WIDTH = 32;
 
 const container = document.getElementById('pretext-output');
-let W, H, prepared, orbs = [];
+let W, H, graphemes = [], graphemeWidths = [], orbs = [];
 let lineHeight = DEFAULT_LINE_HEIGHT;
 let fontSize = 13;
 let orbElements = [];
 const lineElements = [];
 
+function splitGraphemes(text) {
+    if (typeof Intl.Segmenter === 'function') {
+        return [...new Intl.Segmenter('zh-CN', { granularity: 'grapheme' }).segment(text)]
+            .map(item => item.segment);
+    }
+    return Array.from(text);
+}
+
 function prepareRenderedText() {
+    const calibrationText = '测W0.';
     const probe = document.createElement('span');
     probe.className = 'pretext-line';
     probe.style.visibility = 'hidden';
-    probe.textContent = '测';
+    probe.textContent = calibrationText;
     container.appendChild(probe);
 
     const style = getComputedStyle(probe);
@@ -32,12 +39,25 @@ function prepareRenderedText() {
     lineHeight = Number.parseFloat(style.lineHeight) || DEFAULT_LINE_HEIGHT;
     fontSize = Number.parseFloat(style.fontSize) || 13;
     const letterSpacing = Number.parseFloat(style.letterSpacing) || 0;
-    prepared = prepareWithSegments(TEXT, font, { letterSpacing });
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    context.font = font;
+    // Canvas and DOM fallback fonts can differ slightly, so calibrate once
+    // against the rendered probe before using cached grapheme widths.
+    const canvasCalibrationWidth = context.measureText(calibrationText).width;
+    const renderedCalibrationWidth = probe.getBoundingClientRect().width;
+    const widthScale = canvasCalibrationWidth > 0
+        ? renderedCalibrationWidth / canvasCalibrationWidth
+        : 1;
+    graphemes = splitGraphemes(TEXT);
+    graphemeWidths = graphemes.map(grapheme => (
+        Math.max(1, context.measureText(grapheme).width * widthScale + letterSpacing)
+    ));
     probe.remove();
 }
 
 function ensureTextMetrics() {
-    if (!prepared) prepareRenderedText();
+    if (!graphemes.length) prepareRenderedText();
 }
 
 function resize() {
@@ -116,10 +136,9 @@ function renderText() {
     const colStart = padding;
     const colEnd = W - padding;
     const lines = [];
-    let cursor = { segmentIndex: 0, graphemeIndex: 0 };
-    let textExhausted = false;
+    let graphemeIndex = 0;
 
-    for (let y = lineHeight * 1.5; y + lineHeight < H - 20 && !textExhausted; y += lineHeight) {
+    for (let y = lineHeight * 1.5; y + lineHeight < H - 20 && graphemeIndex < graphemes.length; y += lineHeight) {
         const blocked = [];
         for (const orb of orbs) {
             const interval = circleIntervalForBand(orb, y, y + lineHeight);
@@ -128,14 +147,28 @@ function renderText() {
 
         const slots = carveTextLineSlots({ left: colStart, right: colEnd }, blocked);
         for (const slot of slots) {
-            const line = layoutNextLine(prepared, cursor, slot.right - slot.left);
-            if (!line) {
-                textExhausted = true;
-                break;
+            while (graphemeIndex < graphemes.length && /^\s$/u.test(graphemes[graphemeIndex])) {
+                graphemeIndex++;
             }
-            cursor = line.end;
-            if (!line.text) continue;
-            lines.push({ left: slot.left, top: y, text: line.text });
+            if (graphemeIndex >= graphemes.length) break;
+
+            const slotWidth = slot.right - slot.left;
+            const start = graphemeIndex;
+            let textWidth = 0;
+            // Pack graphemes directly instead of preserving whole words or
+            // punctuation clusters, leaving at most one glyph of free space.
+            while (graphemeIndex < graphemes.length) {
+                const nextWidth = graphemeWidths[graphemeIndex];
+                if (textWidth + nextWidth > slotWidth) break;
+                textWidth += nextWidth;
+                graphemeIndex++;
+            }
+            if (graphemeIndex === start) continue;
+            lines.push({
+                left: slot.left,
+                top: y,
+                text: graphemes.slice(start, graphemeIndex).join(''),
+            });
         }
     }
 
@@ -302,7 +335,8 @@ window.addEventListener('resize', () => {
     resizeTimer = setTimeout(() => {
         resize();
         initOrbs();
-        prepared = null;
+        graphemes = [];
+        graphemeWidths = [];
         createOrbElements();
         renderText();
     }, 200);
