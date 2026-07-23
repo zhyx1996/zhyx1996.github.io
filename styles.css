@@ -701,53 +701,52 @@ a:hover { opacity: 0.8; }
     gap: 12px;
 }
 
-.steam-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.steam-avatar {
-    border-radius: 8px;
-    border: 1px solid var(--border-light);
-}
-
-.steam-id {
+.steam-games {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
 }
 
-.steam-id strong {
-    font-size: 15px;
-    font-weight: 600;
-}
-
-.steam-status {
-    font-size: 12px;
+.steam-games-title {
     font-family: var(--font-mono);
-}
-
-.steam-status.online {
-    color: #4ADE80;
-}
-
-.steam-status.offline {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--text-muted);
+    margin-bottom: 4px;
 }
 
-.steam-detail {
+.steam-game {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    gap: 10px;
     padding: 6px 0;
-    border-top: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
 }
 
-.steam-label {
+.steam-game:last-child {
+    border-bottom: none;
+}
+
+.steam-game-icon {
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.steam-game-name {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.steam-game-hours {
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--text-muted);
-    font-size: 12px;
+    flex-shrink: 0;
 }
 
 .steam-link {
@@ -755,7 +754,7 @@ a:hover { opacity: 0.8; }
     font-weight: 500;
     color: var(--accent);
     text-align: center;
-    padding-top: 4px;
+    padding-top: 8px;
     border-top: 1px solid var(--border-light);
 }
 

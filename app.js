@@ -297,22 +297,22 @@ async function loadSteamProfile() {
   if (!container) return;
 
   const STEAM_ID64 = '76561198391062314';
-  const steamUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/?xml=1`;
+  const gamesUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/games/?xml=1`;
 
   try {
-    // 尝试多个 CORS 代理
+    // 尝试多个 CORS 代理获取游戏列表
     const proxies = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(steamUrl)}`,
-      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(steamUrl)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(gamesUrl)}`,
+      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(gamesUrl)}`,
     ];
 
     let text = null;
     for (const proxyUrl of proxies) {
       try {
-        const res = await fetchWithTimeout(proxyUrl, 8000);
+        const res = await fetchWithTimeout(proxyUrl, 10000);
         if (res.ok) {
           text = await res.text();
-          if (text && text.includes('steamID64')) break;
+          if (text && text.includes('game')) break;
         }
       } catch { continue; }
     }
@@ -322,36 +322,50 @@ async function loadSteamProfile() {
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, 'text/xml');
 
-    const steamID = xml.querySelector('steamID')?.textContent || '扶摇接海';
-    const avatarFull = xml.querySelector('avatarFull')?.textContent || 'https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg';
-    const onlineState = xml.querySelector('onlineState')?.textContent || 'offline';
-    const stateMessage = xml.querySelector('stateMessage')?.textContent || '';
-    const customURL = xml.querySelector('customURL')?.textContent || '';
-    const location = xml.querySelector('location')?.textContent || '';
-    const realName = xml.querySelector('realname')?.textContent || '';
+    // 解析游戏列表
+    const games = [];
+    xml.querySelectorAll('game').forEach(g => {
+      const name = g.querySelector('name')?.textContent || '';
+      const logo = g.querySelector('logo')?.textContent || '';
+      const hours = parseFloat(g.querySelector('hoursOnRecord')?.textContent || 0);
+      const lastPlayed = g.querySelector('lastPlayed')?.textContent || '';
+      if (name && hours > 0) {
+        games.push({ name, logo, hours, lastPlayed });
+      }
+    });
 
-    const isOnline = onlineState === 'online';
-    const statusText = isOnline ? (stateMessage || '在线') : '离线';
-    const profileUrl = customURL
-      ? `https://steamcommunity.com/id/${customURL}/`
-      : `https://steamcommunity.com/profiles/${STEAM_ID64}/`;
+    // 按游玩时间排序，取前5个
+    games.sort((a, b) => b.hours - a.hours);
+    const topGames = games.slice(0, 5);
+
+    const profileUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/`;
+
+    let gamesHtml = '';
+    if (topGames.length > 0) {
+      gamesHtml = `
+        <div class="steam-games">
+          <div class="steam-games-title">常玩的游戏</div>
+          ${topGames.map(g => `
+            <div class="steam-game">
+              <img class="steam-game-icon" src="${escapeHtml(g.logo)}" alt="" width="24" height="24">
+              <span class="steam-game-name">${escapeHtml(g.name)}</span>
+              <span class="steam-game-hours">${g.hours.toFixed(1)}h</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
 
     container.innerHTML = `
-      <div class="steam-header">
-        <img class="steam-avatar" src="${escapeHtml(avatarFull)}" alt="Steam avatar" width="56" height="56">
-        <div class="steam-id">
-          <strong>${escapeHtml(steamID)}</strong>
-            <span class="steam-status ${isOnline ? 'online' : 'offline'}">
-              ${isOnline ? '● 在线' : '○ 离线'}
-            </span>
-        </div>
-      </div>
-      ${realName ? `<div class="steam-detail"><span class="steam-label">真实姓名</span><span>${escapeHtml(realName)}</span></div>` : ''}
-      ${location ? `<div class="steam-detail"><span class="steam-label">所在地</span><span>${escapeHtml(location)}</span></div>` : ''}
+      ${gamesHtml}
       <a class="steam-link" href="${escapeHtml(profileUrl)}" target="_blank" rel="noreferrer">查看完整资料 →</a>
     `;
   } catch {
-    // 失败时保持原有静态内容
+    // 失败时显示简化版
+    const profileUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/`;
+    container.innerHTML = `
+      <a class="steam-link" href="${escapeHtml(profileUrl)}" target="_blank" rel="noreferrer">查看 Steam 资料 →</a>
+    `;
   }
 }
 
