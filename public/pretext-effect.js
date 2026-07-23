@@ -5,6 +5,7 @@ const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开
 const FONT = '16px "Inter", "Noto Sans SC", system-ui, sans-serif';
 const LINE_HEIGHT = 26;
 const MIN_SLOT_WIDTH = 60;
+const ORB_BORDER = 2; // CSS border width for .pretext-orb
 
 const container = document.getElementById('pretext-output');
 let W, H, prepared, orbs = [];
@@ -62,8 +63,9 @@ function renderText() {
         const blocked = [];
         for (const orb of orbs) {
             const dy = lineCY - orb.y;
-            if (Math.abs(dy) < orb.r) {
-                const half = Math.sqrt(Math.max(0, orb.r * orb.r - dy * dy));
+            const effectiveR = orb.r + ORB_BORDER; // 加上边框宽度
+            if (Math.abs(dy) < effectiveR) {
+                const half = Math.sqrt(Math.max(0, effectiveR * effectiveR - dy * dy));
                 blocked.push({ left: orb.x - half, right: orb.x + half });
             }
         }
