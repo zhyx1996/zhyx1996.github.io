@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run build:pretext",
     "build:pretext": "esbuild public/pretext-effect.js --bundle --outfile=public/pretext-bundle.js",
-    "check": "node --check app.js && node --check scripts/maintenance.js",
+    "check": "node --check app.js && node --check public/pretext-effect.js && node --check scripts/maintenance.js",
     "maintain": "node scripts/maintenance.js",
     "maintain:report": "node scripts/maintenance.js --report",
     "maintain:fix": "node scripts/maintenance.js --fix"
