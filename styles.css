@@ -410,6 +410,40 @@ a:hover { opacity: 0.8; }
     gap: 16px;
 }
 
+.repo-profile-card {
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    background: var(--bg-inset);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.repo-profile-card h3 {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.repo-profile-card h3 a { color: var(--accent); }
+.repo-profile-card h3 a:hover { text-decoration: underline; opacity: 1; }
+
+.repo-profile-card p {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+    min-width: 200px;
+}
+
+.repo-profile-card .repo-meta {
+    margin: 0;
+}
+
 .repo-card {
     padding: 20px;
     border: 1px solid var(--border-light);
