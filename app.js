@@ -297,27 +297,15 @@ async function loadSteamProfile() {
   if (!container) return;
 
   const STEAM_ID64 = '76561198391062314';
-  const gamesUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/games/?xml=1`;
+  const profileUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/`;
 
+  // 先尝试获取完整资料（头像+游戏）
   try {
-    // 尝试多个 CORS 代理获取游戏列表
-    const proxies = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(gamesUrl)}`,
-      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(gamesUrl)}`,
-    ];
-
-    let text = null;
-    for (const proxyUrl of proxies) {
-      try {
-        const res = await fetchWithTimeout(proxyUrl, 10000);
-        if (res.ok) {
-          text = await res.text();
-          if (text && text.includes('game')) break;
-        }
-      } catch { continue; }
-    }
-
-    if (!text) throw new Error('Steam API error');
+    const gamesUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/games/?xml=1`;
+    const res = await fetchWithTimeout(`https://api.allorigins.win/raw?url=${encodeURIComponent(gamesUrl)}`, 10000);
+    if (!res.ok) throw new Error('Steam API error');
+    const text = await res.text();
+    if (!text || !text.includes('game')) throw new Error('Empty response');
 
     const parser = new DOMParser();
     const xml = parser.parseFromString(text, 'text/xml');
@@ -328,17 +316,11 @@ async function loadSteamProfile() {
       const name = g.querySelector('name')?.textContent || '';
       const logo = g.querySelector('logo')?.textContent || '';
       const hours = parseFloat(g.querySelector('hoursOnRecord')?.textContent || 0);
-      const lastPlayed = g.querySelector('lastPlayed')?.textContent || '';
-      if (name && hours > 0) {
-        games.push({ name, logo, hours, lastPlayed });
-      }
+      if (name && hours > 0) games.push({ name, logo, hours });
     });
 
-    // 按游玩时间排序，取前5个
     games.sort((a, b) => b.hours - a.hours);
     const topGames = games.slice(0, 5);
-
-    const profileUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/`;
 
     let gamesHtml = '';
     if (topGames.length > 0) {
@@ -358,13 +340,19 @@ async function loadSteamProfile() {
 
     container.innerHTML = `
       ${gamesHtml}
-      <a class="steam-link" href="${escapeHtml(profileUrl)}" target="_blank" rel="noreferrer">查看完整资料 →</a>
+      <a class="steam-link" href="${profileUrl}" target="_blank" rel="noreferrer">查看完整资料 →</a>
     `;
   } catch {
-    // 失败时显示简化版
-    const profileUrl = `https://steamcommunity.com/profiles/${STEAM_ID64}/`;
+    // 失败时显示带头像的简化版
     container.innerHTML = `
-      <a class="steam-link" href="${escapeHtml(profileUrl)}" target="_blank" rel="noreferrer">查看 Steam 资料 →</a>
+      <div class="steam-header">
+        <img class="steam-avatar" src="https://avatars.fastly.steamstatic.com/3669d88e971f3ff0da8b146fc370f67b6d0be705_full.jpg" alt="Steam avatar" width="56" height="56">
+        <div class="steam-id">
+          <strong>扶摇接海</strong>
+          <span class="steam-status offline">○ 离线</span>
+        </div>
+      </div>
+      <a class="steam-link" href="${profileUrl}" target="_blank" rel="noreferrer">查看完整资料 →</a>
     `;
   }
 }
