@@ -1,6 +1,6 @@
 import { prepareWithSegments, layoutNextLineRange, materializeLineRange } from './layout.js';
 
-const TEXT = `聚焦计算机视觉、自动驾驶感知、并行计算与公开写作。公开仓库 15 个，长期维护车道检测、点云处理与多路视频编解码相关工具。车道线与感知实验：持续整理传统视觉流程、深度学习方案与场景感知实验，对比 Canny/Hough、CLANE、Transformer 序列生成等不同路线的精度与速度。并行计算围绕 CUDA、OpenMP 和图像/点云处理热点流程做性能优化，覆盖体素下采样、近邻搜索与边界估计的加速。记录 GStreamer 推流与 SEI 注入、CARLA 坐标系转换、Jetson 部署、多路视频编解码等实战经验，并把踩坑过程整理成可复现的工程笔记。也会写一些关于开发环境、构建打包与性能剖析的短文，希望这些零散的实践对路过的同行有一点帮助。平时还会整理阅读过的论文笔记，尤其是 BEV 感知、Occupancy 估计与端到端自动驾驶方向，力求把复杂的公式讲清楚。如果你也在做类似的事情，欢迎在仓库里提 issue 或者开 PR，一起把轮子造得更圆一点。关于工程习惯，我偏爱可复现的环境：容器化构建、锁定依赖版本、把每一步都写进脚本而不是记在脑子里。性能优化通常不是玄学，先用 profiler 找到热点，再决定该不该上 SIMD、该不该搬进 GPU。写代码之外，我也喜欢把实验数据画成图，一张好图往往比一页文字更能说明问题。如果某天你看到这里还有空位，那说明小球又把文字挤到别处去了，这也挺有意思。`;
+const TEXT = `公开仓库 15 个，主要围绕计算机视觉、自动驾驶感知、并行计算与公开写作。lane2seq 做实时车道检测，结合 Canny/Hough 变换、CLAHE、HLS 等传统流程与 Lane2Seq-ViT 序列生成模型，并用 ENet 分割在 TuSimple 和 LLAMAS 数据集上训练与验证。pcl 仓库给 PCL 的 BoundaryEstimation 加了 OMP 并行加速，提升点云边界估计速度。GStreamer 仓库整理 RTSP 推流、自定义 SEI 注入、Carla 多相机管理与 pyinstaller 打包 exe 的完整踩坑记录。auto_calib_v2 在 PJLab-ADG/SensorsCalibration 的 lidar2camera 方案上做改进，方便自动驾驶多传感器联合标定。achievements 是一个 GitHub 成就徽章追踪小工具。stars 仓库收集我在 GitHub 上关注过的有意思项目。Jupyter 笔记记录车道检测实验的迭代过程。近期也在看 BEV 感知、Occupancy 估计与端到端自动驾驶方向，把论文笔记和实验数据整理进博客。文章方面会写 Windows 下 Python 加 GStreamer 推 RTSP 并注入 SEI、123 云盘本地通信被防火墙拦截、JPEG 解码触发段错误、CARLA 坐标系转换、Jetson 部署与多路视频编解码等实战笔记，尽量把环境安装、命令参数与报错信息都写成可复现的文档。除了项目本身，我也在意把过程写清楚：从问题背景、环境版本、关键命令到最终验证，尽量让看到的人能直接复现，少踩一些我踩过的坑。`;
 
 const FONT = '16px "Inter", "Noto Sans SC", system-ui, sans-serif';
 const LINE_HEIGHT = 26;
