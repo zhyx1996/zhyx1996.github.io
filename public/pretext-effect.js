@@ -66,48 +66,54 @@ function renderText() {
     const colEnd = W - padding;
     const colWidth = colEnd - colStart;
     
-    let cursor = { segmentIndex: 0, graphemeIndex: 0 };
+    let graphemeIndex = 0;
     
-    for (let y = LINE_HEIGHT * 1.5; y < H - 20 && cursor.segmentIndex < prepared.segments.length; y += LINE_HEIGHT) {
-        const bandTop = y;
-        const bandBottom = y + LINE_HEIGHT;
+    for (let y = LINE_HEIGHT * 1.5; y < H - 20 && graphemeIndex < graphemes.length; y += LINE_HEIGHT) {
+        let x = colStart;
+        let lineText = '';
         
-        // Calculate blocked regions for this line (circle-rectangle intersection)
-        const blocked = [];
-        for (const orb of orbs) {
-            // Find the minimum distance from orb center to the band
-            const minDy = orb.y >= bandTop && orb.y <= bandBottom ? 0 
-                : orb.y < bandTop ? bandTop - orb.y 
-                : orb.y - bandBottom;
-            if (minDy >= orb.r) continue;
-            const maxDx = Math.sqrt(Math.max(0, orb.r * orb.r - minDy * minDy));
-            blocked.push({ left: orb.x - maxDx, right: orb.x + maxDx });
+        while (x < colEnd && graphemeIndex < graphemes.length) {
+            const gw = graphemeWidths[graphemeIndex];
+            const charLeft = x;
+            const charRight = x + gw;
+            const charTop = y;
+            const charBottom = y + LINE_HEIGHT;
+            
+            // Check if this character collides with any orb
+            let collides = false;
+            for (const orb of orbs) {
+                const closestX = Math.max(charLeft, Math.min(orb.x, charRight));
+                const closestY = Math.max(charTop, Math.min(orb.y, charBottom));
+                const dx = orb.x - closestX;
+                const dy = orb.y - closestY;
+                if (dx * dx + dy * dy < orb.r * orb.r) {
+                    collides = true;
+                    break;
+                }
+            }
+            
+            if (collides) {
+                // Skip this position (leave empty space for the orb)
+                x += gw;
+            } else if (charRight > colEnd) {
+                // Character doesn't fit in the remaining space, move to next line
+                break;
+            } else {
+                // Place the character
+                lineText += graphemes[graphemeIndex];
+                x += gw;
+                graphemeIndex++;
+            }
         }
         
-        // Carve slots from available space
-        const slots = carveSlots(colStart, colEnd, blocked);
-        if (slots.length === 0) continue;
-        
-        // Sort slots by left position (left to right)
-        slots.sort((a, b) => a.left - b.left);
-        
-        // Fill each slot with text
-        for (const slot of slots) {
-            if (cursor.segmentIndex >= prepared.segments.length) break;
-            const slotWidth = slot.right - slot.left;
-            if (slotWidth < 20) continue;
-            
-            const line = layoutNextLine(prepared, cursor, slotWidth);
-            if (!line || !line.text.trim()) break;
-            
+        if (lineText) {
             const el = document.createElement('div');
             el.className = 'pretext-line';
-            el.style.left = slot.left + 'px';
+            el.style.left = colStart + 'px';
             el.style.top = y + 'px';
-            el.style.width = slotWidth + 'px';
-            el.textContent = line.text;
+            el.style.width = colWidth + 'px';
+            el.textContent = lineText;
             container.appendChild(el);
-            cursor = line.end;
         }
     }
 }
