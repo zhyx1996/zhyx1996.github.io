@@ -480,6 +480,16 @@ document.addEventListener('DOMContentLoaded', () => {
   renderArticles();
   initScrollAnimations();
   initBackToTop();
+
+  // 市场快照刷新按钮
+  const marketRefreshBtn = document.getElementById('market-refresh');
+  if (marketRefreshBtn) {
+    marketRefreshBtn.addEventListener('click', () => {
+      marketRefreshBtn.classList.add('spinning');
+      setTimeout(() => marketRefreshBtn.classList.remove('spinning'), 600);
+      loadMarket();
+    });
+  }
   // Sakana widget 加载完成后初始化拖拽
   const checkSakana = setInterval(() => {
     const widget = document.getElementById('sakana-drag-widget');
