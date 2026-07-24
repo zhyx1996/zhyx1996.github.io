@@ -30,6 +30,21 @@ const articleFallback = [
   }
 ];
 
+function renderLatestArticle() {
+  const container = document.getElementById('latest-article');
+  if (!container || articleFallback.length === 0) return;
+  const article = articleFallback[0];
+  container.innerHTML = `
+    <article class="article-card" style="padding:20px 0;border-bottom:none;">
+      <div class="article-meta">
+        <span class="article-date">${escapeHtml(article.date)}</span>
+      </div>
+      <h3><a href="${escapeHtml(article.url)}" target="_blank" rel="noreferrer">${escapeHtml(article.title)}</a></h3>
+      <p>${escapeHtml(article.summary)}</p>
+    </article>
+  `;
+}
+
 function renderArticles() {
   const container = document.querySelector('.article-list');
   if (!container) return;
@@ -478,6 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadMarket();
   loadSteamProfile();
   renderArticles();
+  renderLatestArticle();
   initScrollAnimations();
   initBackToTop();
 
