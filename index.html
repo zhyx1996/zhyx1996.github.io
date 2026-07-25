@@ -132,7 +132,7 @@
     <script src="/app.js?v=3"></script>
     <script>
       function initSakanaWidget() {
-        new SakanaWidget({ size: 120, character: 'chisato' }).mount('#sakana-drag-widget');
+        window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
       }
     </script>
     <script async onload="initSakanaWidget()" src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>

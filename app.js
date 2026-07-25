@@ -248,9 +248,13 @@ function initSakanaDrag() {
     return { x: e.clientX, y: e.clientY };
   };
 
-  const applyTilt = () => {
-    const angle = Math.max(-18, Math.min(18, vx * 0.8));
-    widget.style.transform = `rotate(${angle}deg)`;
+  const applyCharSwing = () => {
+    if (!window.sakanaInstance) return;
+    window.sakanaInstance._running = false;
+    const angle = Math.max(-50, Math.min(50, vx * 2));
+    window.sakanaInstance._state.r = angle;
+    window.sakanaInstance._state.y = vy * 0.5;
+    window.sakanaInstance._draw();
   };
 
   const initPosition = () => {
@@ -297,7 +301,7 @@ function initSakanaDrag() {
     newTop = Math.max(-widgetH * 0.5, Math.min(viewportH - widgetH * 0.5, newTop));
 
     setPos(newLeft, newTop);
-    applyTilt();
+    applyCharSwing();
 
     vxHistory.push(dx);
     vyHistory.push(dy);
@@ -369,10 +373,14 @@ function initSakanaDrag() {
       }
 
       setPos(nextLeft, nextTop);
-      applyTilt();
+      applyCharSwing();
 
       if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) {
-        widget.style.transform = 'none';
+        if (window.sakanaInstance) {
+          window.sakanaInstance._state.r = 0;
+          window.sakanaInstance._state.y = 0;
+          window.sakanaInstance._draw();
+        }
         animId = null;
         return;
       }
