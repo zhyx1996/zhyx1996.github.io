@@ -248,12 +248,12 @@ function initSakanaDrag() {
     return { x: e.clientX, y: e.clientY };
   };
 
-  // 拖拽时：直接控制人偶倾斜角度
+  // 拖拽时：根据速度倾斜人偶（幅度与释放时一致）
   const applyCharLean = () => {
     const sakana = window.sakanaInstance;
     if (!sakana) return;
     sakana._running = false;
-    sakana._state.r = Math.max(-50, Math.min(50, vx * 1.5));
+    sakana._state.r = Math.max(-30, Math.min(30, vx * 0.5));
     sakana._draw();
   };
 
@@ -339,12 +339,15 @@ function initSakanaDrag() {
     vx = Math.max(-maxV, Math.min(maxV, vx));
     vy = Math.max(-maxV, Math.min(maxV, vy));
 
-    // 释放时把速度传给 SakanaWidget 物理引擎，让人偶自然振荡
+    // 释放时：根据拖动速度设置初始角度，w=0 让弹簧自然回弹
+    // 原版 SakanaWidget 也是纯位移驱动，不额外设置角速度
     const sakana = window.sakanaInstance;
     if (sakana) {
       sakana._lastRunUnix = Date.now();
-      sakana._state.w = vx * 0.8;
-      sakana._state.t = vy * 0.4;
+      sakana._state.r = Math.max(-30, Math.min(30, vx * 0.5));
+      sakana._state.y = Math.max(-15, Math.min(15, vy * 0.3));
+      sakana._state.w = 0;
+      sakana._state.t = 0;
       sakana._running = true;
       sakana._run();
     }
