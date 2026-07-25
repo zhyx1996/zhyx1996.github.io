@@ -573,13 +573,16 @@ a:hover { opacity: 0.8; }
 .article-card {
     padding: 24px 0;
     border-bottom: 1px solid var(--border-light);
-    transition: padding-left 0.2s ease;
+    border-left: 2px solid transparent;
+    padding-left: 12px;
+    margin-left: -12px;
+    transition: border-color 0.2s ease;
 }
 
 .article-card:last-child { border-bottom: none; }
 
 .article-card:hover {
-    padding-left: 8px;
+    border-left-color: var(--accent);
 }
 
 .article-meta {
