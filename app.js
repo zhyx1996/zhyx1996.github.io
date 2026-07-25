@@ -227,22 +227,37 @@ function initSakanaDrag() {
   let vx = 0, vy = 0;
   let lastX, lastY, lastTime;
   let animId = null;
-  // 用于记录最近几帧的速度，做加权平均
   let vxHistory = [];
   let vyHistory = [];
+  // 用 transform 定位，(0,0) 对应 CSS right/bottom 的自然位置
+  let posX = 0, posY = 0;
+  let initialized = false;
+
+  const setPos = (x, y) => {
+    posX = x;
+    posY = y;
+    widget.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  };
+
+  const initPosition = () => {
+    if (initialized) return;
+    // 测量当前位置，计算从 translate(0,0) 到当前位置的偏移
+    const rect = widget.getBoundingClientRect();
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    // translate(0,0) 时的位置 = viewport - size - 20px margin
+    const baseX = viewportW - rect.width - 20;
+    const baseY = viewportH - rect.height - 20;
+    posX = rect.left - baseX;
+    posY = rect.top - baseY;
+    initialized = true;
+  };
 
   const onPointerDown = (e) => {
     if (e.target.closest('.sakana-widget-ctrl')) return;
     isDragging = true;
     widget.classList.add('dragging');
-    // 首次点击时根据当前位置初始化 left/top
-    if (!widget.style.left || !widget.style.top) {
-      const rect = widget.getBoundingClientRect();
-      widget.style.left = rect.left + 'px';
-      widget.style.top = rect.top + 'px';
-      widget.style.right = 'auto';
-      widget.style.bottom = 'auto';
-    }
+    initPosition();
     lastX = e.clientX;
     lastY = e.clientY;
     lastTime = Date.now();
@@ -257,46 +272,37 @@ function initSakanaDrag() {
   const onPointerMove = (e) => {
     if (!isDragging) return;
     const now = Date.now();
-    const dt = Math.max(1, now - lastTime);
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
+
+    // 直接用 translate 偏移量累加，无需转换
+    let newX = posX + dx;
+    let newY = posY + dy;
+
+    // 边界限制（基于当前 render 位置）
     const rect = widget.getBoundingClientRect();
     const viewportW = window.innerWidth;
     const viewportH = window.innerHeight;
-    const widgetW = rect.width;
-    const widgetH = rect.height;
+    const currentLeft = rect.left;
+    const currentTop = rect.top;
 
-    let newLeft = rect.left + dx;
-    let newTop = rect.top + dy;
+    if (currentLeft + dx < -rect.width * 0.5) newX = posX;
+    if (currentLeft + dx > viewportW - rect.width * 0.5) newX = posX;
+    if (currentTop + dy < -rect.height * 0.5) newY = posY;
+    if (currentTop + dy > viewportH - rect.height * 0.5) newY = posY;
 
-    // 限制拖拽范围（允许拖出半个身位）
-    newLeft = Math.max(-widgetW * 0.5, Math.min(viewportW - widgetW * 0.5, newLeft));
-    newTop = Math.max(-widgetH * 0.5, Math.min(viewportH - widgetH * 0.5, newTop));
+    setPos(newX, newY);
 
-    widget.style.left = newLeft + 'px';
-    widget.style.top = newTop + 'px';
-    widget.style.right = 'auto';
-    widget.style.bottom = 'auto';
-
-    // 计算瞬时速度（像素/帧）
-    const instVx = dx;
-    const instVy = dy;
-    vxHistory.push(instVx);
-    vyHistory.push(instVy);
+    vxHistory.push(dx);
+    vyHistory.push(dy);
     if (vxHistory.length > 5) vxHistory.shift();
     if (vyHistory.length > 5) vyHistory.shift();
 
-    vx = instVx;
-    vy = instVy;
+    vx = dx;
+    vy = dy;
     lastX = e.clientX;
     lastY = e.clientY;
     lastTime = now;
-  };
-
-  // 鼠标离开窗口时保持最后的速度
-  const onPointerLeave = () => {
-    if (!isDragging) return;
-    // 不立即释放，让速度保持，这样拖出边界后还会反弹
   };
 
   const onPointerUp = (e) => {
@@ -304,7 +310,6 @@ function initSakanaDrag() {
     isDragging = false;
     widget.classList.remove('dragging');
 
-    // 使用加权平均速度（最近帧权重更高）
     if (vxHistory.length > 0) {
       let totalWeight = 0;
       let weightedVx = 0;
@@ -319,7 +324,6 @@ function initSakanaDrag() {
       vy = weightedVy / totalWeight;
     }
 
-    // 限制最大速度
     const maxV = 25;
     vx = Math.max(-maxV, Math.min(maxV, vx));
     vy = Math.max(-maxV, Math.min(maxV, vy));
@@ -331,51 +335,42 @@ function initSakanaDrag() {
     if (animId) cancelAnimationFrame(animId);
     const viewportW = window.innerWidth;
     const viewportH = window.innerHeight;
+    const widgetW = widget.offsetWidth;
+    const widgetH = widget.offsetHeight;
 
     const bounce = () => {
-      const widgetW = widget.offsetWidth;
-      const widgetH = widget.offsetHeight;
-      let left = parseFloat(widget.style.left || 0);
-      let top = parseFloat(widget.style.top || 0);
-
-      // 摩擦
       vx *= 0.96;
       vy *= 0.96;
 
-      left += vx;
-      top += vy;
+      // 获取当前 render 位置
+      const rect = widget.getBoundingClientRect();
+      let currentLeft = rect.left;
+      let currentTop = rect.top;
+      let nextLeft = currentLeft + vx;
+      let nextTop = currentTop + vy;
 
-      let bounced = false;
-
-      // 左边界
-      if (left <= 0) {
-        left = 0;
+      if (nextLeft <= 0) {
+        nextLeft = 0;
         vx = Math.abs(vx) * 0.75;
-        bounced = true;
       }
-      // 右边界
-      if (left >= viewportW - widgetW) {
-        left = viewportW - widgetW;
+      if (nextLeft >= viewportW - widgetW) {
+        nextLeft = viewportW - widgetW;
         vx = -Math.abs(vx) * 0.75;
-        bounced = true;
       }
-      // 上边界
-      if (top <= 0) {
-        top = 0;
+      if (nextTop <= 0) {
+        nextTop = 0;
         vy = Math.abs(vy) * 0.75;
-        bounced = true;
       }
-      // 下边界
-      if (top >= viewportH - widgetH) {
-        top = viewportH - widgetH;
+      if (nextTop >= viewportH - widgetH) {
+        nextTop = viewportH - widgetH;
         vy = -Math.abs(vy) * 0.75;
-        bounced = true;
       }
 
-      widget.style.left = left + 'px';
-      widget.style.top = top + 'px';
+      // 转回 translate: translate = 目标位置 - 基准位置
+      const baseX = viewportW - widgetW - 20;
+      const baseY = viewportH - widgetH - 20;
+      setPos(nextLeft - baseX, nextTop - baseY);
 
-      // 如果速度太小就停止
       if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) {
         animId = null;
         return;
@@ -392,7 +387,6 @@ function initSakanaDrag() {
   document.addEventListener('touchmove', onPointerMove, { passive: false });
   document.addEventListener('mouseup', onPointerUp);
   document.addEventListener('touchend', onPointerUp);
-  document.addEventListener('mouseleave', onPointerLeave);
 }
 
 // ── Steam 资料（解析个人主页 HTML）──

@@ -1058,6 +1058,7 @@ a:hover { opacity: 0.8; }
     background: transparent;
     border: none;
     box-shadow: none;
+    will-change: transform;
 }
 
 #sakana-drag-widget:active,
