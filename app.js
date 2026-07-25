@@ -34,11 +34,11 @@ function renderLatestArticle() {
   const container = document.getElementById('latest-article');
   if (!container || articleFallback.length === 0) return;
   const latest = articleFallback.slice(0, 3);
-  container.innerHTML = latest.map((article, idx) => {
+  container.innerHTML = latest.map((article) => {
     const url = article.url || article.link;
     const date = article.date || fmtDate(article.published_at);
     return `
-    <article class="article-card" style="padding:20px 0;${idx === latest.length - 1 ? 'border-bottom:none' : ''}">
+    <article class="article-card">
       <div class="article-meta">
         <span class="article-date">${escapeHtml(date)}</span>
       </div>
