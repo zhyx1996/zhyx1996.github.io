@@ -877,6 +877,7 @@ a:hover { opacity: 0.8; }
     height: 200px;
     color: var(--text-muted);
     font-size: 14px;
+    animation: market-pulse 1.5s ease-in-out infinite;
 }
 .steam-empty {
     display: flex;
