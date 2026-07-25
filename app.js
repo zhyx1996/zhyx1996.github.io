@@ -229,27 +229,24 @@ function initSakanaDrag() {
   let animId = null;
   let vxHistory = [];
   let vyHistory = [];
-  // 用 transform 定位，(0,0) 对应 CSS right/bottom 的自然位置
-  let posX = 0, posY = 0;
+  // 用 left/top 定位
+  let leftPos = 0, topPos = 0;
   let initialized = false;
 
-  const setPos = (x, y) => {
-    posX = x;
-    posY = y;
-    widget.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  const setPos = (l, t) => {
+    leftPos = l;
+    topPos = t;
+    widget.style.left = l + 'px';
+    widget.style.top = t + 'px';
+    widget.style.right = 'auto';
+    widget.style.bottom = 'auto';
   };
 
   const initPosition = () => {
     if (initialized) return;
-    // 测量当前位置，计算从 translate(0,0) 到当前位置的偏移
     const rect = widget.getBoundingClientRect();
-    const viewportW = window.innerWidth;
-    const viewportH = window.innerHeight;
-    // translate(0,0) 时的位置 = viewport - size - 20px margin
-    const baseX = viewportW - rect.width - 20;
-    const baseY = viewportH - rect.height - 20;
-    posX = rect.left - baseX;
-    posY = rect.top - baseY;
+    leftPos = rect.left;
+    topPos = rect.top;
     initialized = true;
   };
 
@@ -275,23 +272,18 @@ function initSakanaDrag() {
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
 
-    // 直接用 translate 偏移量累加，无需转换
-    let newX = posX + dx;
-    let newY = posY + dy;
+    let newLeft = leftPos + dx;
+    let newTop = topPos + dy;
 
-    // 边界限制（基于当前 render 位置）
-    const rect = widget.getBoundingClientRect();
+    // 边界限制
+    const widgetW = widget.offsetWidth;
+    const widgetH = widget.offsetHeight;
     const viewportW = window.innerWidth;
     const viewportH = window.innerHeight;
-    const currentLeft = rect.left;
-    const currentTop = rect.top;
+    newLeft = Math.max(-widgetW * 0.5, Math.min(viewportW - widgetW * 0.5, newLeft));
+    newTop = Math.max(-widgetH * 0.5, Math.min(viewportH - widgetH * 0.5, newTop));
 
-    if (currentLeft + dx < -rect.width * 0.5) newX = posX;
-    if (currentLeft + dx > viewportW - rect.width * 0.5) newX = posX;
-    if (currentTop + dy < -rect.height * 0.5) newY = posY;
-    if (currentTop + dy > viewportH - rect.height * 0.5) newY = posY;
-
-    setPos(newX, newY);
+    setPos(newLeft, newTop);
 
     vxHistory.push(dx);
     vyHistory.push(dy);
@@ -305,7 +297,7 @@ function initSakanaDrag() {
     lastTime = now;
   };
 
-  const onPointerUp = (e) => {
+  const onPointerUp = () => {
     if (!isDragging) return;
     isDragging = false;
     widget.classList.remove('dragging');
@@ -342,12 +334,8 @@ function initSakanaDrag() {
       vx *= 0.96;
       vy *= 0.96;
 
-      // 获取当前 render 位置
-      const rect = widget.getBoundingClientRect();
-      let currentLeft = rect.left;
-      let currentTop = rect.top;
-      let nextLeft = currentLeft + vx;
-      let nextTop = currentTop + vy;
+      let nextLeft = leftPos + vx;
+      let nextTop = topPos + vy;
 
       if (nextLeft <= 0) {
         nextLeft = 0;
@@ -366,10 +354,7 @@ function initSakanaDrag() {
         vy = -Math.abs(vy) * 0.75;
       }
 
-      // 转回 translate: translate = 目标位置 - 基准位置
-      const baseX = viewportW - widgetW - 20;
-      const baseY = viewportH - widgetH - 20;
-      setPos(nextLeft - baseX, nextTop - baseY);
+      setPos(nextLeft, nextTop);
 
       if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) {
         animId = null;
