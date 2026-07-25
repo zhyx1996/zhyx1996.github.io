@@ -246,8 +246,9 @@ a:hover { opacity: 0.8; }
 }
 
 .hero-ai-note {
-    display: block;
+    display: table;
     margin-top: 28px;
+    margin-left: auto;
     font-size: 11px;
     color: var(--text-muted);
     font-family: var(--font-mono);
@@ -256,8 +257,7 @@ a:hover { opacity: 0.8; }
     border: 1px dashed var(--border);
     border-radius: 3px;
     letter-spacing: 0.03em;
-    width: fit-content;
-    margin-left: auto;
+    white-space: nowrap;
 }
 .hero-ai-note a {
     color: var(--text-muted);
