@@ -256,7 +256,17 @@ a:hover { opacity: 0.8; }
     border: 1px dashed var(--border);
     border-radius: 3px;
     letter-spacing: 0.03em;
-    text-align: right;
+    width: fit-content;
+    margin-left: auto;
+}
+.hero-ai-note a {
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.hero-ai-note a:hover {
+    color: var(--accent);
+    opacity: 1;
 }
 
 @media (max-width: 800px) {
