@@ -744,6 +744,15 @@ a:hover { opacity: 0.8; }
     50% { opacity: 0.5; }
 }
 
+/* 数据卡片载入动画 */
+.market-card:not(.market-loading) {
+    animation: marketCardIn 0.3s ease both;
+}
+@keyframes marketCardIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* 市场快照更新时间 */
 .market-updated {
     margin-top: 12px;
