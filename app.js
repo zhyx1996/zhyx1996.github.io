@@ -257,7 +257,7 @@ function initSakanaDrag() {
     const sakana = window.sakanaInstance;
     if (!sakana) return;
     sakana._running = false;
-    const targetR = Math.max(-20, Math.min(20, vx * 0.4));
+    const targetR = Math.max(-25, Math.min(25, vx * 0.4));
     currentR += (targetR - currentR) * 0.3;
     sakana._state.r = currentR;
     sakana._draw();
@@ -354,7 +354,7 @@ function initSakanaDrag() {
     const sakana = window.sakanaInstance;
     if (sakana) {
       sakana._lastRunUnix = Date.now();
-      sakana._state.r = Math.max(-30, Math.min(30, vx * 0.5));
+      sakana._state.r = Math.max(-25, Math.min(25, vx * 0.5));
       sakana._state.y = Math.max(-15, Math.min(15, vy * 0.3));
       sakana._state.w = 0;
       sakana._state.t = 0;
