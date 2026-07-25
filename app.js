@@ -248,12 +248,15 @@ function initSakanaDrag() {
     return { x: e.clientX, y: e.clientY };
   };
 
-  // 拖拽时：根据速度倾斜人偶（幅度与释放时一致）
+  // 拖拽时：根据速度倾斜人偶，平滑过渡防鬼畜
+  let currentR = 0;
   const applyCharLean = () => {
     const sakana = window.sakanaInstance;
     if (!sakana) return;
     sakana._running = false;
-    sakana._state.r = Math.max(-30, Math.min(30, vx * 0.5));
+    const targetR = Math.max(-20, Math.min(20, vx * 0.4));
+    currentR += (targetR - currentR) * 0.3;
+    sakana._state.r = currentR;
     sakana._draw();
   };
 
@@ -271,7 +274,11 @@ function initSakanaDrag() {
     isDragging = true;
     widget.classList.add('dragging');
     initPosition();
-    if (window.sakanaInstance) window.sakanaInstance._running = false;
+    const sakana = window.sakanaInstance;
+    if (sakana) {
+      sakana._running = false;
+      currentR = sakana._state.r;
+    }
     lastX = xy.x;
     lastY = xy.y;
     lastTime = Date.now();
@@ -389,11 +396,13 @@ function initSakanaDrag() {
       setPos(nextLeft, nextTop);
 
       if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) {
-        if (window.sakanaInstance) {
-          window.sakanaInstance._state.r = 0;
-          window.sakanaInstance._state.y = 0;
-          window.sakanaInstance._draw();
+        const sakana = window.sakanaInstance;
+        if (sakana) {
+          sakana._state.r = 0;
+          sakana._state.y = 0;
+          sakana._draw();
         }
+        currentR = 0;
         animId = null;
         return;
       }
