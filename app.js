@@ -146,7 +146,14 @@ function renderMarket(rates, btcPrice, goldPrice) {
   if (existingUpdated) existingUpdated.remove();
 
   if (parts.length === 0) {
-    container.innerHTML = '<div class="market-card" style="grid-column:1/-1;text-align:center;"><div class="label">数据暂不可用</div><div class="value" style="font-size:13px;">请稍后刷新页面重试</div></div>';
+    container.innerHTML = '<div class="market-card" style="grid-column:1/-1;text-align:center;"><div class="label">数据暂不可用</div><div class="value" style="font-size:13px;"><a href="#" id="market-retry" style="color:var(--accent);font-weight:500;">点击重试 ↻</a></div></div>';
+    const retryLink = document.getElementById('market-retry');
+    if (retryLink) {
+      retryLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loadMarket();
+      });
+    }
   } else {
     container.innerHTML = renderMarketFacts(parts);
   }
