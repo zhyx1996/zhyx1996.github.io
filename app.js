@@ -248,6 +248,11 @@ function initSakanaDrag() {
     return { x: e.clientX, y: e.clientY };
   };
 
+  const applyTilt = () => {
+    const angle = Math.max(-18, Math.min(18, vx * 0.8));
+    widget.style.transform = `rotate(${angle}deg)`;
+  };
+
   const initPosition = () => {
     if (initialized) return;
     const rect = widget.getBoundingClientRect();
@@ -292,6 +297,7 @@ function initSakanaDrag() {
     newTop = Math.max(-widgetH * 0.5, Math.min(viewportH - widgetH * 0.5, newTop));
 
     setPos(newLeft, newTop);
+    applyTilt();
 
     vxHistory.push(dx);
     vyHistory.push(dy);
@@ -363,8 +369,10 @@ function initSakanaDrag() {
       }
 
       setPos(nextLeft, nextTop);
+      applyTilt();
 
       if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) {
+        widget.style.transform = 'none';
         animId = null;
         return;
       }
