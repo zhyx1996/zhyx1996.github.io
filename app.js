@@ -242,6 +242,12 @@ function initSakanaDrag() {
     widget.style.bottom = 'auto';
   };
 
+  const getXY = (e) => {
+    if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    if (e.changedTouches && e.changedTouches[0]) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    return { x: e.clientX, y: e.clientY };
+  };
+
   const initPosition = () => {
     if (initialized) return;
     const rect = widget.getBoundingClientRect();
@@ -252,11 +258,12 @@ function initSakanaDrag() {
 
   const onPointerDown = (e) => {
     if (e.target.closest('.sakana-widget-ctrl')) return;
+    const xy = getXY(e);
     isDragging = true;
     widget.classList.add('dragging');
     initPosition();
-    lastX = e.clientX;
-    lastY = e.clientY;
+    lastX = xy.x;
+    lastY = xy.y;
     lastTime = Date.now();
     vx = 0;
     vy = 0;
@@ -268,9 +275,10 @@ function initSakanaDrag() {
 
   const onPointerMove = (e) => {
     if (!isDragging) return;
+    const xy = getXY(e);
     const now = Date.now();
-    const dx = e.clientX - lastX;
-    const dy = e.clientY - lastY;
+    const dx = xy.x - lastX;
+    const dy = xy.y - lastY;
 
     let newLeft = leftPos + dx;
     let newTop = topPos + dy;
@@ -292,8 +300,8 @@ function initSakanaDrag() {
 
     vx = dx;
     vy = dy;
-    lastX = e.clientX;
-    lastY = e.clientY;
+    lastX = xy.x;
+    lastY = xy.y;
     lastTime = now;
   };
 
