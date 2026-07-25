@@ -248,13 +248,13 @@ function initSakanaDrag() {
     return { x: e.clientX, y: e.clientY };
   };
 
-  const applyCharSwing = () => {
-    if (!window.sakanaInstance) return;
-    window.sakanaInstance._running = false;
-    const angle = Math.max(-50, Math.min(50, vx * 2));
-    window.sakanaInstance._state.r = angle;
-    window.sakanaInstance._state.y = vy * 0.5;
-    window.sakanaInstance._draw();
+  // 拖拽时：直接控制人偶倾斜角度
+  const applyCharLean = () => {
+    const sakana = window.sakanaInstance;
+    if (!sakana) return;
+    sakana._running = false;
+    sakana._state.r = Math.max(-50, Math.min(50, vx * 1.5));
+    sakana._draw();
   };
 
   const initPosition = () => {
@@ -271,6 +271,7 @@ function initSakanaDrag() {
     isDragging = true;
     widget.classList.add('dragging');
     initPosition();
+    if (window.sakanaInstance) window.sakanaInstance._running = false;
     lastX = xy.x;
     lastY = xy.y;
     lastTime = Date.now();
@@ -301,7 +302,7 @@ function initSakanaDrag() {
     newTop = Math.max(-widgetH * 0.5, Math.min(viewportH - widgetH * 0.5, newTop));
 
     setPos(newLeft, newTop);
-    applyCharSwing();
+    applyCharLean();
 
     vxHistory.push(dx);
     vyHistory.push(dy);
@@ -338,6 +339,16 @@ function initSakanaDrag() {
     vx = Math.max(-maxV, Math.min(maxV, vx));
     vy = Math.max(-maxV, Math.min(maxV, vy));
 
+    // 释放时把速度传给 SakanaWidget 物理引擎，让人偶自然振荡
+    const sakana = window.sakanaInstance;
+    if (sakana) {
+      sakana._lastRunUnix = Date.now();
+      sakana._state.w = vx * 8;
+      sakana._state.t = vy * 4;
+      sakana._running = true;
+      sakana._run();
+    }
+
     startBounce();
   };
 
@@ -373,7 +384,6 @@ function initSakanaDrag() {
       }
 
       setPos(nextLeft, nextTop);
-      applyCharSwing();
 
       if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) {
         if (window.sakanaInstance) {
