@@ -46,6 +46,9 @@ function renderLatestArticle() {
       <p>${escapeHtml(article.summary)}</p>
     </article>
   `}).join('');
+
+  const countEl = document.getElementById('article-count');
+  if (countEl) countEl.textContent = `${articleFallback.length} 篇`;
 }
 
 function renderArticles() {

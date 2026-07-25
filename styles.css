@@ -425,6 +425,14 @@ a:hover { opacity: 0.8; }
     color: var(--accent);
 }
 
+.section-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-right: auto;
+    flex-shrink: 0;
+}
+
 /* ── 方向卡片 ── */
 .directions {
     display: grid;
