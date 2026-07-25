@@ -250,9 +250,8 @@ a:hover { opacity: 0.8; }
 }
 
 .hero-ai-note {
-    display: table;
+    float: right;
     margin-top: 28px;
-    margin-left: auto;
     font-size: 11px;
     color: var(--text-muted);
     font-family: var(--font-mono);
