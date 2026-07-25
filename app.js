@@ -343,8 +343,8 @@ function initSakanaDrag() {
     const sakana = window.sakanaInstance;
     if (sakana) {
       sakana._lastRunUnix = Date.now();
-      sakana._state.w = vx * 8;
-      sakana._state.t = vy * 4;
+      sakana._state.w = vx * 0.8;
+      sakana._state.t = vy * 0.4;
       sakana._running = true;
       sakana._run();
     }
