@@ -252,7 +252,7 @@ a:hover { opacity: 0.8; }
 
 .hero-ai-note {
     position: absolute;
-    bottom: 0;
+    bottom: -32px;
     right: 0;
     font-size: 11px;
     color: var(--text-muted);
@@ -263,21 +263,13 @@ a:hover { opacity: 0.8; }
     border-radius: 3px;
     letter-spacing: 0.03em;
     white-space: nowrap;
+    text-decoration: none;
     transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 .hero-ai-note:hover {
     opacity: 1;
     border-color: var(--accent);
     color: var(--accent);
-}
-.hero-ai-note a {
-    color: var(--text-muted);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-}
-.hero-ai-note a:hover {
-    color: var(--accent);
-    opacity: 1;
 }
 
 @media (max-width: 800px) {
