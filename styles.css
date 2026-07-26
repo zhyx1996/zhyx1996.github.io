@@ -617,6 +617,8 @@ a:hover { opacity: 0.8; }
 
 .article-card:hover {
     border-left-color: var(--accent);
+    background: var(--accent-dim);
+    border-radius: 0 var(--radius) var(--radius) 0;
 }
 
 .article-meta {
