@@ -290,33 +290,50 @@ a:hover { opacity: 0.8; }
 
 .hero-actions {
     display: flex;
-    gap: 12px;
+    gap: 14px;
 }
 
 /* ── 按钮 ── */
 .btn {
     display: inline-flex;
     align-items: center;
-    padding: 10px 22px;
+    justify-content: center;
+    padding: 12px 28px;
     border-radius: var(--radius);
     font-weight: 600;
     font-size: 14px;
-    transition: all 0.2s ease;
+    letter-spacing: 0.02em;
+    transition: all 0.25s ease;
     border: 1px solid transparent;
     cursor: pointer;
+    line-height: 1.4;
 }
 
 .btn-primary {
     background: var(--text);
     color: var(--bg);
+    box-shadow: var(--shadow-sm);
 }
-.btn-primary:hover { background: var(--accent); color: white; opacity: 1; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-primary:hover {
+    background: var(--accent);
+    color: white;
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
 
 .btn-ghost {
     border-color: var(--border);
     color: var(--text-secondary);
+    background: transparent;
 }
-.btn-ghost:hover { border-color: var(--text); color: var(--text); opacity: 1; transform: translateY(-1px); }
+.btn-ghost:hover {
+    border-color: var(--text);
+    color: var(--text);
+    background: rgba(0,0,0,0.02);
+    opacity: 1;
+    transform: translateY(-2px);
+}
 
 /* ── 签名元素：实验标本框 ── */
 .specimen-box {
