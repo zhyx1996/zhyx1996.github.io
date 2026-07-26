@@ -63,6 +63,8 @@ function ensureTextMetrics() {
 function resize() {
     const r = container.parentElement.getBoundingClientRect();
     W = r.width; H = r.height;
+    const maxOrbR = Math.min(W, H) * 0.08 * 1.2;
+    container.style.padding = maxOrbR + 'px';
 }
 
 function initOrbs() {
