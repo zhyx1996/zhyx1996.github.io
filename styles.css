@@ -1075,12 +1075,22 @@ a:hover { opacity: 0.8; }
     .showcase-grid { grid-template-columns: 1fr; }
     .showcase-frame-lg { height: 240px; }
     .back-to-top { bottom: 80px; left: 20px; }
+    #sakana-drag-widget {
+        width: 100px;
+        height: 117px;
+        right: 20px;
+    }
 }
 
 @media (max-width: 480px) {
     .market-grid { grid-template-columns: 1fr; }
     .hero-title { font-size: 2rem; }
     .repo-grid { grid-template-columns: 1fr; }
+    #sakana-drag-widget {
+        width: 90px !important;
+        height: 105px !important;
+        right: 10px;
+    }
 }
 
 /* ── 无障碍 ── */
