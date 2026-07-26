@@ -1058,6 +1058,7 @@ a:hover { opacity: 0.8; }
     .directions { grid-template-columns: 1fr; }
     .market-grid { grid-template-columns: 1fr 1fr; }
     .showcase-grid { grid-template-columns: 1fr; }
+    .showcase-frame-lg { height: 240px; }
     .back-to-top { bottom: 80px; left: 20px; }
 }
 
