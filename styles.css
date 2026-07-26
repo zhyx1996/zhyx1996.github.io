@@ -972,6 +972,9 @@ a:hover { opacity: 0.8; }
     border-radius: 4px;
     background: var(--bg-inset);
 }
+.steam-game-cover:not([src]), .steam-game-cover[src=""] {
+    visibility: hidden;
+}
 
 .steam-game-info {
     display: flex;

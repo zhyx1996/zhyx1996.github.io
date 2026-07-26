@@ -503,7 +503,7 @@ async function loadSteamProfile() {
       <div class="steam-games-list">
         ${games.map(g => `
           <div class="steam-game-card">
-            <img class="steam-game-cover" src="${escapeHtml(g.cover)}" alt="${escapeHtml(g.name)}" loading="lazy">
+            <img class="steam-game-cover" src="${escapeHtml(g.cover)}" alt="${escapeHtml(g.name)}" loading="lazy" onerror="this.style.visibility='hidden';this.parentElement.style.background='var(--bg-inset)'">
             <div class="steam-game-info">
               <span class="steam-game-title">${escapeHtml(g.name)}</span>
               <span class="steam-game-hours">${g.hours.toFixed(1)} 小时</span>
