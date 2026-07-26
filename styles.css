@@ -279,6 +279,8 @@ a:hover { opacity: 0.8; }
 
 @media (max-width: 800px) {
     .hero-ai-note {
+        position: static;
+        display: inline-block;
         margin-top: 20px;
     }
 }
