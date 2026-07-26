@@ -161,6 +161,7 @@ a:hover { opacity: 0.8; }
 .hero-content {
     position: relative;
     z-index: 2;
+    min-height: 380px;
 }
 
 .hero-side {
@@ -251,9 +252,9 @@ a:hover { opacity: 0.8; }
 }
 
 .hero-ai-note {
-    display: block;
-    margin-top: 260px;
-    text-align: right;
+    position: absolute;
+    bottom: 0;
+    right: 0;
     font-size: 11px;
     color: var(--text-muted);
     font-family: var(--font-mono);
@@ -264,8 +265,6 @@ a:hover { opacity: 0.8; }
     letter-spacing: 0.03em;
     white-space: nowrap;
     text-decoration: none;
-    width: fit-content;
-    margin-left: auto;
     transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 .hero-ai-note:hover {
