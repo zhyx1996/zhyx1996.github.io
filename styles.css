@@ -252,7 +252,7 @@ a:hover { opacity: 0.8; }
 
 .hero-ai-note {
     position: absolute;
-    bottom: -180px;
+    bottom: -300px;
     right: 0;
     font-size: 11px;
     color: var(--text-muted);
