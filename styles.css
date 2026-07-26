@@ -1082,6 +1082,28 @@ a:hover { opacity: 0.8; }
     color: var(--text);
 }
 
+/* 文章新标记 */
+.article-new-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: var(--accent);
+    color: #fff;
+    margin-right: 6px;
+    vertical-align: middle;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+}
+
+.article-card.new-article {
+    border-left-color: var(--accent);
+    background: var(--accent-dim);
+    border-radius: 0 var(--radius) var(--radius) 0;
+}
+
 /* 文章卡片外链标识 */
 .article-card h3 a[target="_blank"]::after {
     content: ' \2197';

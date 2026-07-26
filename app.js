@@ -37,12 +37,15 @@ function renderLatestArticle() {
   container.innerHTML = latest.map((article) => {
     const url = article.url || article.link;
     const date = article.date || fmtDate(article.published_at);
+    const isNew = isWithinDays(article.date || article.published_at, 30);
+    const badge = isNew ? '<span class="article-new-badge">新</span>' : '';
+    const articleClass = isNew ? 'article-card new-article' : 'article-card';
     return `
-    <article class="article-card">
+    <article class="${articleClass}">
       <div class="article-meta">
         <span class="article-date">${escapeHtml(date)}</span>
       </div>
-      <h3><a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(article.title)}</a></h3>
+      <h3>${badge}<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(article.title)}</a></h3>
       <p>${escapeHtml(article.summary)}</p>
     </article>
   `}).join('');
@@ -58,12 +61,15 @@ function renderArticles() {
   container.innerHTML = articleFallback.map(article => {
     const url = article.url || article.link;
     const date = article.date || fmtDate(article.published_at);
+    const isNew = isWithinDays(article.date || article.published_at, 30);
+    const badge = isNew ? '<span class="article-new-badge">新</span>' : '';
+    const articleClass = isNew ? 'article-card new-article' : 'article-card';
     return `
-    <article class="article-card">
+    <article class="${articleClass}">
       <div class="article-meta">
         <span class="article-date">${escapeHtml(date)}</span>
       </div>
-      <h3><a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(article.title)}</a></h3>
+      <h3>${badge}<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(article.title)}</a></h3>
       <p>${escapeHtml(article.summary)}</p>
     </article>
   `}).join('');
@@ -89,6 +95,20 @@ const fmtDate = (value) => {
     const d = new Date(value);
     return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
   } catch { return '暂无'; }
+};
+
+const parseChineseDate = (value) => {
+  if (!value) return null;
+  const m = String(value).match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+  if (!m) return null;
+  return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+};
+
+const isWithinDays = (value, days) => {
+  const d = parseChineseDate(value);
+  if (!d) return false;
+  const diff = Date.now() - d.getTime();
+  return diff >= 0 && diff <= days * 86400000;
 };
 
 const escapeHtml = (value) => String(value ?? '')
