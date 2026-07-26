@@ -251,9 +251,9 @@ a:hover { opacity: 0.8; }
 }
 
 .hero-ai-note {
-    position: absolute;
-    bottom: -280px;
-    right: 0;
+    display: block;
+    margin-top: 260px;
+    text-align: right;
     font-size: 11px;
     color: var(--text-muted);
     font-family: var(--font-mono);
@@ -264,6 +264,8 @@ a:hover { opacity: 0.8; }
     letter-spacing: 0.03em;
     white-space: nowrap;
     text-decoration: none;
+    width: fit-content;
+    margin-left: auto;
     transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 .hero-ai-note:hover {
