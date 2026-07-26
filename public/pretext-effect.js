@@ -186,6 +186,7 @@ function createOrbElements() {
         el.style.width = (orb.r * 2) + 'px';
         el.style.height = (orb.r * 2) + 'px';
         el.style.borderColor = orb.color;
+        el.style.boxShadow = `0 0 18px 4px ${orb.color}22, inset 0 0 12px 2px ${orb.color}18`;
         el.style.transform = `translate3d(${orb.x - orb.r}px, ${orb.y - orb.r}px, 0)`;
         orbsLayer.appendChild(el);
         orbElements.push(el);
