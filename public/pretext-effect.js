@@ -290,7 +290,7 @@ function hitTest(p) {
 function attachDragEvents() {
     orbsLayer.addEventListener('mousedown', e => {
         dragOrb = hitTest(getPos(e));
-        if (dragOrb) { dragOrb.dragging = true; orbsLayer.style.cursor = 'grabbing'; }
+        if (dragOrb) { dragOrb.dragging = true; orbsLayer.style.cursor = 'grabbing'; e.preventDefault(); }
     });
     orbsLayer.addEventListener('mousemove', e => {
         const p = getPos(e);
