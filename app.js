@@ -549,6 +549,18 @@ function initScrollAnimations() {
   sections.forEach(section => observer.observe(section));
 }
 
+// ── 页脚最后更新 ──
+function initFooterUpdated() {
+  const el = document.getElementById('last-modified');
+  if (!el) return;
+  try {
+    const d = new Date(document.lastModified);
+    el.textContent = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+  } catch {
+    el.textContent = '—';
+  }
+}
+
 // ── 初始化 ──
 document.addEventListener('DOMContentLoaded', () => {
   loadMarket();
@@ -557,6 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderLatestArticle();
   initScrollAnimations();
   initBackToTop();
+  initFooterUpdated();
 
   // 市场快照刷新按钮
   const marketRefreshBtn = document.getElementById('market-refresh');
