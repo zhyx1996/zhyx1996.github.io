@@ -264,9 +264,13 @@ function stopAnimation() {
     lastAnimationTime = null;
 }
 
+function shouldAnimate() {
+    return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) stopAnimation();
-    else startAnimation();
+    else if (shouldAnimate()) startAnimation();
 });
 
 // ─── 拖拽 ────────────────────────────────────────────────────────
@@ -348,7 +352,8 @@ window.addEventListener('resize', () => {
 async function init() {
     orbsLayer = document.getElementById('pretext-orbs');
     if (document.fonts?.ready) await document.fonts.ready;
-    resize(); initOrbs(); ensureTextMetrics(); createOrbElements(); renderText(); attachDragEvents(); startAnimation();
+    resize(); initOrbs(); ensureTextMetrics(); createOrbElements(); renderText(); attachDragEvents();
+    if (shouldAnimate()) startAnimation();
 }
 if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', () => { setTimeout(init, 100); });
