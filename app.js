@@ -52,6 +52,15 @@ function renderLatestArticle() {
 
   const countEl = document.getElementById('article-count');
   if (countEl) countEl.textContent = `${articleFallback.length} 篇`;
+
+  // 添加"在博客园查看更多"链接
+  const moreLink = document.createElement('a');
+  moreLink.className = 'section-link';
+  moreLink.href = 'https://www.cnblogs.com/fix-me/';
+  moreLink.target = '_blank';
+  moreLink.rel = 'noreferrer';
+  moreLink.textContent = '在博客园查看更多文章 →';
+  container.appendChild(moreLink);
 }
 
 function renderArticles() {
