@@ -269,8 +269,18 @@ function shouldAnimate() {
 }
 
 document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopAnimation();
-    else if (shouldAnimate()) startAnimation();
+    if (document.hidden) {
+        stopAnimation();
+    } else {
+        // 仅在 hero 可见时恢复动画，避免后台无谓消耗
+        const target = document.querySelector('.hero-side');
+        if (target) {
+            const rect = target.getBoundingClientRect();
+            if (rect.bottom > 0 && rect.top < window.innerHeight && shouldAnimate()) startAnimation();
+        } else if (shouldAnimate()) {
+            startAnimation();
+        }
+    }
 });
 
 // ─── 拖拽 ────────────────────────────────────────────────────────
@@ -353,7 +363,26 @@ async function init() {
     orbsLayer = document.getElementById('pretext-orbs');
     if (document.fonts?.ready) await document.fonts.ready;
     resize(); initOrbs(); ensureTextMetrics(); createOrbElements(); renderText(); attachDragEvents();
-    if (shouldAnimate()) startAnimation();
+    initVisibilityControl();
+}
+
+// ─── 可见性控制：滚动出视口时暂停动画，节省 GPU ───────────────
+function initVisibilityControl() {
+    const target = document.querySelector('.hero-side');
+    if ('IntersectionObserver' in window && target) {
+        const observer = new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+                if (entry.isIntersecting && !document.hidden) {
+                    if (shouldAnimate()) startAnimation();
+                } else {
+                    stopAnimation();
+                }
+            }
+        }, { threshold: 0.01, rootMargin: '50px' });
+        observer.observe(target);
+    } else if (shouldAnimate()) {
+        startAnimation();
+    }
 }
 if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', () => { setTimeout(init, 100); });
