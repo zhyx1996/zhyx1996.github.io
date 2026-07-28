@@ -236,10 +236,12 @@ function animate(now) {
         if (orb.x - orb.r < 0 || orb.x + orb.r > W) {
             orb.vx *= -1;
             orb.x = Math.max(orb.r, Math.min(W - orb.r, orb.x));
+            orb.vy += (Math.random() - 0.5) * 4;
         }
         if (orb.y - orb.r < 0 || orb.y + orb.r > H) {
             orb.vy *= -1;
             orb.y = Math.max(orb.r, Math.min(H - orb.r, orb.y));
+            orb.vx += (Math.random() - 0.5) * 4;
         }
     }
 
