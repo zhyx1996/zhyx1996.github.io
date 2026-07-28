@@ -1116,6 +1116,16 @@ a:hover { opacity: 0.8; }
     color: var(--text);
 }
 
+/* 文章同步时间戳 */
+.article-sync-time {
+    margin-top: 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+    opacity: 0.7;
+}
+
 /* 文章新标记 */
 .article-new-badge {
     display: inline-block;

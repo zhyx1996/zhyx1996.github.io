@@ -61,6 +61,13 @@ function renderLatestArticle() {
   moreLink.rel = 'noreferrer';
   moreLink.textContent = '在博客园查看更多文章 →';
   container.appendChild(moreLink);
+
+  // 添加最后同步时间戳
+  const syncDiv = document.createElement('div');
+  syncDiv.className = 'article-sync-time';
+  const now = new Date();
+  syncDiv.textContent = `最后同步：${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+  container.appendChild(syncDiv);
 }
 
 function renderArticles() {
