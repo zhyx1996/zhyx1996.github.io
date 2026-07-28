@@ -1082,6 +1082,7 @@ a:hover { opacity: 0.8; }
         grid-template-columns: 1fr;
         gap: 32px;
     }
+    .hero-content { min-height: auto; }
     .hero-side { min-height: 280px; }
     .specimen-box { width: 100%; }
     .specimen-stage { height: 180px; }
