@@ -189,7 +189,7 @@ a:hover { opacity: 0.8; }
     pointer-events: none;
     font-size: 13px;
     line-height: 24px;
-    color: rgba(26, 26, 26, 0.5);
+    color: rgba(26, 26, 26, 0.6);
     font-family: var(--font-mono);
     overflow: hidden;
     font-weight: 500;
