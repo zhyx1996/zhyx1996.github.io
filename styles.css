@@ -464,6 +464,12 @@ a:hover { opacity: 0.8; }
     font-size: 14px;
     font-weight: 500;
     color: var(--accent);
+    transition: text-decoration 0.15s ease;
+}
+
+.section-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
 .section-count {
