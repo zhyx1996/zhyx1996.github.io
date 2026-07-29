@@ -135,8 +135,8 @@ const escapeHtml = (value) => String(value ?? '')
 const PROXY = 'https://corsproxy.io/?';
 
 function renderMarketFacts(items) {
-  return items.map(item => `
-    <div class="market-card">
+  return items.map((item, i) => `
+    <div class="market-card" style="--market-delay:${(i * 0.08).toFixed(2)}s">
       <div class="label">${escapeHtml(item.label)}</div>
       <div class="value">${escapeHtml(item.value)}</div>
       ${item.note ? `<div class="note">${escapeHtml(item.note)}</div>` : ''}

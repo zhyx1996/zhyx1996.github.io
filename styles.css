@@ -807,6 +807,7 @@ a:hover { opacity: 0.8; }
 /* 数据卡片载入动画 */
 .market-card:not(.market-loading) {
     animation: marketCardIn 0.3s ease both;
+    animation-delay: var(--market-delay, 0s);
 }
 @keyframes marketCardIn {
     from { opacity: 0; transform: translateY(6px); }
