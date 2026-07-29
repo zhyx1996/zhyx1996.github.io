@@ -1046,6 +1046,7 @@ a:hover { opacity: 0.8; }
     transition: all 0.3s ease;
     z-index: 9998;
     box-shadow: var(--shadow-md);
+    will-change: transform, opacity;
 }
 
 .back-to-top.visible {
