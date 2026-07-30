@@ -1,3 +1,5 @@
+[English Version](README_en.md)
+
 # zhyx1996.github.io
 
 基于 GitHub Pages 的个人主页，展示个人简介、公开仓库、Star 项目、博客文章，以及部分公开信息嵌入示例。
