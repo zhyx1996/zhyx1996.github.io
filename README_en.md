@@ -8,13 +8,13 @@ Designed and built with AI assistance.
 
 | File | Description |
 |------|-------------|
-| index.html | Homepage: personal direction, recent focus, article summaries, Steam games, Schizosa Simulator |
-| projects.html | Public repository showcase |
-| stars.html | GitHub Stars showcase |
-| rticles.html | CNBlog articles showcase |
-| pp.js | Data rendering & interaction logic (API integration, animations, drag) |
-| styles.css | Site-wide styles (with responsive breakpoints) |
-| public/pretext-effect.js | Floating ball animation engine |
+| `index.html` | Homepage: personal direction, recent focus, article summaries, Steam games, Schizosa Simulator |
+| `projects.html` | Public repository showcase |
+| `stars.html` | GitHub Stars showcase |
+| `articles.html` | CNBlog articles showcase |
+| `app.js` | Data rendering & interaction logic (API integration, animations, drag) |
+| `styles.css` | Site-wide styles (with responsive breakpoints) |
+| `public/pretext-effect.js` | Floating ball animation engine |
 
 ## Technical Features
 
@@ -28,24 +28,24 @@ Designed and built with AI assistance.
 
 ## Local Preview
 
-`ash
+```bash
 python -m http.server 8000
-`
+```
 
-Visit http://localhost:8000. Using a local static server is recommended to avoid inconsistent resource paths and network request behavior.
+Visit `http://localhost:8000`. Using a local static server is recommended to avoid inconsistent resource paths and network request behavior.
 
 ## Validation
 
-`ash
+```bash
 node --check app.js
-`
+```
 
 ## Deployment
 
-Auto-published by GitHub Pages after pushing to the \main\ branch.
+Auto-published by GitHub Pages after pushing to the `main` branch.
 
 ## Maintenance
 
 - Follow existing navigation and visual style when adding new pages
-- Preserve fallback data and exception handling when modifying data fetching logic in \pp.js\
+- Preserve fallback data and exception handling when modifying data fetching logic in `app.js`
 - Sync-check button links and copy on corresponding pages when external entries are updated
