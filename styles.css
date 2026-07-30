@@ -56,6 +56,25 @@ body {
 a { color: var(--accent); text-decoration: none; transition: opacity 0.15s; }
 a:hover { opacity: 0.8; }
 
+/* ── 无障碍：跳转链接 ── */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    background: var(--accent);
+    color: #fff;
+    padding: 8px 16px;
+    z-index: 10000;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 0 0 var(--radius) 0;
+    transition: top 0.2s ease;
+}
+.skip-link:focus {
+    top: 0;
+}
+
 /* ── 布局 ── */
 .layout {
     display: grid;
