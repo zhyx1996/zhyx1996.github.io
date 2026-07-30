@@ -814,16 +814,18 @@ a:hover { opacity: 0.8; }
 .market-card .change.up { color: var(--teal); }
 .market-card .change.down { color: #DC2626; }
 
-/* 市场快照加载状态 */
+/* 市场快照加载状态 — 骨架屏闪烁 */
 .market-loading {
-    animation: market-pulse 1.5s ease-in-out infinite;
+    background: linear-gradient(90deg, var(--bg-surface) 25%, var(--bg-inset) 50%, var(--bg-surface) 75%);
+    background-size: 200% 100%;
+    animation: market-shimmer 1.5s ease-in-out infinite;
 }
 .market-loading .value {
     color: var(--text-muted) !important;
 }
-@keyframes market-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+@keyframes market-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 /* 数据卡片载入动画 */
