@@ -1474,7 +1474,11 @@ body.nk-dark .nethack-tab.active {
     font-size: 11px;
     color: var(--text-muted);
 }
-.nk-cmd-grid kbd {
+.nk-sep-line {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 8px 0;
+}
     display: inline-block;
     padding: 1px 5px;
     font-family: var(--font-mono);

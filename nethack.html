@@ -102,23 +102,47 @@
                         <span><kbd>Z</kbd> 施放法术</span>
                     </div>
                 </details>
-                <details class="nethack-shortcuts">
-                    <summary>符号与特殊</summary>
+                <details class="nethack-shortcuts hidden" data-for="terminal" id="symbols-section">
+                    <summary>地图符号</summary>
                     <div class="nk-cmd-grid">
-                        <span><kbd>,</kbd> 拾取</span>
-                        <span><kbd>.</kbd> 等待</span>
+                        <span><kbd>@</kbd> 玩家</span>
+                        <span><kbd>#</kbd> 墙壁</span>
+                        <span><kbd>.</kbd> 地板</span>
+                        <span><kbd>+</kbd> 门</span>
                         <span><kbd>&lt;</kbd> 上楼</span>
                         <span><kbd>&gt;</kbd> 下楼</span>
-                        <span><kbd>?</kbd> 帮助</span>
-                        <span><kbd>#</kbd> 扩展命令</span>
-                        <span><kbd>^</kbd> 查看陷阱</span>
-                        <span><kbd>"</kbd> 与精灵对话</span>
-                        <span><kbd>:</kbd> 查看地面</span>
-                        <span><kbd>;</kbd> 查看物品</span>
-                        <span><kbd>(</kbd> 查看武器</span>
-                        <span><kbd>[</kbd> 查看护甲</span>
-                        <span><kbd>=</kbd> 查看戒指</span>
-                        <span><kbd>!</kbd> 查看法术</span>
+                        <span><kbd>^</kbd> 陷阱</span>
+                        <span><kbd>$</kbd> 金币</span>
+                        <span><kbd>%</kbd> 食物</span>
+                        <span><kbd>*</kbd> 宝石</span>
+                        <span><kbd>!</kbd> 药水</span>
+                        <span><kbd>?</kbd> 卷轴</span>
+                        <span><kbd>/</kbd> 魔杖</span>
+                        <span><kbd>[</kbd> 护甲</span>
+                        <span><kbd>)</kbd> 武器</span>
+                        <span><kbd>(</kbd> 工具</span>
+                        <span><kbd>"</kbd> 项链</span>
+                        <span><kbd>=</kbd> 戒指</span>
+                        <span><kbd>{</kbd> 喷泉</span>
+                        <span><kbd>}</kbd> 祭坛</span>
+                        <span><kbd>`</kbd> 巨石</span>
+                    </div>
+                    <hr class="nk-sep-line">
+                    <div class="nk-cmd-grid">
+                        <span><kbd>k</kbd> 狗头人</span>
+                        <span><kbd>o</kbd> 兽人</span>
+                        <span><kbd>r</kbd> 老鼠</span>
+                        <span><kbd>s</kbd> 史莱姆</span>
+                        <span><kbd>z</kbd> 僵尸</span>
+                        <span><kbd>D</kbd> 龙</span>
+                        <span><kbd>S</kbd> 蛇</span>
+                        <span><kbd>T</kbd> 巨魔</span>
+                        <span><kbd>B</kbd> 蝙蝠</span>
+                        <span><kbd>u</kbd> 独角兽</span>
+                        <span><kbd>f</kbd> 猫科</span>
+                        <span><kbd>L</kbd> 地精</span>
+                        <span><kbd>@&#8202;!</友善</span>
+                        <span><kbd>@&#8202;?敌对</span>
                     </div>
                 </details>
                 <div class="nethack-links">
@@ -168,6 +192,9 @@
           });
           document.querySelectorAll("[data-hint]").forEach(function(hint) {
             hint.classList.toggle("hidden", hint.dataset.hint !== target);
+          });
+          document.querySelectorAll("[data-for]").forEach(function(el) {
+            el.classList.toggle("hidden", el.dataset.for !== target);
           });
         });
       });
