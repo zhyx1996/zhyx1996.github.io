@@ -1333,29 +1333,28 @@ a:hover { opacity: 0.8; }
 }
 .nethack-tabs {
     display: flex;
-    gap: 0;
+    gap: 4px;
     margin-bottom: 12px;
-    border-bottom: 1px solid var(--border);
 }
 .nethack-tab {
-    padding: 8px 20px;
+    padding: 6px 16px;
     font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
+    font-size: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
     color: var(--text-muted);
     cursor: pointer;
     transition: all 0.2s;
-    margin-bottom: -1px;
 }
 .nethack-tab:hover {
     color: var(--text);
+    border-color: var(--text-muted);
 }
 .nethack-tab.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
 }
 .hidden {
     display: none !important;
@@ -1415,11 +1414,14 @@ body.nk-dark .page-banner {
     background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
 }
 body.nk-dark .nethack-tab {
-    color: #888;
+    background: #111;
+    border-color: #333;
+    color: #aaa;
 }
 body.nk-dark .nethack-tab.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
 }
 .nethack-search {
     display: flex;
