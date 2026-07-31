@@ -129,13 +129,11 @@
             <section class="section nethack-section">
                 <div class="section-header">
                     <h2 class="section-title">地牢探险</h2>
-                    <span class="section-count">Powered by rot.js</span>
+                    <span class="section-count">NetHack 5.0 · nethack.alt.org</span>
                 </div>
                 <div class="nethack-container">
-                    <div class="nethack-status" id="nethack-status"></div>
-                    <div id="nethack-game"></div>
-                    <div class="nethack-log" id="nethack-log"></div>
-                    <div class="nethack-hint">方向键 / WASD 移动 · &gt; 下楼梯 · R 重开</div>
+                    <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy"></iframe>
+                    <div class="nethack-hint">点击终端区域获得焦点 · 方向键移动 · &gt; 下楼梯 · 按 c 连接</div>
                 </div>
             </section>
         </main>
@@ -156,16 +154,11 @@
     </footer>
 
     <script type="module" src="/public/pretext-effect.js?v=1"></script>
-    <script src="/public/rot.min.js"></script>
-    <script src="/public/nethack-game.js"></script>
     <script src="/app.js?v=10" defer></script>
     <script>
       function initSakanaWidget() {
         window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
       }
-      document.addEventListener('DOMContentLoaded', function() {
-        if (window.initNetHack) window.initNetHack('nethack-game');
-      });
     </script>
     <script async onload="initSakanaWidget()" src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
 </body>

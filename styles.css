@@ -1301,49 +1301,23 @@ a:hover { opacity: 0.8; }
     border-radius: 4px;
 }
 
-/* ── NetHack 地牢游戏 ── */
+/* ── NetHack 地牢探险 ── */
 .nethack-section { margin-top: 64px; }
 .nethack-container {
-    background: var(--bg-inset);
+    background: #0a0a0a;
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 16px;
+    padding: 12px;
     font-family: var(--font-mono);
 }
-#nethack-game {
-    border-radius: 4px;
-    overflow-x: auto;
-    margin: 0 auto;
-    width: fit-content;
-}
-#nethack-game canvas {
+.nethack-iframe {
     display: block;
+    width: 100%;
+    height: 600px;
+    border: none;
     border-radius: 4px;
+    background: #000;
 }
-.nethack-status {
-    display: flex;
-    gap: 16px;
-    padding: 8px 12px;
-    background: var(--bg-card);
-    border-radius: 4px;
-    margin-bottom: 8px;
-    font-size: 12px;
-    flex-wrap: wrap;
-}
-.nk-stat { color: var(--text-muted); }
-.nk-stat span { color: var(--text); font-weight: 600; }
-.nethack-log {
-    margin-top: 8px;
-    padding: 8px 12px;
-    background: var(--bg-card);
-    border-radius: 4px;
-    font-size: 11px;
-    min-height: 96px;
-    max-height: 96px;
-    overflow-y: auto;
-}
-.nk-log-line { color: var(--text-muted); line-height: 1.6; }
-.nk-log-line:last-child { color: var(--text); }
 .nethack-hint {
     font-size: 11px;
     color: var(--text-muted);
@@ -1351,6 +1325,5 @@ a:hover { opacity: 0.8; }
     text-align: center;
 }
 @media (max-width: 800px) {
-    .nethack-status { font-size: 10px; gap: 8px; }
-    #nethack-game canvas { max-width: 100%; }
+    .nethack-iframe { height: 450px; }
 }
