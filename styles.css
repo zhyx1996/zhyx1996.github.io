@@ -1195,6 +1195,13 @@ a:hover { opacity: 0.8; }
     color: var(--text);
 }
 
+/* ── 自定义滚动条 ── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+* { scrollbar-width: thin; scrollbar-color: var(--border) var(--bg); }
+
 /* 文章同步时间戳 */
 .article-sync-time {
     margin-top: 16px;
