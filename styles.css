@@ -1318,6 +1318,24 @@ a:hover { opacity: 0.8; }
     border-radius: 4px;
     background: #000;
 }
+.nethack-links {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0 4px;
+    font-size: 12px;
+}
+.nethack-links a {
+    color: var(--accent);
+    text-decoration: none;
+}
+.nethack-links a:hover {
+    text-decoration: underline;
+}
+.nk-sep {
+    color: var(--border);
+}
 .nethack-hint {
     font-size: 11px;
     color: var(--text-muted);
