@@ -852,6 +852,11 @@ a:hover { opacity: 0.8; }
     100% { background-position: -200% 0; }
 }
 
+@keyframes market-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
 /* 数据卡片载入动画 */
 .market-card:not(.market-loading) {
     animation: marketCardIn 0.3s ease both;
