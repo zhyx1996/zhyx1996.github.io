@@ -1494,6 +1494,28 @@ body.nk-dark .nethack-tab.active {
     border-top: 1px solid var(--border);
     margin: 8px 0;
 }
+.nk-cmd-grid kbd.sym-player { color: #fff; background: #444; }
+.nk-cmd-grid kbd.sym-wall { color: #8B7355; background: #333; }
+.nk-cmd-grid kbd.sym-floor { color: #444; background: #222; }
+.nk-cmd-grid kbd.sym-door { color: #8B4513; background: #333; }
+.nk-cmd-grid kbd.sym-stairs { color: #fff; background: #444; }
+.nk-cmd-grid kbd.sym-trap { color: #8B7355; background: #333; }
+.nk-cmd-grid kbd.sym-gold { color: #FFD700; background: #333; }
+.nk-cmd-grid kbd.sym-food { color: #DEB887; background: #333; }
+.nk-cmd-grid kbd.sym-gem { color: #00FFFF; background: #333; }
+.nk-cmd-grid kbd.sym-potion { color: #FF6347; background: #333; }
+.nk-cmd-grid kbd.sym-scroll { color: #DDD; background: #333; }
+.nk-cmd-grid kbd.sym-wand { color: #9370DB; background: #333; }
+.nk-cmd-grid kbd.sym-armor { color: #C0C0C0; background: #333; }
+.nk-cmd-grid kbd.sym-weapon { color: #B0B0B0; background: #333; }
+.nk-cmd-grid kbd.sym-tool { color: #A0A0A0; background: #333; }
+.nk-cmd-grid kbd.sym-amulet { color: #DDA0DD; background: #333; }
+.nk-cmd-grid kbd.sym-ring { color: #FFD700; background: #333; }
+.nk-cmd-grid kbd.sym-fountain { color: #1E90FF; background: #333; }
+.nk-cmd-grid kbd.sym-altar { color: #AAA; background: #333; }
+.nk-cmd-grid kbd.sym-boulder { color: #888; background: #333; }
+.nk-cmd-grid kbd.sym-mon { color: #FF4444; background: #333; }
+.nk-cmd-grid kbd.sym-pet { color: #DEB887; background: #333; }
 .nk-cmd-grid kbd {
     display: inline-block;
     padding: 1px 5px;
