@@ -297,6 +297,28 @@ a:hover { opacity: 0.8; }
     color: var(--accent);
 }
 
+/* ── Hero 入场动画 ── */
+.hero .eyebrow {
+    opacity: 0;
+    animation: heroFadeIn 0.5s ease 0.25s forwards;
+}
+.hero-title {
+    opacity: 0;
+    animation: heroFadeIn 0.5s ease 0.35s forwards;
+}
+.hero-subtitle {
+    opacity: 0;
+    animation: heroFadeIn 0.5s ease 0.45s forwards;
+}
+.hero-actions {
+    opacity: 0;
+    animation: heroFadeIn 0.5s ease 0.55s forwards;
+}
+@keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 800px) {
     .hero-ai-note {
         position: static;
@@ -1150,6 +1172,14 @@ a:hover { opacity: 0.8; }
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
         transition-duration: 0.01ms !important;
+    }
+    .hero .eyebrow,
+    .hero-title,
+    .hero-subtitle,
+    .hero-actions {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
     }
 }
 
