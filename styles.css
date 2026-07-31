@@ -1364,28 +1364,33 @@ a:hover { opacity: 0.8; }
     margin-bottom: 8px;
 }
 .nk-dark-toggle {
-    padding: 4px 12px;
+    padding: 5px 14px;
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 500;
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: 6px;
     color: var(--text-muted);
     cursor: pointer;
     transition: all 0.2s;
 }
 .nk-dark-toggle:hover {
     color: var(--text);
-    border-color: var(--text-muted);
+    border-color: var(--accent);
+    background: var(--accent-dim);
 }
 body.nk-dark {
     --bg: #0a0a0a;
+    --bg-surface: #111;
     --bg-card: #111;
     --bg-inset: #0a0a0a;
     --text: #ccc;
+    --text-secondary: #aaa;
     --text-muted: #777;
     --border: #222;
     --border-light: #1a1a1a;
+    --accent: #D97706;
 }
 body.nk-dark .sidebar {
     background: #0a0a0a;
@@ -1394,6 +1399,19 @@ body.nk-dark .sidebar {
 body.nk-dark .footer {
     background: #0a0a0a;
     border-top: 1px solid #222;
+}
+body.nk-dark .page-banner {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+}
+body.nk-dark .nethack-tab {
+    background: #111;
+    border-color: #333;
+    color: #aaa;
+}
+body.nk-dark .nethack-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
 }
     display: flex;
     gap: 0;
