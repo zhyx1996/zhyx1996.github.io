@@ -1371,6 +1371,7 @@ a:hover { opacity: 0.8; }
 .nk-window-statusbar {
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 6px 12px;
     font-family: var(--font-body);
     font-size: 11px;
