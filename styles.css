@@ -1425,6 +1425,7 @@ body.nk-dark .nk-window-statusbar {
 }
 .nethack-search-row {
     display: flex;
+    justify-content: center;
     gap: 8px;
     margin-bottom: 12px;
 }
@@ -1490,6 +1491,8 @@ body.nk-dark .nethack-tab.active {
 }
 .nethack-search {
     flex: 1;
+    min-width: 0;
+    max-width: 480px;
     display: flex;
     gap: 0;
     margin-bottom: 0;
