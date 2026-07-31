@@ -1355,6 +1355,18 @@ a:hover { opacity: 0.8; }
     border-color: var(--accent);
     color: #fff;
 }
+.nethack-panes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.nethack-pane-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    text-align: center;
+}
 .hidden {
     display: none !important;
 }
@@ -1468,4 +1480,5 @@ a:hover { opacity: 0.8; }
 }
 @media (max-width: 800px) {
     .nethack-iframe { height: 500px; }
+    .nethack-panes { grid-template-columns: 1fr; }
 }
