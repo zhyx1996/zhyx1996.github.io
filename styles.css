@@ -1358,7 +1358,43 @@ a:hover { opacity: 0.8; }
 .hidden {
     display: none !important;
 }
-.nethack-search {
+.nethack-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+}
+.nk-dark-toggle {
+    padding: 4px 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.nk-dark-toggle:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+}
+body.nk-dark {
+    --bg: #0a0a0a;
+    --bg-card: #111;
+    --bg-inset: #0a0a0a;
+    --text: #ccc;
+    --text-muted: #777;
+    --border: #222;
+    --border-light: #1a1a1a;
+}
+body.nk-dark .sidebar {
+    background: #0a0a0a;
+    border-right: 1px solid #222;
+}
+body.nk-dark .footer {
+    background: #0a0a0a;
+    border-top: 1px solid #222;
+}
     display: flex;
     gap: 0;
     margin-bottom: 12px;
