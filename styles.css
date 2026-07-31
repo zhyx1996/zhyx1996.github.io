@@ -1616,7 +1616,7 @@ body.nk-dark .nethack-tab.active {
 .nk-cmd-grid kbd.sym-gem { color: #00FFFF; background: #333; }
 .nk-cmd-grid kbd.sym-potion { color: #FF6347; background: #333; }
 .nk-cmd-grid kbd.sym-scroll { color: #DDD; background: #333; }
-.nk-cmd-grid kbd.sym-wand { color: #9370DB; background: #333; }
+.nk-cmd-grid kbd.sym-wand { color: #A0A0A0; background: #333; }
 .nk-cmd-grid kbd.sym-armor { color: #C0C0C0; background: #333; }
 .nk-cmd-grid kbd.sym-weapon { color: #B0B0B0; background: #333; }
 .nk-cmd-grid kbd.sym-tool { color: #A0A0A0; background: #333; }
@@ -1625,7 +1625,9 @@ body.nk-dark .nethack-tab.active {
 .nk-cmd-grid kbd.sym-fountain { color: #1E90FF; background: #333; }
 .nk-cmd-grid kbd.sym-altar { color: #AAA; background: #333; }
 .nk-cmd-grid kbd.sym-boulder { color: #888; background: #333; }
-.nk-cmd-grid kbd.sym-pet { color: #E0B87E; background: #333; }
+.nk-cmd-grid kbd.sym-dog { color: #A9714B; background: #333; }
+.nk-cmd-grid kbd.sym-feline { color: #E08A3C; background: #333; }
+.nk-cmd-grid kbd.sym-quadruped { color: #8F6B4D; background: #333; }
 .nk-cmd-grid kbd.sym-cockatrice { color: #E3C14B; background: #333; }
 .nk-cmd-grid kbd.sym-kobold { color: #A0522D; background: #333; }
 .nk-cmd-grid kbd.sym-orc { color: #5E8C3E; background: #333; }
