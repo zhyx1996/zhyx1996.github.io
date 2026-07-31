@@ -684,6 +684,7 @@ a:hover { opacity: 0.8; }
     border-left-color: var(--accent);
     background: var(--accent-dim);
     border-radius: 0 var(--radius) var(--radius) 0;
+    box-shadow: var(--shadow-sm);
 }
 
 .article-meta {
