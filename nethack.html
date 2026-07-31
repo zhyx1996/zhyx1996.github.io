@@ -46,6 +46,20 @@
                     <h1>NetHack</h1>
                     <p>在浏览器中玩 NetHack 5.0，支持终端联机与 3D 两种模式。</p>
                 </div>
+                <div class="page-stats">
+                    <div class="stat-card">
+                        <span class="stat-num">5.0</span>
+                        <span class="stat-label">VERSION</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-num">1987</span>
+                        <span class="stat-label">首发</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-num">2</span>
+                        <span class="stat-label">模式</span>
+                    </div>
+                </div>
             </section>
 
             <section class="section nethack-section">
@@ -60,14 +74,28 @@
                     </form>
                     <button class="nk-dark-toggle" id="nk-dark-toggle" type="button">关灯</button>
                 </div>
-                <div class="nethack-container hidden" data-pane="terminal" id="pane-terminal" role="tabpanel" aria-label="NetHack 联机终端">
+                <div class="nk-window hidden" data-pane="terminal" id="pane-terminal" role="tabpanel" aria-label="NetHack 联机终端">
+                    <div class="nk-window-bar">
+                        <span class="nk-dot nk-dot-a"></span>
+                        <span class="nk-dot nk-dot-b"></span>
+                        <span class="nk-dot nk-dot-c"></span>
+                        <span class="nk-window-title">alt.org · hterm</span>
+                        <span class="nk-window-status">● 联机中</span>
+                    </div>
                     <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy"></iframe>
+                    <div class="nk-window-statusbar" data-hint="terminal">点击终端 · 按 c 连接 · 移动: 方向键 / hjkl yubn</div>
                 </div>
-                <div data-pane="3d" id="pane-3d" role="tabpanel" aria-label="NetHack 3D">
+                <div class="nk-window" data-pane="3d" id="pane-3d" role="tabpanel" aria-label="NetHack 3D">
+                    <div class="nk-window-bar">
+                        <span class="nk-dot nk-dot-a"></span>
+                        <span class="nk-dot nk-dot-b"></span>
+                        <span class="nk-dot nk-dot-c"></span>
+                        <span class="nk-window-title">nethack-3d · StackC00ki3</span>
+                        <span class="nk-window-status">● 3D</span>
+                    </div>
                     <iframe class="nethack-iframe nethack-iframe-3d" src="https://stackc00ki3.github.io/nethack-3d/" title="NetHack 3D" loading="lazy"></iframe>
+                    <div class="nk-window-statusbar" data-hint="3d">鼠标拖拽旋转视角 · WASD 移动 · 左键互动 · 滚轮缩放</div>
                 </div>
-                <p class="nethack-hint hidden" data-hint="terminal">nethack.alt.org · 点击终端 · 按 c 连接 · 移动: 方向键 / hjkl yubn · 下拉框: 左字体 右 tileset</p>
-                <p class="nethack-hint" data-hint="3d">StackC00ki3 汉化版 · 鼠标拖拽旋转视角 · WASD 移动 · 左键互动 · 滚轮缩放</p>
                 <details class="nethack-shortcuts">
                     <summary>快捷键</summary>
                     <div class="nk-cmd-grid">
@@ -127,11 +155,12 @@
                         <span><kbd class="sym-altar">}</kbd> 祭坛</span>
                         <span><kbd class="sym-boulder">`</kbd> 巨石</span>
                     </div>
-                    <hr class="nk-sep-line">
+                    <p class="nk-section-label">怪物与宠物（颜色区分敌友）</p>
                     <div class="nk-cmd-grid">
-                        <span><kbd class="sym-pet">d</kbd> 狗</span>
+                        <span><kbd class="sym-pet">d</kbd> 狗/宠物</span>
                         <span><kbd class="sym-pet">c</kbd> 猫</span>
                         <span><kbd class="sym-pet">f</kbd> 猫科</span>
+                        <span><kbd class="sym-pet">q</kbd> 幼宠</span>
                         <span><kbd class="sym-mon">k</kbd> 狗头人</span>
                         <span><kbd class="sym-mon">o</kbd> 兽人</span>
                         <span><kbd class="sym-mon">r</kbd> 老鼠</span>
@@ -143,6 +172,9 @@
                         <span><kbd class="sym-mon">B</kbd> 蝙蝠</span>
                         <span><kbd class="sym-mon">u</kbd> 独角兽</span>
                         <span><kbd class="sym-mon">L</kbd> 地精</span>
+                        <span><kbd class="sym-mon">N</kbd> 娜迦</span>
+                        <span><kbd class="sym-mon">V</kbd> 吸血鬼</span>
+                        <span><kbd class="sym-mon">M</kbd> 拟态怪</span>
                         <span><kbd class="sym-pet">@</kbd> 友善</span>
                         <span><kbd class="sym-mon">@</kbd> 敌对</span>
                     </div>
