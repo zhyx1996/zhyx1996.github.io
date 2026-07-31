@@ -1351,23 +1351,31 @@ a:hover { opacity: 0.8; }
 .nk-dot-c { background: var(--border); }
 .nk-window-title {
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.02em;
-    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
 }
 .nk-window-status {
     margin-left: auto;
     font-family: var(--font-mono);
     font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
     color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid rgba(217, 119, 6, 0.35);
+    border-radius: 999px;
+    padding: 2px 10px;
 }
 .nk-window-statusbar {
     display: flex;
     align-items: center;
-    padding: 5px 12px;
+    padding: 6px 12px;
     font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--text-secondary);
     background: var(--bg-inset);
     border-top: 1px solid var(--border-light);
     border-radius: 0 0 var(--radius) var(--radius);
@@ -1577,12 +1585,33 @@ body.nk-dark .nethack-tab.active {
     text-overflow: ellipsis;
 }
 .nk-section-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px 0 2px;
+    font-family: var(--font-mono);
     font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: var(--text-secondary);
+}
+.nk-section-label::before,
+.nk-section-label::after {
+    content: "";
+    flex-shrink: 0;
+    width: 56px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border));
+}
+.nk-section-label::after {
+    background: linear-gradient(90deg, var(--border), transparent);
+}
+.nk-label-note {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
     color: var(--text-muted);
-    text-align: center;
-    padding: 8px 0 4px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
 }
 .nk-cmd-grid kbd.sym-player { color: #fff; background: #444; }
 .nk-cmd-grid kbd.sym-wall { color: #8B7355; background: #333; }
@@ -1604,8 +1633,27 @@ body.nk-dark .nethack-tab.active {
 .nk-cmd-grid kbd.sym-fountain { color: #1E90FF; background: #333; }
 .nk-cmd-grid kbd.sym-altar { color: #AAA; background: #333; }
 .nk-cmd-grid kbd.sym-boulder { color: #888; background: #333; }
-.nk-cmd-grid kbd.sym-mon { color: #FF4444; background: #333; }
-.nk-cmd-grid kbd.sym-pet { color: #DEB887; background: #333; }
+.nk-cmd-grid kbd.sym-pet { color: #E0B87E; background: #333; }
+.nk-cmd-grid kbd.sym-cockatrice { color: #E3C14B; background: #333; }
+.nk-cmd-grid kbd.sym-kobold { color: #A0522D; background: #333; }
+.nk-cmd-grid kbd.sym-orc { color: #5E8C3E; background: #333; }
+.nk-cmd-grid kbd.sym-rat { color: #8C6E4F; background: #333; }
+.nk-cmd-grid kbd.sym-spider { color: #7A5C3E; background: #333; }
+.nk-cmd-grid kbd.sym-zombie { color: #9E9E9E; background: #333; }
+.nk-cmd-grid kbd.sym-dragon { color: #3FA34D; background: #333; }
+.nk-cmd-grid kbd.sym-snake { color: #66A85C; background: #333; }
+.nk-cmd-grid kbd.sym-troll { color: #6D8F3E; background: #333; }
+.nk-cmd-grid kbd.sym-bat { color: #6B4E2E; background: #333; }
+.nk-cmd-grid kbd.sym-unicorn { color: #F2F2F2; background: #333; }
+.nk-cmd-grid kbd.sym-lich { color: #E6E6E6; background: #333; }
+.nk-cmd-grid kbd.sym-naga { color: #8F7A56; background: #333; }
+.nk-cmd-grid kbd.sym-vampire { color: #E8D8C8; background: #333; }
+.nk-cmd-grid kbd.sym-mummy { color: #B9A08A; background: #333; }
+.nk-cmd-grid kbd.sym-mimic { color: #C9B391; background: #333; }
+.nk-cmd-grid kbd.sym-gnome { color: #A9714B; background: #333; }
+.nk-cmd-grid kbd.sym-giant { color: #C9B8A3; background: #333; }
+.nk-cmd-grid kbd.sym-wraith { color: #D0D0E8; background: #333; }
+.nk-cmd-grid kbd.sym-demon { color: #E05040; background: #333; }
 .nk-cmd-grid kbd {
     display: inline-block;
     min-width: 22px;
