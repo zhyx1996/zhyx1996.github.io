@@ -134,6 +134,29 @@ const escapeHtml = (value) => String(value ?? '')
 // ── 市场快照（实时数据）──
 const PROXY = 'https://corsproxy.io/?';
 
+// ── 市场快照缓存（5 分钟 TTL）──
+const MARKET_CACHE_KEY = 'market_cache_v1';
+const MARKET_CACHE_TTL = 5 * 60 * 1000;
+
+function getCachedMarket() {
+  try {
+    const raw = localStorage.getItem(MARKET_CACHE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (Date.now() - data.timestamp > MARKET_CACHE_TTL) return null;
+    return data.market;
+  } catch { return null; }
+}
+
+function setCachedMarket(rates, btcPrice, goldPrice) {
+  try {
+    localStorage.setItem(MARKET_CACHE_KEY, JSON.stringify({
+      market: { rates, btcPrice, goldPrice },
+      timestamp: Date.now()
+    }));
+  } catch { /* quota exceeded or private mode */ }
+}
+
 function renderMarketFacts(items) {
   return items.map((item, i) => `
     <div class="market-card" style="--market-delay:${(i * 0.08).toFixed(2)}s">
@@ -218,6 +241,12 @@ async function loadMarket() {
   const container = document.getElementById('market-grid');
   if (!container) return;
 
+  // 优先展示缓存数据，减少等待时间
+  const cached = getCachedMarket();
+  if (cached) {
+    renderMarket(cached.rates, cached.btcPrice, cached.goldPrice);
+  }
+
   // 汇率 API（免费无需密钥）
   const fetchRates = async () => {
     try {
@@ -254,7 +283,12 @@ async function loadMarket() {
     fetchGold(),
   ]);
 
-  renderMarket(rates, btcPrice, goldPrice);
+  if (rates || btcPrice || goldPrice) {
+    setCachedMarket(rates, btcPrice, goldPrice);
+    renderMarket(rates, btcPrice, goldPrice);
+  } else if (!cached) {
+    renderMarket(null, null, null);
+  }
 }
 
 // ── Sakana 拖拽小球（物理弹跳）──
