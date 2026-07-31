@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test 3D iframe</title></head>
+<body>
+<iframe id="nh3d-frame" src="https://stackc00ki3.github.io/nethack-3d/" width="900" height="700" style="border:1px solid #333;"></iframe>
+<script>
+const iframe = document.getElementById('nh3d-frame');
+iframe.onload = function() { window.__loaded = true; };
+iframe.onerror = function(e) { window.__error = e.message || 'load error'; };
+</script>
+</body>
+</html>
