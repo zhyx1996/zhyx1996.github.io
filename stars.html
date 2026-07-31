@@ -45,7 +45,7 @@
                 </div>
                 <div class="page-stats">
                     <div class="stat-card">
-                        <span class="stat-num">10</span>
+                        <span class="stat-num" id="star-total">—</span>
                         <span class="stat-label">收藏</span>
                     </div>
                 </div>
@@ -134,6 +134,23 @@
     <div id="sakana-drag-widget"></div>
 
     <script src="/app.js?v=10"></script>
+    <script>
+      fetch('https://api.github.com/users/zhyx1996/starred?per_page=1', { headers: { 'Accept': 'application/vnd.github.v3+json' } })
+        .then(function(r) {
+          var link = r.headers.get('link');
+          var total = '419';
+          if (link) {
+            var m = link.match(/page=(\d+)>; rel="last"/);
+            if (m) total = m[1];
+          }
+          var el = document.getElementById('star-total');
+          if (el) el.textContent = total;
+        })
+        .catch(function() {
+          var el = document.getElementById('star-total');
+          if (el) el.textContent = '419';
+        });
+    </script>
     <script>
       function initSakanaWidget() {
         window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
