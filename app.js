@@ -38,7 +38,7 @@ function renderLatestArticle() {
   container.innerHTML = latest.map((article) => {
     const url = article.url || article.link;
     const date = article.date || fmtDate(article.published_at);
-    const isNew = isWithinDays(article.date || article.published_at, 30);
+    const isNew = isWithinDays(article.date || article.published_at, 45);
     const badge = isNew ? '<span class="article-new-badge">新</span>' : '';
     const articleClass = isNew ? 'article-card new-article' : 'article-card';
     return `
@@ -77,7 +77,7 @@ function renderArticles() {
   container.innerHTML = articleFallback.map(article => {
     const url = article.url || article.link;
     const date = article.date || fmtDate(article.published_at);
-    const isNew = isWithinDays(article.date || article.published_at, 30);
+    const isNew = isWithinDays(article.date || article.published_at, 45);
     const badge = isNew ? '<span class="article-new-badge">新</span>' : '';
     const articleClass = isNew ? 'article-card new-article' : 'article-card';
     return `
