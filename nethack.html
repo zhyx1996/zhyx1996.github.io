@@ -53,10 +53,13 @@
                     <button class="nethack-tab active" data-tab="3d" role="tab" aria-selected="true" aria-controls="pane-3d">3D 版</button>
                     <button class="nethack-tab" data-tab="terminal" role="tab" aria-selected="false" aria-controls="pane-terminal">联机版</button>
                 </div>
-                <form class="nethack-search" action="https://nethackwiki.com/wiki/Special:Search" method="GET" target="_blank" rel="noreferrer">
-                    <input type="text" name="search" placeholder="Search NetHack Wiki..." class="nethack-search-input" />
-                    <button type="submit" class="nethack-search-btn">搜索</button>
-                </form>
+                <div class="nethack-search-row">
+                    <form class="nethack-search" action="https://nethackwiki.com/wiki/Special:Search" method="GET" target="_blank" rel="noreferrer">
+                        <input type="text" name="search" placeholder="Search NetHack Wiki..." class="nethack-search-input" />
+                        <button type="submit" class="nethack-search-btn">搜索</button>
+                    </form>
+                    <button class="nk-dark-toggle" id="nk-dark-toggle" type="button">关灯</button>
+                </div>
                 <div class="nethack-container hidden" data-pane="terminal" id="pane-terminal" role="tabpanel" aria-label="NetHack 联机终端">
                     <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy"></iframe>
                 </div>
@@ -65,9 +68,6 @@
                 </div>
                 <p class="nethack-hint hidden" data-hint="terminal">nethack.alt.org · 点击终端 · 按 c 连接 · 移动: 方向键 / hjkl yubn · 下拉框: 左字体 右 tileset</p>
                 <p class="nethack-hint" data-hint="3d">StackC00ki3 汉化版 · 鼠标拖拽旋转视角 · WASD 移动 · 左键互动 · 滚轮缩放</p>
-                <div class="nethack-toolbar">
-                    <button class="nk-dark-toggle" id="nk-dark-toggle">关灯</button>
-                </div>
                 <details class="nethack-shortcuts">
                     <summary>快捷键</summary>
                     <div class="nk-cmd-grid">
