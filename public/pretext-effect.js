@@ -2,7 +2,7 @@ const TEXT = `公开仓库围绕计算机视觉、自动驾驶感知、并行计
 
 const DEFAULT_LINE_HEIGHT = 24;
 const ORB_TEXT_GAP = 1;
-const MIN_SLOT_WIDTH = 32;
+const MIN_SLOT_WIDTH_BASE = 2.2;
 
 const container = document.getElementById('pretext-output');
 let W, H, graphemes = [], graphemeWidths = [], orbs = [];
@@ -103,7 +103,7 @@ function carveTextLineSlots(base, blocked) {
         }
         slots = next;
     }
-    const minimumWidth = Math.max(MIN_SLOT_WIDTH, fontSize * 2);
+    const minimumWidth = fontSize * MIN_SLOT_WIDTH_BASE;
     return slots.filter(slot => slot.right - slot.left >= minimumWidth);
 }
 
