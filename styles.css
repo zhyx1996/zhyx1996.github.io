@@ -1380,15 +1380,6 @@ a:hover { opacity: 0.8; }
     border-top: 1px solid var(--border-light);
     border-radius: 0 0 var(--radius) var(--radius);
 }
-.nk-window-statusbar::after {
-    content: "▋";
-    color: var(--accent);
-    margin-left: 2px;
-    animation: nk-blink 1.1s steps(2) infinite;
-}
-@keyframes nk-blink {
-    50% { opacity: 0; }
-}
 body.nk-dark .nk-window {
     background: #111;
     border-color: #333;
