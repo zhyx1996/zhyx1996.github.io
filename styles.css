@@ -1518,6 +1518,7 @@ body.nk-dark .nethack-tab.active {
     align-items: center;
     padding: 8px 0 4px;
     font-size: 12px;
+    flex-wrap: wrap;
 }
 .nethack-links a {
     color: var(--accent);
