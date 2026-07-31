@@ -1367,6 +1367,41 @@ a:hover { opacity: 0.8; }
 .nethack-search-btn:hover {
     opacity: 0.85;
 }
+.nethack-shortcuts {
+    margin-top: 12px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.nethack-shortcuts summary {
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 0;
+    user-select: none;
+}
+.nethack-shortcuts summary:hover {
+    color: var(--text);
+}
+.nk-cmd-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px 12px;
+    padding: 12px 0 4px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+.nk-cmd-grid kbd {
+    display: inline-block;
+    padding: 1px 5px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    margin-right: 4px;
+}
 .nethack-iframe {
     display: block;
     width: 100%;
