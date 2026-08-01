@@ -1668,6 +1668,43 @@ body.nk-dark .nk-cmd-grid kbd {
     border-color: #333;
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
+.nk-at-colors {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 6px 0 2px;
+    font-size: 10.5px;
+    line-height: 1.7;
+    color: var(--text-muted);
+}
+.nk-at-glyphs {
+    display: inline-flex;
+    gap: 3px;
+    flex-shrink: 0;
+    padding-top: 1px;
+}
+.nk-at-glyphs kbd {
+    min-width: 18px;
+    padding: 1px 4px;
+    font-size: 10px;
+    margin-right: 0;
+}
+.nk-at-caption {
+    min-width: 0;
+}
+.nk-at-glyphs kbd.sym-at-white { color: #fff; background: #333; }
+.nk-at-glyphs kbd.sym-at-green { color: #00AA00; background: #333; }
+.nk-at-glyphs kbd.sym-at-brightgreen { color: #55FF55; background: #333; }
+.nk-at-glyphs kbd.sym-at-blue { color: #0000AA; background: #333; }
+.nk-at-glyphs kbd.sym-at-brightblue { color: #5555FF; background: #333; }
+.nk-at-glyphs kbd.sym-at-lightgray { color: #AAAAAA; background: #333; }
+.nk-at-glyphs kbd.sym-at-darkgray { color: #555; background: #333; }
+.nk-at-glyphs kbd.sym-at-magenta { color: #AA00AA; background: #333; }
+.nk-at-glyphs kbd.sym-at-brightmagenta { color: #FF55FF; background: #333; }
+.nk-at-glyphs kbd.sym-at-red { color: #AA0000; background: #333; }
+.nk-at-glyphs kbd.sym-at-brown { color: #AA5500; background: #333; }
+.nk-at-glyphs kbd.sym-at-orange { color: #FF5555; background: #333; }
 .nethack-iframe {
     display: block;
     width: 100%;
