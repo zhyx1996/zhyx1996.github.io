@@ -302,10 +302,23 @@
                 <details class="nethack-shortcuts">
                     <summary>关于 Wizard 模式</summary>
                     <div class="nk-cmd-grid nk-desc-grid">
-                        <span><strong>3D 网页版</strong> 创建角色时取名 <code>wizard</code> 即可用 <code>Ctrl+W</code> <a href="https://nethackwiki.com/wiki/Wizard_mode#Wishing" target="_blank" rel="noreferrer">许愿</a>、<code>Ctrl+G</code> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">刷怪</a>等</span>
+                        <span><strong>3D 网页版</strong> 创建角色时取名 <code>wizard</code> 即可</span>
                         <span><strong>本地安装</strong> 启动命令 <code>nethack -D -u wizard</code></span>
                         <span>Unix 可编辑 <code>sysconf</code> 配置 <code>WIZARDS=*</code>，公共服务器（如 <a href="https://nethackwiki.com/wiki/Nethack.alt.org" target="_blank" rel="noreferrer">NAO</a>）禁止 <a href="https://nethackwiki.com/wiki/Wizard_mode" target="_blank" rel="noreferrer">Wizard 模式</a></span>
                         <span>游戏不计入<a href="https://nethackwiki.com/wiki/Record_file" target="_blank" rel="noreferrer">排行榜</a>，仅用于测试</span>
+                    </div>
+                    <p class="nk-section-label">调试快捷键</p>
+                    <div class="nk-cmd-grid nk-desc-grid">
+                        <span><kbd>Ctrl+W</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Wishing" target="_blank" rel="noreferrer">许愿</a></span>
+                        <span><kbd>Ctrl+G</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">创建怪物</a></span>
+                        <span><kbd>Ctrl+V</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">跨层传送</a></span>
+                        <span><kbd>Ctrl+T</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">同层传送</a></span>
+                        <span><kbd>Ctrl+F</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">显示地图</a></span>
+                        <span><kbd>Ctrl+E</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">探测暗门/陷阱</a></span>
+                        <span><kbd>Ctrl+I</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">显示物品信息</a></span>
+                        <span><kbd>Ctrl+X</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">查看属性</a></span>
+                        <span><kbd>#levelchange</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">修改等级</a></span>
+                        <span><kbd>#polyself</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">变形自己</a></span>
                     </div>
                 </details>
                 <details class="nethack-shortcuts">
@@ -335,18 +348,43 @@
                         <span><a href="https://nethackwiki.com/wiki/Price_identification" target="_blank" rel="noreferrer">价格鉴定</a>：识别未知道具</span>
                         <span><a href="https://nethackwiki.com/wiki/Stealing_from_shops" target="_blank" rel="noreferrer">商店行窃</a>：获取物品</span>
                     </div>
-                    <p class="nk-section-label">Wizard 模式命令</p>
-                    <div class="nk-cmd-grid nk-desc-grid">
-                        <span><kbd>Ctrl+W</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Wishing" target="_blank" rel="noreferrer">许愿</a></span>
-                        <span><kbd>Ctrl+G</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">创建怪物</a></span>
-                        <span><kbd>Ctrl+V</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">跨层传送</a></span>
-                        <span><kbd>Ctrl+T</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">同层传送</a></span>
-                        <span><kbd>Ctrl+F</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">显示地图</a></span>
-                        <span><kbd>Ctrl+E</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">探测暗门/陷阱</a></span>
-                        <span><kbd>Ctrl+I</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">显示物品信息</a></span>
-                        <span><kbd>#levelchange</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">修改等级</a></span>
-                        <span><kbd>#wizwish</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Wishing" target="_blank" rel="noreferrer">许愿（文本）</a></span>
-                        <span><kbd>#polyself</kbd> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">变形自己</a></span>
+                </details>
+                <details class="nethack-shortcuts">
+                    <summary>高价值怪物与注意事项</summary>
+                    <p class="nk-section-label">⚠️ 危险怪物（优先躲避）</p>
+                    <div class="nk-cmd-grid">
+                        <span><a href="https://nethackwiki.com/wiki/Dragon" target="_blank" rel="noreferrer">龙 D</a> — 喷吐攻击，<a href="https://nethackwiki.com/wiki/Dragon_scale_mail" target="_blank" rel="noreferrer">龙鳞</a>可做顶级护甲</span>
+                        <span><a href="https://nethackwiki.com/wiki/Lich" target="_blank" rel="noreferrer">巫妖 L</a> — 吸血、减速，<a href="https://nethackwiki.com/wiki/Arch-lich" target="_blank" rel="noreferrer">大巫妖</a>极危险</span>
+                        <span><a href="https://nethackwiki.com/wiki/Vampire" target="_blank" rel="noreferrer">吸血鬼 V</a> — 吸血升级，<a href="https://nethackwiki.com/wiki/Vlad_the_Impaler" target="_blank" rel="noreferrer">弗拉德</a>是 Tourist 任务 Boss</span>
+                        <span><a href="https://nethackwiki.com/wiki/Demon" target="_blank" rel="noreferrer">恶魔 &amp;</a> — 会法术，<a href="https://nethackwiki.com/wiki/Demogorgon" target="_blank" rel="noreferrer">Demogorgon</a>是最强恶魔</span>
+                        <span><a href="https://nethackwiki.com/wiki/Cockatrice" target="_blank" rel="noreferrer">鸡蛇 c</a> — <a href="https://nethackwiki.com/wiki/Stoning" target="_blank" rel="noreferrer">石化</a>攻击，勿徒手/食尸</span>
+                        <span><a href="https://nethackwiki.com/wiki/Medusa" target="_blank" rel="noreferrer">美杜莎 @</a> — <a href="https://nethackwiki.com/wiki/Death_gaze" target="_blank" rel="noreferrer">死亡凝视</a>，秒杀</span>
+                    </div>
+                    <p class="nk-section-label">🍖 可食用尸体（增益效果）</p>
+                    <div class="nk-cmd-grid">
+                        <span><a href="https://nethackwiki.com/wiki/Dragon#Corpse_properties" target="_blank" rel="noreferrer">龙尸</a> — 获得对应元素抗性（火/冷/毒/电/酸/反魔/反射）</span>
+                        <span><a href="https://nethackwiki.com/wiki/Unicorn" target="_blank" rel="noreferrer">独角兽 u</a> — <a href="https://nethackwiki.com/wiki/Blinded" target="_blank" rel="noreferrer">治愈失明</a>、<a href="https://nethackwiki.com/wiki/Luck" target="_blank" rel="noreferrer">幸运</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/Troll" target="_blank" rel="noreferrer">巨魔 T</a> — <a href="https://nethackwiki.com/wiki/Regeneration" target="_blank" rel="noreferrer">再生</a>能力</span>
+                        <span><a href="https://nethackwiki.com/wiki/Lichen" target="_blank" rel="noreferrer">地衣 F</a> — 安全食物，无增益</span>
+                        <span><a href="https://nethackwiki.com/wiki/Floating_eye" target="_blank" rel="noreferrer">浮眼 e</a> — <a href="https://nethackwiki.com/wiki/Telepathy" target="_blank" rel="noreferrer">心灵感应</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/Killer_bee" target="_blank" rel="noreferrer">杀人蜂 a</a> — <a href="https://nethackwiki.com/wiki/Poison_resistance" target="_blank" rel="noreferrer">毒抗</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/Wraith" target="_blank" rel="noreferrer">幽魂 W</a> — <a href="https://nethackwiki.com/wiki/Gain_level" target="_blank" rel="noreferrer">升级</a></span>
+                    </div>
+                    <p class="nk-section-label">🚫 危险尸体（切勿食用）</p>
+                    <div class="nk-cmd-grid">
+                        <span><a href="https://nethackwiki.com/wiki/Cockatrice" target="_blank" rel="noreferrer">鸡蛇 c</a> — 食尸导致<a href="https://nethackwiki.com/wiki/Stoning" target="_blank" rel="noreferrer">石化</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/Medusa" target="_blank" rel="noreferrer">美杜莎 @</a> — 食尸即死</span>
+                        <span><a href="https://nethackwiki.com/wiki/Yellow_mold" target="_blank" rel="noreferrer">黄霉菌 F</a> — 导致<a href="https://nethackwiki.com/wiki/Hallucination" target="_blank" rel="noreferrer">幻觉</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/Rotting_corpse" target="_blank" rel="noreferrer">腐烂尸体</a> — 可能<a href="https://nethackwiki.com/wiki/Sickness" target="_blank" rel="noreferrer">致病</a></span>
+                    </div>
+                    <p class="nk-section-label">🔧 特殊利用方法</p>
+                    <div class="nk-cmd-grid">
+                        <span><a href="https://nethackwiki.com/wiki/Dog" target="_blank" rel="noreferrer">狗/猫 d/c</a> — 宠物，训练后可<a href="https://nethackwiki.com/wiki/Pet#Training" target="_blank" rel="noreferrer">携带物品</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/Unicorn" target="_blank" rel="noreferrer">独角兽 u</a> — <a href="https://nethackwiki.com/wiki/Sacrifice" target="_blank" rel="noreferrer">献祭</a>可获<a href="https://nethackwiki.com/wiki/Luckstone" target="_blank" rel="noreferrer">幸运石</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/Mimic" target="_blank" rel="noreferrer">拟态怪 m</a> — 伪装成物品，<a href="https://nethackwiki.com/wiki/Far_look" target="_blank" rel="noreferrer">; 查看</a>识破</span>
+                        <span><a href="https://nethackwiki.com/wiki/Mind_flayer" target="_blank" rel="noreferrer">夺心魔 h</a> — <a href="https://nethackwiki.com/wiki/Intrinsic_theft" target="_blank" rel="noreferrer">吸脑</a>降智</span>
+                        <span><a href="https://nethackwiki.com/wiki/Rust_monster" target="_blank" rel="noreferrer">锈怪 R</a> — 腐蚀金属装备</span>
+                        <span><a href="https://nethackwiki.com/wiki/Disenchanter" target="_blank" rel="noreferrer">消解怪 R</a> — 消除物品附魔</span>
                     </div>
                 </details>
                 <div class="nethack-links">
