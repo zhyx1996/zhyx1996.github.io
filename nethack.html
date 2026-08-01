@@ -98,16 +98,29 @@
                 </div>
                 <details class="nethack-shortcuts">
                     <summary>基本移动</summary>
+                    <p class="nk-section-label">方向键模式（默认）</p>
                     <div class="nk-cmd-grid">
-                        <span><kbd>y</kbd> ↖ 左上</span>
-                        <span><kbd>k</kbd> ↑ 上</span>
-                        <span><kbd>u</kbd> ↗ 右上</span>
-                        <span><kbd>h</kbd> ← 左</span>
-                        <span><kbd>.</kbd> 等待</span>
-                        <span><kbd>l</kbd> → 右</span>
-                        <span><kbd>b</kbd> ↙ 左下</span>
-                        <span><kbd>j</kbd> ↓ 下</span>
-                        <span><kbd>n</kbd> ↘ 右下</span>
+                        <span><kbd>Num 7</kbd> <kbd>↖</kbd> 左上</span>
+                        <span><kbd>Num 8</kbd> <kbd>↑</kbd> 上</span>
+                        <span><kbd>Num 9</kbd> <kbd>↗</kbd> 右上</span>
+                        <span><kbd>Num 4</kbd> <kbd>←</kbd> 左</span>
+                        <span><kbd>Num 5</kbd> <kbd>●</kbd> 等待</span>
+                        <span><kbd>Num 6</kbd> <kbd>→</kbd> 右</span>
+                        <span><kbd>Num 1</kbd> <kbd>↙</kbd> 左下</span>
+                        <span><kbd>Num 2</kbd> <kbd>↓</kbd> 下</span>
+                        <span><kbd>Num 3</kbd> <kbd>↘</kbd> 右下</span>
+                    </div>
+                    <p class="nk-section-label">Vi 键模式（<code>number_pad:0</code>）</p>
+                    <div class="nk-cmd-grid">
+                        <span><kbd>y</kbd> <kbd>↖</kbd> 左上</span>
+                        <span><kbd>k</kbd> <kbd>↑</kbd> 上</span>
+                        <span><kbd>u</kbd> <kbd>↗</kbd> 右上</span>
+                        <span><kbd>h</kbd> <kbd>←</kbd> 左</span>
+                        <span><kbd>.</kbd> <kbd>●</kbd> 等待</span>
+                        <span><kbd>l</kbd> <kbd>→</kbd> 右</span>
+                        <span><kbd>b</kbd> <kbd>↙</kbd> 左下</span>
+                        <span><kbd>j</kbd> <kbd>↓</kbd> 下</span>
+                        <span><kbd>n</kbd> <kbd>↘</kbd> 右下</span>
                     </div>
                     <div class="nk-cmd-grid nk-cmd-sub">
                         <span><kbd>&lt;</kbd> <a href="https://nethackwiki.com/wiki/Stair" target="_blank" rel="noreferrer">上楼</a></span>
@@ -265,6 +278,20 @@
                         <span><kbd>;</kbd> 查看远处物品/怪物</span>
                         <span><kbd>q</kbd> 喝泉水/药水</span>
                         <span><kbd>D</kbd> 丢弃多个</span>
+                    </div>
+                </details>
+                <details class="nethack-shortcuts">
+                    <summary>常用配置选项</summary>
+                    <div class="nk-cmd-grid">
+                        <span><code>number_pad:0</code> — 禁用数字键移动</span>
+                        <span>启用后使用 <code>yuhjklbn</code>（Vi 键）移动</span>
+                        <span><code>number_pad:1</code> — 默认，方向键/小键盘移动</span>
+                        <span><code>autopickup:1</code> — 自动拾取物品</span>
+                        <span><code>autodig:1</code> — 自动挖掘（对着墙用镐）</span>
+                        <span><code>confirm:1</code> — 危险操作前确认</span>
+                        <span><code>safe_pet:1</code> — 防止误伤宠物</span>
+                        <span><code>dark_room:1</code> — 显示黑暗区域边界</span>
+                        <span><code>hilite_pet:1</code> — 高亮显示宠物</span>
                     </div>
                 </details>
                 <details class="nethack-shortcuts">
