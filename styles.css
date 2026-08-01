@@ -1565,7 +1565,7 @@ body.nk-dark .nethack-tab.active {
 }
 .nk-cmd-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
     gap: 6px 10px;
     padding: 12px 0 4px;
     font-size: 11px;
@@ -1792,7 +1792,6 @@ body.nk-dark .nk-cmd-grid kbd {
 }
 @media (max-width: 800px) {
     .nethack-iframe, .nethack-iframe-3d { height: 450px; }
-    .nk-cmd-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
 
