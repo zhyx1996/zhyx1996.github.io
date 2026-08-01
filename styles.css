@@ -1644,18 +1644,17 @@ body.nk-dark .nethack-tab.active {
     font-family: var(--font-mono);
     font-size: 11px;
 }
-.nk-desc-grid {
-    font-family: var(--font-mono);
-    font-size: 11px;
+.nk-desc-grid span {
+    white-space: normal;
 }
-.nk-desc-grid kbd {
+.nk-cmd-grid.nk-desc-grid kbd {
     display: inline-block;
     font-family: var(--font-mono);
     text-align: left;
     min-width: 100px;
     white-space: nowrap;
 }
-.nk-desc-grid code {
+.nk-cmd-grid.nk-desc-grid code {
     display: inline-block;
     font-family: var(--font-mono);
     text-align: left;

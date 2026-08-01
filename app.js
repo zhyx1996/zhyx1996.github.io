@@ -132,6 +132,9 @@ const escapeHtml = (value) => String(value ?? '')
   .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
 // ── 市场快照（实时数据）──
+// Gold API 和 CoinGecko 在国内访问情况不同：
+// - Gold API (api.gold-api.com) 直连正常且支持 CORS，无需代理
+// - CoinGecko (api.coingecko.com) 国内被墙，需要代理
 const PROXY = 'https://corsproxy.io/?';
 
 // ── 市场快照缓存（5 分钟 TTL）──
@@ -257,20 +260,29 @@ async function loadMarket() {
     } catch { return null; }
   };
 
-  // Bitcoin 价格（CoinGecko，免费无需密钥）
+  // Bitcoin 价格（CoinGecko，国内被墙时走代理）
   const fetchBtc = async () => {
+    // 尝试直连
     try {
-      const res = await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
-      if (!res.ok) return null;
+      const res = await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', 5000);
+      if (!res.ok) throw new Error('not ok');
       const data = await res.json();
       return data.bitcoin?.usd || null;
-    } catch { return null; }
+    } catch {
+      // 直连失败，尝试通过 CORS 代理
+      try {
+        const res = await fetchWithTimeout(PROXY + encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'), 10000);
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.bitcoin?.usd || null;
+      } catch { return null; }
+    }
   };
 
-  // 黄金价格（通过代理避开 CORS）
+  // 黄金价格（直连，API 支持 CORS *）
   const fetchGold = async () => {
     try {
-      const res = await fetchWithTimeout(PROXY + encodeURIComponent('https://api.gold-api.com/price/XAU'));
+      const res = await fetchWithTimeout('https://api.gold-api.com/price/XAU');
       if (!res.ok) return null;
       const data = await res.json();
       return data.price || data[0]?.price || null;
@@ -502,6 +514,7 @@ async function loadSteamProfile() {
 
   try {
     const res = await fetchWithTimeout(`https://corsproxy.io/?${encodeURIComponent('https://steamcommunity.com/profiles/' + STEAM_ID64 + '/')}`, 15000);
+    // 注意：corsproxy.io 免费版可能限制非浏览器请求，浏览器端通常正常
     if (!res.ok) throw new Error('fetch failed');
     const html = await res.text();
 
