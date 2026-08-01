@@ -567,6 +567,18 @@ async function loadSteamProfile() {
   }
 }
 
+// ── 滚动进度条 ──
+function initScrollProgress() {
+  const bar = document.getElementById('scroll-progress');
+  if (!bar) return;
+  window.addEventListener('scroll', () => {
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (docHeight <= 0) { bar.style.width = '0'; return; }
+    const progress = Math.min(100, Math.max(0, (window.scrollY / docHeight) * 100));
+    bar.style.width = progress + '%';
+  }, { passive: true });
+}
+
 // ── 返回顶部 ──
 function initBackToTop() {
   const btn = document.getElementById('back-to-top');
@@ -618,6 +630,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderArticles();
   renderLatestArticle();
   initScrollAnimations();
+  initScrollProgress();
   initBackToTop();
   initFooterUpdated();
 

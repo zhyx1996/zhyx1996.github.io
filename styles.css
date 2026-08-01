@@ -57,6 +57,18 @@ body {
 a { color: var(--accent); text-decoration: none; transition: opacity 0.15s; }
 a:hover { opacity: 0.8; }
 
+/* ── 滚动进度条 ── */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    z-index: 10001;
+    transition: width 0.1s linear;
+    pointer-events: none;
+}
+
 /* ── 无障碍：跳转链接 ── */
 .skip-link {
     position: absolute;
