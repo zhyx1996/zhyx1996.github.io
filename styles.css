@@ -1642,17 +1642,23 @@ body.nk-dark .nethack-tab.active {
     font-family: var(--font-mono);
     font-size: 11px;
 }
-.nk-desc-grid kbd {
-    min-width: 90px !important;
-    display: inline-block;
-    text-align: left;
+.nk-desc-grid {
     font-family: var(--font-mono);
+    font-size: 11px;
+}
+.nk-desc-grid kbd {
+    display: inline-block;
+    font-family: var(--font-mono);
+    text-align: left;
+    min-width: 100px;
+    white-space: nowrap;
 }
 .nk-desc-grid code {
-    min-width: 90px !important;
     display: inline-block;
-    text-align: left;
     font-family: var(--font-mono);
+    text-align: left;
+    min-width: 100px;
+    white-space: nowrap;
     font-size: 11px;
     background: var(--bg-tertiary);
     padding: 1px 4px;
