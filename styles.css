@@ -1646,13 +1646,15 @@ body.nk-dark .nethack-tab.active {
 }
 .nk-cmd-grid.nk-desc-grid {
     display: grid;
-    grid-template-columns: 120px 1fr;
-    column-gap: 14px;
-    row-gap: 4px;
-    align-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 6px 14px;
 }
 .nk-cmd-grid.nk-desc-grid > span {
-    display: contents;
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    column-gap: 12px;
+    align-items: center;
+    white-space: normal;
 }
 .nk-cmd-grid.nk-desc-grid > span > kbd:first-child,
 .nk-cmd-grid.nk-desc-grid > span > code:first-child {
