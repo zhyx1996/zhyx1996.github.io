@@ -1605,6 +1605,18 @@ body.nk-dark .nethack-tab.active {
     letter-spacing: 0.04em;
     color: var(--text-muted);
 }
+.nk-cmd-sub {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed var(--border);
+}
+.nethack-shortcuts a {
+    color: var(--accent);
+    text-decoration: none;
+}
+.nethack-shortcuts a:hover {
+    text-decoration: underline;
+}
 .nk-cmd-grid kbd.sym-player { color: #fff; background: #444; }
 .nk-cmd-grid kbd.sym-wall { color: #8B7355; background: #333; }
 .nk-cmd-grid kbd.sym-floor { color: #444; background: #222; }

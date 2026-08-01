@@ -97,96 +97,172 @@
                     <div class="nk-window-statusbar" data-hint="3d">鼠标拖拽旋转视角 · WASD 移动 · 左键互动 · 滚轮缩放</div>
                 </div>
                 <details class="nethack-shortcuts">
-                    <summary>快捷键</summary>
+                    <summary>基本移动</summary>
                     <div class="nk-cmd-grid">
-                        <span><kbd>a</kbd> 使用工具</span>
-                        <span><kbd>A</kbd> 全部脱下</span>
-                        <span><kbd>c</kbd> 施法</span>
-                        <span><kbd>C</kbd> 命名</span>
-                        <span><kbd>d</kbd> 丢弃</span>
-                        <span><kbd>D</kbd> 丢弃多个</span>
-                        <span><kbd>e</kbd> 进食</span>
-                        <span><kbd>E</kbd> 刻字</span>
-                        <span><kbd>f</kbd> 射击</span>
-                        <span><kbd>F</kbd> 格斗</span>
-                        <span><kbd>i</kbd> 背包</span>
-                        <span><kbd>I</kbd> 分类背包</span>
-                        <span><kbd>o</kbd> 开门</span>
-                        <span><kbd>O</kbd> 选项</span>
+                        <span><kbd>y</kbd> ↖ 左上</span>
+                        <span><kbd>k</kbd> ↑ 上</span>
+                        <span><kbd>u</kbd> ↗ 右上</span>
+                        <span><kbd>h</kbd> ← 左</span>
+                        <span><kbd>.</kbd> 等待</span>
+                        <span><kbd>l</kbd> → 右</span>
+                        <span><kbd>b</kbd> ↙ 左下</span>
+                        <span><kbd>j</kbd> ↓ 下</span>
+                        <span><kbd>n</kbd> ↘ 右下</span>
+                    </div>
+                    <div class="nk-cmd-grid nk-cmd-sub">
+                        <span><kbd>&lt;</kbd> <a href="https://nethackwiki.com/wiki/Stair" target="_blank" rel="noreferrer">上楼</a></span>
+                        <span><kbd>&gt;</kbd> <a href="https://nethackwiki.com/wiki/Stair" target="_blank" rel="noreferrer">下楼</a></span>
                         <span><kbd>q</kbd> 喝药水</span>
-                        <span><kbd>Q</kbd> 装备箭</span>
-                        <span><kbd>r</kbd> 读卷轴</span>
-                        <span><kbd>R</kbd> 脱戒指</span>
                         <span><kbd>s</kbd> 搜索</span>
-                        <span><kbd>t</kbd> 扔</span>
+                        <span><kbd>o</kbd> 开门</span>
+                        <span><kbd>c</kbd> 关门</span>
+                    </div>
+                </details>
+                <details class="nethack-shortcuts">
+                    <summary>日常操作</summary>
+                    <div class="nk-cmd-grid">
+                        <span><kbd>,</kbd> <a href="https://nethackwiki.com/wiki/Pick_up" target="_blank" rel="noreferrer">拾取</a></span>
+                        <span><kbd>d</kbd> <a href="https://nethackwiki.com/wiki/Drop" target="_blank" rel="noreferrer">丢弃</a></span>
+                        <span><kbd>e</kbd> <a href="https://nethackwiki.com/wiki/Food" target="_blank" rel="noreferrer">进食</a></span>
+                        <span><kbd>r</kbd> <a href="https://nethackwiki.com/wiki/Scroll" target="_blank" rel="noreferrer">读卷轴</a></span>
+                        <span><kbd>z</kbd> <a href="https://nethackwiki.com/wiki/Wand" target="_blank" rel="noreferrer">挥魔杖</a></span>
+                        <span><kbd>a</kbd> <a href="https://nethackwiki.com/wiki/Tool" target="_blank" rel="noreferrer">使用工具</a></span>
+                        <span><kbd>p</kbd> 付账</span>
+                        <span><kbd>i</kbd> 查看背包</span>
+                        <span><kbd>:</kbd> 查看地面</span>
+                    </div>
+                </details>
+                <details class="nethack-shortcuts">
+                    <summary>战斗与装备</summary>
+                    <div class="nk-cmd-grid">
+                        <span><kbd>w</kbd> <a href="https://nethackwiki.com/wiki/Weapon" target="_blank" rel="noreferrer">装备武器</a></span>
+                        <span><kbd>W</kbd> <a href="https://nethackwiki.com/wiki/Armor" target="_blank" rel="noreferrer">穿护甲</a></span>
+                        <span><kbd>P</kbd> 戴戒指</span>
                         <span><kbd>T</kbd> 脱护甲</span>
-                        <span><kbd>u</kbd> 踢</span>
-                        <span><kbd>v</kbd> 版本</span>
-                        <span><kbd>w</kbd> 装备武器</span>
-                        <span><kbd>W</kbd> 穿护甲</span>
+                        <span><kbd>R</kbd> 脱戒指</span>
+                        <span><kbd>A</kbd> 全部脱下</span>
+                        <span><kbd>t</kbd> <a href="https://nethackwiki.com/wiki/Throw" target="_blank" rel="noreferrer">扔物品</a></span>
+                        <span><kbd>f</kbd> 射击/弓</span>
                         <span><kbd>x</kbd> 交换武器</span>
                         <span><kbd>X</kbd> 双持模式</span>
-                        <span><kbd>z</kbd> 挥魔杖</span>
-                        <span><kbd>Z</kbd> 施放法术</span>
+                        <span><kbd>F</kbd> 格斗</span>
+                        <span><kbd>Q</kbd> 装备箭/矢</span>
+                    </div>
+                </details>
+                <details class="nethack-shortcuts">
+                    <summary>互动与魔法</summary>
+                    <div class="nk-cmd-grid">
+                        <span><kbd>E</kbd> <a href="https://nethackwiki.com/wiki/Elbereth" target="_blank" rel="noreferrer">刻字（Elbereth）</a></span>
+                        <span><kbd>Z</kbd> <a href="https://nethackwiki.com/wiki/Spell" target="_blank" rel="noreferrer">施放法术</a></span>
+                        <span><kbd>C</kbd> <a href="https://nethackwiki.com/wiki/Monster" target="_blank" rel="noreferrer">命名怪物</a></span>
+                        <span><kbd>#chat</kbd> 与怪对话</span>
+                        <span><kbd>#pray</kbd> <a href="https://nethackwiki.com/wiki/Prayer" target="_blank" rel="noreferrer">祈祷</a></span>
+                        <span><kbd>#offer</kbd> <a href="https://nethackwiki.com/wiki/Sacrifice" target="_blank" rel="noreferrer">献祭</a></span>
+                        <span><kbd>#sit</kbd> <a href="https://nethackwiki.com/wiki/Throne" target="_blank" rel="noreferrer">坐王座</a></span>
+                        <span><kbd>#rub</kbd> <a href="https://nethackwiki.com/wiki/Luckstone" target="_blank" rel="noreferrer">搓幸运石</a></span>
+                        <span><kbd>#dip</kbd> 浸入喷泉</span>
+                        <span><kbd>#loot</kbd> 搜刮商店</span>
+                        <span><kbd>#force</kbd> 撬锁</span>
+                        <span><kbd>#untrap</kbd> 拆除陷阱</span>
                     </div>
                 </details>
                 <details class="nethack-shortcuts hidden" data-for="terminal" id="symbols-section">
                     <summary>地图符号</summary>
-                    <p class="nk-section-label">地形与物品<span class="nk-label-note">颜色＝种类/材质 · 魔杖外观随机</span></p>
+                    <p class="nk-section-label">玩家与地形</p>
                     <div class="nk-cmd-grid">
-                        <span><kbd class="sym-player">@</kbd> 玩家</span>
-                        <span><kbd class="sym-wall">#</kbd> 墙壁</span>
-                        <span><kbd class="sym-floor">.</kbd> 地板</span>
-                        <span><kbd class="sym-door">+</kbd> 门</span>
-                        <span><kbd class="sym-stairs">&lt;</kbd> 上楼</span>
-                        <span><kbd class="sym-stairs">&gt;</kbd> 下楼</span>
-                        <span><kbd class="sym-trap">^</kbd> 陷阱</span>
-                        <span><kbd class="sym-gold">$</kbd> 金币</span>
-                        <span><kbd class="sym-food">%</kbd> 食物</span>
-                        <span><kbd class="sym-gem">*</kbd> 宝石</span>
-                        <span><kbd class="sym-potion">!</kbd> 药水</span>
-                        <span><kbd class="sym-scroll">?</kbd> 卷轴</span>
-                        <span><kbd class="sym-wand">/</kbd> 魔杖</span>
-                        <span><kbd class="sym-armor">[</kbd> 护甲</span>
-                        <span><kbd class="sym-weapon">)</kbd> 武器</span>
-                        <span><kbd class="sym-tool">(</kbd> 工具</span>
-                        <span><kbd class="sym-amulet">"</kbd> 项链</span>
-                        <span><kbd class="sym-ring">=</kbd> 戒指</span>
-                        <span><kbd class="sym-fountain">{</kbd> 喷泉</span>
-                        <span><kbd class="sym-altar">_</kbd> 祭坛</span>
-                        <span><kbd class="sym-boulder">0</kbd> 巨石</span>
+                        <span><a href="https://nethackwiki.com/wiki/@" target="_blank" rel="noreferrer"><kbd class="sym-player">@</kbd></a> <a href="https://nethackwiki.com/wiki/Player" target="_blank" rel="noreferrer">玩家</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/#" target="_blank" rel="noreferrer"><kbd class="sym-wall">#</kbd></a> <a href="https://nethackwiki.com/wiki/Wall" target="_blank" rel="noreferrer">墙壁</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/." target="_blank" rel="noreferrer"><kbd class="sym-floor">.</kbd></a> <a href="https://nethackwiki.com/wiki/Floor" target="_blank" rel="noreferrer">地板</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/+" target="_blank" rel="noreferrer"><kbd class="sym-door">+</kbd></a> <a href="https://nethackwiki.com/wiki/Door" target="_blank" rel="noreferrer">门</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/%3C" target="_blank" rel="noreferrer"><kbd class="sym-stairs">&lt;</kbd></a> <a href="https://nethackwiki.com/wiki/Stair" target="_blank" rel="noreferrer">上楼</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/%3E" target="_blank" rel="noreferrer"><kbd class="sym-stairs">&gt;</kbd></a> <a href="https://nethackwiki.com/wiki/Stair" target="_blank" rel="noreferrer">下楼</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/%5E" target="_blank" rel="noreferrer"><kbd class="sym-trap">^</kbd></a> <a href="https://nethackwiki.com/wiki/Trap" target="_blank" rel="noreferrer">陷阱</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/%7B" target="_blank" rel="noreferrer"><kbd class="sym-fountain">{</kbd></a> <a href="https://nethackwiki.com/wiki/Fountain" target="_blank" rel="noreferrer">喷泉</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/%7D" target="_blank" rel="noreferrer"><kbd class="sym-altar">}</kbd></a> <a href="https://nethackwiki.com/wiki/Altar" target="_blank" rel="noreferrer">祭坛</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/%60" target="_blank" rel="noreferrer"><kbd class="sym-boulder">`</kbd></a> <a href="https://nethackwiki.com/wiki/Boulder" target="_blank" rel="noreferrer">巨石</a></span>
                     </div>
-                    <p class="nk-section-label">怪物图例<span class="nk-label-note">颜色＝怪物种类 · 敌友不靠颜色区分（; 查看）</span></p>
+                    <p class="nk-section-label">物品</p>
                     <div class="nk-cmd-grid">
-                        <span><kbd class="sym-player">@</kbd> 人类/精灵</span>
-                        <span><kbd class="sym-dog">d</kbd> 狗</span>
-                        <span><kbd class="sym-feline">f</kbd> 猫</span>
-                        <span><kbd class="sym-quadruped">q</kbd> 马/四足兽</span>
-                        <span><kbd class="sym-cockatrice">c</kbd> 鸡蛇</span>
-                        <span><kbd class="sym-kobold">k</kbd> 狗头人</span>
-                        <span><kbd class="sym-orc">o</kbd> 兽人</span>
-                        <span><kbd class="sym-rat">r</kbd> 老鼠</span>
-                        <span><kbd class="sym-spider">s</kbd> 蜘蛛</span>
-                        <span><kbd class="sym-zombie">Z</kbd> 僵尸</span>
-                        <span><kbd class="sym-dragon">D</kbd> 龙</span>
-                        <span><kbd class="sym-snake">S</kbd> 蛇</span>
-                        <span><kbd class="sym-troll">T</kbd> 巨魔</span>
-                        <span><kbd class="sym-bat">B</kbd> 蝙蝠</span>
-                        <span><kbd class="sym-unicorn">u</kbd> 独角兽</span>
-                        <span><kbd class="sym-lich">L</kbd> 巫妖</span>
-                        <span><kbd class="sym-naga">N</kbd> 娜迦</span>
-                        <span><kbd class="sym-vampire">V</kbd> 吸血鬼</span>
-                        <span><kbd class="sym-mummy">M</kbd> 木乃伊</span>
-                        <span><kbd class="sym-mimic">m</kbd> 拟态怪</span>
-                        <span><kbd class="sym-gnome">G</kbd> 侏儒</span>
-                        <span><kbd class="sym-giant">H</kbd> 巨人</span>
-                        <span><kbd class="sym-wraith">W</kbd> 幽魂</span>
-                        <span><kbd class="sym-demon">&amp;</kbd> 恶魔</span>
+                        <span><a href="https://nethackwiki.com/wiki/$" target="_blank" rel="noreferrer"><kbd class="sym-gold">$</kbd></a> <a href="https://nethackwiki.com/wiki/Gold" target="_blank" rel="noreferrer">金币</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/%25" target="_blank" rel="noreferrer"><kbd class="sym-food">%</kbd></a> <a href="https://nethackwiki.com/wiki/Food" target="_blank" rel="noreferrer">食物</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/*" target="_blank" rel="noreferrer"><kbd class="sym-gem">*</kbd></a> <a href="https://nethackwiki.com/wiki/Gem" target="_blank" rel="noreferrer">宝石</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/!" target="_blank" rel="noreferrer"><kbd class="sym-potion">!</kbd></a> <a href="https://nethackwiki.com/wiki/Potion" target="_blank" rel="noreferrer">药水</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/%3F" target="_blank" rel="noreferrer"><kbd class="sym-scroll">?</kbd></a> <a href="https://nethackwiki.com/wiki/Scroll" target="_blank" rel="noreferrer">卷轴</a></span>
+                        <span><a href="https://nethackwiki.com/wiki//" target="_blank" rel="noreferrer"><kbd class="sym-wand">/</kbd></a> <a href="https://nethackwiki.com/wiki/Wand" target="_blank" rel="noreferrer">魔杖</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/%5B" target="_blank" rel="noreferrer"><kbd class="sym-armor">[</kbd></a> <a href="https://nethackwiki.com/wiki/Armor" target="_blank" rel="noreferrer">护甲</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/)" target="_blank" rel="noreferrer"><kbd class="sym-weapon">)</kbd></a> <a href="https://nethackwiki.com/wiki/Weapon" target="_blank" rel="noreferrer">武器</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/(" target="_blank" rel="noreferrer"><kbd class="sym-tool">(</kbd></a> <a href="https://nethackwiki.com/wiki/Tool" target="_blank" rel="noreferrer">工具</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/%22" target="_blank" rel="noreferrer"><kbd class="sym-amulet">"</kbd></a> <a href="https://nethackwiki.com/wiki/Amulet" target="_blank" rel="noreferrer">项链</a></span>
+                        <span><a href="https://nethackwiki.com/wiki/=" target="_blank" rel="noreferrer"><kbd class="sym-ring">=</kbd></a> <a href="https://nethackwiki.com/wiki/Ring" target="_blank" rel="noreferrer">戒指</a></span>
                     </div>
-                    <p class="nk-at-colors">
-                        <span class="nk-at-glyphs"><kbd class="sym-at-white">@</kbd><kbd class="sym-at-green">@</kbd><kbd class="sym-at-brightgreen">@</kbd><kbd class="sym-at-blue">@</kbd><kbd class="sym-at-brightblue">@</kbd><kbd class="sym-at-lightgray">@</kbd><kbd class="sym-at-darkgray">@</kbd><kbd class="sym-at-magenta">@</kbd><kbd class="sym-at-brightmagenta">@</kbd><kbd class="sym-at-red">@</kbd><kbd class="sym-at-brown">@</kbd><kbd class="sym-at-orange">@</kbd></span>
-                        <span class="nk-at-caption">@＝人类/精灵，按身份上色：白＝玩家/人类 · 绿＝精灵/巡卫 · 亮绿＝绿精灵/美杜莎 · 蓝＝卫兵 · 亮蓝＝精灵贵族/Oracle · 浅灰＝士兵/灰精灵 · 深灰＝Dark One · 品红＝独特Boss · 亮品红＝巫妖王 · 红/棕/橙＝军官/狼人形（完整色表见 wiki）</span>
-                    </p>
+                    <p class="nk-section-label">怪物与宠物</p>
+                    <div class="nk-cmd-grid">
+                        <span><kbd class="sym-pet">d</kbd> <a href="https://nethackwiki.com/wiki/Dog" target="_blank" rel="noreferrer">狗</a></span>
+                        <span><kbd class="sym-pet">c</kbd> <a href="https://nethackwiki.com/wiki/Cat" target="_blank" rel="noreferrer">猫</a></span>
+                        <span><kbd class="sym-pet">f</kbd> <a href="https://nethackwiki.com/wiki/Feline" target="_blank" rel="noreferrer">猫科</a></span>
+                        <span><kbd class="sym-mon">k</kbd> <a href="https://nethackwiki.com/wiki/Kobold" target="_blank" rel="noreferrer">狗头人</a></span>
+                        <span><kbd class="sym-mon">o</kbd> <a href="https://nethackwiki.com/wiki/Orc" target="_blank" rel="noreferrer">兽人</a></span>
+                        <span><kbd class="sym-mon">r</kbd> <a href="https://nethackwiki.com/wiki/Rat" target="_blank" rel="noreferrer">老鼠</a></span>
+                        <span><kbd class="sym-mon">s</kbd> <a href="https://nethackwiki.com/wiki/Spider" target="_blank" rel="noreferrer">蜘蛛</a></span>
+                        <span><kbd class="sym-mon">z</kbd> <a href="https://nethackwiki.com/wiki/Zombie" target="_blank" rel="noreferrer">僵尸</a></span>
+                        <span><kbd class="sym-mon">D</kbd> <a href="https://nethackwiki.com/wiki/Dragon" target="_blank" rel="noreferrer">龙</a></span>
+                        <span><kbd class="sym-mon">S</kbd> <a href="https://nethackwiki.com/wiki/Snake" target="_blank" rel="noreferrer">蛇</a></span>
+                        <span><kbd class="sym-mon">T</kbd> <a href="https://nethackwiki.com/wiki/Troll" target="_blank" rel="noreferrer">巨魔</a></span>
+                        <span><kbd class="sym-mon">B</kbd> <a href="https://nethackwiki.com/wiki/Bat" target="_blank" rel="noreferrer">蝙蝠</a></span>
+                        <span><kbd class="sym-mon">u</kbd> <a href="https://nethackwiki.com/wiki/Unicorn" target="_blank" rel="noreferrer">独角兽</a></span>
+                        <span><kbd class="sym-mon">L</kbd> <a href="https://nethackwiki.com/wiki/Lich" target="_blank" rel="noreferrer">巫妖</a></span>
+                        <span><kbd class="sym-mon">N</kbd> <a href="https://nethackwiki.com/wiki/Naga" target="_blank" rel="noreferrer">娜迦</a></span>
+                        <span><kbd class="sym-mon">V</kbd> <a href="https://nethackwiki.com/wiki/Vampire" target="_blank" rel="noreferrer">吸血鬼</a></span>
+                        <span><kbd class="sym-mon">M</kbd> <a href="https://nethackwiki.com/wiki/Mummy" target="_blank" rel="noreferrer">木乃伊</a></span>
+                        <span><kbd class="sym-mon">m</kbd> <a href="https://nethackwiki.com/wiki/Mimic" target="_blank" rel="noreferrer">拟态怪</a></span>
+                        <span><kbd class="sym-mon">G</kbd> <a href="https://nethackwiki.com/wiki/Gnome" target="_blank" rel="noreferrer">侏儒</a></span>
+                        <span><kbd class="sym-mon">H</kbd> <a href="https://nethackwiki.com/wiki/Giant" target="_blank" rel="noreferrer">巨人</a></span>
+                        <span><kbd class="sym-mon">W</kbd> <a href="https://nethackwiki.com/wiki/Wraith" target="_blank" rel="noreferrer">幽魂</a></span>
+                        <span><kbd class="sym-mon">&amp;</kbd> <a href="https://nethackwiki.com/wiki/Demon" target="_blank" rel="noreferrer">恶魔</a></span>
+                    </div>
+                </details>
+                <details class="nethack-shortcuts">
+                    <summary>扩展命令（#）</summary>
+                    <div class="nk-cmd-grid">
+                        <span><kbd>#?</kbd> 命令帮助</span>
+                        <span><kbd>#adjust</kbd> 调整物品</span>
+                        <span><kbd>#annotate</kbd> 标注楼层</span>
+                        <span><kbd>#conduct</kbd> 查看成就</span>
+                        <span><kbd>#dip</kbd> 浸入</span>
+                        <span><kbd>#enhance</kbd> 技能升级</span>
+                        <span><kbd>#force</kbd> 撬锁</span>
+                        <span><kbd>#invoke</kbd> 召唤神器</span>
+                        <span><kbd>#jump</kbd> 跳跃</span>
+                        <span><kbd>#loot</kbd> 搜刮</span>
+                        <span><kbd>#monster</kbd> 怪兽能力</span>
+                        <span><kbd>#name</kbd> 命名物品</span>
+                        <span><kbd>#offer</kbd> 献祭</span>
+                        <span><kbd>#overview</kbd> 地下城总览</span>
+                        <span><kbd>#pray</kbd> 祈祷</span>
+                        <span><kbd>#ride</kbd> 骑乘</span>
+                        <span><kbd>#rub</kbd> 搓石</span>
+                        <span><kbd>#sit</kbd> 坐下</span>
+                        <span><kbd>#terrain</kbd> 地形总览</span>
+                        <span><kbd>#tip</kbd> 翻箱</span>
+                        <span><kbd>#turn</kbd> 驱鬼</span>
+                        <span><kbd>#twoweapon</kbd> 双持</span>
+                        <span><kbd>#untrap</kbd> 拆陷阱</span>
+                        <span><kbd>#version</kbd> 版本信息</span>
+                        <span><kbd>#wipe</kbd> 擦脸</span>
+                    </div>
+                </details>
+                <details class="nethack-shortcuts">
+                    <summary>重要提示</summary>
+                    <div class="nk-cmd-grid">
+                        <span><kbd>Elbereth</kbd> 刻字后近战怪不敢攻击</span>
+                        <span><kbd>S</kbd> 保存退出</span>
+                        <span><kbd>^P</kbd> 查看历史消息</span>
+                        <span><kbd>^X</kbd> 查看角色属性</span>
+                        <span><kbd>X</kbd> 双持模式</span>
+                        <span><kbd>#enhance</kbd> 提升武器技能</span>
+                        <span><kbd>:</kbd> 查看地面物品</span>
+                        <span><kbd>;</kbd> 查看远处物品/怪物</span>
+                    </div>
                 </details>
                 <div class="nethack-links">
                     <a href="https://nethackwiki.com/" target="_blank" rel="noreferrer">NetHack Wiki</a>
