@@ -1577,17 +1577,16 @@ body.nk-dark .nethack-tab.active {
 }
 .nk-cmd-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 6px 8px;
     padding: 12px 0 4px;
     font-size: 11px;
     color: var(--text-muted);
 }
 .nk-cmd-grid span {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    word-break: break-word;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     line-height: 1.5;
 }
 .nk-section-label.danger-label {
