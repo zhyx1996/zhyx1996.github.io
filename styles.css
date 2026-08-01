@@ -1617,6 +1617,14 @@ body.nk-dark .nethack-tab.active {
 .nethack-shortcuts a:hover {
     text-decoration: underline;
 }
+.nethack-shortcuts code {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--bg-tertiary);
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: var(--accent);
+}
 .nk-cmd-grid kbd.sym-player { color: #fff; background: #444; }
 .nk-cmd-grid kbd.sym-wall { color: #8B7355; background: #333; }
 .nk-cmd-grid kbd.sym-floor { color: #444; background: #222; }
