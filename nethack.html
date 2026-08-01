@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css?v=40">
+    <link rel="stylesheet" href="/styles.css?v=41">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css" />
     <style>
         body { opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards; }
@@ -301,8 +301,7 @@
                     <p class="nk-section-label">进入方式</p>
                     <div class="nk-cmd-grid nk-desc-grid">
                         <span><kbd>3D 版</kbd><span class="nk-desc"> 创建角色时取名 <code>wizard</code> 即可进入调试模式</span></span>
-                        <span><kbd>本地</kbd><span class="nk-desc"> 启动命令 <code>nethack -D -u wizard</code></span></span>
-                        <span><kbd>Unix</kbd><span class="nk-desc"> 编辑 <code>sysconf</code> 配置 <code>WIZARDS=*</code>，公共服务器（如 <a href="https://nethackwiki.com/wiki/Nethack.alt.org" target="_blank" rel="noreferrer">NAO</a>）禁止 <a href="https://nethackwiki.com/wiki/Wizard_mode" target="_blank" rel="noreferrer">Wizard 模式</a></span></span>
+                        <span><kbd>联机版</kbd><span class="nk-desc"> 无——公共服务器（如 <a href="https://nethackwiki.com/wiki/Nethack.alt.org" target="_blank" rel="noreferrer">NAO</a>）禁止 <a href="https://nethackwiki.com/wiki/Wizard_mode" target="_blank" rel="noreferrer">Wizard 模式</a>，仅管理员可用</span></span>
                         <span><kbd>注意</kbd><span class="nk-desc"> 游戏不计入 <a href="https://nethackwiki.com/wiki/Record_file" target="_blank" rel="noreferrer">排行榜</a>，仅用于测试</span></span>
                     </div>
                     <p class="nk-section-label">调试快捷键</p>
@@ -316,7 +315,7 @@
                         <span><kbd>Ctrl+O</kbd><span class="nk-desc"> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">楼层总览</a></span></span>
                         <span><kbd>Ctrl+I</kbd><span class="nk-desc"> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">显示物品信息</a></span></span>
                         <span><kbd>Ctrl+X</kbd><span class="nk-desc"> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">查看属性</a></span></span>
-                        <span><kbd>#levelchange</kbd><span class="nk-desc"> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">修改等级</a></span></span>
+                        <span><kbd>#levelchange</kbd><span class="nk-desc"> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">修改经验等级</a></span></span>
                         <span><kbd>#polyself</kbd><span class="nk-desc"> <a href="https://nethackwiki.com/wiki/Wizard_mode#Commands" target="_blank" rel="noreferrer">变形自己</a></span></span>
                     </div>
                 </details>
@@ -419,7 +418,7 @@
         </div>
     </footer>
 
-    <script src="/app.js?v=17" defer></script>
+    <script src="/app.js?v=18" defer></script>
     <script>
       function initSakanaWidget() {
         window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
