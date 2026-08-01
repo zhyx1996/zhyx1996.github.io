@@ -1646,20 +1646,24 @@ body.nk-dark .nethack-tab.active {
 }
 .nk-cmd-grid.nk-desc-grid {
     display: grid;
-    grid-template-columns: max-content 1fr;
-    column-gap: 12px;
-    row-gap: 4px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 6px 14px;
 }
 .nk-cmd-grid.nk-desc-grid > span {
-    display: contents;
-}
-.nk-cmd-grid.nk-desc-grid .nk-desc {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 8px;
+    align-items: start;
     white-space: normal;
 }
 .nk-cmd-grid.nk-desc-grid > span > kbd:first-child,
 .nk-cmd-grid.nk-desc-grid > span > code:first-child {
-    text-align: left;
     white-space: nowrap;
+    text-align: left;
+}
+.nk-cmd-grid.nk-desc-grid .nk-desc {
+    white-space: normal;
+    min-width: 0;
 }
 .nethack-shortcuts a {
     color: var(--accent);
@@ -1678,7 +1682,6 @@ body.nk-dark .nethack-tab.active {
 }
 .nk-cmd-grid kbd {
     display: inline-block;
-    min-width: 22px;
     text-align: center;
     padding: 2px 6px;
     font-family: var(--font-mono);
