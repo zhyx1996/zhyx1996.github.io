@@ -1644,27 +1644,22 @@ body.nk-dark .nethack-tab.active {
     font-family: var(--font-mono);
     font-size: 11px;
 }
-.nk-desc-grid span {
+.nk-cmd-grid.nk-desc-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 12px;
+    row-gap: 4px;
+}
+.nk-cmd-grid.nk-desc-grid > span {
+    display: contents;
+}
+.nk-cmd-grid.nk-desc-grid .nk-desc {
     white-space: normal;
 }
-.nk-cmd-grid.nk-desc-grid kbd {
-    display: inline-block;
-    font-family: var(--font-mono);
+.nk-cmd-grid.nk-desc-grid > span > kbd:first-child,
+.nk-cmd-grid.nk-desc-grid > span > code:first-child {
     text-align: left;
-    min-width: 100px;
     white-space: nowrap;
-}
-.nk-cmd-grid.nk-desc-grid code {
-    display: inline-block;
-    font-family: var(--font-mono);
-    text-align: left;
-    min-width: 100px;
-    white-space: nowrap;
-    font-size: 11px;
-    background: var(--bg-tertiary);
-    padding: 1px 4px;
-    border-radius: 3px;
-    color: var(--accent);
 }
 .nethack-shortcuts a {
     color: var(--accent);
@@ -1739,6 +1734,7 @@ body.nk-dark .nethack-tab.active {
 .nk-cmd-grid kbd.sym-mummy { color: #c8a870 !important; background: #333; }
 .nk-cmd-grid kbd.sym-cockatrice { color: #9acd32 !important; background: #333; }
 .nk-cmd-grid kbd.sym-zruty { color: #6b8e23 !important; background: #333; }
+.nk-cmd-grid kbd.sym-pool { color: #3498db !important; background: #333; }
 body.nk-dark .nk-cmd-grid kbd {
     background: linear-gradient(to bottom, #1a1a1a, #0d0d0d);
     border-color: #333;
