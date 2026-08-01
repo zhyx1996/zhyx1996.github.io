@@ -1738,6 +1738,8 @@ body.nk-dark .nethack-tab.active {
 .nk-cmd-grid kbd.sym-rat { color: #aa6633 !important; background: #333; }
 .nk-cmd-grid kbd.sym-mimic { color: #aaaaaa !important; background: #333; }
 .nk-cmd-grid kbd.sym-mummy { color: #c8a870 !important; background: #333; }
+.nk-cmd-grid kbd.sym-cockatrice { color: #9acd32 !important; background: #333; }
+.nk-cmd-grid kbd.sym-zruty { color: #6b8e23 !important; background: #333; }
 body.nk-dark .nk-cmd-grid kbd {
     background: linear-gradient(to bottom, #1a1a1a, #0d0d0d);
     border-color: #333;
