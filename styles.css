@@ -1643,10 +1643,21 @@ body.nk-dark .nethack-tab.active {
     font-size: 11px;
 }
 .nk-desc-grid kbd {
-    min-width: 90px;
+    min-width: 90px !important;
     display: inline-block;
     text-align: left;
     font-family: var(--font-mono);
+}
+.nk-desc-grid code {
+    min-width: 90px !important;
+    display: inline-block;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--bg-tertiary);
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: var(--accent);
 }
 .nethack-shortcuts a {
     color: var(--accent);
