@@ -1578,6 +1578,16 @@ body.nk-dark .nethack-tab.active {
     word-break: break-word;
     line-height: 1.4;
 }
+.nk-section-label.danger-label {
+    color: #ff6b6b;
+}
+.nk-section-label.danger-label::before,
+.nk-section-label.danger-label::after {
+    background: linear-gradient(90deg, transparent, #ff6b6b44);
+}
+.nk-section-label.danger-label::after {
+    background: linear-gradient(90deg, #ff6b6b44, transparent);
+}
 .nk-section-label {
     display: flex;
     align-items: center;
@@ -1606,6 +1616,11 @@ body.nk-dark .nethack-tab.active {
     font-weight: 400;
     letter-spacing: 0.04em;
     color: var(--text-muted);
+}
+.sym-danger {
+    font-size: 9px;
+    color: #ff6b6b;
+    margin-left: 2px;
 }
 .nk-cmd-sub {
     margin-top: 6px;
