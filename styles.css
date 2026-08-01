@@ -1576,20 +1576,20 @@ body.nk-dark .nethack-tab.active {
     color: var(--text);
 }
 .nk-cmd-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 10px;
+    column-count: 6;
+    column-gap: 10px;
     padding: 12px 0 4px;
     font-size: 11px;
     color: var(--text-muted);
 }
 .nk-cmd-grid span {
+    display: block;
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
     word-break: break-word;
-    line-height: 1.4;
-    flex: 0 0 auto;
+    line-height: 1.8;
+    break-inside: avoid;
 }
 .nk-section-label.danger-label {
     color: #ff6b6b;
