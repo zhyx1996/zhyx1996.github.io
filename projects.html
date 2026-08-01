@@ -43,20 +43,20 @@
                     <h1>公开仓库</h1>
                     <p>公开仓库、技术方向与近期维护内容。</p>
                 </div>
-                <div class="page-stats">
-                    <div class="stat-card">
-                        <span class="stat-num">4</span>
-                        <span class="stat-label">仓库</span>
+                    <div class="page-stats">
+                        <div class="stat-card">
+                            <span class="stat-num" id="repo-total">—</span>
+                            <span class="stat-label">仓库</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num">1</span>
+                            <span class="stat-label">Stars</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num">3</span>
+                            <span class="stat-label">语言</span>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <span class="stat-num">1</span>
-                        <span class="stat-label">Stars</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-num">3</span>
-                        <span class="stat-label">语言</span>
-                    </div>
-                </div>
             </section>
 
             <section class="section">
@@ -108,6 +108,18 @@
     <div id="sakana-drag-widget"></div>
 
     <script src="/app.js?v=10"></script>
+    <script>
+      fetch('https://api.github.com/users/zhyx1996', { headers: { 'Accept': 'application/vnd.github.v3+json' } })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          var el = document.getElementById('repo-total');
+          if (el && d.public_repos != null) el.textContent = d.public_repos;
+        })
+        .catch(function() {
+          var el = document.getElementById('repo-total');
+          if (el) el.textContent = '4';
+        });
+    </script>
     <script>
       function initSakanaWidget() {
         window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
