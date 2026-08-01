@@ -133,7 +133,7 @@
     <!-- Sakana 拖拽小球 -->
     <div id="sakana-drag-widget"></div>
 
-    <script src="/app.js?v=18"></script>
+    <script src="/app.js?v=19"></script>
     <script>
       fetch('https://api.github.com/users/zhyx1996/starred?per_page=1', { headers: { 'Accept': 'application/vnd.github.v3+json' } })
         .then(function(r) {
@@ -148,7 +148,7 @@
         })
         .catch(function() {
           var el = document.getElementById('star-total');
-          if (el) el.textContent = '419';
+          if (el) el.textContent = '420';
         });
     </script>
     <script>
