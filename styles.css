@@ -1717,27 +1717,27 @@ body.nk-dark .nethack-tab.active {
 .nk-cmd-grid kbd.sym-fountain { color: #00bcd4; background: #333; }
 .nk-cmd-grid kbd.sym-altar { color: #bdc3c7; background: #333; }
 .nk-cmd-grid kbd.sym-boulder { color: #6c6c6c; background: #333; }
-.nk-cmd-grid kbd.sym-dragon { color: #ff00ff; background: #333; }
-.nk-cmd-grid kbd.sym-lich { color: #00ffff; background: #333; }
-.nk-cmd-grid kbd.sym-vampire { color: #ff0000; background: #333; }
-.nk-cmd-grid kbd.sym-demon { color: #cc0000; background: #333; }
-.nk-cmd-grid kbd.sym-troll { color: #00cccc; background: #333; }
-.nk-cmd-grid kbd.sym-orc { color: #888888; background: #333; }
-.nk-cmd-grid kbd.sym-kobold { color: #8b4513; background: #333; }
-.nk-cmd-grid kbd.sym-gnome { color: #666666; background: #333; }
-.nk-cmd-grid kbd.sym-naga { color: #00ff00; background: #333; }
-.nk-cmd-grid kbd.sym-snake { color: #8b4513; background: #333; }
-.nk-cmd-grid kbd.sym-spider { color: #999999; background: #333; }
-.nk-cmd-grid kbd.sym-zombie { color: #aaaaaa; background: #333; }
-.nk-cmd-grid kbd.sym-wraith { color: #bbbbbb; background: #333; }
-.nk-cmd-grid kbd.sym-giant { color: #ff3333; background: #333; }
-.nk-cmd-grid kbd.sym-dog { color: #aa6633; background: #333; }
-.nk-cmd-grid kbd.sym-cat { color: #ffcc00; background: #333; }
-.nk-cmd-grid kbd.sym-unicorn { color: #ffffff; background: #333; }
-.nk-cmd-grid kbd.sym-bat { color: #ff3333; background: #333; }
-.nk-cmd-grid kbd.sym-rat { color: #aa6633; background: #333; }
-.nk-cmd-grid kbd.sym-mimic { color: #aaaaaa; background: #333; }
-.nk-cmd-grid kbd.sym-mummy { color: #c8a870; background: #333; }
+.nk-cmd-grid kbd.sym-dragon { color: #ff00ff !important; background: #333; }
+.nk-cmd-grid kbd.sym-lich { color: #00ffff !important; background: #333; }
+.nk-cmd-grid kbd.sym-vampire { color: #ff0000 !important; background: #333; }
+.nk-cmd-grid kbd.sym-demon { color: #cc0000 !important; background: #333; }
+.nk-cmd-grid kbd.sym-troll { color: #00cccc !important; background: #333; }
+.nk-cmd-grid kbd.sym-orc { color: #888888 !important; background: #333; }
+.nk-cmd-grid kbd.sym-kobold { color: #8b4513 !important; background: #333; }
+.nk-cmd-grid kbd.sym-gnome { color: #666666 !important; background: #333; }
+.nk-cmd-grid kbd.sym-naga { color: #00ff00 !important; background: #333; }
+.nk-cmd-grid kbd.sym-snake { color: #8b4513 !important; background: #333; }
+.nk-cmd-grid kbd.sym-spider { color: #999999 !important; background: #333; }
+.nk-cmd-grid kbd.sym-zombie { color: #aaaaaa !important; background: #333; }
+.nk-cmd-grid kbd.sym-wraith { color: #bbbbbb !important; background: #333; }
+.nk-cmd-grid kbd.sym-giant { color: #ff3333 !important; background: #333; }
+.nk-cmd-grid kbd.sym-dog { color: #aa6633 !important; background: #333; }
+.nk-cmd-grid kbd.sym-cat { color: #ffcc00 !important; background: #333; }
+.nk-cmd-grid kbd.sym-unicorn { color: #ffffff !important; background: #333; }
+.nk-cmd-grid kbd.sym-bat { color: #ff3333 !important; background: #333; }
+.nk-cmd-grid kbd.sym-rat { color: #aa6633 !important; background: #333; }
+.nk-cmd-grid kbd.sym-mimic { color: #aaaaaa !important; background: #333; }
+.nk-cmd-grid kbd.sym-mummy { color: #c8a870 !important; background: #333; }
 body.nk-dark .nk-cmd-grid kbd {
     background: linear-gradient(to bottom, #1a1a1a, #0d0d0d);
     border-color: #333;
@@ -1814,4 +1814,5 @@ body.nk-dark .nk-cmd-grid kbd {
     .nethack-iframe, .nethack-iframe-3d { height: 450px; }
     .nk-cmd-grid { grid-template-columns: repeat(4, 1fr); }
 }
+
 
