@@ -16,6 +16,8 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="北海虽赊，扶摇可接">
     <meta name="twitter:description" content="北海虽赊，扶摇可接 — 计算机视觉、自动驾驶感知、并行计算。">
+    <meta property="og:image" content="https://avatars.githubusercontent.com/zhyx1996">
+    <meta name="twitter:image" content="https://avatars.githubusercontent.com/zhyx1996">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23D97706'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>扶</text></svg>">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -33,6 +35,19 @@
         body { opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards; }
         @keyframes fadeIn { to { opacity: 1; } }
     </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "扶摇接海",
+      "url": "https://zhyx1996.github.io",
+      "sameAs": [
+        "https://github.com/zhyx1996",
+        "https://www.cnblogs.com/fix-me/"
+      ],
+      "description": "计算机视觉、自动驾驶感知、并行计算。"
+    }
+    </script>
     <noscript>
         <style>
             body { opacity: 1 !important; animation: none !important; }
@@ -126,7 +141,7 @@
                             <span class="showcase-badge">原神</span>
                             <span class="showcase-frame">Enka 框架</span>
                         </div>
-                        <iframe class="showcase-frame-lg" src="https://enka.network/u/147521967/" loading="lazy" referrerpolicy="no-referrer" title="Genshin Showcase"></iframe>
+                         <iframe class="showcase-frame-lg" src="https://enka.network/u/147521967/" loading="lazy" referrerpolicy="no-referrer" title="Genshin Showcase" sandbox="allow-scripts allow-same-origin"></iframe>
                     </div>
                     <div class="showcase-item showcase-wide">
                         <div class="showcase-header">
@@ -163,6 +178,22 @@
         window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
       }
     </script>
-    <script async onload="initSakanaWidget()" src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
+    <script>
+      function loadSakanaWithFallback() {
+        var script = document.createElement('script');
+        script.async = true;
+        script.onload = function() { window.initSakanaWidget && window.initSakanaWidget(); };
+        script.onerror = function() {
+          var fallback = document.createElement('script');
+          fallback.async = true;
+          fallback.onload = function() { window.initSakanaWidget && window.initSakanaWidget(); };
+          fallback.src = 'https://unpkg.com/sakana-widget@2.7.1/lib/sakana.min.js';
+          document.head.appendChild(fallback);
+        };
+        script.src = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js';
+        document.head.appendChild(script);
+      }
+      loadSakanaWithFallback();
+    </script>
 </body>
 </html>

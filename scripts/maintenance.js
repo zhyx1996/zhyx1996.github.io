@@ -110,147 +110,89 @@ function decodeXml(s) {
 // ─── 2. 迭代改进任务 ────────────────────────────────────────────
 const IMPROVEMENT_TASKS = [
     {
-        name: '优化 CSS 间距',
-        description: '调整 section 间距和卡片内边距',
-        apply: () => {
-            let css = fs.readFileSync(STYLES_CSS, 'utf8');
-            let changed = false;
-            // 增加 section 间距
-            if (css.includes('margin-bottom: 2.5rem')) {
-                css = css.replace('margin-bottom: 2.5rem;', 'margin-bottom: 3rem;');
-                changed = true;
-            }
-            // 增加卡片内边距
-            if (css.includes('padding: 1.3rem;') && !css.includes('padding: 1.5rem;')) {
-                css = css.replace(/padding: 1\.3rem;/g, 'padding: 1.5rem;');
-                changed = true;
-            }
-            if (changed) fs.writeFileSync(STYLES_CSS, css);
-            return changed;
-        }
+        name: '同步 RSS 文章数据',
+        description: '从博客园 RSS 同步最新文章到 articleFallback',
+        apply: () => { /* 由 syncArticles 处理 */ return false; }
     },
     {
-        name: '添加平滑滚动',
-        description: '为锚点链接添加平滑滚动效果',
+        name: '校验 HTML 结构完整性',
+        description: '检查所有页面是否包含必要的 skip-link、nav、main、footer',
         apply: () => {
-            let css = fs.readFileSync(STYLES_CSS, 'utf8');
-            if (css.includes('scroll-behavior: smooth')) return false;
-            css = css.replace('html { scroll-behavior: smooth; }', 'html { scroll-behavior: smooth; }\nhtml { scroll-padding-top: 80px; }');
-            // 简化：直接添加 scroll-padding-top
-            if (!css.includes('scroll-padding-top')) {
-                css = css.replace('html { scroll-behavior: smooth; }', 'html { scroll-behavior: smooth; scroll-padding-top: 80px; }');
+            const pages = ['index.html', 'projects.html', 'stars.html', 'articles.html', 'nethack.html'];
+            let issues = [];
+            for (const page of pages) {
+                const html = fs.readFileSync(path.join(SITE_DIR, page), 'utf8');
+                if (!html.includes('skip-link')) issues.push(`${page}: 缺少 skip-link`);
+                if (!html.includes('sidebar-nav')) issues.push(`${page}: 缺少 sidebar-nav`);
+                if (!html.includes('main-content')) issues.push(`${page}: 缺少 main-content`);
+                if (!html.includes('</footer>')) issues.push(`${page}: 缺少 footer`);
             }
-            fs.writeFileSync(STYLES_CSS, css);
-            return true;
-        }
-    },
-    {
-        name: '优化字体加载',
-        description: '添加 font-display: swap 到所有字体',
-        apply: () => {
-            let css = fs.readFileSync(STYLES_CSS, 'utf8');
-            if (css.includes('font-display: swap')) return false;
-            // 已经通过 @font-face 设置了 font-display: swap
+            if (issues.length) {
+                process.stdout.write('  ⚠️ 结构问题:\n' + issues.map(i => '     ' + i).join('\n') + '\n');
+            }
             return false;
         }
     },
     {
-        name: '添加卡片悬停动画',
-        description: '增强卡片悬停效果',
-        apply: () => {
-            let css = fs.readFileSync(STYLES_CSS, 'utf8');
-            if (css.includes('transition: all 0.3s')) return false;
-            css = css.replace(
-                '.card {',
-                '.card {\n    transition: all 0.3s ease;'
-            );
-            fs.writeFileSync(STYLES_CSS, css);
-            return true;
-        }
-    },
-    {
-        name: '优化按钮样式',
-        description: '添加按钮点击反馈',
-        apply: () => {
-            let css = fs.readFileSync(STYLES_CSS, 'utf8');
-            if (css.includes('.button:active')) return false;
-            css += `\n.button:active { transform: scale(0.97); }\n`;
-            fs.writeFileSync(STYLES_CSS, css);
-            return true;
-        }
-    },
-    {
-        name: '添加暗色滚动条',
-        description: '自定义滚动条样式匹配暗色主题',
-        apply: () => {
-            let css = fs.readFileSync(STYLES_CSS, 'utf8');
-            if (css.includes('::-webkit-scrollbar')) return false;
-            css += `\n::-webkit-scrollbar { width: 8px; }\n::-webkit-scrollbar-track { background: var(--void); }\n::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }\n::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }\n`;
-            fs.writeFileSync(STYLES_CSS, css);
-            return true;
-        }
-    },
-    {
-        name: '优化图片加载',
-        description: '为图片添加 loading="lazy"',
-        apply: () => {
-            let html = fs.readFileSync(INDEX_HTML, 'utf8');
-            if (html.includes('loading="lazy"')) return false;
-            html = html.replace(/<img([^>]+)>/g, (match) => {
-                if (match.includes('loading=')) return match;
-                return match.replace('<img', '<img loading="lazy"');
-            });
-            fs.writeFileSync(INDEX_HTML, html);
-            return true;
-        }
-    },
-    {
-        name: '添加回到顶部按钮',
-        description: '添加滚动到顶部按钮',
-        apply: () => {
-            let html = fs.readFileSync(INDEX_HTML, 'utf8');
-            if (html.includes('#back-to-top')) return false;
-            html = html.replace('</body>', '<button id="back-to-top" aria-label="回到顶部">↑</button>\n</body>');
-            let css = fs.readFileSync(STYLES_CSS, 'utf8');
-            if (!css.includes('#back-to-top')) {
-                css += `\n#back-to-top {\n    position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px;\n    border-radius: 50%; background: var(--lane); color: var(--void); border: none;\n    font-size: 1.2rem; cursor: pointer; opacity: 0; transition: opacity 0.3s;\n    z-index: 100; box-shadow: var(--glow-lane);\n}\n#back-to-top.visible { opacity: 1; }\n`;
-                fs.writeFileSync(STYLES_CSS, css);
+        name: '校验外部资源可达性',
+        description: '检查 CDN 资源和 API 端点是否可访问',
+        apply: async () => {
+            const targets = [
+                'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js',
+                'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css',
+                'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600',
+            ];
+            for (const url of targets) {
+                try {
+                    const r = await fetch(url);
+                    process.stdout.write(`  ${r.status < 400 ? '✅' : '❌'} ${url} (${r.status})\n`);
+                } catch (e) {
+                    process.stdout.write(`  ❌ ${url} (${e.message})\n`);
+                }
             }
-            // 添加 JS
-            let appjs = fs.readFileSync(APP_JS, 'utf8');
-            if (!appjs.includes('back-to-top')) {
-                appjs += `\n// 回到顶部\nconst backTop = document.getElementById('back-to-top');\nif (backTop) {\n    window.addEventListener('scroll', () => backTop.classList.toggle('visible', window.scrollY > 300));\n    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));\n}\n`;
-                fs.writeFileSync(APP_JS, appjs);
-            }
-            return true;
+            return false;
         }
     },
     {
-        name: '优化 Pretext 文字流',
-        description: '调整 Pretext 文字行高和颜色',
+        name: '校验 JavaScript 语法',
+        description: '运行 node --check 检查所有脚本',
         apply: () => {
-            let css = fs.readFileSync(STYLES_CSS, 'utf8');
-            if (css.includes('pretext-line:hover')) return false;
-            css = css.replace(
-                '.pretext-line {',
-                '.pretext-line { cursor: default; transition: color 0.2s;'
-            );
-            if (!css.includes('.pretext-line:hover')) {
-                css += `\n.pretext-line:hover { color: var(--lane) !important; }\n`;
+            const { execSync } = require('child_process');
+            try {
+                execSync(`node --check "${APP_JS}"`, { stdio: 'ignore' });
+                execSync(`node --check "${path.join(SITE_DIR, 'public/pretext-effect.js')}"`, { stdio: 'ignore' });
+                process.stdout.write('  ✅ JS 语法校验通过\n');
+            } catch (e) {
+                process.stdout.write(`  ❌ JS 语法错误: ${e.message}\n`);
             }
-            fs.writeFileSync(STYLES_CSS, css);
-            return true;
+            return false;
         }
     },
     {
-        name: '添加页面加载动画',
-        description: '添加淡入效果',
+        name: '生成站点报告',
+        description: '输出当前站点状态摘要',
         apply: () => {
-            let css = fs.readFileSync(STYLES_CSS, 'utf8');
-            if (css.includes('@keyframes fadeIn')) return false;
-            css += `\n@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }\n.section { animation: fadeIn 0.5s ease-out; }\n`;
-            fs.writeFileSync(STYLES_CSS, css);
-            return true;
+            const report = {
+                timestamp: new Date().toISOString(),
+                pages: {},
+                totalSize: 0,
+                cssVersion: null
+            };
+            const pages = ['index.html', 'projects.html', 'stars.html', 'articles.html', 'nethack.html'];
+            for (const page of pages) {
+                const filePath = path.join(SITE_DIR, page);
+                if (fs.existsSync(filePath)) {
+                    const stats = fs.statSync(filePath);
+                    report.pages[page] = { size: stats.size, modified: stats.mtime.toISOString() };
+                    report.totalSize += stats.size;
+                }
+            }
+            const indexHtml = fs.readFileSync(INDEX_HTML, 'utf8');
+            const cssVerMatch = indexHtml.match(/styles\.css\?v=(\d+)/);
+            if (cssVerMatch) report.cssVersion = cssVerMatch[1];
+            saveReport(report);
+            process.stdout.write(`  ✅ 报告已生成 (${Object.keys(report.pages).length} 页面, ${(report.totalSize / 1024).toFixed(1)} KB 总计)\n`);
+            return false;
         }
     }
 ];
@@ -275,7 +217,7 @@ async function runImprovement() {
     process.stdout.write(`   ${task.description}\n`);
 
     try {
-        const changed = task.apply();
+        const changed = await task.apply();
         if (changed) {
             state.improvements = state.improvements || [];
             state.improvements.push(task.name);
@@ -326,15 +268,21 @@ async function main() {
 async function autoCommit() {
     const { execSync } = require('child_process');
     try {
-        execSync('git config http.proxy http://127.0.0.1:18808', { cwd: SITE_DIR, stdio: 'ignore' });
-        execSync('git config https.proxy http://127.0.0.1:18808', { cwd: SITE_DIR, stdio: 'ignore' });
+        try {
+            execSync('git config http.proxy http://127.0.0.1:18808', { cwd: SITE_DIR, stdio: 'ignore' });
+            execSync('git config https.proxy http://127.0.0.1:18808', { cwd: SITE_DIR, stdio: 'ignore' });
+        } catch { /* proxy 配置可选 */ }
         const status = execSync('git status --porcelain', { cwd: SITE_DIR, encoding: 'utf8' }).trim();
         if (!status) { process.stdout.write('\n📦 无变更需提交\n'); return; }
         execSync('git add -A', { cwd: SITE_DIR, stdio: 'ignore' });
         const msg = `auto: ${loadState().lastImprovement || '迭代优化'}`;
         execSync(`git commit -m "${msg}"`, { cwd: SITE_DIR, stdio: 'ignore' });
-        execSync('git push origin main', { cwd: SITE_DIR, stdio: 'ignore' });
-        process.stdout.write(`\n📦 已提交并推送: ${msg}\n`);
+        try {
+            execSync('git push origin main', { cwd: SITE_DIR, stdio: 'ignore' });
+            process.stdout.write(`\n📦 已提交并推送: ${msg}\n`);
+        } catch (pushErr) {
+            process.stdout.write(`\n📦 已提交（推送失败，可稍后手动 push）: ${msg}\n`);
+        }
     } catch (e) {
         process.stdout.write(`\n⚠️ 提交失败: ${e.message}\n`);
     }

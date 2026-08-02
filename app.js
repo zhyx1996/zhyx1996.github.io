@@ -30,20 +30,31 @@ function renderLatestArticle() {
   if (!container || articleFallback.length === 0) return;
   const latest = articleFallback.slice(0, 3);
   container.innerHTML = latest.map((article) => {
-    const url = article.url || article.link;
+    const url = article.url || article.link || '#';
     const date = article.date || fmtDate(article.published_at);
     const isNew = isWithinDays(article.date || article.published_at, 45);
     const badge = isNew ? '<span class="article-new-badge">新</span>' : '';
     const articleClass = isNew ? 'article-card new-article' : 'article-card';
-    return `
-    <article class="${articleClass}">
+    const safeUrl = escapeHtml(url);
+    const safeTitle = escapeHtml(article.title);
+    const safeSummary = escapeHtml(article.summary);
+    const safeDate = escapeHtml(date);
+    return url && url !== '#'
+      ? `<article class="${articleClass}">
       <div class="article-meta">
-        <span class="article-date">${escapeHtml(date)}</span>
+        <span class="article-date">${safeDate}</span>
       </div>
-      <h3>${badge}<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(article.title)}</a></h3>
-      <p>${escapeHtml(article.summary)}</p>
-    </article>
-  `}).join('');
+      <h3>${badge}<a href="${safeUrl}" target="_blank" rel="noreferrer">${safeTitle}</a></h3>
+      <p>${safeSummary}</p>
+    </article>`
+      : `<article class="${articleClass}">
+      <div class="article-meta">
+        <span class="article-date">${safeDate}</span>
+      </div>
+      <h3>${badge}${safeTitle}</h3>
+      <p>${safeSummary}</p>
+    </article>`;
+  }).join('');
 
   const countEl = document.getElementById('article-count');
   if (countEl) countEl.textContent = `${articleFallback.length} 篇`;
@@ -69,20 +80,31 @@ function renderArticles() {
   if (!container) return;
 
   container.innerHTML = articleFallback.map(article => {
-    const url = article.url || article.link;
+    const url = article.url || article.link || '#';
     const date = article.date || fmtDate(article.published_at);
     const isNew = isWithinDays(article.date || article.published_at, 45);
     const badge = isNew ? '<span class="article-new-badge">新</span>' : '';
     const articleClass = isNew ? 'article-card new-article' : 'article-card';
-    return `
-    <article class="${articleClass}">
+    const safeUrl = escapeHtml(url);
+    const safeTitle = escapeHtml(article.title);
+    const safeSummary = escapeHtml(article.summary);
+    const safeDate = escapeHtml(date);
+    return url && url !== '#'
+      ? `<article class="${articleClass}">
       <div class="article-meta">
-        <span class="article-date">${escapeHtml(date)}</span>
+        <span class="article-date">${safeDate}</span>
       </div>
-      <h3>${badge}<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(article.title)}</a></h3>
-      <p>${escapeHtml(article.summary)}</p>
-    </article>
-  `}).join('');
+      <h3>${badge}<a href="${safeUrl}" target="_blank" rel="noreferrer">${safeTitle}</a></h3>
+      <p>${safeSummary}</p>
+    </article>`
+      : `<article class="${articleClass}">
+      <div class="article-meta">
+        <span class="article-date">${safeDate}</span>
+      </div>
+      <h3>${badge}${safeTitle}</h3>
+      <p>${safeSummary}</p>
+    </article>`;
+  }).join('');
 
   // 添加「查看更多」链接
   const moreLink = document.createElement('a');
@@ -96,6 +118,8 @@ function renderArticles() {
   // 更新文章计数
   const statNum = document.querySelector('.stat-num');
   if (statNum) statNum.textContent = articleFallback.length;
+  const articleTotal = document.getElementById('article-total');
+  if (articleTotal) articleTotal.textContent = articleFallback.length;
 }
 
 // ── 工具函数 ──
@@ -585,30 +609,44 @@ async function loadSteamProfile() {
   }
 }
 
-// ── 滚动进度条 ──
+// ── 滚动进度条（rAF 节流）──
 function initScrollProgress() {
   const bar = document.getElementById('scroll-progress');
   if (!bar) return;
-  window.addEventListener('scroll', () => {
+  let ticking = false;
+  const update = () => {
     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    if (docHeight <= 0) { bar.style.width = '0'; return; }
+    if (docHeight <= 0) { bar.style.width = '0'; ticking = false; return; }
     const progress = Math.min(100, Math.max(0, (window.scrollY / docHeight) * 100));
     bar.style.width = progress + '%';
+    ticking = false;
+  };
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
   }, { passive: true });
+  update();
 }
 
-// ── 返回顶部 ──
+// ── 返回顶部（rAF 节流）──
 function initBackToTop() {
   const btn = document.getElementById('back-to-top');
   if (!btn) return;
 
+  let ticking = false;
+  const update = () => {
+    btn.classList.toggle('visible', window.scrollY > 300);
+    ticking = false;
+  };
   window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-      btn.classList.add('visible');
-    } else {
-      btn.classList.remove('visible');
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
     }
-  });
+  }, { passive: true });
+  update();
 
   btn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });

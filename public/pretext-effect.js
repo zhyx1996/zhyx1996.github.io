@@ -363,6 +363,8 @@ window.addEventListener('resize', () => {
 
 async function init() {
     orbsLayer = document.getElementById('pretext-orbs');
+    if (!orbsLayer) return;
+    if (!container) return;
     if (document.fonts?.ready) await document.fonts.ready;
     resize(); initOrbs(); ensureTextMetrics(); createOrbElements(); renderText(); attachDragEvents();
     initVisibilityControl();

@@ -16,6 +16,8 @@
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="NetHack · 扶摇接海">
     <meta name="twitter:description" content="在浏览器中玩 NetHack 5.0，支持终端联机与 3D 两种模式。">
+    <meta property="og:image" content="https://avatars.githubusercontent.com/zhyx1996">
+    <meta name="twitter:image" content="https://avatars.githubusercontent.com/zhyx1996">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23D97706'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>扶</text></svg>">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -90,7 +92,7 @@
                         <span class="nk-window-title">alt.org · hterm</span>
                         <span class="nk-window-status">● 联机中</span>
                     </div>
-                    <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy"></iframe>
+                     <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin"></iframe>
                     <div class="nk-window-statusbar" data-hint="terminal">点击终端 · 按 c 连接 · 移动: 方向键 / hjkl yubn · 顶部下拉框：字体 / tileset（画面风格）</div>
                 </div>
                 <div class="nk-window" data-pane="3d" id="pane-3d" role="tabpanel" aria-label="NetHack 3D">
@@ -101,7 +103,7 @@
                         <span class="nk-window-title">nethack-3d · StackC00ki3</span>
                         <span class="nk-window-status">● 3D</span>
                     </div>
-                    <iframe class="nethack-iframe nethack-iframe-3d" src="https://stackc00ki3.github.io/nethack-3d/" title="NetHack 3D" loading="lazy"></iframe>
+                     <iframe class="nethack-iframe nethack-iframe-3d" src="https://stackc00ki3.github.io/nethack-3d/" title="NetHack 3D" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin"></iframe>
                     <div class="nk-window-statusbar" data-hint="3d">鼠标拖拽旋转视角 · WASD 移动 · 左键互动 · 滚轮缩放</div>
                 </div>
                 <details class="nethack-shortcuts">
@@ -434,10 +436,24 @@
       function initSakanaWidget() {
         window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
       }
+      function loadSakanaWithFallback() {
+        var script = document.createElement('script');
+        script.async = true;
+        script.onload = function() { window.initSakanaWidget && window.initSakanaWidget(); };
+        script.onerror = function() {
+          var fallback = document.createElement('script');
+          fallback.async = true;
+          fallback.onload = function() { window.initSakanaWidget && window.initSakanaWidget(); };
+          fallback.src = 'https://unpkg.com/sakana-widget@2.7.1/lib/sakana.min.js';
+          document.head.appendChild(fallback);
+        };
+        script.src = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js';
+        document.head.appendChild(script);
+      }
+      loadSakanaWithFallback();
     </script>
-    <script async onload="initSakanaWidget()" src="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js"></script>
     <script>
-      document.querySelectorAll(".nethack-tab").forEach(function(tab) {
+      document.querySelectorAll('.nethack-tab').forEach(function(tab) {
         tab.addEventListener("click", function() {
           var target = this.dataset.tab;
           document.querySelectorAll(".nethack-tab").forEach(function(t) {
