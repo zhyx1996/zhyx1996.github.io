@@ -1,7 +1,7 @@
 // ── 扶摇接海 · 个人主页 — 主脚本 ──
 
 const GITHUB_USERNAME = 'zhyx1996';
-const ARTICLE_LAST_SYNC = '2026年8月2日 16:01';
+const ARTICLE_LAST_SYNC = '2026年8月2日 18:01';
 
 // ── 文章数据（博客园同步）──
 const articleFallback = [
@@ -10,6 +10,12 @@ const articleFallback = [
     title: 'Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及 pyinstaller 打包',
     url: 'https://www.cnblogs.com/fix-me/p/20968815',
     summary: 'Windows + Python + GStreamer + 打包的实战记录，涵盖环境安装、RTSP 推流、SEI 注入与 pyinstaller 打包的完整流程与踩坑经验。'
+  },
+  {
+    date: '2026年5月28日',
+    title: '123SyncCloud 日志排查：MaintenanceServer 服务启动失败',
+    url: 'https://www.cnblogs.com/fix-me/p/20194105',
+    summary: '联系客服后查看 123SyncCloud 日志，定位 MaintenanceServer 服务启动失败的原因，记录排查思路与解决过程。'
   },
   {
     date: '2026年4月23日',
@@ -330,23 +336,252 @@ async function loadMarket() {
 }
 
 // ── Sakana 拖拽小球（物理弹跳）──
+// 物理参数：晃动更慢、幅度更大；平移与视觉摇摆分离；能量有上限防累积
+const SAKANA_PHYSICS = {
+  // 平移惯性
+  friction: 0.982,         // 每帧速度保留率（原 0.96 → 晃动更持久、更慢）
+  wallBounce: 0.5,         // 撞墙速度保留率（原 0.75 → 更沉稳、不抽搐）
+  maxVelocity: 22,         // 最大初始速度（原 25 → 稍慢的初始动量）
+  stopThreshold: 0.6,      // 停止阈值（原 0.3 → 更早停止微抖动）
+  // 角色视觉摇摆
+  charLeanFactor: 1.05,    // 释放时角色倾斜系数
+  charSwayFactor: 0.68,    // 释放时角色垂直摆动系数
+  charLeanMax: 44,         // 角色最大倾斜角度
+  charSwayMax: 28,         // 角色最大垂直摆动
+  // 撞墙角色反应
+  wallLeanFactor: 1.65,    // 撞墙时角色倾斜系数
+  wallSwayFactor: 0.9,     // 撞墙时角色垂直摆动系数
+  // 能量控制
+  maxBounces: 10,          // 最大碰撞次数限制
+  bounceEnergyCap: 18,     // 碰撞后速度上限（防能量累积）
+  dampingAfterMaxBounces: 0.9, // 超过最大碰撞后的额外阻尼
+  // Sakana 内部弹簧参数（_state.i 积分步长/摆动频率，_state.d 速度阻尼）
+  swingTimeStep: 0.052,    // 内部 _state.i（默认 0.08，降低 → 更慢摆动）
+  swingDamping: 0.992,     // 内部 _state.d（默认 ~0.99，提高 → 衰减更慢）
+};
+
+// 纯函数：模拟弹跳物理（用于测试与调试）
+// bounds: { width, height, widgetW, widgetH }
+function simulateSakanaBounce(initialVx, initialVy, bounds, options) {
+  const physics = Object.assign({}, SAKANA_PHYSICS, options || {});
+  const friction = physics.friction;
+  const wallBounce = physics.wallBounce;
+  const stopThreshold = physics.stopThreshold;
+  const maxBounces = physics.maxBounces;
+  const bounceEnergyCap = physics.bounceEnergyCap;
+  const dampingAfterMaxBounces = physics.dampingAfterMaxBounces;
+  const width = bounds.width;
+  const height = bounds.height;
+  const widgetW = bounds.widgetW;
+  const widgetH = bounds.widgetH;
+
+  let vx = initialVx;
+  let vy = initialVy;
+  let x = 0;
+  let y = 0;
+  let bounces = 0;
+  let maxAmplitudeX = 0;
+  let maxAmplitudeY = 0;
+  let frames = 0;
+  let energy = Math.sqrt(vx * vx + vy * vy);
+
+  while (frames < 1000) {
+    vx *= friction;
+    vy *= friction;
+
+    let nextX = x + vx;
+    let nextY = y + vy;
+    let bounced = false;
+
+    if (nextX <= 0 && vx < 0) {
+      nextX = 0;
+      vx = Math.min(Math.abs(vx) * wallBounce, bounceEnergyCap);
+      bounced = true;
+    } else if (nextX >= width - widgetW && vx > 0) {
+      nextX = width - widgetW;
+      vx = -Math.min(Math.abs(vx) * wallBounce, bounceEnergyCap);
+      bounced = true;
+    }
+
+    if (nextY <= 0 && vy < 0) {
+      nextY = 0;
+      vy = Math.min(Math.abs(vy) * wallBounce, bounceEnergyCap);
+      bounced = true;
+    } else if (nextY >= height - widgetH && vy > 0) {
+      nextY = height - widgetH;
+      vy = -Math.min(Math.abs(vy) * wallBounce, bounceEnergyCap);
+      bounced = true;
+    }
+
+    if (bounced) {
+      bounces++;
+      if (bounces > maxBounces) {
+        vx *= dampingAfterMaxBounces;
+        vy *= dampingAfterMaxBounces;
+      }
+    }
+
+    x = nextX;
+    y = nextY;
+    frames++;
+
+    maxAmplitudeX = Math.max(maxAmplitudeX, Math.abs(x));
+    maxAmplitudeY = Math.max(maxAmplitudeY, Math.abs(y));
+    energy = Math.sqrt(vx * vx + vy * vy);
+
+    if ((Math.abs(vx) < stopThreshold && Math.abs(vy) < stopThreshold) || bounces > maxBounces * 2) {
+      break;
+    }
+  }
+
+  return {
+    frames: frames,
+    durationSeconds: +(frames / 60).toFixed(2),
+    bounces: bounces,
+    maxAmplitudeX: +maxAmplitudeX.toFixed(1),
+    maxAmplitudeY: +maxAmplitudeY.toFixed(1),
+    finalEnergy: +energy.toFixed(2),
+    settled: frames < 1000
+  };
+}
+
+// 纯函数：根据速度计算角色摇摆状态（返回 r/y/w/t/i/d）
+function computeCharState(vx, vy, physics) {
+  physics = physics || SAKANA_PHYSICS;
+  return {
+    r: Math.max(-physics.charLeanMax, Math.min(physics.charLeanMax, vx * physics.charLeanFactor)),
+    y: Math.max(-physics.charSwayMax, Math.min(physics.charSwayMax, vy * physics.charSwayFactor)),
+    w: 0,
+    t: 0,
+    i: physics.swingTimeStep,
+    d: physics.swingDamping
+  };
+}
+
+// 纯函数：模拟 Sakana 内部弹簧方程
+// 方程：w = w * d - 2*r - t, r += w * i * 1.2
+// 其中 i = swingTimeStep, d = swingDamping
+function simulateSakanaSpring(initialR, initialY, initialW, initialT, physics, maxFrames) {
+  physics = physics || SAKANA_PHYSICS;
+  maxFrames = maxFrames || 600;
+  var i = physics.swingTimeStep;
+  var d = physics.swingDamping;
+
+  var r = initialR;
+  var y = initialY;
+  var w = initialW;
+  var t = initialT;
+  var frames = 0;
+  var peakR = Math.abs(initialR);
+  var peakY = Math.abs(initialY);
+  var zeroCrossingsR = 0;
+  var zeroCrossingsY = 0;
+  var prevR = initialR;
+  var prevY = initialY;
+  var settled = false;
+  var firstSameDirPeakR = null;
+  var firstSameDirPeakY = null;
+  var initialSignR = initialR >= 0 ? 1 : -1;
+  var initialSignY = initialY >= 0 ? 1 : -1;
+
+  while (frames < maxFrames) {
+    // Sakana 内部方程：w = w * d - 2*r - t, r += w * i * 1.2
+    w = w * d - 2 * r - t;
+    r = r + w * i * 1.2;
+    t = t * d - 2 * y - w;
+    y = y + t * i * 1.2;
+    frames++;
+
+    if (Math.abs(r) > peakR) peakR = Math.abs(r);
+    if (Math.abs(y) > peakY) peakY = Math.abs(y);
+    if ((prevR < 0 && r >= 0) || (prevR > 0 && r <= 0)) zeroCrossingsR++;
+    if ((prevY < 0 && y >= 0) || (prevY > 0 && y <= 0)) zeroCrossingsY++;
+    prevR = r;
+    prevY = y;
+
+    // 记录首次同向峰值
+    if (firstSameDirPeakR === null && frames > 10) {
+      if ((initialSignR > 0 && r < initialR * 0.5) || (initialSignR < 0 && r > initialR * 0.5)) {
+        firstSameDirPeakR = peakR;
+      }
+    }
+    if (firstSameDirPeakY === null && frames > 10) {
+      if ((initialSignY > 0 && y < initialY * 0.5) || (initialSignY < 0 && y > initialY * 0.5)) {
+        firstSameDirPeakY = peakY;
+      }
+    }
+
+    if (Math.abs(r) < 0.5 && Math.abs(w) < 0.5 && Math.abs(y) < 0.5 && Math.abs(t) < 0.5) {
+      settled = true;
+      break;
+    }
+  }
+
+  return {
+    frames: frames,
+    durationSeconds: +(frames / 60).toFixed(2),
+    peakR: +peakR.toFixed(2),
+    peakY: +peakY.toFixed(2),
+    zeroCrossingsR: zeroCrossingsR,
+    zeroCrossingsY: zeroCrossingsY,
+    firstSameDirPeakR: firstSameDirPeakR != null ? +firstSameDirPeakR.toFixed(2) : +peakR.toFixed(2),
+    firstSameDirPeakY: firstSameDirPeakY != null ? +firstSameDirPeakY.toFixed(2) : +peakY.toFixed(2),
+    settled: settled,
+    halfPeriodR: zeroCrossingsR > 0 ? +((frames / 60) / zeroCrossingsR).toFixed(3) : null,
+    halfPeriodY: zeroCrossingsY > 0 ? +((frames / 60) / zeroCrossingsY).toFixed(3) : null
+  };
+}
+
+// 调试钩子（可在浏览器控制台调用 window.__sakanaPhysics.test()）
+window.__sakanaPhysics = {
+  config: SAKANA_PHYSICS,
+  simulate: simulateSakanaBounce,
+  simulateSpring: simulateSakanaSpring,
+  computeCharState: computeCharState,
+  test: function () {
+    var bounds = { width: 1920, height: 1080, widgetW: 130, widgetH: 150 };
+    var baseline = { swingTimeStep: 0.08, swingDamping: 0.99 };
+    var tuned = { swingTimeStep: 0.052, swingDamping: 0.992 };
+    var results = {
+      releaseRight: simulateSakanaBounce(15, 0, bounds),
+      releaseLeft: simulateSakanaBounce(-15, 0, bounds),
+      wallLeft: simulateSakanaBounce(-18, 0, bounds),
+      wallRight: simulateSakanaBounce(18, 0, bounds),
+      springReleaseBaseline: simulateSakanaSpring(35, 12, 0, 0, baseline, 600),
+      springReleaseTuned: simulateSakanaSpring(35, 12, 0, 0, tuned, 600),
+      springWallBaseline: simulateSakanaSpring(-50, -20, 9, 2, baseline, 600),
+      springWallTuned: simulateSakanaSpring(-50, -20, 9, 2, tuned, 600)
+    };
+    if (typeof console !== 'undefined') {
+      console.log('=== Sakana Physics Test ===');
+      console.log('Config:', SAKANA_PHYSICS);
+      for (var k in results) {
+        console.log(k + ':', results[k]);
+      }
+    }
+    return results;
+  }
+};
+
 function initSakanaDrag() {
   if (window.__sakanaDragInitialized) return;
   window.__sakanaDragInitialized = true;
-  const widget = document.getElementById('sakana-drag-widget');
+  var widget = document.getElementById('sakana-drag-widget');
   if (!widget) return;
 
-  let isDragging = false;
-  let vx = 0, vy = 0;
-  let lastX, lastY, lastTime;
-  let animId = null;
-  let vxHistory = [];
-  let vyHistory = [];
-  // 用 left/top 定位
-  let leftPos = 0, topPos = 0;
-  let initialized = false;
+  var isDragging = false;
+  var vx = 0, vy = 0;
+  var lastX, lastY, lastTime;
+  var animId = null;
+  var vxHistory = [];
+  var vyHistory = [];
+  var leftPos = 0, topPos = 0;
+  var initialized = false;
+  var bounceCount = 0;
+  var swingAnimId = null;
+  var swingR = 0, swingW = 0;
 
-  const setPos = (l, t) => {
+  var setPos = function (l, t) {
     leftPos = l;
     topPos = t;
     widget.style.left = l + 'px';
@@ -355,39 +590,54 @@ function initSakanaDrag() {
     widget.style.bottom = 'auto';
   };
 
-  const getXY = (e) => {
+  var getXY = function (e) {
     if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
     if (e.changedTouches && e.changedTouches[0]) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
     return { x: e.clientX, y: e.clientY };
   };
 
-  // 拖拽时：根据速度倾斜人偶，平滑过渡防鬼畜
-  let currentR = 0;
-  const applyCharLean = () => {
-    const sakana = window.sakanaInstance;
+  var currentR = 0;
+  var applyCharLean = function () {
+    var sakana = window.sakanaInstance;
     if (!sakana) return;
     sakana._running = false;
-    const targetR = Math.max(-25, Math.min(25, vx * 0.4));
+    var targetR = Math.max(-25, Math.min(25, vx * 0.4));
     currentR += (targetR - currentR) * 0.3;
     sakana._state.r = currentR;
     sakana._draw();
   };
 
-  const initPosition = () => {
+  var applyWallCharReaction = function (impactVx, impactVy) {
+    var sakana = window.sakanaInstance;
+    if (!sakana) return;
+    var targetR = Math.max(-SAKANA_PHYSICS.charLeanMax * 1.2, Math.min(SAKANA_PHYSICS.charLeanMax * 1.2, impactVx * SAKANA_PHYSICS.wallLeanFactor));
+    var targetY = Math.max(-SAKANA_PHYSICS.charSwayMax * 1.2, Math.min(SAKANA_PHYSICS.charSwayMax * 1.2, impactVy * SAKANA_PHYSICS.wallSwayFactor));
+    sakana._state.r = targetR;
+    sakana._state.y = targetY;
+    sakana._state.w = -targetR * 0.18;
+    sakana._state.t = -targetY * 0.12;
+    sakana._state.i = SAKANA_PHYSICS.swingTimeStep;
+    sakana._state.d = SAKANA_PHYSICS.swingDamping;
+    sakana._lastRunUnix = Date.now();
+    sakana._running = true;
+    if (typeof sakana._run === 'function') sakana._run();
+  };
+
+  var initPosition = function () {
     if (initialized) return;
-    const rect = widget.getBoundingClientRect();
+    var rect = widget.getBoundingClientRect();
     leftPos = rect.left;
     topPos = rect.top;
     initialized = true;
   };
 
-  const onPointerDown = (e) => {
+  var onPointerDown = function (e) {
     if (e.target.closest('.sakana-widget-ctrl')) return;
-    const xy = getXY(e);
+    var xy = getXY(e);
     isDragging = true;
     widget.classList.add('dragging');
     initPosition();
-    const sakana = window.sakanaInstance;
+    var sakana = window.sakanaInstance;
     if (sakana) {
       sakana._running = false;
       currentR = sakana._state.r;
@@ -399,25 +649,26 @@ function initSakanaDrag() {
     vy = 0;
     vxHistory = [];
     vyHistory = [];
+    bounceCount = 0;
     if (animId) { cancelAnimationFrame(animId); animId = null; }
+    if (swingAnimId) { cancelAnimationFrame(swingAnimId); swingAnimId = null; }
     e.preventDefault();
   };
 
-  const onPointerMove = (e) => {
+  var onPointerMove = function (e) {
     if (!isDragging) return;
-    const xy = getXY(e);
-    const now = Date.now();
-    const dx = xy.x - lastX;
-    const dy = xy.y - lastY;
+    var xy = getXY(e);
+    var now = Date.now();
+    var dx = xy.x - lastX;
+    var dy = xy.y - lastY;
 
-    let newLeft = leftPos + dx;
-    let newTop = topPos + dy;
+    var newLeft = leftPos + dx;
+    var newTop = topPos + dy;
 
-    // 边界限制
-    const widgetW = widget.offsetWidth;
-    const widgetH = widget.offsetHeight;
-    const viewportW = window.innerWidth;
-    const viewportH = window.innerHeight;
+    var widgetW = widget.offsetWidth;
+    var widgetH = widget.offsetHeight;
+    var viewportW = window.innerWidth;
+    var viewportH = window.innerHeight;
     newLeft = Math.max(-widgetW * 0.5, Math.min(viewportW - widgetW * 0.5, newLeft));
     newTop = Math.max(-widgetH * 0.5, Math.min(viewportH - widgetH * 0.5, newTop));
 
@@ -436,17 +687,17 @@ function initSakanaDrag() {
     lastTime = now;
   };
 
-  const onPointerUp = () => {
+  var onPointerUp = function () {
     if (!isDragging) return;
     isDragging = false;
     widget.classList.remove('dragging');
 
     if (vxHistory.length > 0) {
-      let totalWeight = 0;
-      let weightedVx = 0;
-      let weightedVy = 0;
-      for (let i = 0; i < vxHistory.length; i++) {
-        const weight = i + 1;
+      var totalWeight = 0;
+      var weightedVx = 0;
+      var weightedVy = 0;
+      for (var i = 0; i < vxHistory.length; i++) {
+        var weight = i + 1;
         weightedVx += vxHistory[i] * weight;
         weightedVy += vyHistory[i] * weight;
         totalWeight += weight;
@@ -455,66 +706,83 @@ function initSakanaDrag() {
       vy = weightedVy / totalWeight;
     }
 
-    const maxV = 25;
+    var maxV = SAKANA_PHYSICS.maxVelocity;
     vx = Math.max(-maxV, Math.min(maxV, vx));
     vy = Math.max(-maxV, Math.min(maxV, vy));
 
-    // 释放时：根据拖动速度设置初始角度，w=0 让弹簧自然回弹
-    // 原版 SakanaWidget 也是纯位移驱动，不额外设置角速度
-    const sakana = window.sakanaInstance;
+    var sakana = window.sakanaInstance;
     if (sakana) {
-      sakana._lastRunUnix = Date.now();
-      sakana._state.r = Math.max(-30, Math.min(30, vx * 0.55));
-      sakana._state.y = Math.max(-18, Math.min(18, vy * 0.33));
-      sakana._state.w = 0;
-      sakana._state.t = 0;
-      sakana._running = true;
-      sakana._run();
+      var state = computeCharState(vx, vy);
+      sakana._running = false;
+      sakana._state.r = state.r;
+      sakana._state.y = state.y;
+      sakana._state.w = state.w;
+      sakana._state.t = state.t;
+      sakana._state.i = state.i;
+      sakana._state.d = state.d;
+      sakana._draw();
     }
 
     startBounce();
   };
 
-  const startBounce = () => {
+  var startBounce = function () {
     if (animId) cancelAnimationFrame(animId);
-    const viewportW = window.innerWidth;
-    const viewportH = window.innerHeight;
-    const widgetW = widget.offsetWidth;
-    const widgetH = widget.offsetHeight;
+    var viewportW = window.innerWidth;
+    var viewportH = window.innerHeight;
+    var widgetW = widget.offsetWidth;
+    var widgetH = widget.offsetHeight;
+    bounceCount = 0;
 
-    const bounce = () => {
-      vx *= 0.96;
-      vy *= 0.96;
+    var bounce = function () {
+      vx *= SAKANA_PHYSICS.friction;
+      vy *= SAKANA_PHYSICS.friction;
 
-      let nextLeft = leftPos + vx;
-      let nextTop = topPos + vy;
+      var nextLeft = leftPos + vx;
+      var nextTop = topPos + vy;
+      var bounced = false;
+      var impactVx = 0;
+      var impactVy = 0;
 
-      if (nextLeft <= 0) {
+      // 碰撞前保存碰撞前速度
+      if (nextLeft <= 0 && vx < 0) {
+        impactVx = vx;
         nextLeft = 0;
-        vx = Math.abs(vx) * 0.75;
-      }
-      if (nextLeft >= viewportW - widgetW) {
+        vx = Math.min(Math.abs(vx) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
+        bounced = true;
+      } else if (nextLeft >= viewportW - widgetW && vx > 0) {
+        impactVx = vx;
         nextLeft = viewportW - widgetW;
-        vx = -Math.abs(vx) * 0.75;
+        vx = -Math.min(Math.abs(vx) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
+        bounced = true;
       }
-      if (nextTop <= 0) {
+
+      if (nextTop <= 0 && vy < 0) {
+        impactVy = vy;
         nextTop = 0;
-        vy = Math.abs(vy) * 0.75;
-      }
-      if (nextTop >= viewportH - widgetH) {
+        vy = Math.min(Math.abs(vy) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
+        bounced = true;
+      } else if (nextTop >= viewportH - widgetH && vy > 0) {
+        impactVy = vy;
         nextTop = viewportH - widgetH;
-        vy = -Math.abs(vy) * 0.75;
+        vy = -Math.min(Math.abs(vy) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
+        bounced = true;
+      }
+
+      if (bounced) {
+        bounceCount++;
+        // 用碰撞前速度触发视觉反应
+        applyWallCharReaction(impactVx, impactVy);
+        if (bounceCount > SAKANA_PHYSICS.maxBounces) {
+          vx *= SAKANA_PHYSICS.dampingAfterMaxBounces;
+          vy *= SAKANA_PHYSICS.dampingAfterMaxBounces;
+        }
       }
 
       setPos(nextLeft, nextTop);
 
-      if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) {
-        const sakana = window.sakanaInstance;
-        if (sakana) {
-          sakana._state.r = 0;
-          sakana._state.y = 0;
-          sakana._draw();
-        }
+      if ((Math.abs(vx) < SAKANA_PHYSICS.stopThreshold && Math.abs(vy) < SAKANA_PHYSICS.stopThreshold) || bounceCount > SAKANA_PHYSICS.maxBounces * 2) {
+        // 不平移清零 r/y，内部弹簧自行衰减
         currentR = 0;
         animId = null;
         return;
@@ -524,6 +792,8 @@ function initSakanaDrag() {
     };
     animId = requestAnimationFrame(bounce);
   };
+
+  // 内部弹簧由 SakanaWidget._run 驱动，不再需要独立 swing 动画
 
   widget.addEventListener('mousedown', onPointerDown);
   widget.addEventListener('touchstart', onPointerDown, { passive: false });
