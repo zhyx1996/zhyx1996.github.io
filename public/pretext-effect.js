@@ -134,7 +134,7 @@ function syncTextLines(lines) {
 function renderText() {
     ensureTextMetrics();
 
-    const padding = 30;
+    const padding = 16;
     const colStart = padding;
     const colEnd = W - padding;
     const lines = [];

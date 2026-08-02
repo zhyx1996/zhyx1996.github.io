@@ -202,8 +202,8 @@ a:hover { opacity: 0.8; }
 /* ─ Hero ── */
 .hero {
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 48px;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 32px;
     align-items: start;
     margin-bottom: 72px;
     padding-bottom: 56px;

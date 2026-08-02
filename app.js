@@ -356,8 +356,8 @@ const SAKANA_PHYSICS = {
   bounceEnergyCap: 18,     // 碰撞后速度上限（防能量累积）
   dampingAfterMaxBounces: 0.9, // 超过最大碰撞后的额外阻尼
   // Sakana 内部弹簧参数（_state.i 积分步长/摆动频率，_state.d 速度阻尼）
-  swingTimeStep: 0.052,    // 内部 _state.i（默认 0.08，降低 → 更慢摆动）
-  swingDamping: 0.992,     // 内部 _state.d（默认 ~0.99，提高 → 衰减更慢）
+  swingTimeStep: 0.050,    // 内部 _state.i（默认 0.08，降低 → 更慢摆动）
+  swingDamping: 0.9915,    // 内部 _state.d（默认 ~0.99，提高 → 衰减更慢）
 };
 
 // 纯函数：模拟弹跳物理（用于测试与调试）
@@ -458,15 +458,14 @@ function computeCharState(vx, vy, physics) {
   };
 }
 
-// 纯函数：模拟 Sakana 2.7.1 内部弹簧方程（两个独立弹簧，无交叉耦合）
-// 旋转：w -= 2*r + rotate, r += w*i*1.2, w *= d
-// 纵向：t -= 2*y, y += t*i*2, t *= d
+// 纯函数：模拟 Sakana 内部弹簧方程（严格逐帧，无交叉耦合，rotate=0）
+// 每帧：w = w - 2*r; r = r + w*i*1.2; w = w*d
+//       t = t - 2*y; y = y + t*i*2;   t = t*d
 function simulateSakanaSpring(initialR, initialY, initialW, initialT, physics, maxFrames) {
   physics = physics || SAKANA_PHYSICS;
   maxFrames = maxFrames || 600;
   var i = physics.swingTimeStep;
   var d = physics.swingDamping;
-  var rotate = physics.rotate || 0;
 
   var r = initialR;
   var y = initialY;
@@ -475,24 +474,18 @@ function simulateSakanaSpring(initialR, initialY, initialW, initialT, physics, m
   var frames = 0;
   var peakR = Math.abs(initialR);
   var peakY = Math.abs(initialY);
-  var zeroCrossingsR = 0;
-  var zeroCrossingsY = 0;
   var prevR = initialR;
   var prevY = initialY;
   var settled = false;
-  var firstPeakR = Math.abs(initialR);
-  var firstPeakY = Math.abs(initialY);
-  var initialEnergy = r * r + y * y + w * w + t * t;
+  var firstZeroFrameR = null;
+  var firstZeroFrameY = null;
+  var initialEnergy = Math.abs(r) + Math.abs(w) + Math.abs(y) + Math.abs(t);
   var energyAt10s = initialEnergy;
-  var prevW = initialW;
-  var prevT = initialT;
 
   while (frames < maxFrames) {
-    // 旋转弹簧（独立）
-    w = w - 2 * r - rotate;
+    w = w - 2 * r;
     r = r + w * i * 1.2;
     w = w * d;
-    // 纵向弹簧（独立）
     t = t - 2 * y;
     y = y + t * i * 2;
     t = t * d;
@@ -502,30 +495,24 @@ function simulateSakanaSpring(initialR, initialY, initialW, initialT, physics, m
     var absY = Math.abs(y);
     if (absR > peakR) peakR = absR;
     if (absY > peakY) peakY = absY;
-    if ((prevR < 0 && r >= 0) || (prevR > 0 && r <= 0)) zeroCrossingsR++;
-    if ((prevY < 0 && y >= 0) || (prevY > 0 && y <= 0)) zeroCrossingsY++;
+    if (firstZeroFrameR === null && ((prevR < 0 && r >= 0) || (prevR > 0 && r <= 0))) firstZeroFrameR = frames;
+    if (firstZeroFrameY === null && ((prevY < 0 && y >= 0) || (prevY > 0 && y <= 0))) firstZeroFrameY = frames;
     prevR = r;
     prevY = y;
 
-    if (frames === 1) {
-      firstPeakR = absR;
-      firstPeakY = absY;
-    }
     if (frames === 600) {
-      energyAt10s = r * r + y * y + w * w + t * t;
+      energyAt10s = absR + Math.abs(w) + absY + Math.abs(t);
     }
 
     if (absR < 0.3 && Math.abs(w) < 0.3 && absY < 0.3 && Math.abs(t) < 0.3) {
       settled = true;
-      if (frames < 600) energyAt10s = r * r + y * y + w * w + t * t;
+      if (frames < 600) energyAt10s = absR + Math.abs(w) + absY + Math.abs(t);
       break;
     }
-    prevW = w;
-    prevT = t;
   }
 
   if (frames >= 600) {
-    energyAt10s = r * r + y * y + w * w + t * t;
+    energyAt10s = Math.abs(r) + Math.abs(w) + Math.abs(y) + Math.abs(t);
   }
 
   return {
@@ -533,13 +520,9 @@ function simulateSakanaSpring(initialR, initialY, initialW, initialT, physics, m
     durationSeconds: +(frames / 60).toFixed(2),
     peakR: +peakR.toFixed(2),
     peakY: +peakY.toFixed(2),
-    firstPeakR: +firstPeakR.toFixed(2),
-    firstPeakY: +firstPeakY.toFixed(2),
-    zeroCrossingsR: zeroCrossingsR,
-    zeroCrossingsY: zeroCrossingsY,
+    firstZeroFrameR: firstZeroFrameR,
+    firstZeroFrameY: firstZeroFrameY,
     settled: settled,
-    halfPeriodR: zeroCrossingsR > 0 ? +((frames / zeroCrossingsR)).toFixed(1) : null,
-    halfPeriodY: zeroCrossingsY > 0 ? +((frames / zeroCrossingsY)).toFixed(1) : null,
     initialEnergy: +initialEnergy.toFixed(2),
     energyAt10s: +energyAt10s.toFixed(2),
     energyRatio: initialEnergy > 0 ? +(energyAt10s / initialEnergy).toFixed(4) : 0
@@ -556,8 +539,7 @@ window.__sakanaPhysics = {
     var bounds = { width: 1920, height: 1080, widgetW: 130, widgetH: 150 };
     var baseline = { swingTimeStep: 0.08, swingDamping: 0.99 };
     var tuned = { swingTimeStep: 0.052, swingDamping: 0.992 };
-    // Release: same input velocity, old mapping for baseline vs new mapping for tuned
-    var vx = 15, vy = 8;
+    var vx = 18, vy = 10;
     var baseR = Math.max(-30, Math.min(30, vx * 0.55));
     var baseY = Math.max(-18, Math.min(18, vy * 0.33));
     var tuneR = Math.max(-44, Math.min(44, vx * 1.05));
@@ -639,8 +621,10 @@ function initSakanaDrag() {
     sakana._state.i = SAKANA_PHYSICS.swingTimeStep;
     sakana._state.d = SAKANA_PHYSICS.swingDamping;
     sakana._lastRunUnix = Date.now();
-    sakana._running = true;
-    if (typeof sakana._run === 'function') sakana._run();
+    if (!sakana._running) {
+      sakana._running = true;
+      if (typeof sakana._run === 'function') sakana._run();
+    }
   };
 
   var initPosition = function () {
@@ -733,13 +717,17 @@ function initSakanaDrag() {
     var sakana = window.sakanaInstance;
     if (sakana) {
       var state = computeCharState(vx, vy);
-      sakana._running = false;
       sakana._state.r = state.r;
       sakana._state.y = state.y;
       sakana._state.w = state.w;
       sakana._state.t = state.t;
       sakana._state.i = state.i;
       sakana._state.d = state.d;
+      sakana._lastRunUnix = Date.now();
+      if (!sakana._running) {
+        sakana._running = true;
+        if (typeof sakana._run === 'function') sakana._run();
+      }
       sakana._draw();
     }
 
@@ -791,7 +779,7 @@ function initSakanaDrag() {
 
       if (bounced) {
         bounceCount++;
-        // 用碰撞前速度触发视觉反应
+        // 用碰撞前速度触发视觉反应（无论是否运行都要更新碰撞状态）
         applyWallCharReaction(impactVx, impactVy);
         if (bounceCount > SAKANA_PHYSICS.maxBounces) {
           vx *= SAKANA_PHYSICS.dampingAfterMaxBounces;

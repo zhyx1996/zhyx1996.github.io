@@ -20,8 +20,8 @@ const BASELINE = {
 
 // Tuned: 新映射 (charLeanFactor=1.05/max44, charSwayFactor=0.68/max28, wall 碰撞前*1.65/.9)
 const TUNED = {
-  swingTimeStep: 0.052,
-  swingDamping: 0.992,
+  swingTimeStep: 0.050,
+  swingDamping: 0.9915,
   charLeanFactor: 1.05,
   charLeanMax: 44,
   charSwayFactor: 0.68,
