@@ -1649,6 +1649,10 @@ body.nk-dark .nethack-tab.active {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 6px 14px;
 }
+.nk-desc-grid.nk-desc-stack {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+}
 .nk-cmd-grid.nk-desc-grid > span {
     display: grid;
     grid-template-columns: 120px 1fr;
