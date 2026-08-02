@@ -125,18 +125,34 @@
     <script src="/app.js?v=25" defer></script>
     <script>
       (function() {
+        var FALLBACK = 14;
+        var CACHE_KEY = 'repo_total_cache';
+        var CACHE_TTL = 60 * 60 * 1000;
+        var el = document.getElementById('repo-total');
+        var render = function(v) { if (el) el.textContent = v; };
+        try {
+          var cached = localStorage.getItem(CACHE_KEY);
+          if (cached) {
+            var parsed = JSON.parse(cached);
+            if (parsed && Date.now() - parsed.ts < CACHE_TTL) {
+              render(parsed.value);
+              return;
+            }
+          }
+        } catch (_) {}
         var controller = new AbortController();
         var timer = setTimeout(function() { controller.abort(); }, 8000);
         fetch('https://api.github.com/users/zhyx1996', { headers: { 'Accept': 'application/vnd.github.v3+json' }, signal: controller.signal })
           .then(function(r) { clearTimeout(timer); return r.json(); })
           .then(function(d) {
-            var el = document.getElementById('repo-total');
-            if (el && d.public_repos != null) el.textContent = d.public_repos;
+            if (d && typeof d.public_repos === 'number') {
+              render(d.public_repos);
+              try { localStorage.setItem(CACHE_KEY, JSON.stringify({ value: d.public_repos, ts: Date.now() })); } catch (_) {}
+            } else {
+              render(FALLBACK);
+            }
           })
-          .catch(function() {
-            var el = document.getElementById('repo-total');
-            if (el) el.textContent = '14';
-          })
+          .catch(function() { render(FALLBACK); })
           .finally(function() { clearTimeout(timer); });
       })();
     </script>
