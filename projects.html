@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>公开仓库 · 扶摇接海</title>
     <meta name="theme-color" content="#D97706">
+    <meta name="description" content="公开仓库 — 公开仓库、技术方向与近期维护内容。">
+    <link rel="canonical" href="https://zhyx1996.github.io/projects.html">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:site_name" content="扶摇接海">
+    <meta property="og:title" content="公开仓库 · 扶摇接海">
+    <meta property="og:description" content="公开仓库 — 公开仓库、技术方向与近期维护内容。">
+    <meta property="og:url" content="https://zhyx1996.github.io/projects.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="公开仓库 · 扶摇接海">
+    <meta name="twitter:description" content="公开仓库 — 公开仓库、技术方向与近期维护内容。">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23D97706'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>扶</text></svg>">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" href="/styles.css?v=43">
@@ -16,6 +27,8 @@
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">跳到主要内容</a>
+    <div class="scroll-progress" id="scroll-progress"></div>
     <div class="layout">
         <!-- 左侧导航 -->
         <aside class="sidebar">
@@ -23,7 +36,7 @@
                 <span class="logo-mark">扶</span>
                 <span class="logo-text">摇接海</span>
             </div>
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav" aria-label="主导航">
                 <a class="nav-item" href="/index.html">首页</a>
                 <a class="nav-item active" href="/projects.html">仓库</a>
                 <a class="nav-item" href="/stars.html">收藏</a>
@@ -36,7 +49,7 @@
         </aside>
 
         <!-- 主内容 -->
-        <main class="main">
+        <main class="main" id="main-content">
             <section class="page-banner">
                 <div>
                     <span class="eyebrow">代码仓库</span>
@@ -109,16 +122,21 @@
 
     <script src="/app.js?v=19"></script>
     <script>
-      fetch('https://api.github.com/users/zhyx1996', { headers: { 'Accept': 'application/vnd.github.v3+json' } })
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-          var el = document.getElementById('repo-total');
-          if (el && d.public_repos != null) el.textContent = d.public_repos;
-        })
-        .catch(function() {
-          var el = document.getElementById('repo-total');
-          if (el) el.textContent = '14';
-        });
+      (function() {
+        var controller = new AbortController();
+        var timer = setTimeout(function() { controller.abort(); }, 8000);
+        fetch('https://api.github.com/users/zhyx1996', { headers: { 'Accept': 'application/vnd.github.v3+json' }, signal: controller.signal })
+          .then(function(r) { clearTimeout(timer); return r.json(); })
+          .then(function(d) {
+            var el = document.getElementById('repo-total');
+            if (el && d.public_repos != null) el.textContent = d.public_repos;
+          })
+          .catch(function() {
+            var el = document.getElementById('repo-total');
+            if (el) el.textContent = '14';
+          })
+          .finally(function() { clearTimeout(timer); });
+      })();
     </script>
     <script>
       function initSakanaWidget() {

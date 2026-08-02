@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>博客园文章 · 扶摇接海</title>
     <meta name="theme-color" content="#D97706">
+    <meta name="description" content="博客园文章展示 — 公开文章、最近随笔与内容摘要。">
+    <link rel="canonical" href="https://zhyx1996.github.io/articles.html">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:site_name" content="扶摇接海">
+    <meta property="og:title" content="博客园文章 · 扶摇接海">
+    <meta property="og:description" content="博客园文章展示 — 公开文章、最近随笔与内容摘要。">
+    <meta property="og:url" content="https://zhyx1996.github.io/articles.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="博客园文章 · 扶摇接海">
+    <meta name="twitter:description" content="博客园文章展示 — 公开文章、最近随笔与内容摘要。">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23D97706'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>扶</text></svg>">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="stylesheet" href="/styles.css?v=43">
@@ -16,6 +27,8 @@
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">跳到主要内容</a>
+    <div class="scroll-progress" id="scroll-progress"></div>
     <div class="layout">
         <!-- 左侧导航 -->
         <aside class="sidebar">
@@ -23,7 +36,7 @@
                 <span class="logo-mark">扶</span>
                 <span class="logo-text">摇接海</span>
             </div>
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav" aria-label="主导航">
                 <a class="nav-item" href="/index.html">首页</a>
                 <a class="nav-item" href="/projects.html">仓库</a>
                 <a class="nav-item" href="/stars.html">收藏</a>
@@ -36,7 +49,7 @@
         </aside>
 
         <!-- 主内容 -->
-        <main class="main">
+        <main class="main" id="main-content">
             <section class="page-banner">
                 <div>
                     <span class="eyebrow">博客园文章</span>

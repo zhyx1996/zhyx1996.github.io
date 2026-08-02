@@ -226,74 +226,82 @@ function renderMarket(rates, btcPrice, goldPrice) {
 }
 
 function fetchWithTimeout(url, timeout = 8000) {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error('timeout')), timeout);
-    fetch(url)
-      .then(res => { clearTimeout(timer); resolve(res); })
-      .catch(err => { clearTimeout(timer); reject(err); });
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  return fetch(url, { signal: controller.signal })
+    .then(res => { clearTimeout(timer); return res; })
+    .catch(err => { clearTimeout(timer); throw err; });
 }
 
+let marketLoading = false;
 async function loadMarket() {
   const container = document.getElementById('market-grid');
   if (!container) return;
+  if (marketLoading) return;
+  marketLoading = true;
+  container.setAttribute('aria-busy', 'true');
 
-  // 优先展示缓存数据，减少等待时间
-  const cached = getCachedMarket();
-  if (cached) {
-    renderMarket(cached.rates, cached.btcPrice, cached.goldPrice);
-  }
+  try {
+    // 优先展示缓存数据，减少等待时间
+    const cached = getCachedMarket();
+    if (cached) {
+      renderMarket(cached.rates, cached.btcPrice, cached.goldPrice);
+    }
 
-  // 汇率 API（免费无需密钥）
-  const fetchRates = async () => {
-    try {
-      const res = await fetchWithTimeout('https://api.exchangerate-api.com/v4/latest/USD');
-      if (!res.ok) return null;
-      const data = await res.json();
-      return data.rates || null;
-    } catch { return null; }
-  };
-
-  // Bitcoin 价格（CoinGecko，国内被墙时走代理）
-  const fetchBtc = async () => {
-    // 尝试直连
-    try {
-      const res = await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', 5000);
-      if (!res.ok) throw new Error('not ok');
-      const data = await res.json();
-      return data.bitcoin?.usd || null;
-    } catch {
-      // 直连失败，尝试通过 CORS 代理
+    // 汇率 API（免费无需密钥）
+    const fetchRates = async () => {
       try {
-        const res = await fetchWithTimeout(PROXY + encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'), 10000);
+        const res = await fetchWithTimeout('https://api.exchangerate-api.com/v4/latest/USD');
         if (!res.ok) return null;
         const data = await res.json();
-        return data.bitcoin?.usd || null;
+        return data.rates || null;
       } catch { return null; }
+    };
+
+    // Bitcoin 价格（CoinGecko，国内被墙时走代理）
+    const fetchBtc = async () => {
+      // 尝试直连
+      try {
+        const res = await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', 5000);
+        if (!res.ok) throw new Error('not ok');
+        const data = await res.json();
+        return data.bitcoin?.usd || null;
+      } catch {
+        // 直连失败，尝试通过 CORS 代理
+        try {
+          const res = await fetchWithTimeout(PROXY + encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'), 10000);
+          if (!res.ok) return null;
+          const data = await res.json();
+          return data.bitcoin?.usd || null;
+        } catch { return null; }
+      }
+    };
+
+    // 黄金价格（直连，API 支持 CORS *）
+    const fetchGold = async () => {
+      try {
+        const res = await fetchWithTimeout('https://api.gold-api.com/price/XAU');
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.price || data[0]?.price || null;
+      } catch { return null; }
+    };
+
+    const [rates, btcPrice, goldPrice] = await Promise.all([
+      fetchRates(),
+      fetchBtc(),
+      fetchGold(),
+    ]);
+
+    if (rates || btcPrice || goldPrice) {
+      setCachedMarket(rates, btcPrice, goldPrice);
+      renderMarket(rates, btcPrice, goldPrice);
+    } else if (!cached) {
+      renderMarket(null, null, null);
     }
-  };
-
-  // 黄金价格（直连，API 支持 CORS *）
-  const fetchGold = async () => {
-    try {
-      const res = await fetchWithTimeout('https://api.gold-api.com/price/XAU');
-      if (!res.ok) return null;
-      const data = await res.json();
-      return data.price || data[0]?.price || null;
-    } catch { return null; }
-  };
-
-  const [rates, btcPrice, goldPrice] = await Promise.all([
-    fetchRates(),
-    fetchBtc(),
-    fetchGold(),
-  ]);
-
-  if (rates || btcPrice || goldPrice) {
-    setCachedMarket(rates, btcPrice, goldPrice);
-    renderMarket(rates, btcPrice, goldPrice);
-  } else if (!cached) {
-    renderMarket(null, null, null);
+  } finally {
+    marketLoading = false;
+    container.setAttribute('aria-busy', 'false');
   }
 }
 
@@ -503,6 +511,7 @@ function initSakanaDrag() {
 async function loadSteamProfile() {
   const container = document.getElementById('steam-profile');
   if (!container) return;
+  container.setAttribute('aria-busy', 'true');
 
   const STEAM_ID64 = '76561198391062314';
 
@@ -571,6 +580,8 @@ async function loadSteamProfile() {
     `;
   } catch {
     container.innerHTML = '<div class="steam-empty"><span>无法加载游戏数据</span><a href="https://steamcommunity.com/profiles/76561198391062314/" target="_blank" rel="noreferrer">在 Steam 上查看 \u2192</a></div>';
+  } finally {
+    container.setAttribute('aria-busy', 'false');
   }
 }
 
@@ -645,9 +656,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const marketRefreshBtn = document.getElementById('market-refresh');
   if (marketRefreshBtn) {
     marketRefreshBtn.addEventListener('click', () => {
+      if (marketLoading) return;
       marketRefreshBtn.classList.add('spinning');
-      setTimeout(() => marketRefreshBtn.classList.remove('spinning'), 600);
-      loadMarket();
+      marketRefreshBtn.disabled = true;
+      loadMarket().finally(() => {
+        marketRefreshBtn.classList.remove('spinning');
+        marketRefreshBtn.disabled = false;
+      });
     });
   }
   // Sakana widget 加载完成后初始化拖拽

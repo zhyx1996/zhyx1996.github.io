@@ -1212,16 +1212,36 @@ a:hover { opacity: 0.8; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
     .hero .eyebrow,
     .hero-title,
     .hero-subtitle,
-    .hero-actions {
+    .hero-actions,
+    .sidebar-nav .nav-item,
+    .article-new-badge {
         animation: none !important;
         opacity: 1 !important;
         transform: none !important;
     }
+    .scroll-progress {
+        transition: none !important;
+    }
+}
+
+/* 屏幕阅读器专用 */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 /* ── 选中高亮 ── */

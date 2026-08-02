@@ -6,6 +6,16 @@
     <title>北海虽赊，扶摇可接</title>
     <meta name="theme-color" content="#D97706">
     <meta name="description" content="北海虽赊，扶摇可接 — 计算机视觉、自动驾驶感知、并行计算。">
+    <link rel="canonical" href="https://zhyx1996.github.io/index.html">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:site_name" content="扶摇接海">
+    <meta property="og:title" content="北海虽赊，扶摇可接">
+    <meta property="og:description" content="北海虽赊，扶摇可接 — 计算机视觉、自动驾驶感知、并行计算。">
+    <meta property="og:url" content="https://zhyx1996.github.io/index.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="北海虽赊，扶摇可接">
+    <meta name="twitter:description" content="北海虽赊，扶摇可接 — 计算机视觉、自动驾驶感知、并行计算。">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23D97706'/><text x='16' y='23' font-size='20' text-anchor='middle' fill='white' font-family='sans-serif'>扶</text></svg>">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -40,7 +50,7 @@
                 <span class="logo-mark">扶</span>
                 <span class="logo-text">摇接海</span>
             </div>
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav" aria-label="主导航">
                 <a class="nav-item active" href="/index.html">首页</a>
                 <a class="nav-item" href="/projects.html">仓库</a>
                 <a class="nav-item" href="/stars.html">收藏</a>
@@ -88,7 +98,7 @@
                     <h2 class="section-title">市场快照</h2>
                     <button class="market-refresh" id="market-refresh" aria-label="刷新数据">↻</button>
                 </div>
-                <div class="market-grid" id="market-grid">
+                <div class="market-grid" id="market-grid" aria-live="polite" aria-busy="true">
                     <div class="market-card market-loading">
                         <div class="label">加载中</div>
                         <div class="value">…</div>
@@ -120,7 +130,7 @@
                             <span class="showcase-badge">Steam</span>
                             <span class="showcase-frame">最近游戏</span>
                         </div>
-                        <div class="steam-embed" id="steam-profile">
+                        <div class="steam-embed" id="steam-profile" aria-live="polite" aria-busy="true">
                             <div class="steam-loading">加载中...</div>
                         </div>
                     </div>
