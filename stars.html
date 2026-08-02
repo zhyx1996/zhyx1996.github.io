@@ -125,7 +125,7 @@
                         </div>
                     </div>
                 </div>
-                 <a class="section-link" href="https://github.com/zhyx1996?tab=stars" target="_blank" rel="noreferrer">查看全部 420 个收藏 →</a>
+                 <a class="section-link" href="https://github.com/zhyx1996?tab=stars" target="_blank" rel="noreferrer">查看全部 419 个收藏 →</a>
             </section>
         </main>
     </div>
@@ -138,7 +138,7 @@
       fetch('https://api.github.com/users/zhyx1996/starred?per_page=1', { headers: { 'Accept': 'application/vnd.github.v3+json' } })
         .then(function(r) {
           var link = r.headers.get('link');
-          var total = '420';
+          var total = '419';
           if (link) {
             var m = link.match(/page=(\d+)>; rel="last"/);
             if (m) total = m[1];
@@ -148,7 +148,7 @@
         })
         .catch(function() {
           var el = document.getElementById('star-total');
-          if (el) el.textContent = '420';
+          if (el) el.textContent = '419';
         });
     </script>
     <script>
