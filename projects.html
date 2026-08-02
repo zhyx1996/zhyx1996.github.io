@@ -120,7 +120,7 @@
     <!-- Sakana 拖拽小球 -->
     <div id="sakana-drag-widget"></div>
 
-    <script src="/app.js?v=20"></script>
+    <script src="/app.js?v=21"></script>
     <script>
       (function() {
         var controller = new AbortController();
@@ -133,7 +133,7 @@
           })
           .catch(function() {
             var el = document.getElementById('repo-total');
-            if (el) el.textContent = '14';
+            if (el) el.textContent = '10';
           })
           .finally(function() { clearTimeout(timer); });
       })();
