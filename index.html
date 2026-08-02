@@ -141,7 +141,7 @@
                             <span class="showcase-badge">原神</span>
                             <span class="showcase-frame">Enka 框架</span>
                         </div>
-                         <iframe class="showcase-frame-lg" src="https://enka.network/u/147521967/" loading="lazy" referrerpolicy="no-referrer" title="Genshin Showcase" sandbox="allow-scripts allow-same-origin"></iframe>
+                         <iframe class="showcase-frame-lg" src="https://enka.network/u/147521967/" loading="lazy" referrerpolicy="no-referrer" title="Genshin Showcase"></iframe>
                     </div>
                     <div class="showcase-item showcase-wide">
                         <div class="showcase-header">
@@ -172,9 +172,11 @@
     </footer>
 
     <script type="module" src="/public/pretext-effect.js?v=1"></script>
-    <script src="/app.js?v=24" defer></script>
+    <script src="/app.js?v=25" defer></script>
     <script>
       function initSakanaWidget() {
+        if (window.__sakanaWidgetInitialized) return;
+        window.__sakanaWidgetInitialized = true;
         window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
       }
     </script>

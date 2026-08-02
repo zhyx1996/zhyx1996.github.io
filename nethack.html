@@ -92,7 +92,7 @@
                         <span class="nk-window-title">alt.org · hterm</span>
                         <span class="nk-window-status">● 联机中</span>
                     </div>
-                     <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin"></iframe>
+                     <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy" referrerpolicy="no-referrer"></iframe>
                     <div class="nk-window-statusbar" data-hint="terminal">点击终端 · 按 c 连接 · 移动: 方向键 / hjkl yubn · 顶部下拉框：字体 / tileset（画面风格）</div>
                 </div>
                 <div class="nk-window" data-pane="3d" id="pane-3d" role="tabpanel" aria-label="NetHack 3D">
@@ -103,7 +103,7 @@
                         <span class="nk-window-title">nethack-3d · StackC00ki3</span>
                         <span class="nk-window-status">● 3D</span>
                     </div>
-                     <iframe class="nethack-iframe nethack-iframe-3d" src="https://stackc00ki3.github.io/nethack-3d/" title="NetHack 3D" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin"></iframe>
+                     <iframe class="nethack-iframe nethack-iframe-3d" src="https://stackc00ki3.github.io/nethack-3d/" title="NetHack 3D" loading="lazy" referrerpolicy="no-referrer"></iframe>
                     <div class="nk-window-statusbar" data-hint="3d">鼠标拖拽旋转视角 · WASD 移动 · 左键互动 · 滚轮缩放</div>
                 </div>
                 <details class="nethack-shortcuts">
@@ -431,9 +431,11 @@
         </div>
     </footer>
 
-    <script src="/app.js?v=24" defer></script>
+    <script src="/app.js?v=25" defer></script>
     <script>
       function initSakanaWidget() {
+        if (window.__sakanaWidgetInitialized) return;
+        window.__sakanaWidgetInitialized = true;
         window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
       }
       function loadSakanaWithFallback() {

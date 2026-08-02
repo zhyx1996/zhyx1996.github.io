@@ -81,9 +81,11 @@
     <!-- Sakana 拖拽小球 -->
     <div id="sakana-drag-widget"></div>
 
-    <script src="/app.js?v=24" defer></script>
+    <script src="/app.js?v=25" defer></script>
     <script>
       function initSakanaWidget() {
+        if (window.__sakanaWidgetInitialized) return;
+        window.__sakanaWidgetInitialized = true;
         window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
       }
       function loadSakanaWithFallback() {

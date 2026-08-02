@@ -246,6 +246,12 @@ async function main() {
     process.stdout.write(`🔧 zhyx1996.github.io 维护脚本 — ${ts()}\n`);
     process.stdout.write('═'.repeat(52) + '\n');
 
+    const autoCommitEnabled = args.includes('--commit');
+
+    if (!autoCommitEnabled) {
+        process.stdout.write('⚠️  安全模式：不自动 commit/push（传入 --commit 启用）\n');
+    }
+
     if (mode === '--sync') {
         await syncArticles();
     } else if (mode === '--improve') {
@@ -254,12 +260,16 @@ async function main() {
         await syncArticles();
         await runImprovement();
     } else {
-        process.stdout.write('用法: node maintenance.js [--sync|--improve|--fix]\n');
+        process.stdout.write('用法: node maintenance.js [--sync|--improve|--fix] [--commit]\n');
+        process.stdout.write('  --commit  显式启用自动 commit + push（默认禁用）\n');
         return;
     }
 
-    // 自动提交并推送
-    await autoCommit();
+    if (autoCommitEnabled) {
+        await autoCommit();
+    } else {
+        process.stdout.write('\n📦 跳过提交（使用 --commit 启用）\n');
+    }
 
     process.stdout.write('\n' + '═'.repeat(52) + '\n');
     process.stdout.write(`📊 完成于 ${ts()}\n`);

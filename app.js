@@ -331,6 +331,8 @@ async function loadMarket() {
 
 // ── Sakana 拖拽小球（物理弹跳）──
 function initSakanaDrag() {
+  if (window.__sakanaDragInitialized) return;
+  window.__sakanaDragInitialized = true;
   const widget = document.getElementById('sakana-drag-widget');
   if (!widget) return;
 
