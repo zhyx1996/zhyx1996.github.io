@@ -254,6 +254,7 @@ function animate(now) {
 }
 
 function startAnimation() {
+    if (!shouldAnimate()) return;
     if (animationId !== null) return;
     lastAnimationTime = null;
     animationId = requestAnimationFrame(animate);
@@ -269,6 +270,12 @@ function stopAnimation() {
 function shouldAnimate() {
     return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
+
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+reducedMotionQuery.addEventListener?.('change', event => {
+    if (event.matches) stopAnimation();
+    else startAnimation();
+});
 
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {

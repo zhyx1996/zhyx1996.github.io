@@ -889,6 +889,44 @@ async function loadSteamProfile() {
   }
 }
 
+// 运行时注入的 page-agent 浮窗：只设置初始位置，保留后续自身的拖动行为。
+function initPageAgentPlacement() {
+  const selectors = [
+    '#page-agent',
+    '.page-agent',
+    'page-agent',
+    '[data-page-agent]',
+    '#page-agent-window',
+    '.page-agent-window',
+    '[data-testid="page-agent"]',
+    '[id*="page-agent" i]',
+    '[class*="page-agent" i]',
+    '[data-testid*="page-agent" i]',
+  ];
+  const selector = selectors.join(',');
+
+  const place = (element) => {
+    if (!(element instanceof HTMLElement) || element.dataset.codexPlaced === 'true') return;
+    element.style.position = 'fixed';
+    element.style.left = '20px';
+    element.style.top = '84px';
+    element.style.right = 'auto';
+    element.style.bottom = 'auto';
+    element.style.zIndex = '9990';
+    element.dataset.codexPlaced = 'true';
+  };
+
+  const apply = () => document.querySelectorAll(selector).forEach(place);
+  apply();
+  if (document.querySelector(selector)) return;
+
+  const observer = new MutationObserver(() => {
+    apply();
+    if (document.querySelector(selector)) observer.disconnect();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
 // ── 滚动进度条（rAF 节流）──
 function initScrollProgress() {
   const bar = document.getElementById('scroll-progress');
@@ -965,6 +1003,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSteamProfile();
   renderArticles();
   renderLatestArticle();
+  initPageAgentPlacement();
   initScrollAnimations();
   initScrollProgress();
   initBackToTop();
