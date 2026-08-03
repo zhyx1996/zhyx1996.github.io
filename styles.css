@@ -220,7 +220,7 @@ a:hover { opacity: 0.8; }
 .hero-side {
     position: relative;
     width: 100%;
-    min-height: 380px;
+    min-height: 340px;
     overflow: hidden;
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -307,26 +307,25 @@ a:hover { opacity: 0.8; }
     position: absolute;
     white-space: pre;
     pointer-events: none;
-    font-size: 13px;
-    line-height: 24px;
-    color: rgba(26, 26, 26, 0.6);
+    font-size: 11px;
+    line-height: 18px;
+    color: var(--text-muted);
     font-family: var(--font-mono);
     overflow: hidden;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.08em;
 }
 
 .pretext-orb {
     position: absolute;
     border-radius: 50%;
-    border: 2px dashed var(--accent);
-    background: rgba(217, 119, 6, 0.06);
-    pointer-events: none;
+    border: 1px solid var(--accent);
+    background: rgba(217, 119, 6, 0.04);
+    pointer-events: auto;
     z-index: 2;
     will-change: transform;
-    animation: orbPulse 3s ease-in-out infinite;
-    box-shadow: 0 0 18px 4px rgba(217, 119, 6, 0.08), inset 0 0 12px 2px rgba(217, 119, 6, 0.05);
-    backdrop-filter: blur(1px);
-    -webkit-backdrop-filter: blur(1px);
+    box-shadow: 0 0 12px 2px rgba(217, 119, 6, 0.08), inset 0 0 8px 1px rgba(217, 119, 6, 0.04);
+    touch-action: none;
 }
 
 @keyframes orbPulse {
@@ -341,6 +340,7 @@ a:hover { opacity: 0.8; }
     z-index: 2;
     pointer-events: auto;
     user-select: none;
+    touch-action: none;
     -webkit-user-select: none;
 }
 
@@ -1277,7 +1277,7 @@ a:hover { opacity: 0.8; }
     #sakana-drag-widget {
         width: 100px;
         height: 117px;
-        right: 20px;
+        right: 16px;
     }
 }
 
@@ -1290,7 +1290,7 @@ a:hover { opacity: 0.8; }
     #sakana-drag-widget {
         width: 90px !important;
         height: 105px !important;
-        right: 10px;
+        right: 8px;
     }
 }
 
@@ -1298,10 +1298,15 @@ a:hover { opacity: 0.8; }
 :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
     position: fixed;
     top: 84px;
-    left: 20px;
+    left: 50%;
     right: auto;
     bottom: auto;
     z-index: 9990;
+    width: min(360px, calc(100vw - 40px));
+    box-sizing: border-box;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 104px);
+    overflow: auto;
 }
 
 /* ── 无障碍 ── */
@@ -1412,9 +1417,21 @@ a:hover { opacity: 0.8; }
     cursor: grab;
     user-select: none;
     touch-action: none;
+    box-sizing: border-box;
+    overflow: hidden;
     background: transparent;
     border: none;
     box-shadow: none;
+}
+
+@media (max-width: 600px) {
+    :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
+        top: 76px;
+        left: 50%;
+        width: calc(100vw - 24px);
+        max-width: calc(100vw - 24px);
+        max-height: calc(100vh - 88px);
+    }
 }
 
 #sakana-drag-widget:active,

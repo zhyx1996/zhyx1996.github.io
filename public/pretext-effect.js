@@ -1,9 +1,6 @@
-const TEXT = `公开仓库围绕计算机视觉、自动驾驶感知、并行计算与公开写作。lane2seq 做实时车道检测，结合 Canny/Hough 变换、CLAHE、HLS 等传统流程与 Lane2Seq-ViT 序列生成模型，并用 ENet 分割在 TuSimple 和 LLAMAS 数据集上训练与验证。GStreamer-SEI 整理 RTSP 推流、自定义 SEI 注入、Carla 多相机管理与 pyinstaller 打包 exe 的完整踩坑记录。auto_calib_v2.0 在 PJLab-ADG/SensorsCalibration 的 lidar2camera 方案上做改进，方便自动驾驶多传感器联合标定。utils 收集常用脚本工具。lanenet-lane-detection 记录车道检测实验的迭代过程。维护多份 gkd 订阅用于广告过滤与规则分享。近期也在看 BEV 感知、Occupancy 估计与端到端自动驾驶方向。`;
+const TEXT = `视觉输入      感知结果      并行计算      实践记录`;
 
 const DEFAULT_LINE_HEIGHT = 24;
-const ORB_TEXT_GAP = 1;
-const MIN_SLOT_WIDTH_BASE = 2.2;
-
 const container = document.getElementById('pretext-output');
 let W, H, graphemes = [], graphemeWidths = [], orbs = [];
 let lineHeight = DEFAULT_LINE_HEIGHT;
@@ -76,37 +73,6 @@ function initOrbs() {
     ];
 }
 
-function circleIntervalForBand(orb, bandTop, bandBottom) {
-    if (bandTop >= orb.y + orb.r || bandBottom <= orb.y - orb.r) return null;
-    const minDy = orb.y >= bandTop && orb.y <= bandBottom
-        ? 0
-        : orb.y < bandTop ? bandTop - orb.y : orb.y - bandBottom;
-    if (minDy >= orb.r) return null;
-    const halfWidth = Math.sqrt(orb.r * orb.r - minDy * minDy);
-    return {
-        left: orb.x - halfWidth - ORB_TEXT_GAP,
-        right: orb.x + halfWidth + ORB_TEXT_GAP,
-    };
-}
-
-function carveTextLineSlots(base, blocked) {
-    let slots = [base];
-    for (const interval of blocked.sort((a, b) => a.left - b.left)) {
-        const next = [];
-        for (const slot of slots) {
-            if (interval.right <= slot.left || interval.left >= slot.right) {
-                next.push(slot);
-                continue;
-            }
-            if (interval.left > slot.left) next.push({ left: slot.left, right: interval.left });
-            if (interval.right < slot.right) next.push({ left: interval.right, right: slot.right });
-        }
-        slots = next;
-    }
-    const minimumWidth = fontSize * MIN_SLOT_WIDTH_BASE;
-    return slots.filter(slot => slot.right - slot.left >= minimumWidth);
-}
-
 function syncTextLines(lines) {
     while (lineElements.length < lines.length) {
         const element = document.createElement('span');
@@ -133,48 +99,13 @@ function syncTextLines(lines) {
 
 function renderText() {
     ensureTextMetrics();
-
-    const padding = 16;
-    const colStart = padding;
-    const colEnd = W - padding;
-    const lines = [];
-    let graphemeIndex = 0;
-
-    for (let y = lineHeight * 1.5; y + lineHeight < H - 20 && graphemeIndex < graphemes.length; y += lineHeight) {
-        const blocked = [];
-        for (const orb of orbs) {
-            const interval = circleIntervalForBand(orb, y, y + lineHeight);
-            if (interval) blocked.push(interval);
-        }
-
-        const slots = carveTextLineSlots({ left: colStart, right: colEnd }, blocked);
-        for (const slot of slots) {
-            while (graphemeIndex < graphemes.length && /^\s$/u.test(graphemes[graphemeIndex])) {
-                graphemeIndex++;
-            }
-            if (graphemeIndex >= graphemes.length) break;
-
-            const slotWidth = slot.right - slot.left;
-            const start = graphemeIndex;
-            let textWidth = 0;
-            // Pack graphemes directly instead of preserving whole words or
-            // punctuation clusters, leaving at most one glyph of free space.
-            while (graphemeIndex < graphemes.length) {
-                const nextWidth = graphemeWidths[graphemeIndex];
-                if (textWidth + nextWidth > slotWidth) break;
-                textWidth += nextWidth;
-                graphemeIndex++;
-            }
-            if (graphemeIndex === start) continue;
-            lines.push({
-                left: slot.left,
-                top: y,
-                text: graphemes.slice(start, graphemeIndex).join(''),
-            });
-        }
-    }
-
-    syncTextLines(lines);
+    const lines = [
+        { left: 24, top: Math.max(78, H * 0.28), text: '视觉输入' },
+        { left: Math.max(24, W * 0.54), top: Math.max(78, H * 0.28), text: '感知结果' },
+        { left: 24, top: Math.min(H - lineHeight * 2.5, H * 0.7), text: '并行计算' },
+        { left: Math.max(24, W * 0.54), top: Math.min(H - lineHeight * 2.5, H * 0.7), text: '实践记录' },
+    ];
+    syncTextLines(lines.filter(line => line.left + line.text.length * fontSize < W - 18));
 }
 
 // ─── 圆球渲染（CSS transform，GPU 加速）─────────────────────────
@@ -222,6 +153,84 @@ function orbNeedsTextSync() {
 
 function saveOrbPositions() {
     lastOrbPositions = orbs.map(orb => ({ x: orb.x, y: orb.y }));
+}
+
+// 标签与小球互不重叠：小球避开四个标签矩形（留白），小球之间互相弹开。
+function getLabelBoxes() {
+    const boxes = [];
+    for (const el of lineElements) {
+        if (!el || el.style.display === 'none' || !el.textContent) continue;
+        boxes.push({
+            left: parseFloat(el.style.left) || 0,
+            top: parseFloat(el.style.top) || 0,
+            width: el.offsetWidth || el.textContent.length * fontSize,
+            height: lineHeight,
+        });
+    }
+    return boxes;
+}
+
+function resolveCollisions() {
+    const pad = 10; // 标签周围留白
+    const boxes = getLabelBoxes();
+    for (const orb of orbs) {
+        if (orb.dragging) continue;
+        for (const box of boxes) {
+            const minX = box.left - orb.r - pad;
+            const maxX = box.left + box.width + orb.r + pad;
+            const minY = box.top - orb.r - pad;
+            const maxY = box.top + box.height + orb.r + pad;
+            if (orb.x <= minX || orb.x >= maxX || orb.y <= minY || orb.y >= maxY) continue;
+            const overlapLeft = orb.x - minX;
+            const overlapRight = maxX - orb.x;
+            const overlapTop = orb.y - minY;
+            const overlapBottom = maxY - orb.y;
+            const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+            if (minOverlap === overlapLeft) {
+                orb.x = minX - 0.5;
+                orb.vx = -Math.abs(orb.vx);
+            } else if (minOverlap === overlapRight) {
+                orb.x = maxX + 0.5;
+                orb.vx = Math.abs(orb.vx);
+            } else if (minOverlap === overlapTop) {
+                orb.y = minY - 0.5;
+                orb.vy = -Math.abs(orb.vy);
+            } else {
+                orb.y = maxY + 0.5;
+                orb.vy = Math.abs(orb.vy);
+            }
+        }
+    }
+    // 小球互斥（等质量弹性碰撞近似）
+    for (let i = 0; i < orbs.length; i++) {
+        const orb = orbs[i];
+        if (orb.dragging) continue;
+        for (let j = i + 1; j < orbs.length; j++) {
+            const other = orbs[j];
+            if (other.dragging) continue;
+            const dx = orb.x - other.x;
+            const dy = orb.y - other.y;
+            const dist = Math.hypot(dx, dy);
+            const minDist = orb.r + other.r + 4;
+            if (dist > 0 && dist < minDist) {
+                const push = (minDist - dist) / 2;
+                const ux = dx / dist;
+                const uy = dy / dist;
+                orb.x += ux * push;
+                orb.y += uy * push;
+                other.x -= ux * push;
+                other.y -= uy * push;
+                const v1n = orb.vx * ux + orb.vy * uy;
+                const v2n = other.vx * ux + other.vy * uy;
+                if (v1n > v2n) {
+                    orb.vx += (v2n - v1n) * ux;
+                    orb.vy += (v2n - v1n) * uy;
+                    other.vx += (v1n - v2n) * ux;
+                    other.vy += (v1n - v2n) * uy;
+                }
+            }
+        }
+    }
 }
 
 function animate(now) {
@@ -294,12 +303,11 @@ document.addEventListener('visibilitychange', () => {
 
 // ─── 拖拽 ────────────────────────────────────────────────────────
 let dragOrb = null;
+let dragPointerId = null;
 
 function getPos(e) {
     const r = orbsLayer.getBoundingClientRect();
-    const cx = e.touches ? e.touches[0].clientX : e.clientX;
-    const cy = e.touches ? e.touches[0].clientY : e.clientY;
-    return { x: cx - r.left, y: cy - r.top };
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
 }
 
 function hitTest(p) {
@@ -311,13 +319,21 @@ function hitTest(p) {
 }
 
 function attachDragEvents() {
-    orbsLayer.addEventListener('mousedown', e => {
+    orbsLayer.addEventListener('pointerdown', e => {
+        if (dragOrb || (e.pointerType === 'mouse' && e.button !== 0)) return;
         dragOrb = hitTest(getPos(e));
-        if (dragOrb) { dragOrb.dragging = true; orbsLayer.style.cursor = 'grabbing'; e.preventDefault(); }
+        if (!dragOrb) return;
+        dragPointerId = e.pointerId;
+        dragOrb.dragging = true;
+        orbsLayer.style.cursor = 'grabbing';
+        orbsLayer.setPointerCapture?.(e.pointerId);
+        e.preventDefault();
     });
-    orbsLayer.addEventListener('mousemove', e => {
+    orbsLayer.addEventListener('pointermove', e => {
+        if (dragPointerId !== null && e.pointerId !== dragPointerId) return;
         const p = getPos(e);
         if (!dragOrb) { orbsLayer.style.cursor = hitTest(p) ? 'grab' : 'default'; return; }
+        e.preventDefault();
         dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
         dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
         const idx = orbs.indexOf(dragOrb);
@@ -325,33 +341,21 @@ function attachDragEvents() {
             orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
         }
     });
-    const finishDrag = () => {
+    const finishDrag = e => {
+        if (dragPointerId !== null && e?.pointerId !== dragPointerId) return;
         if (dragOrb) {
             dragOrb.dragging = false;
             dragOrb = null;
             renderText();
             saveOrbPositions();
         }
+        if (dragPointerId !== null) orbsLayer.releasePointerCapture?.(dragPointerId);
+        dragPointerId = null;
         orbsLayer.style.cursor = 'default';
     };
-    orbsLayer.addEventListener('mouseup', finishDrag);
-    orbsLayer.addEventListener('mouseleave', finishDrag);
-    orbsLayer.addEventListener('touchstart', e => {
-        dragOrb = hitTest(getPos(e));
-        if (dragOrb) { dragOrb.dragging = true; }
-    }, { passive: true });
-    orbsLayer.addEventListener('touchmove', e => {
-        if (!dragOrb) return;
-        e.preventDefault();
-        const p = getPos(e);
-        dragOrb.x = Math.max(dragOrb.r, Math.min(W - dragOrb.r, p.x));
-        dragOrb.y = Math.max(dragOrb.r, Math.min(H - dragOrb.r, p.y));
-        const idx = orbs.indexOf(dragOrb);
-        if (idx >= 0 && orbElements[idx]) {
-            orbElements[idx].style.transform = `translate3d(${dragOrb.x - dragOrb.r}px, ${dragOrb.y - dragOrb.r}px, 0)`;
-        }
-    }, { passive: false });
-    orbsLayer.addEventListener('touchend', finishDrag);
+    orbsLayer.addEventListener('pointerup', finishDrag);
+    orbsLayer.addEventListener('pointercancel', finishDrag);
+    orbsLayer.addEventListener('lostpointercapture', finishDrag);
 }
 
 // ─── 初始化 ──────────────────────────────────────────────────────

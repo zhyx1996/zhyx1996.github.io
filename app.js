@@ -565,6 +565,43 @@ window.__sakanaPhysics = {
   }
 };
 
+// 计算 Sakana 初始安全位置：
+// - 桌面（>600px）：放在 hero 右列（hero-side 装饰区）内右下方空白，避开左列
+//   hero 标题/正文/按钮、导航，以及下方的“正在处理的问题”标题横线和卡片顶部；
+// - 移动端或空间不足：退回视口右下角，并保证完整位于视口内。
+function computeSakanaSafePosition(widgetW, widgetH) {
+  var margin = 8;
+  var viewportW = window.innerWidth;
+  var viewportH = window.innerHeight;
+
+  if (viewportW > 600) {
+    var heroSide = document.querySelector('.hero-side');
+    if (heroSide) {
+      var r = heroSide.getBoundingClientRect();
+      if (r.width > 0 && r.bottom > 0 && r.top < viewportH) {
+        var left = r.right - widgetW - margin;
+        // Keep the diagram itself clear. The gap between the diagram and the
+        // directions section is the quietest desktop landing zone.
+        var directions = document.querySelector('.section-directions');
+        var top = r.bottom + margin;
+        if (directions) {
+          var directionsTop = directions.getBoundingClientRect().top;
+          top = Math.min(top, directionsTop - widgetH - 16);
+        }
+        // 完整位于视口内（拖动同样被限制在视口内）
+        left = Math.max(margin, Math.min(viewportW - widgetW - margin, left));
+        top = Math.max(margin, Math.min(viewportH - widgetH - margin, top));
+        return { left: left, top: top };
+      }
+    }
+  }
+
+  return {
+    left: Math.max(margin, viewportW - widgetW - margin),
+    top: Math.max(margin, viewportH - widgetH - margin),
+  };
+}
+
 function initSakanaDrag() {
   if (window.__sakanaDragInitialized) return;
   window.__sakanaDragInitialized = true;
@@ -579,6 +616,7 @@ function initSakanaDrag() {
   var vyHistory = [];
   var leftPos = 0, topPos = 0;
   var initialized = false;
+  var userDragged = false; // 用户拖动后不再自动重定位（resize 时保持用户位置）
   var bounceCount = 0;
   var swingAnimId = null;
   var swingR = 0, swingW = 0;
@@ -592,11 +630,8 @@ function initSakanaDrag() {
     widget.style.bottom = 'auto';
   };
 
-  var getXY = function (e) {
-    if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    if (e.changedTouches && e.changedTouches[0]) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-    return { x: e.clientX, y: e.clientY };
-  };
+  var pointerId = null;
+  var getXY = function (e) { return { x: e.clientX, y: e.clientY }; };
 
   var currentR = 0;
   var applyCharLean = function () {
@@ -629,16 +664,31 @@ function initSakanaDrag() {
 
   var initPosition = function () {
     if (initialized) return;
-    var rect = widget.getBoundingClientRect();
-    leftPos = rect.left;
-    topPos = rect.top;
+    var pos = computeSakanaSafePosition(widget.offsetWidth, widget.offsetHeight);
+    leftPos = pos.left;
+    topPos = pos.top;
+    setPos(leftPos, topPos);
+    initialized = true;
+  };
+
+  // 用户尚未拖动时重新计算安全位置（字体就绪校正 / 窗口 resize 共用）
+  var repositionIfNotDragged = function () {
+    if (userDragged) return;
+    var pos = computeSakanaSafePosition(widget.offsetWidth, widget.offsetHeight);
+    leftPos = pos.left;
+    topPos = pos.top;
+    setPos(leftPos, topPos);
     initialized = true;
   };
 
   var onPointerDown = function (e) {
+    if (isDragging || (e.pointerType === 'mouse' && e.button !== 0)) return;
     if (e.target.closest('.sakana-widget-ctrl')) return;
     var xy = getXY(e);
     isDragging = true;
+    userDragged = true; // 用户已开始交互，此后 resize 不再重置位置
+    pointerId = e.pointerId;
+    widget.setPointerCapture?.(e.pointerId);
     widget.classList.add('dragging');
     initPosition();
     var sakana = window.sakanaInstance;
@@ -660,7 +710,7 @@ function initSakanaDrag() {
   };
 
   var onPointerMove = function (e) {
-    if (!isDragging) return;
+    if (!isDragging || e.pointerId !== pointerId) return;
     var xy = getXY(e);
     var now = Date.now();
     var dx = xy.x - lastX;
@@ -673,8 +723,8 @@ function initSakanaDrag() {
     var widgetH = widget.offsetHeight;
     var viewportW = window.innerWidth;
     var viewportH = window.innerHeight;
-    newLeft = Math.max(-widgetW * 0.5, Math.min(viewportW - widgetW * 0.5, newLeft));
-    newTop = Math.max(-widgetH * 0.5, Math.min(viewportH - widgetH * 0.5, newTop));
+    newLeft = Math.max(8, Math.min(viewportW - widgetW - 8, newLeft));
+    newTop = Math.max(8, Math.min(viewportH - widgetH - 8, newTop));
 
     setPos(newLeft, newTop);
     applyCharLean();
@@ -691,9 +741,11 @@ function initSakanaDrag() {
     lastTime = now;
   };
 
-  var onPointerUp = function () {
-    if (!isDragging) return;
+  var onPointerUp = function (e) {
+    if (!isDragging || (e && e.pointerId !== pointerId)) return;
     isDragging = false;
+    widget.releasePointerCapture?.(pointerId);
+    pointerId = null;
     widget.classList.remove('dragging');
 
     if (vxHistory.length > 0) {
@@ -803,12 +855,21 @@ function initSakanaDrag() {
 
   // 内部弹簧由 SakanaWidget._run 驱动，不再需要独立 swing 动画
 
-  widget.addEventListener('mousedown', onPointerDown);
-  widget.addEventListener('touchstart', onPointerDown, { passive: false });
-  document.addEventListener('mousemove', onPointerMove);
-  document.addEventListener('touchmove', onPointerMove, { passive: false });
-  document.addEventListener('mouseup', onPointerUp);
-  document.addEventListener('touchend', onPointerUp);
+  widget.addEventListener('pointerdown', onPointerDown);
+  widget.addEventListener('pointermove', onPointerMove);
+  widget.addEventListener('pointerup', onPointerUp);
+  widget.addEventListener('pointercancel', onPointerUp);
+  widget.addEventListener('lostpointercapture', onPointerUp);
+
+  // Sakana 初始加载时立即定位到安全空白区（不依赖字体加载完成，
+  // 避免初始位置停留在 CSS 默认的视口右下角、遮挡方向区内容）
+  initPosition();
+  // 字体就绪后再校正一次（用户未拖动时），消除字体加载导致的几何抖动
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(repositionIfNotDragged);
+  }
+  // 窗口尺寸变化时：仅在用户尚未拖动前重新定位；用户拖动后保持用户位置
+  window.addEventListener('resize', repositionIfNotDragged);
 }
 
 // ── Steam 资料（解析个人主页 HTML）──
@@ -889,7 +950,8 @@ async function loadSteamProfile() {
   }
 }
 
-// 运行时注入的 page-agent 浮窗：只设置初始位置，保留后续自身的拖动行为。
+// 运行时注入的 page-agent 浮窗：首次注入时定位到首屏安全空白区，
+// 之后完全交给 page-agent 自身行为，不做持续抢位。
 function initPageAgentPlacement() {
   const selectors = [
     '#page-agent',
@@ -898,6 +960,7 @@ function initPageAgentPlacement() {
     '[data-page-agent]',
     '#page-agent-window',
     '.page-agent-window',
+    '#page-agent-runtime_agent-panel',
     '[data-testid="page-agent"]',
     '[id*="page-agent" i]',
     '[class*="page-agent" i]',
@@ -905,15 +968,93 @@ function initPageAgentPlacement() {
   ];
   const selector = selectors.join(',');
 
-  const place = (element) => {
-    if (!(element instanceof HTMLElement) || element.dataset.codexPlaced === 'true') return;
+  // 计算安全初始位置：桌面端放在 hero 左列（hero-content）按钮下方的空白带，
+  // 用明确的 left 定位（不做 translateX 居中，避免左侧裁切），避开导航、
+  // hero 标题/正文/按钮与 hero 分隔线，也不进入右列 hero-side 研究图内
+  // （避免遮住研究图标签）；移动端退回顶部导航下方。
+  const computePlacement = () => {
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    const compact = viewportW <= 600;
+    const barHeight = 40; // page-agent 收起时横条高度（其 --height）
+    const inputHeight = 48; // 展开时输入区高度（其 --input-section 高度）
+
+    if (compact) {
+      // 移动端：仅保证完整不出屏，顶部导航下方居中
+      const width = Math.min(360, viewportW - 24);
+      return { top: 76, left: '50%', width, center: true };
+    }
+
+    const heroContent = document.querySelector('.hero-content');
+    if (heroContent) {
+      const r = heroContent.getBoundingClientRect();
+      if (r.width > 0 && r.bottom > 0 && r.top < viewportH) {
+        const width = Math.min(360, r.width, viewportW - 24);
+        const left = Math.max(8, r.left + 8);
+        // 基准：hero 左列按钮（hero-actions）下方 10px 的空白带
+        const actions = document.querySelector('.hero-actions');
+        const actionsBottom = actions ? actions.getBoundingClientRect().bottom : (r.top + 140);
+        // 上限：展开输入区（barHeight + inputHeight）不越过 hero 分隔线，
+        // 且整体完整位于视口内
+        const aiWrap = document.querySelector('.hero-ai-wrap');
+        const aiBottom = aiWrap ? aiWrap.getBoundingClientRect().bottom : actionsBottom;
+        const directions = document.querySelector('.section-directions');
+        const directionsTop = directions ? directions.getBoundingClientRect().top : viewportH;
+        const totalHeight = barHeight + inputHeight;
+        const maxTop = Math.min(
+          viewportH - totalHeight - 12,
+          directionsTop - totalHeight - 16
+        );
+        const safeStart = Math.max(actionsBottom + 10, aiBottom + 4);
+        const top = Math.max(8, Math.min(maxTop, safeStart));
+        if (top + totalHeight <= viewportH - 12) {
+          return { top: Math.round(top), left: Math.round(left), width, center: false };
+        }
+      }
+    }
+    // 兜底：视口右缘中部，保证完整在视口内
+    const width = Math.min(340, viewportW - 24);
+    return { top: 96, left: Math.max(12, viewportW - width - 12), width, center: false };
+  };
+
+  const applyInitialPlacement = (element) => {
+    // 用户一旦拖过就绝不再重定位（含初始化逻辑）
+    if (element.dataset.codexUserMoved === 'true') return;
+    const pos = computePlacement();
     element.style.position = 'fixed';
-    element.style.left = '20px';
-    element.style.top = '84px';
+    element.style.left = pos.center ? '50%' : pos.left + 'px';
+    element.style.top = pos.top + 'px';
     element.style.right = 'auto';
     element.style.bottom = 'auto';
-    element.style.zIndex = '9990';
+    element.style.zIndex = '9990'; // 低于 Sakana（#sakana-drag-widget 为 9999）
+    element.style.width = pos.width + 'px';
+    element.style.setProperty('--width', pos.width + 'px'); // 与库内部 --width 同步，保证 history/输入区宽度一致
+    element.style.maxWidth = 'calc(100vw - 24px)';
+    element.style.boxSizing = 'border-box';
+    // 桌面端不居中：清掉库默认的 translateX(-50%)，避免左侧裁切残影；
+    // 只保留水平居中所需的 translateX（移动端 center=true 时）。
+    element.style.transform = pos.center ? 'translateX(-50%) translateY(0)' : 'translateY(0)';
+  };
+
+  const markUserMoved = () => {
+    document.querySelectorAll(selector).forEach((el) => {
+      el.dataset.codexUserMoved = 'true';
+    });
+  };
+  // 用户一旦开始交互（含其自身拖动 / 指针移动）就不再重定位
+  ['pointerdown', 'pointermove', 'mousedown', 'touchstart', 'dragstart'].forEach((type) => {
+    document.addEventListener(type, (e) => {
+      if (e.target && e.target.closest && e.target.closest(selector)) markUserMoved();
+    }, { passive: true });
+  });
+
+  const place = (element) => {
+    if (!(element instanceof HTMLElement) || element.dataset.codexPlaced === 'true') return;
     element.dataset.codexPlaced = 'true';
+    applyInitialPlacement(element);
+    // page-agent 注入后 ~0ms 才 show() 并写入自身 transform/opacity；
+    // 在其初始化稳定后各确认一次位置（用户未拖动时）。仅此一次，之后彻底放手。
+    setTimeout(() => { applyInitialPlacement(element); }, 250);
   };
 
   const apply = () => document.querySelectorAll(selector).forEach(place);
