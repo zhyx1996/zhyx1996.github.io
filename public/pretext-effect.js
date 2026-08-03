@@ -3,12 +3,12 @@ const TEXT = `基于 GitHub Pages 的个人主页，展示个人简介、公开�
 const DEFAULT_LINE_HEIGHT = 24;
 const ORB_TEXT_GAP = 1;
 const MIN_SLOT_WIDTH_BASE = 2.2;
+const TEXT_PADDING = 16;
 
 const container = document.getElementById('pretext-output');
 let W, H, graphemes = [], graphemeWidths = [], orbs = [];
 let lineHeight = DEFAULT_LINE_HEIGHT;
 let fontSize = 13;
-let pad = 16;
 let orbElements = [];
 const lineElements = [];
 
@@ -64,8 +64,6 @@ function ensureTextMetrics() {
 function resize() {
     const r = container.parentElement.getBoundingClientRect();
     W = r.width; H = r.height;
-    pad = Math.min(W, H) * 0.08 * 1.2;
-    container.style.padding = pad + 'px';
 }
 
 function initOrbs() {
@@ -135,10 +133,10 @@ function syncTextLines(lines) {
 function renderText() {
     ensureTextMetrics();
 
-    const colStart = pad;
-    const colEnd = W - pad;
-    const textTop = pad;
-    const textBottom = H - pad;
+    const colStart = TEXT_PADDING;
+    const colEnd = W - TEXT_PADDING;
+    const textTop = lineHeight * 1.5;
+    const textBottom = H - 20;
     const lines = [];
     let graphemeIndex = 0;
 
