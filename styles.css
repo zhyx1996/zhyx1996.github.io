@@ -229,27 +229,15 @@ a:hover { opacity: 0.8; }
     background: radial-gradient(ellipse at 50% 40%, rgba(217, 119, 6, 0.07) 0%, rgba(13, 148, 136, 0.03) 50%, transparent 70%);
 }
 
-.hero-side::before,
-.hero-side::after {
+.hero-side::before {
     content: "";
     position: absolute;
     z-index: 0;
     pointer-events: none;
-}
-
-.hero-side::before {
     inset: 48px 28px;
     border: 1px solid var(--border-light);
     border-radius: 50%;
     transform: rotate(-18deg) scaleX(1.2);
-}
-
-.hero-side::after {
-    left: 12%;
-    right: 12%;
-    top: 50%;
-    border-top: 1px dashed var(--border);
-    box-shadow: 0 -68px 0 var(--border-light), 0 68px 0 var(--border-light);
 }
 
 .hero-visual-head,
@@ -261,19 +249,29 @@ a:hover { opacity: 0.8; }
     font-size: 10px;
     letter-spacing: 0.08em;
     color: var(--text-muted);
+    pointer-events: none;
 }
 
 .hero-visual-head {
-    top: 14px;
+    top: 8px;
     left: 16px;
     right: 16px;
     display: flex;
     justify-content: space-between;
-    padding-bottom: 10px;
+    align-items: baseline;
+    gap: 4px 16px;
+    flex-wrap: wrap;
+    padding-bottom: 4px;
     border-bottom: 1px solid var(--border-light);
 }
 
-.hero-visual-label { left: 20px; }
+.hero-visual-label {
+    left: 20px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 2px 8px;
+}
 .hero-visual-label-top { top: 78px; }
 .hero-visual-label-bottom { bottom: 60px; }
 
@@ -284,12 +282,14 @@ a:hover { opacity: 0.8; }
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .hero-visual-footer i {
     width: 24px;
     height: 1px;
     background: var(--border);
+    flex-shrink: 0;
 }
 
 #pretext-output {
@@ -1285,7 +1285,10 @@ a:hover { opacity: 0.8; }
     .market-grid { grid-template-columns: 1fr; }
     .hero-title { font-size: 2.75rem; }
     .hero-subtitle { font-size: 16px; }
-    .hero-visual-label { font-size: 9px; }
+    .hero-visual-head,
+    .hero-visual-footer,
+    .hero-visual-label { font-size: 9px; letter-spacing: 0.04em; }
+    .hero-visual-label { padding: 2px 6px; }
     .repo-grid { grid-template-columns: 1fr; }
     #sakana-drag-widget {
         width: 90px !important;

@@ -1,4 +1,4 @@
-const TEXT = `计算机视觉 自动驾驶感知 并行计算 车道检测 多传感器标定 BEV 感知 Occupancy CUDA`;
+const TEXT = `基于 GitHub Pages 的个人主页，展示个人简介、公开仓库、Star 项目、博客文章，以及部分公开信息嵌入示例。由 AI 辅助设计与构建。页面结构：index.html 主页，含个人方向、近期关注、文章摘要、Steam 游戏、石蒜模拟器；projects.html 公开仓库展示；stars.html GitHub Stars 展示；articles.html 博客园文章展示；app.js 数据渲染与交互逻辑（API 集成、动画、拖拽）；styles.css 全站样式（含响应式断点）；public/pretext-effect.js 浮动小球动画引擎。技术特性：原生 HTML / CSS / JavaScript，无构建工具；Sakana Widget（石蒜模拟器）集成，支持鼠标/触摸拖拽；浮动小球弹跳动画，边界约束与拖拽；GitHub API 集成（仓库、Stars、个人信息）；Steam 游戏库展示；博客园文章聚合；响应式布局（桌面 / 平板 / 移动端）。本地预览：python -m http.server 8000。校验：node --check app.js。部署：提交到 main 分支后由 GitHub Pages 自动发布。`;
 
 const DEFAULT_LINE_HEIGHT = 24;
 const ORB_TEXT_GAP = 1;
@@ -8,6 +8,7 @@ const container = document.getElementById('pretext-output');
 let W, H, graphemes = [], graphemeWidths = [], orbs = [];
 let lineHeight = DEFAULT_LINE_HEIGHT;
 let fontSize = 13;
+let pad = 16;
 let orbElements = [];
 const lineElements = [];
 
@@ -63,7 +64,8 @@ function ensureTextMetrics() {
 function resize() {
     const r = container.parentElement.getBoundingClientRect();
     W = r.width; H = r.height;
-    container.style.padding = Math.min(W, H) * 0.08 * 1.2 + 'px';
+    pad = Math.min(W, H) * 0.08 * 1.2;
+    container.style.padding = pad + 'px';
 }
 
 function initOrbs() {
@@ -133,11 +135,10 @@ function syncTextLines(lines) {
 function renderText() {
     ensureTextMetrics();
 
-    const padding = 16;
-    const colStart = padding;
-    const colEnd = W - padding;
-    const textTop = Math.max(lineHeight * 1.5, 96);
-    const textBottom = H - 78;
+    const colStart = pad;
+    const colEnd = W - pad;
+    const textTop = pad;
+    const textBottom = H - pad;
     const lines = [];
     let graphemeIndex = 0;
 
