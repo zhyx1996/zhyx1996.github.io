@@ -241,8 +241,7 @@ a:hover { opacity: 0.8; }
 }
 
 .hero-visual-head,
-.hero-visual-footer,
-.hero-visual-label {
+.hero-visual-footer {
     position: absolute;
     z-index: 4;
     font-family: var(--font-mono);
@@ -265,16 +264,6 @@ a:hover { opacity: 0.8; }
     border-bottom: 1px solid var(--border-light);
 }
 
-.hero-visual-label {
-    left: 20px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-light);
-    border-radius: 3px;
-    padding: 2px 8px;
-}
-.hero-visual-label-top { top: 78px; }
-.hero-visual-label-bottom { bottom: 60px; }
-
 .hero-visual-footer {
     bottom: 14px;
     left: 16px;
@@ -283,12 +272,13 @@ a:hover { opacity: 0.8; }
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
+    opacity: 0.7;
 }
 
 .hero-visual-footer i {
-    width: 24px;
+    width: 20px;
     height: 1px;
-    background: var(--border);
+    background: var(--border-light);
     flex-shrink: 0;
 }
 
@@ -1286,9 +1276,7 @@ a:hover { opacity: 0.8; }
     .hero-title { font-size: 2.75rem; }
     .hero-subtitle { font-size: 16px; }
     .hero-visual-head,
-    .hero-visual-footer,
-    .hero-visual-label { font-size: 9px; letter-spacing: 0.04em; }
-    .hero-visual-label { padding: 2px 6px; }
+    .hero-visual-footer { font-size: 9px; letter-spacing: 0.04em; }
     .repo-grid { grid-template-columns: 1fr; }
     #sakana-drag-widget {
         width: 90px !important;
