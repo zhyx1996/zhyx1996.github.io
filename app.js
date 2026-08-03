@@ -614,36 +614,12 @@ window.__sakanaPhysics = {
   }
 };
 
-// 计算 Sakana 初始安全位置：
-// - 桌面（>600px）：放在 hero 右列（hero-side 装饰区）内右下方空白，避开左列
-//   hero 标题/正文/按钮、导航，以及下方的“正在处理的问题”标题横线和卡片顶部；
-// - 移动端或空间不足：退回视口右下角，并保证完整位于视口内。
+// 计算 Sakana 初始安全位置：所有页面统一放在视口右下角，
+// 避免因页面内容结构不同而改变浮层位置；移动端同样保证完整位于视口内。
 function computeSakanaSafePosition(widgetW, widgetH) {
   var margin = 8;
   var viewportW = window.innerWidth;
   var viewportH = window.innerHeight;
-
-  if (viewportW > 600) {
-    var heroSide = document.querySelector('.hero-side');
-    if (heroSide) {
-      var r = heroSide.getBoundingClientRect();
-      if (r.width > 0 && r.bottom > 0 && r.top < viewportH) {
-        var left = r.right - widgetW - margin;
-        // Keep the diagram itself clear. The gap between the diagram and the
-        // directions section is the quietest desktop landing zone.
-        var directions = document.querySelector('.section-directions');
-        var top = r.bottom + margin;
-        if (directions) {
-          var directionsTop = directions.getBoundingClientRect().top;
-          top = Math.min(top, directionsTop - widgetH - 16);
-        }
-        // 完整位于视口内（拖动同样被限制在视口内）
-        left = Math.max(margin, Math.min(viewportW - widgetW - margin, left));
-        top = Math.max(margin, Math.min(viewportH - widgetH - margin, top));
-        return { left: left, top: top };
-      }
-    }
-  }
 
   return {
     left: Math.max(margin, viewportW - widgetW - margin),
@@ -1066,26 +1042,8 @@ function initPageAgentPlacement() {
         };
       };
 
-      const heroContent = document.querySelector('.hero-content');
-      const aiWrap = document.querySelector('.hero-ai-wrap');
-      const heroSide = document.querySelector('.hero-side');
-      if (heroContent && aiWrap && heroSide) {
-        const aiRect = aiWrap.getBoundingClientRect();
-        const sideRect = heroSide.getBoundingClientRect();
-        if (aiRect.width > 0 && sideRect.width > 0 && aiRect.bottom < sideRect.top) {
-          const top = Math.max(aiRect.bottom + 8, 8);
-          // 空隙需容纳展开后的窗口（barHeight + inputHeight）并留出边距
-          if (sideRect.top - aiRect.bottom >= totalHeight + 24 && top <= maxTop) {
-            const width = Math.min(340, viewportW - 24);
-            const heroLeft = heroContent.getBoundingClientRect().left;
-            const left = Math.max(8, Math.min(heroLeft + 8, viewportW - width - 8));
-            return { top: Math.round(top), left: Math.round(left), width, center: false };
-          }
-        }
-      }
-
-      // 回退：视口左下角（left 8、宽度 ≤280px），右缘停在 Sakana 左缘前，
-      // 底部不出屏；顶部区域（导航/品牌/hero 标题）完全不被压住。
+      // 所有移动页面统一回退到视口左下角（left 8、宽度 ≤280px），
+      // 右缘停在 Sakana 左缘前，底部不出屏且不覆盖顶部导航。
       let width = Math.min(280, viewportW - 24);
       const sakRect = getSakanaRect();
       if (sakRect) {
@@ -1094,50 +1052,27 @@ function initPageAgentPlacement() {
       return { top: Math.round(maxTop), left: 8, width, center: false };
     }
 
-    const heroContent = document.querySelector('.hero-content');
-    if (heroContent) {
-      const r = heroContent.getBoundingClientRect();
-      if (r.width > 0 && r.bottom > 0 && r.top < viewportH) {
-        const width = Math.min(360, r.width, viewportW - 24);
-        const left = Math.max(8, r.left + 8);
-        // 基准：hero 左列按钮（hero-actions）下方 10px 的空白带
-        const actions = document.querySelector('.hero-actions');
-        const actionsBottom = actions ? actions.getBoundingClientRect().bottom : (r.top + 140);
-        // 上限：展开输入区（barHeight + inputHeight）不越过 hero 分隔线，
-        // 且整体完整位于视口内
-        const aiWrap = document.querySelector('.hero-ai-wrap');
-        const aiBottom = aiWrap ? aiWrap.getBoundingClientRect().bottom : actionsBottom;
-        const directions = document.querySelector('.section-directions');
-        const directionsTop = directions ? directions.getBoundingClientRect().top : viewportH;
-        const maxTop = Math.min(
-          viewportH - totalHeight - 12,
-          directionsTop - totalHeight - 16
-        );
-        const safeStart = Math.max(actionsBottom + 10, aiBottom + 4);
-        const top = Math.max(8, Math.min(maxTop, safeStart));
-        if (top + totalHeight <= viewportH - 12) {
-          return { top: Math.round(top), left: Math.round(left), width, center: false };
-        }
-      }
-    }
-    // 非主页桌面端（无 .hero-content）：优先放入 page-banner 右侧的真实空栏
-    // （left = banner.right + 12，宽 = viewportW - left - 12，限制在 180~240），
-    // 完全避开 banner 与正文；右侧空栏不足 180 时回退 banner 下方右缘
-    // （原安全策略，宽度受视口约束，保证完整可见）。
+    // 桌面端所有页面统一放在主内容列右侧的空栏；有 page-banner 时
+    // 以 banner 底部为起点，主页则使用与 banner 同等的首屏垂直锚点。
     let left;
     let width;
     let top = 96;
     const banner = document.querySelector('.page-banner');
+    const anchor = banner || document.querySelector('.hero');
     if (banner) {
       const br = banner.getBoundingClientRect();
       if (br.width > 0 && br.bottom > 0 && br.top < viewportH) {
         top = Math.round(br.bottom + 12);
-        const rightSideLeft = Math.round(br.right + 12);
-        const rightSideWidth = viewportW - rightSideLeft - 12;
-        if (rightSideWidth >= 180) {
-          left = rightSideLeft;
-          width = Math.min(240, rightSideWidth);
-        }
+      }
+    }
+    const anchorRect = anchor && anchor.getBoundingClientRect();
+    if (anchorRect && anchorRect.width > 0) {
+      if (!banner) top = Math.round(anchorRect.top + 180);
+      const rightSideLeft = Math.round(anchorRect.right + 12);
+      const rightSideWidth = viewportW - rightSideLeft - 12;
+      if (rightSideWidth >= 180) {
+        left = rightSideLeft;
+        width = Math.min(240, rightSideWidth);
       }
     }
     if (left === undefined) {
