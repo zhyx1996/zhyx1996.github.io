@@ -9,6 +9,7 @@ const container = document.getElementById('pretext-output');
 let W, H, graphemes = [], graphemeWidths = [], orbs = [];
 let lineHeight = DEFAULT_LINE_HEIGHT;
 let fontSize = 13;
+let baseLetterSpacing = 0;
 let orbElements = [];
 const lineElements = [];
 
@@ -20,12 +21,36 @@ function splitGraphemes(text) {
     return Array.from(text);
 }
 
-function prepareRenderedText() {
-    const calibrationText = '测W0.';
+// 逐字形 DOM 精确测量：Canvas measureText 与 DOM 渲染因字体回退差异
+// 会有系统性偏差（尤其 CJK），导致两端对齐后文字压到圆球。这里改用
+// 隐藏探针逐一测量每个「不同字形」的真实 DOM 宽度并缓存，一次性完成，
+// 之后布局与对齐全部基于精确宽度，不再需要每帧 DOM 读取。
+const glyphWidthCache = new Map();
+let glyphFontKey = '';
+
+function measureGlyphWidths(glyphs, font) {
     const probe = document.createElement('span');
     probe.className = 'pretext-line';
     probe.style.visibility = 'hidden';
-    probe.textContent = calibrationText;
+    probe.style.position = 'absolute';
+    probe.style.left = '-9999px';
+    probe.style.top = '0';
+    probe.style.letterSpacing = '0';
+    container.appendChild(probe);
+    for (const glyph of glyphs) {
+        probe.textContent = glyph;
+        const width = probe.getBoundingClientRect().width;
+        if (!(width > 0)) continue;
+        glyphWidthCache.set(glyph, width);
+    }
+    probe.remove();
+}
+
+function prepareRenderedText() {
+    const probe = document.createElement('span');
+    probe.className = 'pretext-line';
+    probe.style.visibility = 'hidden';
+    probe.textContent = '测W0.';
     container.appendChild(probe);
 
     const style = getComputedStyle(probe);
@@ -39,21 +64,24 @@ function prepareRenderedText() {
 
     lineHeight = Number.parseFloat(style.lineHeight) || DEFAULT_LINE_HEIGHT;
     fontSize = Number.parseFloat(style.fontSize) || 13;
-    const letterSpacing = Number.parseFloat(style.letterSpacing) || 0;
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    context.font = font;
-    // Canvas and DOM fallback fonts can differ slightly, so calibrate once
-    // against the rendered probe before using cached grapheme widths.
-    const canvasCalibrationWidth = context.measureText(calibrationText).width;
-    const renderedCalibrationWidth = probe.getBoundingClientRect().width;
-    const widthScale = canvasCalibrationWidth > 0
-        ? renderedCalibrationWidth / canvasCalibrationWidth
-        : 1;
+    baseLetterSpacing = Number.parseFloat(style.letterSpacing) || 0;
+
     graphemes = splitGraphemes(TEXT);
-    graphemeWidths = graphemes.map(grapheme => (
-        Math.max(1, context.measureText(grapheme).width * widthScale + letterSpacing)
-    ));
+    const uniqueGlyphs = [...new Set(graphemes)];
+    if (font !== glyphFontKey) {
+        glyphWidthCache.clear();
+        glyphFontKey = font;
+        measureGlyphWidths(uniqueGlyphs, font);
+    } else {
+        // 字体未变但可能有未测过的字形（理论不会发生，兜底）
+        const missing = uniqueGlyphs.filter(g => !glyphWidthCache.has(g));
+        if (missing.length) measureGlyphWidths(missing, font);
+    }
+
+    graphemeWidths = graphemes.map(grapheme => {
+        const measured = glyphWidthCache.get(grapheme);
+        return Math.max(1, (measured || 0) + baseLetterSpacing);
+    });
     probe.remove();
 }
 
@@ -89,7 +117,7 @@ function circleIntervalForBand(orb, bandTop, bandBottom) {
 }
 
 function carveTextLineSlots(base, blocked) {
-    let slots = [base];
+    let slots = [{ left: base.left, right: base.right, orbRight: false }];
     for (const interval of blocked.sort((a, b) => a.left - b.left)) {
         const next = [];
         for (const slot of slots) {
@@ -97,8 +125,9 @@ function carveTextLineSlots(base, blocked) {
                 next.push(slot);
                 continue;
             }
-            if (interval.left > slot.left) next.push({ left: slot.left, right: interval.left });
-            if (interval.right < slot.right) next.push({ left: interval.right, right: slot.right });
+            // 右侧被圆球截断的槽位：文字要贴住圆球左缘（orbRight=true）。
+            if (interval.left > slot.left) next.push({ left: slot.left, right: interval.left, orbRight: true });
+            if (interval.right < slot.right) next.push({ left: interval.right, right: slot.right, orbRight: slot.orbRight });
         }
         slots = next;
     }
@@ -127,6 +156,12 @@ function syncTextLines(lines) {
         const top = `${Math.round(line.top)}px`;
         if (element.style.left !== left) element.style.left = left;
         if (element.style.top !== top) element.style.top = top;
+        if (line.spacing !== null) {
+            const spacing = `${line.spacing.toFixed(3)}px`;
+            if (element.style.letterSpacing !== spacing) element.style.letterSpacing = spacing;
+        } else if (element.style.letterSpacing !== '') {
+            element.style.letterSpacing = '';
+        }
     }
 }
 
@@ -166,10 +201,18 @@ function renderText() {
                 graphemeIndex++;
             }
             if (graphemeIndex === start) continue;
+            const glyphCount = graphemeIndex - start;
+            let spacing = null;
+            // 槽位右缘被圆球截断时，把剩余空隙以字距形式均匀摊到每个字形上，
+            // 使文字右缘贴住圆球左缘（与圆球右侧的紧贴一致），即 CJK 两端对齐。
+            if (slot.orbRight && glyphCount >= 2 && textWidth < slotWidth) {
+                spacing = baseLetterSpacing + (slotWidth - textWidth) / glyphCount;
+            }
             lines.push({
                 left: slot.left,
                 top: y,
                 text: graphemes.slice(start, graphemeIndex).join(''),
+                spacing,
             });
         }
     }

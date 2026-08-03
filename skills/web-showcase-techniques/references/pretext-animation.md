@@ -1,6 +1,7 @@
 # Pretext 文字绕球动画
 
-动态文字排版系统：文字实时绕开移动的圆形障碍物（orbs）流动。
+动态文字排版系统：文字实时绕开移动的圆形障碍物（orbs）流动。参考实现：
+<https://somnai-dreams.github.io/pretext-demos/the-editorial-engine.html>。
 
 ## 核心算法
 
@@ -32,11 +33,12 @@ function circleIntervalForBand(orb, bandTop, bandBottom) {
 
 ### 2. 区间切割（Interval Carving）
 
-从完整行宽中减去所有被遮挡区间，得到可用文字槽位。
+从完整行宽中减去所有被遮挡区间，得到可用文字槽位。每个槽位额外记录
+`orbRight`：槽位右缘是否被圆球截断（用于第 5 节的两端对齐）。
 
 ```javascript
 function carveTextLineSlots(base, blocked) {
-  let slots = [base];
+  let slots = [{ left: base.left, right: base.right, orbRight: false }];
   for (const interval of blocked.sort((a, b) => a.left - b.left)) {
     const next = [];
     for (const slot of slots) {
@@ -45,9 +47,9 @@ function carveTextLineSlots(base, blocked) {
         continue;
       }
       if (interval.left > slot.left)
-        next.push({ left: slot.left, right: interval.left });
+        next.push({ left: slot.left, right: interval.left, orbRight: true });
       if (interval.right < slot.right)
-        next.push({ left: interval.right, right: slot.right });
+        next.push({ left: interval.right, right: slot.right, orbRight: slot.orbRight });
     }
     slots = next;
   }
@@ -55,30 +57,40 @@ function carveTextLineSlots(base, blocked) {
 }
 ```
 
-### 3. Canvas 字体校准
+### 3. DOM 逐字形精确测量（替代 Canvas）
 
-Canvas `measureText()` 与 DOM 渲染宽度不同，需要校准系数。
+Canvas `measureText()` 与 DOM 渲染在字体回退（尤其 CJK）上存在系统性偏差，
+直接用它做两端对齐会导致文字压到圆球。改为**一次性**用隐藏探针逐一测量
+每个不同字形的真实 DOM 宽度并缓存；布局阶段 0 次 DOM 读取。
 
 ```javascript
-function prepareRenderedText() {
-  const probe = document.createElement('probe-span');
-  probe.textContent = '测W0.';
-  document.body.appendChild(probe);
-  const renderedWidth = probe.getBoundingClientRect().width;
-  document.body.removeChild(probe);
+const glyphWidthCache = new Map();
 
-  const canvasWidth = context.measureText('测W0.').width;
-  const widthScale = renderedWidth / canvasWidth;
-
-  graphemeWidths = graphemes.map(g => (
-    Math.max(1, context.measureText(g).width * widthScale + letterSpacing)
-  ));
+function measureGlyphWidths(glyphs) {
+  const probe = document.createElement('span');
+  probe.className = 'pretext-line';
+  probe.style.visibility = 'hidden';
+  probe.style.position = 'absolute';
+  probe.style.left = '-9999px';
+  probe.style.letterSpacing = '0'; // 测纯字形宽度，字距单独核算
+  container.appendChild(probe);
+  for (const glyph of glyphs) {
+    probe.textContent = glyph;
+    const width = probe.getBoundingClientRect().width;
+    if (width > 0) glyphWidthCache.set(glyph, width);
+  }
+  probe.remove();
 }
+
+// 字形宽 = 纯字形宽 + 基础字距（CSS letter-spacing）
+graphemeWidths = graphemes.map(g => Math.max(1, (glyphWidthCache.get(g) || 0) + baseLetterSpacing));
 ```
+
+缓存按字体（`font` 字符串）为键，仅在字体变化时重建；resize 直接复用。
 
 ### 4. 贪心字形打包
 
-逐字形（grapheme）填充槽位，非按词换行。
+逐字形（grapheme）填充槽位，非按词换行。每个槽位最多留一个字形的空隙。
 
 ```javascript
 while (graphemeIndex < graphemes.length) {
@@ -89,7 +101,25 @@ while (graphemeIndex < graphemes.length) {
 }
 ```
 
-### 5. 条件重排（性能优化）
+### 5. 槽位两端对齐（CJK 对齐的关键）
+
+圆球左侧的槽位若只做左对齐，会因打包余量留下最多一个字形宽的空隙，
+视觉上「左边距文字有段距离」。把剩余空隙以字距形式均匀摊到每个字形上，
+文字右缘即精确贴住圆球左缘（右侧同理：文字从圆球右缘开始，天然紧贴）。
+
+```javascript
+let spacing = null;
+if (slot.orbRight && glyphCount >= 2 && textWidth < slotWidth) {
+  spacing = baseLetterSpacing + (slotWidth - textWidth) / glyphCount;
+}
+```
+
+`spacing` 覆盖 CSS 基础字距（`baseLetterSpacing`）实现「两端对齐」。
+因为字形宽来自第 3 节的精确 DOM 测量，且 CSS `letter-spacing` 按
+「每个字形后加距（含末尾）」生效（`渲染宽 = 字形宽和 + 字形数 × 字距`），
+最终渲染宽恰好等于槽位宽，误差 <1px。
+
+### 6. 条件重排（性能优化）
 
 只在 orb 移动超过 1px 时才触发昂贵的 DOM 重排。
 
@@ -140,7 +170,10 @@ function hitTest(p) {
 | 常量 | 值 | 用途 |
 |------|---|------|
 | `ORB_TEXT_GAP` | 1px | 文字与 orb 间距 |
-| `MIN_SLOT_WIDTH` | 32px | 最小可用槽宽 |
+| `MIN_SLOT_WIDTH_BASE` | 2.2（×字号） | 最小可用槽宽（相对字号） |
 | `TEXT_SYNC_THRESHOLD` | 1px | 触发重排的最小位移 |
+| `TEXT_PADDING` | 16px | 文字列左右留白 |
+| `glyphWidthCache` | 按字体缓存的字形宽 | 精确测量，避免 Canvas 偏差 |
+| `baseLetterSpacing` | CSS 基础字距 | 对齐时在此之上摊余量 |
 | orb 半径 | `min(W,H) * 0.08` | 响应式大小 |
 | orb 速度 | 12-18 px/s | 缓慢漂浮 |

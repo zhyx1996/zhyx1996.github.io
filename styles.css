@@ -542,8 +542,6 @@ a:hover { opacity: 0.8; }
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.section-directions { margin-bottom: 72px; }
-
 .section.visible {
     opacity: 1;
     transform: translateY(0);
@@ -629,51 +627,6 @@ a:hover { opacity: 0.8; }
     margin-right: auto;
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
-}
-
-/* ── 方向卡片 ── */
-.directions {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-}
-
-.direction-card {
-    padding: 20px;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius);
-    background: var(--bg-surface);
-    transition: border-color 0.15s;
-}
-
-.direction-card:hover { border-color: var(--border); }
-
-.direction-tag {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.05em;
-    padding: 3px 8px;
-    border-radius: 3px;
-    background: var(--accent-dim);
-    color: var(--accent);
-    margin-bottom: 12px;
-}
-
-.direction-tag.tag-amber { background: var(--amber-dim); color: var(--amber); }
-.direction-tag.tag-teal { background: var(--teal-dim); color: var(--teal); }
-
-.direction-card h3 {
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-.direction-card p {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.6;
 }
 
 /* ── 仓库网格 ── */
@@ -1259,7 +1212,6 @@ a:hover { opacity: 0.8; }
     .hero-side { min-height: 300px; }
     .specimen-box { width: 100%; }
     .specimen-stage { height: 180px; }
-    .directions { grid-template-columns: 1fr; }
     .market-grid { grid-template-columns: 1fr 1fr; }
     .showcase-grid { grid-template-columns: 1fr; }
     .showcase-frame-lg { height: 240px; }
@@ -1288,19 +1240,19 @@ a:hover { opacity: 0.8; }
 /* page-agent 由运行时注入；作为 JS 执行前的安全兜底。
    兜底不参与具体页面布局（主页 hero 分离布局 / 非主页 banner 均
    由 app.js initPageAgentPlacement 按可见布局计算），因此这里只做
-   保守的“右下角完整可见”，避免共享定位压住任意页面的右上统计卡
-   或顶部导航下沿。 */
+   保守定位：底部锚定在 Sakana 可见区域（canvas 顶边）上方，
+   右缘与 Sakana 右缘对齐，避免与右下角的 Sakana 组件重叠。 */
 :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
     position: fixed;
     top: auto;
-    bottom: 24px;
+    bottom: 254px; /* Sakana 容器 bottom 20 + 180 高 + canvas 上延 30 + 间距 24 */
     left: auto;
     right: 24px;
     z-index: 9990;
     width: min(360px, calc(100vw - 40px));
     box-sizing: border-box;
     max-width: calc(100vw - 40px);
-    max-height: calc(100vh - 104px);
+    max-height: calc(100vh - 274px);
     overflow: auto;
 }
 
@@ -1425,12 +1377,12 @@ a:hover { opacity: 0.8; }
 @media (max-width: 600px) {
     :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
         top: auto;
-        bottom: 16px;
+        bottom: 250px; /* Sakana 容器 bottom 16 + 180 高 + canvas 上延 30 + 间距 24 */
         left: auto;
         right: 12px;
         width: calc(100vw - 24px);
         max-width: calc(100vw - 24px);
-        max-height: calc(100vh - 88px);
+        max-height: calc(100vh - 270px);
     }
 }
 

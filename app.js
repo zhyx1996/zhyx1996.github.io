@@ -1005,31 +1005,36 @@ function initPageAgentPlacement() {
   const selector = selectors.join(',');
 
   // 计算安全初始位置：桌面与移动端统一把 page-agent 放在 Sakana 正上方、
-  // 右缘与 Sakana 右缘对齐（间距 16px）。优先读取 #sakana-drag-widget 的
-  // 真实几何；Sakana 尚未注入时按 styles.css 的默认 bottom/right 估算
-  // （尺寸 180×180，桌面 right 30、≤600px right 16、≤480px right 8，bottom 20）。
+  // 右缘与 Sakana 右缘对齐。关键：用 bottom 锚定而不是 top——
+  // page-agent 展开时向“上”生长，绝不会向下压到 Sakana；再配 max-height
+  // 兜底，保证无论面板多高都完整落在 Sakana 上方且不超出视口。
+  // 优先读取 #sakana-drag-widget 内 canvas 的真实几何（canvas 是可见部分，
+  // 比容器 top 还要再高 30px）；尚未注入时按 styles.css 默认位置估算
+  // （尺寸 180×180，canvas top = 容器 top - 30，桌面 right 30、≤600px right 16、
+  // ≤480px right 8，容器 bottom 20）。
   const computePlacement = (element) => {
     const viewportW = window.innerWidth;
     const viewportH = window.innerHeight;
-    // 优先读取 page-agent 当前实际高度；尚未注入出真实高度时按收起横条高度 40px 兜底。
-    const rect = element && element instanceof HTMLElement ? element.getBoundingClientRect() : null;
-    const panelHeight = rect && rect.height > 0 ? rect.height : 40;
 
-    // Sakana 矩形：已渲染用真实几何，未注入时按 styles.css 的默认位置估算。
+    // Sakana 可见区域：canvas 存在则用 canvas 矩形，否则回退到容器矩形（顶边 -30）。
     const getSakanaRect = () => {
       const el = document.getElementById('sakana-drag-widget');
       if (el) {
-        const r = el.getBoundingClientRect();
+        const canvas = el.querySelector('canvas');
+        const r = canvas && canvas.getBoundingClientRect().width > 0
+          ? canvas.getBoundingClientRect()
+          : el.getBoundingClientRect();
         if (r.width > 0 && r.height > 0) return r;
       }
       const right = viewportW <= 480 ? 8 : viewportW <= 600 ? 16 : 30;
       const bottom = 20;
       const size = 180; // 与 #sakana-drag-widget 安全尺寸一致
+      const widgetTop = viewportH - bottom - size;
       return {
         left: viewportW - right - size,
         right: viewportW - right,
-        top: viewportH - bottom - size,
-        bottom: viewportH - bottom,
+        top: widgetTop - 30, // canvas 比容器顶边再高 30px
+        height: size,
       };
     };
 
@@ -1037,14 +1042,21 @@ function initPageAgentPlacement() {
     const width = Math.min(viewportW <= 600 ? 280 : 340, viewportW - 24);
 
     const sakRect = getSakanaRect();
-    // 右缘对齐 Sakana 右缘；底部锚定在 Sakana 上方 16px 处。
+    // 右缘对齐 Sakana 右缘。
     let left = sakRect.right - width;
-    let top = sakRect.top - panelHeight - 16;
+
+    // 底部锚定：page-agent 底边固定在 Sakana 顶部上方 24px 处。
+    const gap = 24;
+    let bottom = viewportH - sakRect.top + gap;
+
+    // 面板可伸展高度上限 = Sakana 顶部 - 间距 - 顶部 8px 安全边距，
+    // 保证展开时永不越过 Sakana、也不超出视口顶部。
+    const maxHeight = Math.max(120, Math.round(sakRect.top - gap - 8));
 
     // 不出屏保护：整块保持 8px 最小边距，且不超出视口。
     left = Math.max(8, Math.min(left, viewportW - width - 8));
-    top = Math.max(8, Math.min(top, viewportH - panelHeight - 8));
-    return { top: Math.round(top), left: Math.round(left), width, center: false };
+    bottom = Math.max(8, bottom);
+    return { bottom: Math.round(bottom), left: Math.round(left), width, maxHeight, center: false };
   };
 
   const applyInitialPlacement = (element) => {
@@ -1053,13 +1065,14 @@ function initPageAgentPlacement() {
     const pos = computePlacement(element);
     element.style.position = 'fixed';
     element.style.left = pos.center ? '50%' : pos.left + 'px';
-    element.style.top = pos.top + 'px';
+    element.style.top = 'auto';
     element.style.right = 'auto';
-    element.style.bottom = 'auto';
+    element.style.bottom = pos.bottom + 'px';
     element.style.zIndex = '9990'; // 低于 Sakana（#sakana-drag-widget 为 9999）
     element.style.width = pos.width + 'px';
     element.style.setProperty('--width', pos.width + 'px'); // 与库内部 --width 同步，保证 history/输入区宽度一致
     element.style.maxWidth = 'calc(100vw - 24px)';
+    element.style.maxHeight = pos.maxHeight + 'px';
     element.style.boxSizing = 'border-box';
     // 桌面端不居中：清掉库默认的 translateX(-50%)，避免左侧裁切残影；
     // 只保留水平居中所需的 translateX（移动端 center=true 时）。
