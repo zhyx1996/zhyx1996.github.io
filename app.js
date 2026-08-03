@@ -355,13 +355,57 @@ const SAKANA_PHYSICS = {
   maxBounces: 10,          // 最大碰撞次数限制
   bounceEnergyCap: 18,     // 碰撞后速度上限（防能量累积）
   dampingAfterMaxBounces: 0.9, // 超过最大碰撞后的额外阻尼
+  // 时间归一化（消除设备/事件频率差异，统一到 60fps 基准）
+  frameMs: 16.667,         // 1 帧时长基准（1000/60），速度与摩擦均换算到该基准
+  velocitySampleWindowMs: 120, // 释放速度采样窗口（取窗口内首尾位移/时间）
+  velocitySampleMax: 12,   // 最大采样点数（拖动期间循环覆盖旧样本）
   // Sakana 内部弹簧参数（_state.i 积分步长/摆动频率，_state.d 速度阻尼）
   swingTimeStep: 0.050,    // 内部 _state.i（默认 0.08，降低 → 更慢摆动）
   swingDamping: 0.9915,    // 内部 _state.d（默认 ~0.99，提高 → 衰减更慢）
 };
 
+// 纯函数：从带时间戳的指针采样中计算释放速度（时间归一化）。
+// samples: [{ x, y, t }]（t 为 ms 时间戳，x/y 为 client 坐标）。
+// 取「最近 velocitySampleWindowMs 窗口」内首尾样本的位移/时间，
+// 换算为 60fps 基准的 px/frame，与事件采样频率无关（60Hz/120Hz 一致）。
+function computeReleaseVelocity(samples, options) {
+  const opts = Object.assign({
+    sampleWindowMs: SAKANA_PHYSICS.velocitySampleWindowMs,
+    frameMs: SAKANA_PHYSICS.frameMs
+  }, options || {});
+  if (!Array.isArray(samples) || samples.length < 2) return { vx: 0, vy: 0 };
+  const last = samples[samples.length - 1];
+  let first = samples[0];
+  for (let i = 0; i < samples.length; i++) {
+    if (last.t - samples[i].t <= opts.sampleWindowMs) {
+      first = samples[i];
+      break;
+    }
+  }
+  const dt = last.t - first.t;
+  if (!(dt > 0)) return { vx: 0, vy: 0 };
+  return {
+    vx: ((last.x - first.x) / dt) * opts.frameMs,
+    vy: ((last.y - first.y) / dt) * opts.frameMs,
+  };
+}
+
+// 纯函数：按真实经过时间施加摩擦（帧率归一化）。
+// dtMs 为相邻动画帧的时间差；decay = friction^(dt/frameMs)，
+// 使 60/120/144Hz 设备在同一真实时间内的速度衰减一致。
+function applyFrameFriction(vx, vy, dtMs, options) {
+  const opts = Object.assign({
+    friction: SAKANA_PHYSICS.friction,
+    frameMs: SAKANA_PHYSICS.frameMs
+  }, options || {});
+  const dt = Math.max(0, Math.min(dtMs, 100));
+  const decay = Math.pow(opts.friction, dt / opts.frameMs);
+  return { vx: vx * decay, vy: vy * decay };
+}
+
 // 纯函数：模拟弹跳物理（用于测试与调试）
 // bounds: { width, height, widgetW, widgetH }
+// options.dtMs: 每步真实时间（默认 frameMs，即 60fps 一帧，行为与历史一致）
 function simulateSakanaBounce(initialVx, initialVy, bounds, options) {
   const physics = Object.assign({}, SAKANA_PHYSICS, options || {});
   const friction = physics.friction;
@@ -370,6 +414,8 @@ function simulateSakanaBounce(initialVx, initialVy, bounds, options) {
   const maxBounces = physics.maxBounces;
   const bounceEnergyCap = physics.bounceEnergyCap;
   const dampingAfterMaxBounces = physics.dampingAfterMaxBounces;
+  const dtMs = physics.dtMs || physics.frameMs; // 每步真实时间（ms）
+  const timeScale = dtMs / physics.frameMs;     // 位移缩放（60fps 下为 1）
   const width = bounds.width;
   const height = bounds.height;
   const widgetW = bounds.widgetW;
@@ -386,11 +432,12 @@ function simulateSakanaBounce(initialVx, initialVy, bounds, options) {
   let energy = Math.sqrt(vx * vx + vy * vy);
 
   while (frames < 1000) {
-    vx *= friction;
-    vy *= friction;
+    const decay = Math.pow(friction, timeScale);
+    vx *= decay;
+    vy *= decay;
 
-    let nextX = x + vx;
-    let nextY = y + vy;
+    let nextX = x + vx * timeScale;
+    let nextY = y + vy * timeScale;
     let bounced = false;
 
     if (nextX <= 0 && vx < 0) {
@@ -436,7 +483,7 @@ function simulateSakanaBounce(initialVx, initialVy, bounds, options) {
 
   return {
     frames: frames,
-    durationSeconds: +(frames / 60).toFixed(2),
+    durationSeconds: +(frames * dtMs / 1000).toFixed(2),
     bounces: bounces,
     maxAmplitudeX: +maxAmplitudeX.toFixed(1),
     maxAmplitudeY: +maxAmplitudeY.toFixed(1),
@@ -535,6 +582,8 @@ window.__sakanaPhysics = {
   simulate: simulateSakanaBounce,
   simulateSpring: simulateSakanaSpring,
   computeCharState: computeCharState,
+  computeReleaseVelocity: computeReleaseVelocity,
+  applyFrameFriction: applyFrameFriction,
   test: function () {
     var bounds = { width: 1920, height: 1080, widgetW: 130, widgetH: 150 };
     var baseline = { swingTimeStep: 0.08, swingDamping: 0.99 };
@@ -612,8 +661,7 @@ function initSakanaDrag() {
   var vx = 0, vy = 0;
   var lastX, lastY, lastTime;
   var animId = null;
-  var vxHistory = [];
-  var vyHistory = [];
+  var samples = []; // 拖动指针采样 [{ x, y, t }]，释放时做时间归一化速度计算
   var leftPos = 0, topPos = 0;
   var initialized = false;
   var userDragged = false; // 用户拖动后不再自动重定位（resize 时保持用户位置）
@@ -701,8 +749,7 @@ function initSakanaDrag() {
     lastTime = Date.now();
     vx = 0;
     vy = 0;
-    vxHistory = [];
-    vyHistory = [];
+    samples = [{ x: xy.x, y: xy.y, t: lastTime }];
     bounceCount = 0;
     if (animId) { cancelAnimationFrame(animId); animId = null; }
     if (swingAnimId) { cancelAnimationFrame(swingAnimId); swingAnimId = null; }
@@ -715,6 +762,7 @@ function initSakanaDrag() {
     var now = Date.now();
     var dx = xy.x - lastX;
     var dy = xy.y - lastY;
+    var dtMs = now - lastTime;
 
     var newLeft = leftPos + dx;
     var newTop = topPos + dy;
@@ -727,15 +775,23 @@ function initSakanaDrag() {
     newTop = Math.max(8, Math.min(viewportH - widgetH - 8, newTop));
 
     setPos(newLeft, newTop);
+
+    // 时间归一化速度（px/frame@60fps）：拖动倾斜与释放惯性均与事件频率无关
+    if (dtMs > 0) {
+      vx = (dx / dtMs) * SAKANA_PHYSICS.frameMs;
+      vy = (dy / dtMs) * SAKANA_PHYSICS.frameMs;
+    } else {
+      vx = 0;
+      vy = 0;
+    }
     applyCharLean();
 
-    vxHistory.push(dx);
-    vyHistory.push(dy);
-    if (vxHistory.length > 5) vxHistory.shift();
-    if (vyHistory.length > 5) vyHistory.shift();
+    // 采样（带时间戳），保留滑动窗口内最近样本
+    samples.push({ x: xy.x, y: xy.y, t: now });
+    var windowStart = now - SAKANA_PHYSICS.velocitySampleWindowMs;
+    while (samples.length > 2 && samples[0].t < windowStart) samples.shift();
+    if (samples.length > SAKANA_PHYSICS.velocitySampleMax) samples.shift();
 
-    vx = dx;
-    vy = dy;
     lastX = xy.x;
     lastY = xy.y;
     lastTime = now;
@@ -748,18 +804,13 @@ function initSakanaDrag() {
     pointerId = null;
     widget.classList.remove('dragging');
 
-    if (vxHistory.length > 0) {
-      var totalWeight = 0;
-      var weightedVx = 0;
-      var weightedVy = 0;
-      for (var i = 0; i < vxHistory.length; i++) {
-        var weight = i + 1;
-        weightedVx += vxHistory[i] * weight;
-        weightedVy += vyHistory[i] * weight;
-        totalWeight += weight;
-      }
-      vx = weightedVx / totalWeight;
-      vy = weightedVy / totalWeight;
+    if (samples.length >= 2) {
+      var vel = computeReleaseVelocity(samples);
+      vx = vel.vx;
+      vy = vel.vy;
+    } else {
+      vx = 0;
+      vy = 0;
     }
 
     var maxV = SAKANA_PHYSICS.maxVelocity;
@@ -793,13 +844,22 @@ function initSakanaDrag() {
     var widgetW = widget.offsetWidth;
     var widgetH = widget.offsetHeight;
     bounceCount = 0;
+    var lastFrameTime = null;
 
-    var bounce = function () {
-      vx *= SAKANA_PHYSICS.friction;
-      vy *= SAKANA_PHYSICS.friction;
+    var bounce = function (now) {
+      // 帧率归一化：60/120/144Hz 设备在同一真实时间内速度衰减与位移均一致。
+      // vx/vy 是 60fps 基准的 px/frame，因此位移按真实 rAF 间隔缩放
+      // （timeScale = dtMs/frameMs，60fps 下恰为 1，行为与历史一致）。
+      if (lastFrameTime === null) lastFrameTime = now;
+      var dtMs = Math.min(now - lastFrameTime, 100);
+      lastFrameTime = now;
+      var timeScale = dtMs / SAKANA_PHYSICS.frameMs;
+      var decay = Math.pow(SAKANA_PHYSICS.friction, timeScale);
+      vx *= decay;
+      vy *= decay;
 
-      var nextLeft = leftPos + vx;
-      var nextTop = topPos + vy;
+      var nextLeft = leftPos + vx * timeScale;
+      var nextTop = topPos + vy * timeScale;
       var bounced = false;
       var impactVx = 0;
       var impactVy = 0;
@@ -971,18 +1031,67 @@ function initPageAgentPlacement() {
   // 计算安全初始位置：桌面端放在 hero 左列（hero-content）按钮下方的空白带，
   // 用明确的 left 定位（不做 translateX 居中，避免左侧裁切），避开导航、
   // hero 标题/正文/按钮与 hero 分隔线，也不进入右列 hero-side 研究图内
-  // （避免遮住研究图标签）；移动端退回顶部导航下方。
+  // （避免遮住研究图标签）；移动端优先用页面实际几何（hero-ai-wrap 与
+  // hero-side 之间空隙），不足则回退视口左下角并避开右下 Sakana。
   const computePlacement = () => {
     const viewportW = window.innerWidth;
     const viewportH = window.innerHeight;
     const compact = viewportW <= 600;
     const barHeight = 40; // page-agent 收起时横条高度（其 --height）
     const inputHeight = 48; // 展开时输入区高度（其 --input-section 高度）
+    const totalHeight = barHeight + inputHeight;
 
     if (compact) {
-      // 移动端：仅保证完整不出屏，顶部导航下方居中
-      const width = Math.min(360, viewportW - 24);
-      return { top: 76, left: '50%', width, center: true };
+      // 移动端优先使用页面实际几何：主页 hero 存在时，放入
+      // hero-ai-wrap 与 hero-side 之间的真实空隙（不压住 hero 标题/研究图）；
+      // 空间不足或非主页时回退到视口左下角（窄宽度），
+      // 水平避开右下角 Sakana，且不覆盖顶部导航与站点品牌。
+      const maxTop = Math.max(8, viewportH - totalHeight - 12);
+
+      // Sakana 矩形：已渲染用真实几何，未注入时按 styles.css 的
+      // 移动端规则估计（≤600px: 100×117、right 16、bottom 20；≤480px 更小）
+      const getSakanaRect = () => {
+        const el = document.getElementById('sakana-drag-widget');
+        if (el) {
+          const r = el.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0) return r;
+        }
+        const size = viewportW <= 480 ? 90 : 100;
+        const height = viewportW <= 480 ? 105 : 117;
+        return {
+          left: viewportW - 16 - size,
+          right: viewportW - 16,
+          top: viewportH - 20 - height,
+          bottom: viewportH - 20
+        };
+      };
+
+      const heroContent = document.querySelector('.hero-content');
+      const aiWrap = document.querySelector('.hero-ai-wrap');
+      const heroSide = document.querySelector('.hero-side');
+      if (heroContent && aiWrap && heroSide) {
+        const aiRect = aiWrap.getBoundingClientRect();
+        const sideRect = heroSide.getBoundingClientRect();
+        if (aiRect.width > 0 && sideRect.width > 0 && aiRect.bottom < sideRect.top) {
+          const top = Math.max(aiRect.bottom + 8, 8);
+          // 空隙需容纳展开后的窗口（barHeight + inputHeight）并留出边距
+          if (sideRect.top - aiRect.bottom >= totalHeight + 24 && top <= maxTop) {
+            const width = Math.min(340, viewportW - 24);
+            const heroLeft = heroContent.getBoundingClientRect().left;
+            const left = Math.max(8, Math.min(heroLeft + 8, viewportW - width - 8));
+            return { top: Math.round(top), left: Math.round(left), width, center: false };
+          }
+        }
+      }
+
+      // 回退：视口左下角（left 8、宽度 ≤280px），右缘停在 Sakana 左缘前，
+      // 底部不出屏；顶部区域（导航/品牌/hero 标题）完全不被压住。
+      let width = Math.min(280, viewportW - 24);
+      const sakRect = getSakanaRect();
+      if (sakRect) {
+        width = Math.min(width, Math.max(140, sakRect.left - 16));
+      }
+      return { top: Math.round(maxTop), left: 8, width, center: false };
     }
 
     const heroContent = document.querySelector('.hero-content');
@@ -1000,7 +1109,6 @@ function initPageAgentPlacement() {
         const aiBottom = aiWrap ? aiWrap.getBoundingClientRect().bottom : actionsBottom;
         const directions = document.querySelector('.section-directions');
         const directionsTop = directions ? directions.getBoundingClientRect().top : viewportH;
-        const totalHeight = barHeight + inputHeight;
         const maxTop = Math.min(
           viewportH - totalHeight - 12,
           directionsTop - totalHeight - 16
@@ -1012,9 +1120,32 @@ function initPageAgentPlacement() {
         }
       }
     }
-    // 兜底：视口右缘中部，保证完整在视口内
-    const width = Math.min(340, viewportW - 24);
-    return { top: 96, left: Math.max(12, viewportW - width - 12), width, center: false };
+    // 非主页桌面端（无 .hero-content）：优先放入 page-banner 右侧的真实空栏
+    // （left = banner.right + 12，宽 = viewportW - left - 12，限制在 180~240），
+    // 完全避开 banner 与正文；右侧空栏不足 180 时回退 banner 下方右缘
+    // （原安全策略，宽度受视口约束，保证完整可见）。
+    let left;
+    let width;
+    let top = 96;
+    const banner = document.querySelector('.page-banner');
+    if (banner) {
+      const br = banner.getBoundingClientRect();
+      if (br.width > 0 && br.bottom > 0 && br.top < viewportH) {
+        top = Math.round(br.bottom + 12);
+        const rightSideLeft = Math.round(br.right + 12);
+        const rightSideWidth = viewportW - rightSideLeft - 12;
+        if (rightSideWidth >= 180) {
+          left = rightSideLeft;
+          width = Math.min(240, rightSideWidth);
+        }
+      }
+    }
+    if (left === undefined) {
+      width = Math.min(340, viewportW - 24);
+      left = Math.max(12, viewportW - width - 12);
+    }
+    top = Math.max(8, Math.min(top, viewportH - totalHeight - 12));
+    return { top, left, width, center: false };
   };
 
   const applyInitialPlacement = (element) => {

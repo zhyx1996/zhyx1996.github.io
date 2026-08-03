@@ -99,8 +99,14 @@ function simulateSpring(r, y, w, t, params, maxFrames) {
   };
 }
 
-// ── 弹跳模拟（用于获取碰撞前速度）──
-function simulateBounce(initialVx, initialVy, startX, bounds) {
+// ── 弹跳模拟（用于获取碰撞前速度；支持按真实时间推进）──
+// dtMs: 每步真实时间（默认 16.667 = 60fps 一帧，行为与历史一致）
+// durationMs: 可选；到该真实时间即停止，最后一帧按剩余时间比例子步进，
+//             保证 60/120/144Hz 在“同一真实时刻”的位置可直接比较
+function simulateBounce(initialVx, initialVy, startX, bounds, dtMs, durationMs) {
+  var frameMs = 16.667;
+  var dt = dtMs || frameMs;
+  var timeScale = dt / frameMs;
   var friction = 0.982;
   var wallBounce = 0.5;
   var stopThreshold = 0.6;
@@ -114,15 +120,24 @@ function simulateBounce(initialVx, initialVy, startX, bounds) {
   var y = 0;
   var bounces = 0;
   var frames = 0;
+  var elapsedMs = 0;
   var preImpactVx = 0;
   var preImpactVy = 0;
 
   while (frames < 1000) {
-    vx *= friction;
-    vy *= friction;
+    // 最后一段不足一帧：按剩余真实时间比例推进（摩擦与位移同步缩放）
+    var stepDt = dt;
+    if (durationMs != null && elapsedMs + dt > durationMs) {
+      stepDt = durationMs - elapsedMs;
+      if (stepDt <= 0) break;
+    }
+    var stepScale = stepDt / frameMs;
+    var decay = Math.pow(friction, stepScale);
+    vx *= decay;
+    vy *= decay;
 
-    var nextX = x + vx;
-    var nextY = y + vy;
+    var nextX = x + vx * stepScale;
+    var nextY = y + vy * stepScale;
     var bounced = false;
 
     if (nextX <= 0 && vx < 0) {
@@ -160,18 +175,125 @@ function simulateBounce(initialVx, initialVy, startX, bounds) {
     x = nextX;
     y = nextY;
     frames++;
+    elapsedMs += stepDt;
 
     if ((Math.abs(vx) < stopThreshold && Math.abs(vy) < stopThreshold) || bounces > maxBounces * 2) {
+      break;
+    }
+    if (durationMs != null && elapsedMs >= durationMs) {
       break;
     }
   }
 
   return {
     frames: frames,
+    elapsedMs: +elapsedMs.toFixed(3),
+    x: +x.toFixed(3),
+    y: +y.toFixed(3),
     bounces: bounces,
     preImpactVx: +preImpactVx.toFixed(2),
     preImpactVy: +preImpactVy.toFixed(2)
   };
+}
+
+// ── 时间归一化参数（与 app.js SAKANA_PHYSICS 保持一致）──
+const TIME_NORM = {
+  frameMs: 16.667,            // 60fps 帧时长基准
+  sampleWindowMs: 120,        // 释放速度采样窗口
+  sampleMax: 12,              // 最大采样点数
+  friction: 0.982             // 与 simulateBounce 一致
+};
+
+// 与 app.js computeReleaseVelocity 相同的纯函数：窗口内首尾位移/时间 → px/frame@60fps
+function computeReleaseVelocity(samples, opts) {
+  opts = opts || {};
+  var frameMs = opts.frameMs || TIME_NORM.frameMs;
+  var windowMs = opts.sampleWindowMs || TIME_NORM.sampleWindowMs;
+  if (!samples || samples.length < 2) return { vx: 0, vy: 0 };
+  var last = samples[samples.length - 1];
+  var first = samples[0];
+  for (var i = 0; i < samples.length; i++) {
+    if (last.t - samples[i].t <= windowMs) { first = samples[i]; break; }
+  }
+  var dt = last.t - first.t;
+  if (!(dt > 0)) return { vx: 0, vy: 0 };
+  return {
+    vx: ((last.x - first.x) / dt) * frameMs,
+    vy: ((last.y - first.y) / dt) * frameMs
+  };
+}
+
+// 与 app.js applyFrameFriction 相同的纯函数：按真实时间施加摩擦
+function applyFrameFriction(vx, vy, dtMs, opts) {
+  opts = opts || {};
+  var friction = opts.friction || TIME_NORM.friction;
+  var frameMs = opts.frameMs || TIME_NORM.frameMs;
+  var dt = Math.max(0, Math.min(dtMs, 100));
+  var decay = Math.pow(friction, dt / frameMs);
+  return { vx: vx * decay, vy: vy * decay };
+}
+
+// 旧逻辑（修复前 bug 版）：摩擦已按时间归一化，但位移未按 dt 缩放
+// （每帧位移 = vx*1）。用于证明按 dtMs/frameMs 缩放位移的必要性。
+function simulateBounceLegacy(initialVx, initialVy, startX, bounds, dtMs, durationMs) {
+  var frameMs = 16.667;
+  var friction = 0.982;
+  var wallBounce = 0.5;
+  var bounceEnergyCap = 18;
+  var vx = initialVx;
+  var vy = initialVy;
+  var x = startX;
+  var y = 0;
+  var frames = 0;
+  var elapsedMs = 0;
+
+  while (frames < 1000) {
+    var decay = Math.pow(friction, dtMs / frameMs);
+    vx *= decay;
+    vy *= decay;
+
+    var nextX = x + vx; // ← 修复前：位移未按 dtMs/frameMs 缩放
+    var nextY = y + vy;
+
+    if (nextX <= 0 && vx < 0) {
+      nextX = 0;
+      vx = Math.min(Math.abs(vx) * wallBounce, bounceEnergyCap);
+    } else if (nextX >= bounds.width - bounds.widgetW && vx > 0) {
+      nextX = bounds.width - bounds.widgetW;
+      vx = -Math.min(Math.abs(vx) * wallBounce, bounceEnergyCap);
+    }
+    if (nextY <= 0 && vy < 0) {
+      nextY = 0;
+      vy = Math.min(Math.abs(vy) * wallBounce, bounceEnergyCap);
+    } else if (nextY >= bounds.height - bounds.widgetH && vy > 0) {
+      nextY = bounds.height - bounds.widgetH;
+      vy = -Math.min(Math.abs(vy) * wallBounce, bounceEnergyCap);
+    }
+
+    x = nextX;
+    y = nextY;
+    frames++;
+    elapsedMs += dtMs;
+    if (durationMs != null && elapsedMs >= durationMs) break;
+    if (Math.abs(vx) < 0.6 && Math.abs(vy) < 0.6) break;
+  }
+
+  return { frames: frames, x: x, y: y, elapsedMs: elapsedMs };
+}
+
+// 生成匀速运动的采样序列（模拟不同事件频率）
+function makeSampleSeries(totalDx, totalDy, durationMs, intervalMs) {
+  var samples = [];
+  var n = Math.round(durationMs / intervalMs);
+  for (var i = 0; i <= n; i++) {
+    var t = Math.round(i * intervalMs);
+    samples.push({
+      x: (i * totalDx) / n,
+      y: (i * totalDy) / n,
+      t: t
+    });
+  }
+  return samples;
 }
 
 // ── 测试用例 ──
@@ -341,6 +463,90 @@ function runTests() {
 
   assert(rightWallBaseline.energyRatio <= 0.2, 'RightWall baseline 10s 能量比 ' + (rightWallBaseline.energyRatio * 100).toFixed(2) + '% <= 20%');
   assert(rightWallTuned.energyRatio <= 0.2, 'RightWall tuned 10s 能量比 ' + (rightWallTuned.energyRatio * 100).toFixed(2) + '% <= 20%');
+
+  // ── 4. 时间归一化：释放速度与事件采样频率无关 ──
+  console.log('\n=== 时间归一化（速度采样与摩擦）===');
+
+  // 同一手势（300px / 120px / 200ms），60Hz 与 120Hz 采样应得到相同速度
+  var s60 = makeSampleSeries(300, 120, 200, 16.667);
+  var s120 = makeSampleSeries(300, 120, 200, 8.333);
+  // 采样窗口需覆盖整个手势（200ms），否则 60Hz 稀疏采样只落入最近 ~117ms，
+  // 得到 24.93 而非整手势的 25 px/frame；窗口语义另由下方 vStop 用例验证
+  var v60 = computeReleaseVelocity(s60, { sampleWindowMs: 250 });
+  var v120 = computeReleaseVelocity(s120, { sampleWindowMs: 250 });
+  console.log('  60Hz 采样:', JSON.stringify(v60));
+  console.log('  120Hz 采样:', JSON.stringify(v120));
+
+  // 期望：300px / 200ms × 16.667ms/帧 = 25 px/frame；Y 同理 10
+  assert(Math.abs(v60.vx - 25) < 0.05, '60Hz vx=' + v60.vx.toFixed(2) + ' ≈ 25 px/frame');
+  assert(Math.abs(v60.vy - 10) < 0.05, '60Hz vy=' + v60.vy.toFixed(2) + ' ≈ 10 px/frame');
+  assert(Math.abs(v120.vx - 25) < 0.05, '120Hz vx=' + v120.vx.toFixed(2) + ' ≈ 25 px/frame');
+  var freqDiffPct = (Math.abs(v60.vx - v120.vx) / Math.max(1, Math.abs(v60.vx)) * 100).toFixed(2);
+  assert(Math.abs(v60.vx - v120.vx) < 0.05, '60Hz/120Hz 速度差 ' + freqDiffPct + '% (< 0.2%)');
+
+  // 旧逻辑（直接取事件位移）在 120Hz 下只有 60Hz 的一半 —— 证明归一化的必要性
+  var legacy60 = 300 / (s60.length - 1);
+  var legacy120 = 300 / (s120.length - 1);
+  assert(Math.abs(legacy60 - legacy120) > 8, '旧逻辑 60Hz(' + legacy60.toFixed(1) + ') 与 120Hz(' + legacy120.toFixed(1) + ') 位移差异显著，需时间归一化');
+
+  // 窗口语义：拖动后停住 500ms 再释放 → 速度来自最近 120ms，静止段不参与
+  var stopped = [];
+  var i;
+  for (i = 0; i < 12; i++) stopped.push({ x: 0, y: 0, t: i * 16.667 });      // 前 200ms 静止
+  for (i = 0; i <= 10; i++) stopped.push({ x: i * 30, y: i * 12, t: 300 + i * 16.667 }); // 后 167ms 移动 300/120px
+  var vStop = computeReleaseVelocity(stopped);
+  // 最近 120ms：t ∈ [347, 466]，x 从 (347-300)/166.7*300≈84.6 → 300，vx=(300-84.6)/120*16.667≈29.9
+  assert(vStop.vx > 25 && vStop.vx < 35, '静止后释放速度来自最近窗口 vx=' + vStop.vx.toFixed(1) + '（期望 ≈30）');
+  assert(vStop.vy > 10 && vStop.vy < 15, '静止后释放速度来自最近窗口 vy=' + vStop.vy.toFixed(1) + '（期望 ≈12）');
+
+  // 帧率归一化摩擦：1 秒真实时间，60fps(60步) 与 120fps(120步) 衰减应一致
+  var v0 = 20;
+  var v60f = v0, v120f = v0;
+  for (i = 0; i < 60; i++) v60f = applyFrameFriction(v60f, 0, 16.667).vx;
+  for (i = 0; i < 120; i++) v120f = applyFrameFriction(v120f, 0, 8.333).vx;
+  var expected60 = v0 * Math.pow(TIME_NORM.friction, 60);
+  var frictionDiffPct = (Math.abs(v60f - v120f) / v60f * 100).toFixed(3);
+  console.log('  1s 摩擦后 60fps=' + v60f.toFixed(3) + ' 120fps=' + v120f.toFixed(3) + ' 期望=' + expected60.toFixed(3));
+  assert(Math.abs(v60f - expected60) < 0.01, '60fps 逐帧摩擦与 friction^60 一致 (' + v60f.toFixed(3) + ')');
+  assert(Math.abs(v60f - v120f) < 0.01, '60fps/120fps 摩擦衰减差 ' + frictionDiffPct + '% (< 0.1%)');
+
+  // 释放速度上限保护：极端快甩也不超过 maxVelocity（clamp 语义由 onPointerUp 承担）
+  var fast = makeSampleSeries(2000, 2000, 50, 8.333);
+  var vFast = computeReleaseVelocity(fast);
+  assert(vFast.vx > 22, '快速甩动计算速度 vx=' + vFast.vx.toFixed(1) + ' 将触发 22 px/frame 上限保护');
+
+  // ── 5. 帧率无关性：60/120/144Hz 相同真实时间位移一致 ──
+  // 对应 app.js startBounce 的修复：位移按 rAF 真实 dtMs/frameMs 缩放，
+  // 摩擦与位移均帧率归一化后，同一真实时间内的轨迹一致。
+  console.log('\n=== 帧率无关性（60/120/144Hz 相同真实时间位移一致）===');
+
+  // 5a. 自由运动（无碰撞）：1 秒真实时间。注意“先摩擦后位移”是离散积分，
+  // 存在随帧率收敛的方法误差（60→120→144 单调接近连续极限，约 0.4%），
+  // 因此断言 <1% 级一致，并用“远小于 legacy 差异”证明修复有效性。
+  var f60 = simulateBounce(15, 8, 60, bounds, 16.667, 1000);
+  var f120 = simulateBounce(15, 8, 60, bounds, 8.333, 1000);
+  var f144 = simulateBounce(15, 8, 60, bounds, 6.944, 1000);
+  console.log('  1s 自由运动: 60Hz=' + JSON.stringify({ x: f60.x, y: f60.y }) + ' 120Hz=' + JSON.stringify({ x: f120.x, y: f120.y }) + ' 144Hz=' + JSON.stringify({ x: f144.x, y: f144.y }));
+  assert(Math.abs(f60.x - f120.x) < 6, '60Hz/120Hz 1s 位移差 ' + Math.abs(f60.x - f120.x).toFixed(3) + 'px (< 1%)');
+  assert(Math.abs(f60.x - f144.x) < 6, '60Hz/144Hz 1s 位移差 ' + Math.abs(f60.x - f144.x).toFixed(3) + 'px (< 1%)');
+  assert(Math.abs(f60.y - f120.y) < 4 && Math.abs(f60.y - f144.y) < 4, '三档 1s Y 位移差 < 4px');
+  assert(Math.abs(f60.elapsedMs - f120.elapsedMs) < 0.01 && Math.abs(f60.elapsedMs - f144.elapsedMs) < 0.01, '三档模拟结束于同一真实时刻 (≈' + f60.elapsedMs + 'ms)');
+
+  // 旧逻辑对比：位移未按 dt 缩放时，120Hz 1s 位移约为归一化结果的 2 倍
+  var legacy = simulateBounceLegacy(15, 8, 60, bounds, 8.333, 1000);
+  console.log('  旧逻辑(位移未缩放) 120Hz 1s x=' + legacy.x.toFixed(1) + ' vs 归一化 60Hz x=' + f60.x.toFixed(1));
+  assert(Math.abs(legacy.x - f60.x) > 300, '旧逻辑 120Hz 位移 ' + legacy.x.toFixed(1) + ' 与归一化 ' + f60.x.toFixed(1) + ' 差异显著 (>300px)，证明需按 dt 缩放位移');
+  // 归一化后帧率差异（~3px）远小于 legacy 差异（~553px），修复有效
+  assert(Math.abs(f60.x - f144.x) * 20 < Math.abs(legacy.x - f60.x), '归一化 60/144Hz 位移差 ' + Math.abs(f60.x - f144.x).toFixed(2) + 'px 仅为 legacy 差异 ' + Math.abs(legacy.x - f60.x).toFixed(1) + 'px 的 ' + (Math.abs(f60.x - f144.x) / Math.abs(legacy.x - f60.x) * 100).toFixed(1) + '% (< 5%)');
+
+  // 5b. 带碰撞：向左撞左墙（vx=-18）、向下撞下墙（vy=22），3 秒真实时间
+  var c60 = simulateBounce(-18, 22, 60, bounds, 16.667, 3000);
+  var c120 = simulateBounce(-18, 22, 60, bounds, 8.333, 3000);
+  var c144 = simulateBounce(-18, 22, 60, bounds, 6.944, 3000);
+  console.log('  3s 含碰撞: 60Hz=' + JSON.stringify({ x: c60.x, y: c60.y, b: c60.bounces }) + ' 120Hz=' + JSON.stringify({ x: c120.x, y: c120.y, b: c120.bounces }) + ' 144Hz=' + JSON.stringify({ x: c144.x, y: c144.y, b: c144.bounces }));
+  assert(c60.bounces === c120.bounces && c60.bounces === c144.bounces, '三档 3s 碰撞次数一致 (' + c60.bounces + ')');
+  assert(Math.abs(c60.x - c120.x) < 15 && Math.abs(c60.x - c144.x) < 15, '三档 3s X 位移差 < 15px');
+  assert(Math.abs(c60.y - c120.y) < 10 && Math.abs(c60.y - c144.y) < 10, '三档 3s Y 位移差 < 10px');
 
   // ── 总结 ──
   console.log('\n=== 总结 ===');

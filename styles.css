@@ -1294,13 +1294,17 @@ a:hover { opacity: 0.8; }
     }
 }
 
-/* page-agent 由运行时注入；作为 JS 执行前的安全兜底。 */
+/* page-agent 由运行时注入；作为 JS 执行前的安全兜底。
+   兜底不参与具体页面布局（主页 hero 分离布局 / 非主页 banner 均
+   由 app.js initPageAgentPlacement 按可见布局计算），因此这里只做
+   保守的“右下角完整可见”，避免共享定位压住任意页面的右上统计卡
+   或顶部导航下沿。 */
 :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
     position: fixed;
-    top: 84px;
-    left: 50%;
-    right: auto;
-    bottom: auto;
+    top: auto;
+    bottom: 24px;
+    left: auto;
+    right: 24px;
     z-index: 9990;
     width: min(360px, calc(100vw - 40px));
     box-sizing: border-box;
@@ -1426,8 +1430,10 @@ a:hover { opacity: 0.8; }
 
 @media (max-width: 600px) {
     :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
-        top: 76px;
-        left: 50%;
+        top: auto;
+        bottom: 16px;
+        left: auto;
+        right: 12px;
         width: calc(100vw - 24px);
         max-width: calc(100vw - 24px);
         max-height: calc(100vh - 88px);
@@ -1779,8 +1785,31 @@ body.nk-dark .nethack-tab.active {
 }
 .nk-cmd-grid.nk-desc-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px 14px;
+}
+/* 长条目内容（怪物/攻略）：桌面双列扫读，移动端单列 */
+.nk-cmd-grid.nk-wide-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.nk-cmd-grid.nk-wide-grid > span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+    .nk-cmd-grid.nk-desc-grid,
+    .nk-cmd-grid.nk-wide-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* 分组提示行（如“更多 # 命令见扩展命令”） */
+.nk-group-note {
+    margin: 10px 0 0;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border-light);
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
 }
 .nk-desc-grid.nk-desc-stack {
     grid-template-columns: 1fr;
