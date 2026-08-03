@@ -1,4 +1,4 @@
-const TEXT = `公开仓库围绕计算机视觉、自动驾驶感知、并行计算与公开写作。lane2seq 做实时车道检测，结合 Canny/Hough 变换、CLAHE、HLS 等传统流程与 Lane2Seq-ViT 序列生成模型，并用 ENet 分割在 TuSimple 和 LLAMAS 数据集上训练与验证。GStreamer-SEI 整理 RTSP 推流、自定义 SEI 注入、Carla 多相机管理与 pyinstaller 打包 exe 的完整踩坑记录。auto_calib_v2.0 在 PJLab-ADG/SensorsCalibration 的 lidar2camera 方案上做改进，方便自动驾驶多传感器联合标定。utils 收集常用脚本工具。lanenet-lane-detection 记录车道检测实验的迭代过程。维护多份 gkd 订阅用于广告过滤与规则分享。近期也在看 BEV 感知、Occupancy 估计与端到端自动驾驶方向。`;
+const TEXT = `计算机视觉 自动驾驶感知 并行计算 车道检测 多传感器标定 BEV 感知 Occupancy CUDA`;
 
 const DEFAULT_LINE_HEIGHT = 24;
 const ORB_TEXT_GAP = 1;
@@ -63,8 +63,7 @@ function ensureTextMetrics() {
 function resize() {
     const r = container.parentElement.getBoundingClientRect();
     W = r.width; H = r.height;
-    const maxOrbR = Math.min(W, H) * 0.08 * 1.2;
-    container.style.padding = maxOrbR + 'px';
+    container.style.padding = Math.min(W, H) * 0.08 * 1.2 + 'px';
 }
 
 function initOrbs() {
@@ -137,10 +136,12 @@ function renderText() {
     const padding = 16;
     const colStart = padding;
     const colEnd = W - padding;
+    const textTop = Math.max(lineHeight * 1.5, 96);
+    const textBottom = H - 78;
     const lines = [];
     let graphemeIndex = 0;
 
-    for (let y = lineHeight * 1.5; y + lineHeight < H - 20 && graphemeIndex < graphemes.length; y += lineHeight) {
+    for (let y = textTop; y + lineHeight < textBottom && graphemeIndex < graphemes.length; y += lineHeight) {
         const blocked = [];
         for (const orb of orbs) {
             const interval = circleIntervalForBand(orb, y, y + lineHeight);
