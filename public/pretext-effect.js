@@ -156,12 +156,6 @@ function syncTextLines(lines) {
         const top = `${Math.round(line.top)}px`;
         if (element.style.left !== left) element.style.left = left;
         if (element.style.top !== top) element.style.top = top;
-        if (line.spacing !== null) {
-            const spacing = `${line.spacing.toFixed(3)}px`;
-            if (element.style.letterSpacing !== spacing) element.style.letterSpacing = spacing;
-        } else if (element.style.letterSpacing !== '') {
-            element.style.letterSpacing = '';
-        }
     }
 }
 
@@ -201,18 +195,15 @@ function renderText() {
                 graphemeIndex++;
             }
             if (graphemeIndex === start) continue;
-            const glyphCount = graphemeIndex - start;
-            let spacing = null;
-            // 槽位右缘被圆球截断时，把剩余空隙以字距形式均匀摊到每个字形上，
-            // 使文字右缘贴住圆球左缘（与圆球右侧的紧贴一致），即 CJK 两端对齐。
-            if (slot.orbRight && glyphCount >= 2 && textWidth < slotWidth) {
-                spacing = baseLetterSpacing + (slotWidth - textWidth) / glyphCount;
-            }
+            // 字距保持恒定（不随球移动变化）：球左侧槽位改为「右对齐」，
+            // 让文字右缘贴住圆球左缘（与球右侧的紧贴一致）。拖拽/弹跳时
+            // 文字整体滑动、不伸缩，效果更稳。右缘由精确字形宽求得，误差 <1px。
             lines.push({
-                left: slot.left,
+                left: slot.orbRight && slot.right - textWidth > slot.left
+                    ? slot.right - textWidth
+                    : slot.left,
                 top: y,
                 text: graphemes.slice(start, graphemeIndex).join(''),
-                spacing,
             });
         }
     }

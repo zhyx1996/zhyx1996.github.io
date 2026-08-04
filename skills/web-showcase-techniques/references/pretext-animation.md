@@ -34,7 +34,7 @@ function circleIntervalForBand(orb, bandTop, bandBottom) {
 ### 2. 区间切割（Interval Carving）
 
 从完整行宽中减去所有被遮挡区间，得到可用文字槽位。每个槽位额外记录
-`orbRight`：槽位右缘是否被圆球截断（用于第 5 节的两端对齐）。
+`orbRight`：槽位右缘是否被圆球截断（用于第 5 节的右对齐）。
 
 ```javascript
 function carveTextLineSlots(base, blocked) {
@@ -101,23 +101,25 @@ while (graphemeIndex < graphemes.length) {
 }
 ```
 
-### 5. 槽位两端对齐（CJK 对齐的关键）
+### 5. 槽位右对齐（字距恒定）
 
 圆球左侧的槽位若只做左对齐，会因打包余量留下最多一个字形宽的空隙，
-视觉上「左边距文字有段距离」。把剩余空隙以字距形式均匀摊到每个字形上，
-文字右缘即精确贴住圆球左缘（右侧同理：文字从圆球右缘开始，天然紧贴）。
+视觉上「左边距文字有段距离」。若用两端对齐（改字距）填满，拖拽小球时
+字距会逐帧变化、文字一伸一缩，观感不稳。因此这里保持字距恒定（CSS
+基础 `letter-spacing` 不变），改为**右对齐**：利用第 3 节的精确字形宽
+算出整段文字宽度，把左边缘挪到「槽位右缘 - 段宽」，使文字右缘精确贴住
+圆球左缘（与球右侧从圆球右缘开始天然紧贴一致）。拖拽时文字整体滑动，
+不伸缩。
 
 ```javascript
-let spacing = null;
-if (slot.orbRight && glyphCount >= 2 && textWidth < slotWidth) {
-  spacing = baseLetterSpacing + (slotWidth - textWidth) / glyphCount;
-}
+lines.push({
+  left: slot.orbRight && slot.right - textWidth > slot.left
+    ? slot.right - textWidth   // 右对齐到圆球左缘
+    : slot.left,               // 普通槽位保持左对齐
+  top: y,
+  text: graphemes.slice(start, graphemeIndex).join(''),
+});
 ```
-
-`spacing` 覆盖 CSS 基础字距（`baseLetterSpacing`）实现「两端对齐」。
-因为字形宽来自第 3 节的精确 DOM 测量，且 CSS `letter-spacing` 按
-「每个字形后加距（含末尾）」生效（`渲染宽 = 字形宽和 + 字形数 × 字距`），
-最终渲染宽恰好等于槽位宽，误差 <1px。
 
 ### 6. 条件重排（性能优化）
 
