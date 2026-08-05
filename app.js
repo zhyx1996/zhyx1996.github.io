@@ -355,6 +355,7 @@ const SAKANA_PHYSICS = {
   maxBounces: 10,          // 最大碰撞次数限制
   bounceEnergyCap: 18,     // 碰撞后速度上限（防能量累积）
   dampingAfterMaxBounces: 0.9, // 超过最大碰撞后的额外阻尼
+  edgeNormalAbsorb: 0.15,  // 边缘释放时吸收「朝向墙壁」法向速度的比例（拖到边缘松手不弹飞整屏）
   // 时间归一化（消除设备/事件频率差异，统一到 60fps 基准）
   frameMs: 16.667,         // 1 帧时长基准（1000/60），速度与摩擦均换算到该基准
   velocitySampleWindowMs: 120, // 释放速度采样窗口（取窗口内首尾位移/时间）
@@ -792,6 +793,17 @@ function initSakanaDrag() {
     var maxV = SAKANA_PHYSICS.maxVelocity;
     vx = Math.max(-maxV, Math.min(maxV, vx));
     vy = Math.max(-maxV, Math.min(maxV, vy));
+
+    // 拖到边缘释放：吸收「朝向墙壁」的法向速度，只保留沿边的切向速度，
+    // 避免指针在边缘继续移动攒出高速、松手后撞墙弹飞整屏。widget 已
+    // 贴住边缘时，让它贴着边缘自然停下（保留少量回弹更有手感）。
+    var wW = widget.offsetWidth, wH = widget.offsetHeight;
+    var vW = window.innerWidth, vH = window.innerHeight;
+    var edgeMargin = 16;
+    if (leftPos <= edgeMargin && vx < 0) vx *= SAKANA_PHYSICS.edgeNormalAbsorb;
+    else if (leftPos >= vW - wW - edgeMargin && vx > 0) vx *= SAKANA_PHYSICS.edgeNormalAbsorb;
+    if (topPos <= edgeMargin && vy < 0) vy *= SAKANA_PHYSICS.edgeNormalAbsorb;
+    else if (topPos >= vH - wH - edgeMargin && vy > 0) vy *= SAKANA_PHYSICS.edgeNormalAbsorb;
 
     var sakana = window.sakanaInstance;
     if (sakana) {
