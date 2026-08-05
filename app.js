@@ -1152,6 +1152,40 @@ function initFooterUpdated() {
   }
 }
 
+// ── GitHub Profile 统计：静态兜底 + 动态拉取 ──
+// HTML 里已写死兜底值（⭐ / 🍴），拉取成功后覆盖为真实值；
+// 直连失败（大陆限流/被墙）再走 corsproxy 代理，仍失败则保持兜底。
+async function initProfileStats() {
+  const card = document.querySelector('.repo-profile-card');
+  const meta = card && card.querySelector('.repo-meta');
+  if (!meta) return;
+
+  const apply = (stars, forks) => {
+    meta.innerHTML = `<span>⭐ ${stars}</span><span>🍴 ${forks}</span>`;
+  };
+
+  const url = 'https://api.github.com/users/zhyx1996/repos?per_page=100';
+  let repos = null;
+  try {
+    const res = await fetchWithTimeout(url, 8000);
+    if (res.ok) repos = await res.json();
+  } catch { /* 直连失败 */ }
+  if (!Array.isArray(repos)) {
+    try {
+      const res = await fetchWithTimeout(PROXY + encodeURIComponent(url), 10000);
+      if (res.ok) repos = await res.json();
+    } catch { /* 代理失败，保持兜底 */ }
+  }
+  if (Array.isArray(repos) && repos.length) {
+    let stars = 0, forks = 0;
+    for (const repo of repos) {
+      stars += repo.stargazers_count || 0;
+      forks += repo.forks_count || 0;
+    }
+    apply(stars, forks);
+  }
+}
+
 // ── 初始化 ──
 document.addEventListener('DOMContentLoaded', () => {
   loadMarket();
@@ -1163,6 +1197,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollProgress();
   initBackToTop();
   initFooterUpdated();
+  initProfileStats();
 
   // 市场快照刷新按钮
   const marketRefreshBtn = document.getElementById('market-refresh');

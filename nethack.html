@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css?v=49">
+    <link rel="stylesheet" href="/styles.css?v=50">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css" />
     <style>
         body { opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards; }
@@ -92,7 +92,15 @@
                         <span class="nk-window-title">alt.org · hterm</span>
                         <span class="nk-window-status">● 联机中</span>
                     </div>
-                     <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                    <div class="nethack-frame-wrap" data-nh-src="https://www.alt.org/nethack/hterm/">
+                        <div class="nethack-frame-loading">正在加载外部游戏…</div>
+                        <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                        <div class="nethack-frame-error" hidden>
+                            <span>外部游戏加载失败（可能被网络拦截或需联网）</span>
+                            <button type="button" class="nethack-frame-retry">重试</button>
+                            <a href="https://www.alt.org/nethack/hterm/" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
+                        </div>
+                    </div>
                     <div class="nk-window-statusbar" data-hint="terminal">点击终端 · 按 c 连接 · 移动推荐 yuhjklbn（Vi 键）或数字小键盘，方向键无法斜向移动 · 顶部下拉框：字体 / tileset（画面风格）</div>
                 </div>
                 <div class="nk-window" data-pane="3d" id="pane-3d" role="tabpanel" aria-label="NetHack 3D">
@@ -103,7 +111,15 @@
                         <span class="nk-window-title">nethack-3d · StackC00ki3</span>
                         <span class="nk-window-status">● 3D</span>
                     </div>
-                     <iframe class="nethack-iframe nethack-iframe-3d" src="https://stackc00ki3.github.io/nethack-3d/" title="NetHack 3D" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                    <div class="nethack-frame-wrap" data-nh-src="https://stackc00ki3.github.io/nethack-3d/">
+                        <div class="nethack-frame-loading">正在加载外部游戏…</div>
+                        <iframe class="nethack-iframe nethack-iframe-3d" src="https://stackc00ki3.github.io/nethack-3d/" title="NetHack 3D" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                        <div class="nethack-frame-error" hidden>
+                            <span>外部游戏加载失败（可能被网络拦截或需联网）</span>
+                            <button type="button" class="nethack-frame-retry">重试</button>
+                            <a href="https://stackc00ki3.github.io/nethack-3d/" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
+                        </div>
+                    </div>
                     <div class="nk-window-statusbar" data-hint="3d">鼠标拖拽旋转视角 · WASD 移动 · 左键互动 · 滚轮缩放</div>
                 </div>
                 <details class="nethack-shortcuts">
@@ -430,7 +446,7 @@
         </div>
     </footer>
 
-    <script src="/app.js?v=44" defer></script>
+    <script src="/app.js?v=46" defer></script>
     <script>
       function initSakanaWidget() {
         if (window.__sakanaWidgetInitialized) return;
@@ -476,6 +492,49 @@
       document.getElementById("nk-dark-toggle").addEventListener("click", function() {
         document.body.classList.toggle("nk-dark");
         this.textContent = document.body.classList.contains("nk-dark") ? "开灯" : "关灯";
+      });
+
+      // 外部游戏 iframe：懒加载 + 加载占位 + 加载失败兜底
+      document.querySelectorAll('.nethack-frame-wrap').forEach(function(wrap) {
+        var iframe = wrap.querySelector('iframe');
+        var loading = wrap.querySelector('.nethack-frame-loading');
+        var error = wrap.querySelector('.nethack-frame-error');
+        var src = wrap.getAttribute('data-nh-src');
+        var loaded = false;
+        var timer = null;
+        var TIMEOUT = 15000;
+        var startTimer = function() {
+          if (timer !== null || loaded) return;
+          timer = setTimeout(function() {
+            if (!loaded) {
+              loading.style.display = 'none';
+              error.hidden = false;
+            }
+            timer = null;
+          }, TIMEOUT);
+        };
+        iframe.addEventListener('load', function() {
+          loaded = true;
+          loading.style.display = 'none';
+          error.hidden = true;
+        });
+        if ('IntersectionObserver' in window) {
+          var obs = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting) startTimer();
+          }, { threshold: 0.05 });
+          obs.observe(wrap);
+        } else {
+          startTimer();
+        }
+        var retry = wrap.querySelector('.nethack-frame-retry');
+        if (retry) retry.addEventListener('click', function() {
+          error.hidden = true;
+          loading.style.display = '';
+          loaded = false;
+          iframe.src = src;
+          if (timer !== null) { clearTimeout(timer); timer = null; }
+          startTimer();
+        });
       });
     </script>
 

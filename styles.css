@@ -1881,6 +1881,53 @@ body.nk-dark .nk-cmd-grid kbd {
 .nethack-iframe-3d {
     height: 700px;
 }
+
+/* 外部游戏 iframe：加载占位 / 失败兜底 */
+.nethack-frame-wrap {
+    position: relative;
+}
+.nethack-frame-loading,
+.nethack-frame-error {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: var(--bg-surface);
+    color: var(--text-muted);
+    font-size: 13px;
+    text-align: center;
+    border-radius: 4px;
+}
+.nethack-frame-loading {
+    animation: market-pulse 1.5s ease-in-out infinite;
+}
+.nethack-frame-error a {
+    font-weight: 500;
+    text-decoration: none;
+}
+.nethack-frame-error a:hover {
+    text-decoration: underline;
+}
+.nethack-frame-retry {
+    padding: 6px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+.nethack-frame-retry:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
 .nethack-links {
     display: flex;
     gap: 8px;
