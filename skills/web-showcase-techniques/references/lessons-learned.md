@@ -112,3 +112,19 @@ ANSI/GBK，会把 UTF-8 的中文整文件批量损坏成 `�?`，且损坏字�
   指定 `UTF8Encoding($false)`（无 BOM），不要用 `Get-Content/Set-Content`。
 - 改完用 `git diff --stat` 核对：若中文文件出现超大 diff（整文件行级变动），
   几乎必然是编码损坏，用 `git checkout HEAD -- <file>` 恢复后重做。
+
+## 9. page-agent 定位的坑（面板出屏 + 遮罩被压扁）
+
+page-agent 注入的是运行时元素，有几处易踩的坑：
+- **`[id*="page-agent" i]` 选择器会命中辅助元素**：`#page-agent-runtime_simulator-mask`
+  的 id 含 "page-agent"，把全屏遮罩也套上 `position:fixed; left:24px; width:340px`
+  会被压成左下角小块。定位规则必须加 `:not([id*="simulator" i]):not([class*="mask" i])`
+  排除，且 JS 定位（`place()`）也要跳过 `simulator/mask`。
+- **库在任务开始再次 show() 时会写回 `translateX(-50%)`**（假设 left:50% 居中），
+  与本站 `left:24px` 叠加 → 面板左移半宽出屏。用 CSS `transform: translateY(0) !important`
+  钉住即可（代价是收起动画没了，位置正确）。
+- **测试要本地化脚本**：page-agent 从 jsdelivr 加载，大陆测试环境拉不到 → 面板
+  不注入、无法验收。临时把 `page-agent.demo.js` 下载到 `public/` 并在 index.html
+  指到本地，验完再还原（别提交测试文件）。
+- 验收以 DOM 几何 + 视觉子代理为准：任务触发后检查 panel 的 `left`/`transform`
+  和 mask 是否全屏。

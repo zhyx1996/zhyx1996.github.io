@@ -1493,6 +1493,11 @@ function initPageAgentPlacement() {
 
   const place = (element) => {
     if (!(element instanceof HTMLElement) || element.dataset.codexPlaced === 'true') return;
+    // 只定位真正的面板容器；排除运行时辅助元素（如 simulator-mask 全屏遮罩，
+    // 其 id 同样含 "page-agent"），避免把全屏遮罩误定位成左下角小块。
+    const pid = element.id || '';
+    const pcls = element.className || '';
+    if (/simulator|mask/i.test(pid) || /simulator/i.test(pcls)) return;
     element.dataset.codexPlaced = 'true';
     applyInitialPlacement(element);
     // page-agent 注入后 ~0ms 才 show() 并写入自身 transform/opacity；
