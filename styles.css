@@ -1218,8 +1218,10 @@ a:hover { opacity: 0.8; }
    兜底不参与具体页面布局（主页 hero 分离布局 / 非主页 banner 均
    由 app.js initPageAgentPlacement 按可见布局计算），因此这里只做
    保守定位：放在左下角（左侧导航栏下方），避开右下角 Sakana。
-   底边 88px 让出返回顶部按钮（left:24 bottom:24 高 40px）。 */
-:where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
+   底边 88px 让出返回顶部按钮（left:24 bottom:24 高 40px）。
+   :not() 排除运行时辅助元素（如 simulator-mask 全屏遮罩，其 id 同样
+   含 "page-agent"，不能被压成左下角小块）。 */
+:where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]):not([id*="simulator" i]):not([class*="simulator" i]):not([id*="mask" i]):not([class*="mask" i]) {
     position: fixed;
     top: auto;
     bottom: 88px;
@@ -1352,7 +1354,7 @@ a:hover { opacity: 0.8; }
 }
 
 @media (max-width: 600px) {
-    :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
+    :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]):not([id*="simulator" i]):not([class*="simulator" i]):not([id*="mask" i]):not([class*="mask" i]) {
         top: auto;
         bottom: 88px;
         left: 12px;
