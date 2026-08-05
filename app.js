@@ -795,11 +795,25 @@ function initSakanaDrag() {
 
     var sakana = window.sakanaInstance;
     if (sakana) {
+      // 参考官方实现（_onMouseUp）：释放时保留当前姿态，只恢复弹簧 _run。
+      // 之前用 computeCharState(vx,vy) 直接覆写 r/y/w/t，当拖动后停顿再松手
+      // （采样窗口内速度≈0）时 r=y=w=t=0，_run 一启动就满足停止条件立刻停摆。
+      // 现在：有足够释放速度才按速度设姿态；低速释放保留当前位置并补一个
+      // 轻微回摆量，保证晃动不中止。
       var state = computeCharState(vx, vy);
-      sakana._state.r = state.r;
-      sakana._state.y = state.y;
-      sakana._state.w = state.w;
-      sakana._state.t = state.t;
+      if (Math.abs(vx) < 3 && Math.abs(vy) < 3) {
+        sakana._state.w = 0;
+        sakana._state.t = 0;
+        if (Math.abs(sakana._state.r) < 0.5 && Math.abs(sakana._state.y) < 0.5) {
+          sakana._state.r = 8;
+          sakana._state.y = 4;
+        }
+      } else {
+        sakana._state.r = state.r;
+        sakana._state.y = state.y;
+        sakana._state.w = state.w;
+        sakana._state.t = state.t;
+      }
       sakana._state.i = state.i;
       sakana._state.d = state.d;
       sakana._lastRunUnix = Date.now();
