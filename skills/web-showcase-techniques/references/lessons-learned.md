@@ -66,3 +66,13 @@
 期间检测到另一个进程也在提交该仓库（如文章同步、版本号统一等）。
 **提交/推送前先 `git log` 与 `git status` 核对**，避免冲突或把别人的改动一起带上；
 版本号统一到全站一致再提交。
+
+## 7. git push 到 GitHub 也要走代理
+
+大陆直连 `git push origin main` 会报
+`schannel: failed to receive handshake, SSL/TLS connection failed`。
+走本机代理即可：
+
+```bash
+git -c http.proxy=http://localhost:18808 -c https.proxy=http://localhost:18808 push origin main
+```
