@@ -1415,11 +1415,8 @@ async function loadSteamProfile() {
   }
 }
 
-// 运行时注入的 page-agent 浮窗：首次注入时定位到首屏安全空白区。
-// 后续只做最小干预：page-agent 在任务开始（running）等时机再次 show() 时会
-// 写回它自己默认的 translateX(-50%)（假设 left:50% 居中），与本站 left 边距
-// 定位叠加会把面板向左平移半个宽度导致一半出屏，因此需持续剥掉该位移
-// （用户拖动过后不再干预）。
+// 运行时注入的 page-agent 浮窗：首次注入时定位到首屏安全空白区，
+// 之后完全交给 page-agent 自身行为，不做持续抢位。
 function initPageAgentPlacement() {
   const selectors = [
     '#page-agent',
@@ -1494,39 +1491,15 @@ function initPageAgentPlacement() {
     }, { passive: true });
   });
 
-  // 剥掉 page-agent 库写回的 translateX(-50%)（其默认居中假设与本站 left 边距
-  // 定位冲突，会整体左移半个宽度导致出屏）。仅保留 translateY 位移动画。
-  // 注意：该位移是库每次 show()/hide() 写回的居中默认值，不是用户拖出来的
-  // 位置（本库无拖动逻辑），因此不受 codexUserMoved 限制，始终纠正。
-  const stripCenteringX = (element) => {
-    const t = element.style.transform || '';
-    if (!t.includes('translateX(-50%)')) return;
-    const ty = (t.match(/translateY\([^)]*\)/) || ['translateY(0)'])[0];
-    element.style.transform = ty;
-  };
-
-  // 守护注入元素的 style：page-agent 每次 show()（如任务开始）都会重写
-  // transform，把 translateX(-50%) 加回来；这里在 style 变化后立即纠正，
-  // 保证面板始终留在左侧定位上。
-  const guardStyle = (element) => {
-    if (element.dataset.codexGuard === 'true') return;
-    element.dataset.codexGuard = 'true';
-    const mo = new MutationObserver(() => stripCenteringX(element));
-    mo.observe(element, { attributes: true, attributeFilter: ['style'] });
-  };
-
   const place = (element) => {
     if (!(element instanceof HTMLElement) || element.dataset.codexPlaced === 'true') return;
-    // 只定位真正的面板容器；排除全屏遮罩等辅助元素（如 simulator-mask，
-    // 其 class 同样含 wrapper，需按 id 特征先行排除），避免把
-    // fixed/inset:0 的遮罩误改为边距定位。
+    // 只定位真正的面板容器；排除运行时辅助元素（如 simulator-mask 全屏遮罩，
+    // 其 id 同样含 "page-agent"），避免把固定定位的遮罩误改为左下角边距定位。
     const pid = element.id || '';
     const pcls = element.className || '';
     if (/simulator|mask/i.test(pid) || /simulator/i.test(pcls)) return;
-    if (!/panel/i.test(pid) && !/wrapper/i.test(pcls)) return;
     element.dataset.codexPlaced = 'true';
     applyInitialPlacement(element);
-    guardStyle(element);
     // page-agent 注入后 ~0ms 才 show() 并写入自身 transform/opacity；
     // 在其初始化稳定后各确认一次位置（用户未拖动时）。仅此一次，之后彻底放手。
     setTimeout(() => { applyInitialPlacement(element); }, 250);

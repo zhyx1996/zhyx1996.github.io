@@ -1233,6 +1233,16 @@ a:hover { opacity: 0.8; }
     max-width: calc(100vw - 40px);
     max-height: calc(100vh - 96px);
     overflow: auto;
+    /* 钉住 transform：page-agent 在任务开始（running）等时机再次 show() 时会
+       写回它默认的 translateX(-50%)（假设 left:50% 居中），与本站 left 边距
+       叠加会把面板左移半个宽度导致出屏。!important 让 inline style 也无法覆盖。 */
+    transform: translateY(0) !important;
+}
+
+/* page-agent 的全屏模拟遮罩（simulator-mask）保持原样全屏，但穿透点击，
+   避免卡住页面；其操作高亮/光标渲染不受 pointer-events 影响。 */
+:where(#page-agent-runtime_simulator-mask, [id*="simulator-mask" i], [class*="simulator" i]) {
+    pointer-events: none !important;
 }
 
 /* ── 无障碍 ── */
