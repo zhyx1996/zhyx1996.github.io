@@ -104,15 +104,18 @@ function simulateSpring(r, y, w, t, params, maxFrames) {
 // durationMs: 可选；到该真实时间即停止，最后一帧按剩余时间比例子步进，
 //             保证 60/120/144Hz 在“同一真实时刻”的位置可直接比较
 function simulateBounce(initialVx, initialVy, startX, bounds, dtMs, durationMs) {
-  var frameMs = 16.667;
+  var frameMs = BOUNCE_PARAMS.frameMs;
   var dt = dtMs || frameMs;
-  var timeScale = dt / frameMs;
-  var friction = 0.982;
-  var wallBounce = 0.5;
-  var stopThreshold = 0.6;
-  var maxBounces = 10;
-  var bounceEnergyCap = 18;
-  var dampingAfterMaxBounces = 0.9;
+  var friction = BOUNCE_PARAMS.friction;
+  var wallBounce = BOUNCE_PARAMS.wallBounce;
+  var stopThreshold = BOUNCE_PARAMS.stopThreshold;
+  var maxBounces = BOUNCE_PARAMS.maxBounces;
+  var bounceEnergyCap = BOUNCE_PARAMS.bounceEnergyCap;
+  var dampingAfterMaxBounces = BOUNCE_PARAMS.dampingAfterMaxBounces;
+
+  // 与 app.js bounce 帧一致：边界下限 0（视口小于 widget 时退化为贴左上角）
+  var maxLeft = Math.max(0, bounds.width - bounds.widgetW);
+  var maxTop = Math.max(0, bounds.height - bounds.widgetH);
 
   var vx = initialVx;
   var vy = initialVy;
@@ -140,28 +143,38 @@ function simulateBounce(initialVx, initialVy, startX, bounds, dtMs, durationMs) 
     var nextY = y + vy * stepScale;
     var bounced = false;
 
-    if (nextX <= 0 && vx < 0) {
-      preImpactVx = vx;
+    // 位置越界一律钳回边界，仅当速度指向边界时才反弹
+    // （覆盖 resize 缩小后起点越界等极端情况，与 app.js bounce 帧一致）
+    if (nextX <= 0) {
       nextX = 0;
-      vx = Math.min(Math.abs(vx) * wallBounce, bounceEnergyCap);
-      bounced = true;
-    } else if (nextX >= bounds.width - bounds.widgetW && vx > 0) {
-      preImpactVx = vx;
-      nextX = bounds.width - bounds.widgetW;
-      vx = -Math.min(Math.abs(vx) * wallBounce, bounceEnergyCap);
-      bounced = true;
+      if (vx < 0) {
+        preImpactVx = vx;
+        vx = Math.min(Math.abs(vx) * wallBounce, bounceEnergyCap);
+        bounced = true;
+      }
+    } else if (nextX >= maxLeft) {
+      nextX = maxLeft;
+      if (vx > 0) {
+        preImpactVx = vx;
+        vx = -Math.min(Math.abs(vx) * wallBounce, bounceEnergyCap);
+        bounced = true;
+      }
     }
 
-    if (nextY <= 0 && vy < 0) {
-      preImpactVy = vy;
+    if (nextY <= 0) {
       nextY = 0;
-      vy = Math.min(Math.abs(vy) * wallBounce, bounceEnergyCap);
-      bounced = true;
-    } else if (nextY >= bounds.height - bounds.widgetH && vy > 0) {
-      preImpactVy = vy;
-      nextY = bounds.height - bounds.widgetH;
-      vy = -Math.min(Math.abs(vy) * wallBounce, bounceEnergyCap);
-      bounced = true;
+      if (vy < 0) {
+        preImpactVy = vy;
+        vy = Math.min(Math.abs(vy) * wallBounce, bounceEnergyCap);
+        bounced = true;
+      }
+    } else if (nextY >= maxTop) {
+      nextY = maxTop;
+      if (vy > 0) {
+        preImpactVy = vy;
+        vy = -Math.min(Math.abs(vy) * wallBounce, bounceEnergyCap);
+        bounced = true;
+      }
     }
 
     if (bounced) {
@@ -203,6 +216,30 @@ const TIME_NORM = {
   sampleMax: 12,              // 最大采样点数
   friction: 0.982             // 与 simulateBounce 一致
 };
+
+// ── 弹跳与边缘参数（与 app.js SAKANA_PHYSICS 保持一致）──
+const BOUNCE_PARAMS = {
+  frameMs: TIME_NORM.frameMs,
+  friction: TIME_NORM.friction,
+  wallBounce: 0.5,            // 撞墙速度保留率
+  stopThreshold: 0.6,         // 停止阈值
+  maxBounces: 10,             // 最大碰撞次数限制
+  bounceEnergyCap: 18,        // 碰撞后速度上限
+  dampingAfterMaxBounces: 0.9,// 超过最大碰撞后的额外阻尼
+  edgeNormalAbsorb: 0.15,     // 边缘释放时吸收法向速度的比例
+  maxVelocity: 22             // 释放速度上限
+};
+
+// 与 app.js clampSakanaPosition 相同的纯函数：位置钳制到视口内（不越界）
+function clampSakanaPosition(left, top, viewportW, viewportH, widgetW, widgetH, margin) {
+  margin = margin == null ? 8 : margin;
+  var maxL = Math.max(0, viewportW - widgetW - margin);
+  var maxT = Math.max(0, viewportH - widgetH - margin);
+  return {
+    left: Math.min(Math.max(0, left), maxL),
+    top: Math.min(Math.max(0, top), maxT)
+  };
+}
 
 // 与 app.js computeReleaseVelocity 相同的纯函数：窗口内首尾位移/时间 → px/frame@60fps
 function computeReleaseVelocity(samples, opts) {
@@ -547,6 +584,84 @@ function runTests() {
   assert(c60.bounces === c120.bounces && c60.bounces === c144.bounces, '三档 3s 碰撞次数一致 (' + c60.bounces + ')');
   assert(Math.abs(c60.x - c120.x) < 15 && Math.abs(c60.x - c144.x) < 15, '三档 3s X 位移差 < 15px');
   assert(Math.abs(c60.y - c120.y) < 10 && Math.abs(c60.y - c144.y) < 10, '三档 3s Y 位移差 < 10px');
+
+  // ── 6. 边界钳制：拖动 / 释放 / resize 全程位置不越界 ──
+  console.log('\n=== 边界钳制（clampSakanaPosition）===');
+
+  var c1 = clampSakanaPosition(2000, 2000, 1920, 1080, 180, 180, 8);
+  assert(c1.left === 1732 && c1.top === 892, '右下越界钳回 (1732, 892)，实际 (' + c1.left + ',' + c1.top + ')');
+
+  var c2 = clampSakanaPosition(-50, -30, 1920, 1080, 180, 180, 8);
+  assert(c2.left === 0 && c2.top === 0, '左上越界钳回 (0, 0)，实际 (' + c2.left + ',' + c2.top + ')');
+
+  var c3 = clampSakanaPosition(100, 100, 100, 100, 180, 180, 8);
+  assert(c3.left === 0 && c3.top === 0, '视口小于 widget 时贴左上角 (0, 0)，实际 (' + c3.left + ',' + c3.top + ')');
+
+  var c4 = clampSakanaPosition(50, 50, 200, 200, 180, 180, 8);
+  assert(c4.left === 12 && c4.top === 12, '视口 200 时最大坐标 12，实际 (' + c4.left + ',' + c4.top + ')');
+
+  var c5 = clampSakanaPosition(12, 12, 1920, 1080, 180, 180, 8);
+  assert(c5.left === 12 && c5.top === 12, '界内位置保持不变');
+
+  // ── 7. 碰撞反弹稳定性：不越界 / 不穿透 / 不抖动 ──
+  console.log('\n=== 碰撞反弹稳定性 ===');
+
+  // 7a. 起点越界 + 速度朝墙外（resize 缩小后释放）：位置钳回边界并反弹
+  var tinyBounds = { width: 800, height: 600, widgetW: 180, widgetH: 180 };
+  var oob = simulateBounce(5, 4, 700, tinyBounds); // maxLeft = 620
+  assert(oob.x >= 0 && oob.x <= 620, '越界起点被钳回界内 x=' + oob.x);
+  assert(oob.bounces >= 1, '越界起点朝墙外速度触发反弹 bounces=' + oob.bounces);
+
+  // 7b. 起点越界但速度=0（resize 后静止释放）：位置被纠正到边界，不产生弹跳
+  var oobStill = simulateBounce(0, 0, 700, tinyBounds);
+  assert(oobStill.x === 620, '越界静止起点被钳回边界 x=' + oobStill.x);
+  assert(oobStill.bounces === 0, '越界静止起点不触发反弹 bounces=' + oobStill.bounces);
+
+  // 7c. 高刷新率长时间模拟：位置始终在界内（不穿透、不飞出）
+  var hf = simulateBounce(-22, 22, 100, bounds, 6.944, 5000);
+  assert(hf.x >= 0 && hf.x <= 1790, '144Hz 5s 后 x=' + hf.x + ' 在界内 [0,1790]');
+  assert(hf.y >= 0 && hf.y <= 930, '144Hz 5s 后 y=' + hf.y + ' 在界内 [0,930]');
+
+  // 7d. 贴墙慢速朝墙释放：仅一次反弹，停在墙边，不来回抖动
+  var wallRight = simulateBounce(1.2, 0, 1790, bounds); // maxLeft = 1790
+  assert(wallRight.bounces === 1, '贴墙慢速释放仅一次反弹 bounces=' + wallRight.bounces);
+  assert(wallRight.x <= 1790 && wallRight.x >= 1785, '贴墙慢速释放停在墙边 x=' + wallRight.x);
+
+  // 7e. 反弹后轨迹单调远离墙（无来回穿越抖动）
+  var xT = 1790, vT = 18;
+  var monoOk = true;
+  var prevX = 1790;
+  for (var iT = 0; iT < 30; iT++) {
+    vT *= BOUNCE_PARAMS.friction;
+    var nxT = xT + vT;
+    if (nxT >= 1790) {
+      nxT = 1790;
+      vT = -Math.min(Math.abs(vT) * BOUNCE_PARAMS.wallBounce, BOUNCE_PARAMS.bounceEnergyCap);
+    }
+    xT = nxT;
+    if (iT > 0 && xT > prevX) monoOk = false;
+    prevX = xT;
+  }
+  assert(monoOk, '撞墙反弹后 30 帧位置单调远离墙（无抖动）');
+
+  // 7f. 碰撞前速度有界（能量上限保护）
+  var fast = simulateBounce(-22, 22, 100, bounds, 16.667, 5000);
+  assert(Math.abs(fast.preImpactVx) <= BOUNCE_PARAMS.maxVelocity && Math.abs(fast.preImpactVy) <= BOUNCE_PARAMS.maxVelocity, '碰撞前速度有界（<= maxVelocity 22）');
+
+  // ── 8. 边缘释放：法向速度吸收，不整屏飞出 ──
+  console.log('\n=== 边缘释放（edgeNormalAbsorb）===');
+
+  // 贴右边缘、以最大速度朝墙释放：法向先吸收 85%（22×0.15=3.3），反弹后迅速停下
+  var edgeVx = BOUNCE_PARAMS.maxVelocity * BOUNCE_PARAMS.edgeNormalAbsorb;
+  var edge = simulateBounce(edgeVx, 0, 1790, bounds);
+  assert(edge.bounces <= 2, '边缘释放反弹次数受限 bounces=' + edge.bounces);
+  // 反弹后速度 1.6px/frame 衰减到 0.6 需 ~49 帧，累计滑行 ~56px（不足 widget 宽的 1/3）
+  assert(edge.x <= 1790 && edge.x >= 1690, '边缘释放后贴边停下（滑行 <100px）x=' + edge.x);
+
+  // 对照：不吸收时 22px/frame 从右墙反弹后滑行 ~700px（横穿大半屏）
+  var noAbsorb = simulateBounce(BOUNCE_PARAMS.maxVelocity, 0, 1790, bounds);
+  console.log('  吸收后滑行距离 ' + (1790 - edge.x).toFixed(0) + 'px vs 未吸收 ' + (1790 - noAbsorb.x).toFixed(0) + 'px');
+  assert(noAbsorb.x < edge.x - 100, '未吸收时从墙边滑出更远 x=' + noAbsorb.x + ' vs 吸收后 x=' + edge.x);
 
   // ── 总结 ──
   console.log('\n=== 总结 ===');

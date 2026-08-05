@@ -585,6 +585,7 @@ window.__sakanaPhysics = {
   computeCharState: computeCharState,
   computeReleaseVelocity: computeReleaseVelocity,
   applyFrameFriction: applyFrameFriction,
+  clampSakanaPosition: clampSakanaPosition,
   test: function () {
     var bounds = { width: 1920, height: 1080, widgetW: 180, widgetH: 180 };
     var baseline = { swingTimeStep: 0.08, swingDamping: 0.99 };
@@ -614,6 +615,18 @@ window.__sakanaPhysics = {
     return results;
   }
 };
+
+// 纯函数：把位置钳制到视口内（拖动 / 释放 / resize / scroll 全程保证完整可见、不越界）。
+// margin 为保留边距；当视口小于 widget 时退化为贴左上角（无法完整可见时的最优解，保证不越左/上界）。
+function clampSakanaPosition(left, top, viewportW, viewportH, widgetW, widgetH, margin) {
+  const m = margin == null ? 8 : margin;
+  const maxL = Math.max(0, viewportW - widgetW - m);
+  const maxT = Math.max(0, viewportH - widgetH - m);
+  return {
+    left: Math.min(Math.max(0, left), maxL),
+    top: Math.min(Math.max(0, top), maxT),
+  };
+}
 
 // 计算 Sakana 初始安全位置：所有页面统一放在视口右下角，
 // 避免因页面内容结构不同而改变浮层位置；移动端同样保证完整位于视口内。
@@ -713,7 +726,11 @@ function initSakanaDrag() {
     isDragging = true;
     userDragged = true; // 用户已开始交互，此后 resize 不再重置位置
     pointerId = e.pointerId;
-    widget.setPointerCapture?.(e.pointerId);
+    try {
+      if (widget.setPointerCapture) widget.setPointerCapture(e.pointerId);
+    } catch (err) {
+      // capture 失败（极少数浏览器/指针状态）不影响拖拽，window 级监听兜底
+    }
     widget.classList.add('dragging');
     initPosition();
     var sakana = window.sakanaInstance;
@@ -746,10 +763,10 @@ function initSakanaDrag() {
 
     var widgetW = widget.offsetWidth;
     var widgetH = widget.offsetHeight;
-    var viewportW = window.innerWidth;
-    var viewportH = window.innerHeight;
-    newLeft = Math.max(8, Math.min(viewportW - widgetW - 8, newLeft));
-    newTop = Math.max(8, Math.min(viewportH - widgetH - 8, newTop));
+    // 每次 move 都按当前视口/widget 尺寸钳制（覆盖拖拽中 resize 的极端情况）
+    var clamped = clampSakanaPosition(newLeft, newTop, window.innerWidth, window.innerHeight, widgetW, widgetH, 8);
+    newLeft = clamped.left;
+    newTop = clamped.top;
 
     setPos(newLeft, newTop);
 
@@ -774,14 +791,36 @@ function initSakanaDrag() {
     lastTime = now;
   };
 
-  var onPointerUp = function (e) {
-    if (!isDragging || (e && e.pointerId !== pointerId)) return;
+  // 统一结束拖拽：pointerup / pointercancel / lostpointercapture / window blur /
+  // visibilitychange / 窗口级兜底监听全部走这里收尾，保证 pointer capture、
+  // dragging 状态与物理状态一定被清理——不会「卡住 / 消失 / 继续跟随」。
+  // opts.computeVelocity === false 时（失焦/页面隐藏等非主动释放）不计算甩动速度，只恢复摇晃。
+  var finishDrag = function (e, opts) {
+    opts = opts || {};
+    if (!isDragging) return;
+    if (e && typeof e.pointerId === 'number' && e.pointerId !== pointerId) return;
     isDragging = false;
-    widget.releasePointerCapture?.(pointerId);
-    pointerId = null;
     widget.classList.remove('dragging');
+    var pid = pointerId;
+    pointerId = null;
+    if (pid != null && typeof widget.releasePointerCapture === 'function') {
+      try {
+        // capture 可能已被浏览器隐式释放（pointercancel/失焦），
+        // 此时 releasePointerCapture 会抛 NotFoundError，先查再放并兜底。
+        if (typeof widget.hasPointerCapture !== 'function' || widget.hasPointerCapture(pid)) {
+          widget.releasePointerCapture(pid);
+        }
+      } catch (err) { /* ignore */ }
+    }
 
-    if (samples.length >= 2) {
+    // 结束前把位置钳回视口内（覆盖 resize 缩小、scroll、边缘外释放等极端情况）
+    var clamped = clampSakanaPosition(leftPos, topPos, window.innerWidth, window.innerHeight, widget.offsetWidth, widget.offsetHeight, 8);
+    if (clamped.left !== leftPos || clamped.top !== topPos) setPos(clamped.left, clamped.top);
+
+    if (opts.computeVelocity === false) {
+      vx = 0;
+      vy = 0;
+    } else if (samples.length >= 2) {
       var vel = computeReleaseVelocity(samples);
       vx = vel.vx;
       vy = vel.vy;
@@ -839,12 +878,17 @@ function initSakanaDrag() {
     startBounce();
   };
 
+  var onPointerUp = function (e) { finishDrag(e, { computeVelocity: true }); };
+  // pointercancel / lostpointercapture 等同主动释放（浏览器已结束指针流）
+  var onPointerCancel = function (e) { finishDrag(e, { computeVelocity: true }); };
+  // 窗口失焦 / 页面隐藏：非主动释放，不计算甩动速度，只清理状态并恢复摇晃
+  var onWindowBlur = function () { finishDrag(null, { computeVelocity: false }); };
+  var onVisibilityChange = function () {
+    if (document.visibilityState === 'hidden') finishDrag(null, { computeVelocity: false });
+  };
+
   var startBounce = function () {
     if (animId) cancelAnimationFrame(animId);
-    var viewportW = window.innerWidth;
-    var viewportH = window.innerHeight;
-    var widgetW = widget.offsetWidth;
-    var widgetH = widget.offsetHeight;
     bounceCount = 0;
     var lastFrameTime = null;
 
@@ -860,35 +904,54 @@ function initSakanaDrag() {
       vx *= decay;
       vy *= decay;
 
+      // 每帧读取视口/widget 尺寸：弹跳期间发生 resize 时边界始终正确
+      var viewportW = window.innerWidth;
+      var viewportH = window.innerHeight;
+      var widgetW = widget.offsetWidth;
+      var widgetH = widget.offsetHeight;
+      // 视口小于 widget 时边界退化为 0（无法完整可见时的最优解），保证不越左/上界
+      var maxLeft = Math.max(0, viewportW - widgetW);
+      var maxTop = Math.max(0, viewportH - widgetH);
+
       var nextLeft = leftPos + vx * timeScale;
       var nextTop = topPos + vy * timeScale;
       var bounced = false;
       var impactVx = 0;
       var impactVy = 0;
 
-      // 碰撞前保存碰撞前速度
-      if (nextLeft <= 0 && vx < 0) {
-        impactVx = vx;
+      // 碰撞：位置越界一律钳回边界（即使 vx 方向不朝墙、或起点已越界），
+      // 仅当速度指向边界时才反弹——保证不穿透、不抖动、不整屏飞出，
+      // 也覆盖「resize 缩小后起点越界」的极端情况。
+      if (nextLeft <= 0) {
         nextLeft = 0;
-        vx = Math.min(Math.abs(vx) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
-        bounced = true;
-      } else if (nextLeft >= viewportW - widgetW && vx > 0) {
-        impactVx = vx;
-        nextLeft = viewportW - widgetW;
-        vx = -Math.min(Math.abs(vx) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
-        bounced = true;
+        if (vx < 0) {
+          impactVx = vx;
+          vx = Math.min(Math.abs(vx) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
+          bounced = true;
+        }
+      } else if (nextLeft >= maxLeft) {
+        nextLeft = maxLeft;
+        if (vx > 0) {
+          impactVx = vx;
+          vx = -Math.min(Math.abs(vx) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
+          bounced = true;
+        }
       }
 
-      if (nextTop <= 0 && vy < 0) {
-        impactVy = vy;
+      if (nextTop <= 0) {
         nextTop = 0;
-        vy = Math.min(Math.abs(vy) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
-        bounced = true;
-      } else if (nextTop >= viewportH - widgetH && vy > 0) {
-        impactVy = vy;
-        nextTop = viewportH - widgetH;
-        vy = -Math.min(Math.abs(vy) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
-        bounced = true;
+        if (vy < 0) {
+          impactVy = vy;
+          vy = Math.min(Math.abs(vy) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
+          bounced = true;
+        }
+      } else if (nextTop >= maxTop) {
+        nextTop = maxTop;
+        if (vy > 0) {
+          impactVy = vy;
+          vy = -Math.min(Math.abs(vy) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
+          bounced = true;
+        }
       }
 
       if (bounced) {
@@ -917,11 +980,49 @@ function initSakanaDrag() {
 
   // 内部弹簧由 SakanaWidget._run 驱动，不再需要独立 swing 动画
 
+  // 窗口级兜底：capture 生效时同一事件已被 widget 处理过（冒泡至此），
+  // 用 hasPointerCapture 跳过；capture 失效/未生效（setPointerCapture 失败、
+  // 指针移出窗口、旧浏览器）时由这里继续处理，保证拖拽不断触、释放必收尾。
+  var onWindowPointerMove = function (e) {
+    if (pointerId != null && widget.hasPointerCapture && widget.hasPointerCapture(pointerId)) return;
+    onPointerMove(e);
+  };
+  var onWindowPointerUp = function (e) {
+    if (pointerId != null && widget.hasPointerCapture && widget.hasPointerCapture(pointerId)) return;
+    finishDrag(e, { computeVelocity: true });
+  };
+
+  // resize：用户尚未拖动时重新定位到统一安全位置；已拖动/正在拖动时
+  // 保持用户位置、仅钳回视口内（防止窗口缩小后 widget 卡在界外）。
+  var onWindowResize = function () {
+    if (!userDragged) {
+      repositionIfNotDragged();
+      return;
+    }
+    var clamped = clampSakanaPosition(leftPos, topPos, window.innerWidth, window.innerHeight, widget.offsetWidth, widget.offsetHeight, 8);
+    if (clamped.left !== leftPos || clamped.top !== topPos) setPos(clamped.left, clamped.top);
+  };
+
+  // scroll：fixed 定位不受页面滚动影响，此处仅做防御性钳制
+  // （覆盖极端布局/嵌入场景下位置被推挤越界的情况）。
+  var onWindowScroll = function () {
+    if (isDragging) return; // 拖拽中由 pointermove 每帧钳制
+    var clamped = clampSakanaPosition(leftPos, topPos, window.innerWidth, window.innerHeight, widget.offsetWidth, widget.offsetHeight, 8);
+    if (clamped.left !== leftPos || clamped.top !== topPos) setPos(clamped.left, clamped.top);
+  };
+
   widget.addEventListener('pointerdown', onPointerDown);
   widget.addEventListener('pointermove', onPointerMove);
   widget.addEventListener('pointerup', onPointerUp);
-  widget.addEventListener('pointercancel', onPointerUp);
-  widget.addEventListener('lostpointercapture', onPointerUp);
+  widget.addEventListener('pointercancel', onPointerCancel);
+  widget.addEventListener('lostpointercapture', onPointerCancel);
+  window.addEventListener('pointermove', onWindowPointerMove);
+  window.addEventListener('pointerup', onWindowPointerUp);
+  window.addEventListener('pointercancel', onWindowPointerUp);
+  window.addEventListener('blur', onWindowBlur);
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  window.addEventListener('resize', onWindowResize);
+  window.addEventListener('scroll', onWindowScroll, true);
 
   // Sakana 初始加载时立即定位到安全空白区（不依赖字体加载完成，
   // 避免初始位置停留在 CSS 默认的视口右下角、遮挡方向区内容）
@@ -930,8 +1031,6 @@ function initSakanaDrag() {
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(repositionIfNotDragged);
   }
-  // 窗口尺寸变化时：仅在用户尚未拖动前重新定位；用户拖动后保持用户位置
-  window.addEventListener('resize', repositionIfNotDragged);
 }
 
 // ── Steam 资料（解析个人主页 HTML）──
