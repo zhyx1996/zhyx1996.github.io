@@ -1,7 +1,10 @@
 const TEXT = `基于 GitHub Pages 的个人主页，展示个人简介、公开仓库、Star 项目、博客文章，以及部分公开信息嵌入示例。由 AI 辅助设计与构建。页面结构：index.html 主页，含个人方向、近期关注、文章摘要、Steam 游戏、石蒜模拟器；projects.html 公开仓库展示；stars.html GitHub Stars 展示；articles.html 博客园文章展示；app.js 数据渲染与交互逻辑（API 集成、动画、拖拽）；styles.css 全站样式（含响应式断点）；public/pretext-effect.js 浮动小球动画引擎。技术特性：原生 HTML / CSS / JavaScript，无构建工具；Sakana Widget（石蒜模拟器）集成，支持鼠标/触摸拖拽；浮动小球弹跳动画，边界约束与拖拽；GitHub API 集成（仓库、Stars、个人信息）；Steam 游戏库展示；博客园文章聚合；响应式布局（桌面 / 平板 / 移动端）。本地预览：python -m http.server 8000。校验：node --check app.js。部署：提交到 main 分支后由 GitHub Pages 自动发布。`;
 
 const DEFAULT_LINE_HEIGHT = 24;
-const ORB_TEXT_GAP = 1;
+// 参照 the-editorial-engine demo：hPad=14 / vPad=4，球周围固定横向/纵向
+// 留白，左右两侧的最小间隙相同、观感对称，字距恒定、不随球伸缩。
+const ORB_H_PAD = 14;
+const ORB_V_PAD = 4;
 const MIN_SLOT_WIDTH_BASE = 2.2;
 const TEXT_PADDING = 16;
 
@@ -104,20 +107,22 @@ function initOrbs() {
 }
 
 function circleIntervalForBand(orb, bandTop, bandBottom) {
-    if (bandTop >= orb.y + orb.r || bandBottom <= orb.y - orb.r) return null;
-    const minDy = orb.y >= bandTop && orb.y <= bandBottom
+    const top = bandTop - ORB_V_PAD;
+    const bottom = bandBottom + ORB_V_PAD;
+    if (top >= orb.y + orb.r || bottom <= orb.y - orb.r) return null;
+    const minDy = orb.y >= top && orb.y <= bottom
         ? 0
-        : orb.y < bandTop ? bandTop - orb.y : orb.y - bandBottom;
+        : orb.y < top ? top - orb.y : orb.y - bottom;
     if (minDy >= orb.r) return null;
     const halfWidth = Math.sqrt(orb.r * orb.r - minDy * minDy);
     return {
-        left: orb.x - halfWidth - ORB_TEXT_GAP,
-        right: orb.x + halfWidth + ORB_TEXT_GAP,
+        left: orb.x - halfWidth - ORB_H_PAD,
+        right: orb.x + halfWidth + ORB_H_PAD,
     };
 }
 
 function carveTextLineSlots(base, blocked) {
-    let slots = [{ left: base.left, right: base.right, orbRight: false }];
+    let slots = [base];
     for (const interval of blocked.sort((a, b) => a.left - b.left)) {
         const next = [];
         for (const slot of slots) {
@@ -125,9 +130,8 @@ function carveTextLineSlots(base, blocked) {
                 next.push(slot);
                 continue;
             }
-            // 右侧被圆球截断的槽位：文字要贴住圆球左缘（orbRight=true）。
-            if (interval.left > slot.left) next.push({ left: slot.left, right: interval.left, orbRight: true });
-            if (interval.right < slot.right) next.push({ left: interval.right, right: slot.right, orbRight: slot.orbRight });
+            if (interval.left > slot.left) next.push({ left: slot.left, right: interval.left });
+            if (interval.right < slot.right) next.push({ left: interval.right, right: slot.right });
         }
         slots = next;
     }
@@ -195,13 +199,10 @@ function renderText() {
                 graphemeIndex++;
             }
             if (graphemeIndex === start) continue;
-            // 字距保持恒定（不随球移动变化）：球左侧槽位改为「右对齐」，
-            // 让文字右缘贴住圆球左缘（与球右侧的紧贴一致）。拖拽/弹跳时
-            // 文字整体滑动、不伸缩，效果更稳。右缘由精确字形宽求得，误差 <1px。
+            // 参照 demo：行统一左对齐、左缘贴列边，字距恒定，不随球移动
+            // 额外调整。球两侧由 ORB_H_PAD 保证固定最小间隙，观感对称。
             lines.push({
-                left: slot.orbRight && slot.right - textWidth > slot.left
-                    ? slot.right - textWidth
-                    : slot.left,
+                left: slot.left,
                 top: y,
                 text: graphemes.slice(start, graphemeIndex).join(''),
             });

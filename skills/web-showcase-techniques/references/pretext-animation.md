@@ -33,12 +33,11 @@ function circleIntervalForBand(orb, bandTop, bandBottom) {
 
 ### 2. 区间切割（Interval Carving）
 
-从完整行宽中减去所有被遮挡区间，得到可用文字槽位。每个槽位额外记录
-`orbRight`：槽位右缘是否被圆球截断（用于第 5 节的右对齐）。
+从完整行宽中减去所有被遮挡区间，得到可用文字槽位。
 
 ```javascript
 function carveTextLineSlots(base, blocked) {
-  let slots = [{ left: base.left, right: base.right, orbRight: false }];
+  let slots = [base];
   for (const interval of blocked.sort((a, b) => a.left - b.left)) {
     const next = [];
     for (const slot of slots) {
@@ -47,9 +46,9 @@ function carveTextLineSlots(base, blocked) {
         continue;
       }
       if (interval.left > slot.left)
-        next.push({ left: slot.left, right: interval.left, orbRight: true });
+        next.push({ left: slot.left, right: interval.left });
       if (interval.right < slot.right)
-        next.push({ left: interval.right, right: slot.right, orbRight: slot.orbRight });
+        next.push({ left: interval.right, right: slot.right });
     }
     slots = next;
   }
@@ -101,24 +100,39 @@ while (graphemeIndex < graphemes.length) {
 }
 ```
 
-### 5. 槽位右对齐（字距恒定）
+### 5. 行左对齐 + 球固定留白（参照 demo）
 
-圆球左侧的槽位若只做左对齐，会因打包余量留下最多一个字形宽的空隙，
-视觉上「左边距文字有段距离」。若用两端对齐（改字距）填满，拖拽小球时
-字距会逐帧变化、文字一伸一缩，观感不稳。因此这里保持字距恒定（CSS
-基础 `letter-spacing` 不变），改为**右对齐**：利用第 3 节的精确字形宽
-算出整段文字宽度，把左边缘挪到「槽位右缘 - 段宽」，使文字右缘精确贴住
-圆球左缘（与球右侧从圆球右缘开始天然紧贴一致）。拖拽时文字整体滑动，
-不伸缩。
+参照 the-editorial-engine demo 的做法：行统一左对齐、左缘贴列边，字距恒定，
+位置不随球移动额外调整（拖拽时文字稳定）。球两侧的间隙由固定的
+`ORB_H_PAD` 兜底——右侧文字从「球右缘 + ORB_H_PAD」开始，左侧文字最迟
+在「球左缘 − ORB_H_PAD」换行，两侧最小间隙相同、观感对称；贪心打包留下
+的多余空隙（最多一字宽）是左对齐换行的自然结果。
 
 ```javascript
 lines.push({
-  left: slot.orbRight && slot.right - textWidth > slot.left
-    ? slot.right - textWidth   // 右对齐到圆球左缘
-    : slot.left,               // 普通槽位保持左对齐
+  left: slot.left,           // 恒为列起始边
   top: y,
   text: graphemes.slice(start, graphemeIndex).join(''),
 });
+```
+
+圆球碰撞区额外加入垂直留白 `ORB_V_PAD`，避免行贴近球的上下边缘：
+
+```javascript
+function circleIntervalForBand(orb, bandTop, bandBottom) {
+  const top = bandTop - ORB_V_PAD;
+  const bottom = bandBottom + ORB_V_PAD;
+  if (top >= orb.y + orb.r || bottom <= orb.y - orb.r) return null;
+  const minDy = orb.y >= top && orb.y <= bottom
+    ? 0
+    : orb.y < top ? top - orb.y : orb.y - bottom;
+  if (minDy >= orb.r) return null;
+  const halfWidth = Math.sqrt(orb.r * orb.r - minDy * minDy);
+  return {
+    left: orb.x - halfWidth - ORB_H_PAD,
+    right: orb.x + halfWidth + ORB_H_PAD,
+  };
+}
 ```
 
 ### 6. 条件重排（性能优化）
@@ -171,11 +185,12 @@ function hitTest(p) {
 
 | 常量 | 值 | 用途 |
 |------|---|------|
-| `ORB_TEXT_GAP` | 1px | 文字与 orb 间距 |
+| `ORB_H_PAD` | 14px | 球与文字固定横向留白（左右相同，参照 demo） |
+| `ORB_V_PAD` | 4px | 球与文字纵向留白（避免行贴住球上下缘） |
 | `MIN_SLOT_WIDTH_BASE` | 2.2（×字号） | 最小可用槽宽（相对字号） |
 | `TEXT_SYNC_THRESHOLD` | 1px | 触发重排的最小位移 |
 | `TEXT_PADDING` | 16px | 文字列左右留白 |
 | `glyphWidthCache` | 按字体缓存的字形宽 | 精确测量，避免 Canvas 偏差 |
-| `baseLetterSpacing` | CSS 基础字距 | 对齐时在此之上摊余量 |
+| `baseLetterSpacing` | CSS 基础字距 | 恒定，不随球伸缩 |
 | orb 半径 | `min(W,H) * 0.08` | 响应式大小 |
 | orb 速度 | 12-18 px/s | 缓慢漂浮 |
