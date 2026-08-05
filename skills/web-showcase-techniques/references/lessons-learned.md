@@ -123,6 +123,10 @@ page-agent 注入的是运行时元素，有几处易踩的坑：
 - **库在任务开始再次 show() 时会写回 `translateX(-50%)`**（假设 left:50% 居中），
   与本站 `left:24px` 叠加 → 面板左移半宽出屏。用 CSS `transform: translateY(0) !important`
   钉住即可（代价是收起动画没了，位置正确）。
+- **千万别给面板设 `overflow: auto` 或 `max-height`**：库的面板 `--height` 恒为
+  40px，输入栏与历史区是用绝对定位放在 `top/bottom: var(--height)` 处、靠 wrapper
+  默认 `overflow:visible` **溢出显示**的。设了 `overflow:auto` 会把输入栏裁掉
+  （表现为"输入栏显示不全"）。滚动交给历史区自身的 `max-height + overflow-y:auto`。
 - **测试要本地化脚本**：page-agent 从 jsdelivr 加载，大陆测试环境拉不到 → 面板
   不注入、无法验收。临时把 `page-agent.demo.js` 下载到 `public/` 并在 index.html
   指到本地，验完再还原（别提交测试文件）。
