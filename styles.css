@@ -1218,10 +1218,8 @@ a:hover { opacity: 0.8; }
    兜底不参与具体页面布局（主页 hero 分离布局 / 非主页 banner 均
    由 app.js initPageAgentPlacement 按可见布局计算），因此这里只做
    保守定位：放在左下角（左侧导航栏下方），避开右下角 Sakana。
-   底边 88px 让出返回顶部按钮（left:24 bottom:24 高 40px）。
-   :not() 排除运行时辅助元素（如 simulator-mask 全屏遮罩，其 id 同样
-   含 "page-agent"，不能被压成左下角小块）。 */
-:where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]):not([id*="simulator" i]):not([class*="simulator" i]):not([id*="mask" i]):not([class*="mask" i]) {
+   底边 88px 让出返回顶部按钮（left:24 bottom:24 高 40px）。 */
+:where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
     position: fixed;
     top: auto;
     bottom: 88px;
@@ -1233,16 +1231,6 @@ a:hover { opacity: 0.8; }
     max-width: calc(100vw - 40px);
     max-height: calc(100vh - 96px);
     overflow: auto;
-    /* 钉住 transform：page-agent 在任务开始（running）等时机再次 show() 时会
-       写回它默认的 translateX(-50%)（假设 left:50% 居中），与本站 left 边距
-       叠加会把面板左移半个宽度导致出屏。!important 让 inline style 也无法覆盖。 */
-    transform: translateY(0) !important;
-}
-
-/* page-agent 的全屏模拟遮罩（simulator-mask）保持原样全屏，但穿透点击，
-   避免卡住页面；其操作高亮/光标渲染不受 pointer-events 影响。 */
-:where(#page-agent-runtime_simulator-mask, [id*="simulator-mask" i], [class*="simulator" i]) {
-    pointer-events: none !important;
 }
 
 /* ── 无障碍 ── */
@@ -1364,7 +1352,7 @@ a:hover { opacity: 0.8; }
 }
 
 @media (max-width: 600px) {
-    :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]):not([id*="simulator" i]):not([class*="simulator" i]):not([id*="mask" i]):not([class*="mask" i]) {
+    :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
         top: auto;
         bottom: 88px;
         left: 12px;
