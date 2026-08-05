@@ -3,6 +3,30 @@
 > 记录 zhyx1996.github.io 维护过程中遇到的坑与对策。
 > 持续更新，供后续 AI 协作直接复用。
 
+## 0. 访问外链一律走代理（127.0.0.1:18808）
+
+大陆网络访问 GitHub、Google、opencode.ai 等外网经常失败/超时。
+**凡是要访问外链资源（API、网页、git push、模型等），统一走本机代理：**
+
+```bash
+# 通用环境变量（PowerShell 当前会话）
+$env:HTTPS_PROXY="http://127.0.0.1:18808"
+$env:HTTP_PROXY="http://127.0.0.1:18808"
+$env:NO_PROXY="localhost,127.0.0.1,172.30.194.57"
+
+# git push
+git -c http.proxy=http://127.0.0.1:18808 -c https.proxy=http://127.0.0.1:18808 push origin main
+
+# 通用请求（PowerShell）
+Invoke-WebRequest -Uri "<url>" -Proxy "http://127.0.0.1:18808"
+
+# opencode 视觉子代理（opencode run）
+$env:HTTPS_PROXY="http://127.0.0.1:18808"; opencode run --model opencode-go/gpt-5.6-luna "..."
+```
+
+注意：`HTTP_PROXY/HTTPS_PROXY` 已持久化到用户环境变量，重启 opencode 后
+会话内的视觉子代理即可直接用代理；本机/内网（localhost、172.30.194.57）走 `NO_PROXY` 豁免。
+
 ## 1. Playwright 自动化：卡住的根因与对策
 
 **症状**：`playwright-cli open <url>` 经常长时间无输出，最终被工具超时判定"卡死"。
@@ -71,7 +95,7 @@
 
 大陆直连 `git push origin main` 会报
 `schannel: failed to receive handshake, SSL/TLS connection failed`。
-走本机代理即可：
+走代理即可（见第 0 节），例如：
 
 ```bash
 git -c http.proxy=http://localhost:18808 -c https.proxy=http://localhost:18808 push origin main
