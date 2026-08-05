@@ -185,7 +185,7 @@ function hitTest(p) {
 
 | 常量 | 值 | 用途 |
 |------|---|------|
-| `ORB_H_PAD` | 14px | 球与文字固定横向留白（左右相同，参照 demo） |
+| `ORB_H_PAD` | 8px | 球与文字固定横向留白（左右相同，参照 demo 思路） |
 | `ORB_V_PAD` | 4px | 球与文字纵向留白（避免行贴住球上下缘） |
 | `MIN_SLOT_WIDTH_BASE` | 2.2（×字号） | 最小可用槽宽（相对字号） |
 | `TEXT_SYNC_THRESHOLD` | 1px | 触发重排的最小位移 |

@@ -1,9 +1,9 @@
 const TEXT = `基于 GitHub Pages 的个人主页，展示个人简介、公开仓库、Star 项目、博客文章，以及部分公开信息嵌入示例。由 AI 辅助设计与构建。页面结构：index.html 主页，含个人方向、近期关注、文章摘要、Steam 游戏、石蒜模拟器；projects.html 公开仓库展示；stars.html GitHub Stars 展示；articles.html 博客园文章展示；app.js 数据渲染与交互逻辑（API 集成、动画、拖拽）；styles.css 全站样式（含响应式断点）；public/pretext-effect.js 浮动小球动画引擎。技术特性：原生 HTML / CSS / JavaScript，无构建工具；Sakana Widget（石蒜模拟器）集成，支持鼠标/触摸拖拽；浮动小球弹跳动画，边界约束与拖拽；GitHub API 集成（仓库、Stars、个人信息）；Steam 游戏库展示；博客园文章聚合；响应式布局（桌面 / 平板 / 移动端）。本地预览：python -m http.server 8000。校验：node --check app.js。部署：提交到 main 分支后由 GitHub Pages 自动发布。`;
 
 const DEFAULT_LINE_HEIGHT = 24;
-// 参照 the-editorial-engine demo：hPad=14 / vPad=4，球周围固定横向/纵向
-// 留白，左右两侧的最小间隙相同、观感对称，字距恒定、不随球伸缩。
-const ORB_H_PAD = 14;
+// 参照 the-editorial-engine demo：球周围固定横向/纵向留白，左右两侧的
+// 最小间隙相同、观感对称，字距恒定、不随球伸缩。
+const ORB_H_PAD = 8;
 const ORB_V_PAD = 4;
 const MIN_SLOT_WIDTH_BASE = 2.2;
 const TEXT_PADDING = 16;
