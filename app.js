@@ -335,6 +335,135 @@ async function loadMarket() {
   }
 }
 
+// ── Sakana 调试诊断模式（仅显式开启，默认关闭且零日志）──
+// 开启：URL 查询参数 ?sakana-debug=1，或 localStorage 中 sakana-debug=1
+//（URL 参数存在时优先于 localStorage；?sakana-debug=0 可强制关闭）。
+// 开启后所有日志以 console.debug('[Sakana]', ...) 输出；事件同时写入
+// window.__sakanaDebug.events 环形缓冲（默认 500 条，最旧自动覆盖），
+// 可用 getEvents() 取回（数据均为可序列化值）。getState() 返回组件几何
+// 与 sakana 运行状态。诊断只读不改：不参与任何物理计算，日志自身抛错
+// 会被吞掉，绝不中断或改变拖拽交互；window.__sakanaDebug.enabled 也可
+// 在控制台运行时置 true/false 动态开关。
+var sakanaDebug = (function () {
+  var enabled = false;
+  var MAX_EVENTS = 500;
+  var ring = new Array(MAX_EVENTS); // 环形缓冲本体
+  var head = 0;   // 下一个写入位置
+  var count = 0;  // 当前有效条数
+
+  try {
+    var params = new URLSearchParams(window.location.search);
+    if (params.has('sakana-debug')) {
+      enabled = params.get('sakana-debug') === '1';
+    } else {
+      enabled = window.localStorage.getItem('sakana-debug') === '1';
+    }
+  } catch (e) {
+    enabled = false; // localStorage/URL 不可用时保持关闭
+  }
+
+  // 只保留可序列化值：JSON round-trip 丢弃函数/循环引用，保证缓冲内
+  // 数据可被 JSON.stringify（getEvents() 结果可直接序列化/传输）
+  var sanitize = function (v) {
+    var s = JSON.stringify(v);
+    return s === undefined ? null : JSON.parse(s);
+  };
+
+  // 环形缓冲写入
+  var push = function (entry) {
+    ring[head] = entry;
+    head = (head + 1) % MAX_EVENTS;
+    if (count < MAX_EVENTS) count++;
+  };
+
+  // 命中元素的安全描述（tag/id/class 均为字符串，兼容 SVG 的 className）
+  var describeTarget = function (el) {
+    try {
+      if (!el) return null;
+      var out = {};
+      if (el.tagName) out.tag = String(el.tagName).toLowerCase();
+      if (el.id) out.id = String(el.id);
+      var cls = el.className;
+      if (cls != null) {
+        out.class = typeof cls === 'string' ? cls : (cls.baseVal != null ? String(cls.baseVal) : '');
+      }
+      return out;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  var api = {
+    enabled: enabled,        // 初始由 URL/localStorage 检测；可运行时改写
+    maxEvents: MAX_EVENTS,
+    events: ring,            // 环形缓冲本体（调试器内直查；脚本读取用 getEvents()）
+    log: function (type, data) {
+      if (!api.enabled) return;
+      var entry;
+      try {
+        entry = { t: Date.now(), type: String(type), data: data == null ? null : sanitize(data) };
+      } catch (e) {
+        return; // 数据不可序列化时丢弃本条，绝不抛错
+      }
+      push(entry);
+      try {
+        console.debug('[Sakana]', entry.type, entry.data);
+      } catch (e) { /* console 被改写也不影响页面 */ }
+    },
+    clear: function () {
+      head = 0;
+      count = 0;
+      for (var i = 0; i < MAX_EVENTS; i++) ring[i] = undefined;
+      return api;
+    },
+    getEvents: function () {
+      var out = [];
+      var start = count < MAX_EVENTS ? 0 : head;
+      for (var i = 0; i < count; i++) {
+        out.push(ring[(start + i) % MAX_EVENTS]);
+      }
+      return out;
+    },
+    describeTarget: describeTarget,
+    getState: function () {
+      try {
+        var widget = document.getElementById('sakana-drag-widget');
+        var sakana = window.sakanaInstance;
+        var rect = null;
+        var cls = null;
+        if (widget) {
+          var r = widget.getBoundingClientRect();
+          rect = { left: r.left, top: r.top, width: r.width, height: r.height };
+          cls = typeof widget.className === 'string' ? widget.className : '';
+        }
+        var state = null;
+        if (sakana && sakana._state) {
+          try {
+            state = JSON.parse(JSON.stringify(sakana._state));
+          } catch (e) {
+            state = {
+              r: sakana._state.r, y: sakana._state.y,
+              w: sakana._state.w, t: sakana._state.t,
+              i: sakana._state.i, d: sakana._state.d
+            };
+          }
+        }
+        return {
+          enabled: api.enabled,
+          widget: widget ? { rect: rect, className: cls } : null,
+          sakana: sakana ? { running: !!sakana._running, state: state } : null
+        };
+      } catch (e) {
+        return null;
+      }
+    }
+  };
+  return api;
+})();
+
+// 暴露调试接口（未开启时调用同样安全、无输出）
+window.__sakanaDebug = sakanaDebug;
+
 // ── Sakana 拖拽小球（物理弹跳）──
 // 物理参数：晃动更慢、幅度更大；平移与视觉摇摆分离；能量有上限防累积
 const SAKANA_PHYSICS = {
@@ -741,9 +870,18 @@ function initSakanaDrag() {
   var widget = document.getElementById('sakana-drag-widget');
   if (!widget) return;
 
+  sakanaDebug.log('init', {
+    widget: sakanaDebug.describeTarget(widget),
+    rect: (function () {
+      var r = widget.getBoundingClientRect();
+      return { left: r.left, top: r.top, width: r.width, height: r.height };
+    })()
+  });
+
   var isDragging = false;
   var vx = 0, vy = 0;
   var lastX, lastY, lastTime;
+  var lastMoveLogAt = 0; // pointermove 调试日志节流时间戳（每 50ms 至多一条）
   var animId = null;
   var samples = []; // 拖动指针采样 [{ x, y, t }]，释放时做时间归一化速度计算
   var leftPos = 0, topPos = 0;
@@ -814,16 +952,38 @@ function initSakanaDrag() {
   };
 
   var onPointerDown = function (e) {
-    if (isDragging || (e.pointerType === 'mouse' && e.button !== 0)) return;
-    if (e.target.closest('.sakana-widget-ctrl')) return;
+    var downInfo = {
+      pointerId: e.pointerId,
+      pointerType: e.pointerType,
+      button: e.button,
+      target: sakanaDebug.describeTarget(e.target),
+      x: e.clientX,
+      y: e.clientY
+    };
+    if (isDragging || (e.pointerType === 'mouse' && e.button !== 0)) {
+      sakanaDebug.log('pointerdown', Object.assign({ ignored: isDragging ? 'already-dragging' : 'not-primary-button' }, downInfo));
+      return;
+    }
+    if (e.target.closest('.sakana-widget-ctrl')) {
+      sakanaDebug.log('pointerdown', Object.assign({ ignored: 'ctrl' }, downInfo));
+      return;
+    }
     var xy = getXY(e);
     isDragging = true;
     userDragged = true; // 用户已开始交互，此后 resize 不再重置位置
     pointerId = e.pointerId;
     try {
-      if (widget.setPointerCapture) widget.setPointerCapture(e.pointerId);
+      if (widget.setPointerCapture) {
+        widget.setPointerCapture(e.pointerId);
+        sakanaDebug.log('setPointerCapture', { ok: true, pointerId: e.pointerId });
+      }
     } catch (err) {
       // capture 失败（极少数浏览器/指针状态）不影响拖拽，window 级监听兜底
+      sakanaDebug.log('setPointerCapture', {
+        ok: false,
+        pointerId: e.pointerId,
+        error: err && err.message ? String(err.message) : String(err)
+      });
     }
     widget.classList.add('dragging');
     initPosition();
@@ -835,13 +995,18 @@ function initSakanaDrag() {
     lastX = xy.x;
     lastY = xy.y;
     lastTime = Date.now();
+    if (animId) {
+      cancelAnimationFrame(animId);
+      sakanaDebug.log('bounce-stop', { reason: 'pointerdown', bounceCount: bounceCount, vx: vx, vy: vy, left: leftPos, top: topPos });
+      animId = null;
+    }
     vx = 0;
     vy = 0;
     samples = [{ x: xy.x, y: xy.y, t: lastTime }];
     bounceCount = 0;
-    if (animId) { cancelAnimationFrame(animId); animId = null; }
     if (swingAnimId) { cancelAnimationFrame(swingAnimId); swingAnimId = null; }
     e.preventDefault();
+    sakanaDebug.log('pointerdown', downInfo);
   };
 
   var onPointerMove = function (e) {
@@ -883,6 +1048,18 @@ function initSakanaDrag() {
     lastX = xy.x;
     lastY = xy.y;
     lastTime = now;
+
+    // 调试节流采样：每 50ms 至多一条（不随事件/RAF 频率刷屏）
+    if (now - lastMoveLogAt >= 50) {
+      lastMoveLogAt = now;
+      sakanaDebug.log('pointermove', {
+        pointerId: e.pointerId,
+        dx: dx, dy: dy,
+        dtMs: dtMs,
+        vx: vx, vy: vy,
+        x: xy.x, y: xy.y
+      });
+    }
   };
 
   // 统一结束拖拽：pointerup / pointercancel / lostpointercapture / window blur /
@@ -893,7 +1070,7 @@ function initSakanaDrag() {
   // 所有路径统一走 resolveSakanaRelease：失焦 / 页面隐藏等非主动释放同样
   // 保留最后一次有效甩动速度（窗口外松手时常只有 blur 到达），边缘法向吸收
   // 只作用于平移回弹，角色初始角度按真实甩动方向/速度计算。
-  var finishDrag = function (e) {
+  var finishDrag = function (e, reason) {
     if (!isDragging) return;
     if (e && typeof e.pointerId === 'number' && e.pointerId !== pointerId) return;
     isDragging = false;
@@ -920,16 +1097,38 @@ function initSakanaDrag() {
     // vx/vy 在此调用前仍是拖动期间最后一次 move 计算的有效速度（尚未被
     // release 结果覆盖），作为 fallback 传给所有收尾路径共享的释放链——
     // 快速拖动并在窗口外松手、采样不足时仍保证整体有轻微回弹。
+    var fallbackVx = vx;
+    var fallbackVy = vy;
+    var usedFallback = !(Array.isArray(samples) && samples.length >= 2);
+    // 解析前速度：采样窗口速度，采样不足时为 fallback（与 release 使用同一纯函数）
+    var preVel = computeFinalVelocity(samples, {
+      maxVelocity: SAKANA_PHYSICS.maxVelocity,
+      fallbackVx: fallbackVx,
+      fallbackVy: fallbackVy
+    });
     var release = resolveSakanaRelease(
       samples, leftPos, topPos,
       window.innerWidth, window.innerHeight,
       widget.offsetWidth, widget.offsetHeight,
       sakana ? sakana._state.r : 0,
       sakana ? sakana._state.y : 0,
-      { fallbackVx: vx, fallbackVy: vy }
+      { fallbackVx: fallbackVx, fallbackVy: fallbackVy }
     );
     vx = release.vx;
     vy = release.vy;
+
+    // 调试：收尾原因、采样数量、fallback 使用、释放解析前后速度与边缘吸收
+    sakanaDebug.log('drag-end', {
+      reason: reason || (e && e.type) || 'unknown',
+      pointerId: (e && typeof e.pointerId === 'number') ? e.pointerId : null,
+      samplesCount: samples.length,
+      usedFallback: usedFallback,
+      preVel: preVel,                                   // 解析前（采样速度或 fallback）
+      vx: release.vx, vy: release.vy,                   // 解析后平移速度（边缘法向已吸收）
+      charVx: release.charVx, charVy: release.charVy,   // 角色弹簧真实甩动速度（未吸收）
+      absorbed: release.vx !== release.charVx || release.vy !== release.charVy,
+      left: leftPos, top: topPos
+    });
 
     if (sakana) {
       // 参考官方实现（_onMouseUp）：释放时保留当前姿态，只恢复弹簧 _run；
@@ -948,19 +1147,26 @@ function initSakanaDrag() {
         if (typeof sakana._run === 'function') sakana._run();
       }
       sakana._draw();
+      // 调试：角色弹簧初始状态（r/y/w/t/i/d）
+      sakanaDebug.log('char-state', {
+        r: release.state.r, y: release.state.y,
+        w: release.state.w, t: release.state.t,
+        i: release.state.i, d: release.state.d
+      });
     }
 
     startBounce();
   };
 
-  var onPointerUp = function (e) { finishDrag(e); };
+  // 收尾原因显式传入：同一 e.type 区分 widget 主动事件与 window 兜底监听
+  var onPointerUp = function (e) { finishDrag(e, e.type); };
   // pointercancel / lostpointercapture 等同主动释放（浏览器已结束指针流）
-  var onPointerCancel = function (e) { finishDrag(e); };
+  var onPointerCancel = function (e) { finishDrag(e, e.type); };
   // 窗口失焦 / 页面隐藏：非主动释放，但同样保留最后有效甩动速度（窗口外
   // 松手时常只有 blur 到达），由 resolveSakanaRelease 统一计算
-  var onWindowBlur = function () { finishDrag(null); };
+  var onWindowBlur = function () { finishDrag(null, 'window-blur'); };
   var onVisibilityChange = function () {
-    if (document.visibilityState === 'hidden') finishDrag(null);
+    if (document.visibilityState === 'hidden') finishDrag(null, 'visibilitychange');
   };
 
   var startBounce = function () {
@@ -994,6 +1200,7 @@ function initSakanaDrag() {
       var bounced = false;
       var impactVx = 0;
       var impactVy = 0;
+      var hitEdges = []; // 调试：本帧命中的边界（可同时撞两轴）
 
       // 碰撞：位置越界一律钳回边界（即使 vx 方向不朝墙、或起点已越界），
       // 仅当速度指向边界时才反弹——保证不穿透、不抖动、不整屏飞出，
@@ -1004,6 +1211,7 @@ function initSakanaDrag() {
           impactVx = vx;
           vx = Math.min(Math.abs(vx) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
           bounced = true;
+          hitEdges.push('left');
         }
       } else if (nextLeft >= maxLeft) {
         nextLeft = maxLeft;
@@ -1011,6 +1219,7 @@ function initSakanaDrag() {
           impactVx = vx;
           vx = -Math.min(Math.abs(vx) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
           bounced = true;
+          hitEdges.push('right');
         }
       }
 
@@ -1020,6 +1229,7 @@ function initSakanaDrag() {
           impactVy = vy;
           vy = Math.min(Math.abs(vy) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
           bounced = true;
+          hitEdges.push('top');
         }
       } else if (nextTop >= maxTop) {
         nextTop = maxTop;
@@ -1027,11 +1237,22 @@ function initSakanaDrag() {
           impactVy = vy;
           vy = -Math.min(Math.abs(vy) * SAKANA_PHYSICS.wallBounce, SAKANA_PHYSICS.bounceEnergyCap);
           bounced = true;
+          hitEdges.push('bottom');
         }
       }
 
       if (bounced) {
         bounceCount++;
+        // 调试：碰撞前后速度与位置（before 为碰撞前，after 为反弹后）
+        sakanaDebug.log('collision', {
+          edges: hitEdges,
+          bounceCount: bounceCount,
+          beforeVx: impactVx, beforeVy: impactVy,
+          beforeLeft: leftPos, beforeTop: topPos,
+          afterVx: vx, afterVy: vy,
+          afterLeft: nextLeft, afterTop: nextTop,
+          extraDamping: bounceCount > SAKANA_PHYSICS.maxBounces
+        });
         // 用碰撞前速度触发视觉反应（无论是否运行都要更新碰撞状态）
         applyWallCharReaction(impactVx, impactVy);
         if (bounceCount > SAKANA_PHYSICS.maxBounces) {
@@ -1043,6 +1264,13 @@ function initSakanaDrag() {
       setPos(nextLeft, nextTop);
 
       if ((Math.abs(vx) < SAKANA_PHYSICS.stopThreshold && Math.abs(vy) < SAKANA_PHYSICS.stopThreshold) || bounceCount > SAKANA_PHYSICS.maxBounces * 2) {
+        // 调试：动画停止原因
+        sakanaDebug.log('bounce-stop', {
+          reason: bounceCount > SAKANA_PHYSICS.maxBounces * 2 ? 'max-bounces' : 'settled',
+          bounceCount: bounceCount,
+          vx: vx, vy: vy,
+          left: leftPos, top: topPos
+        });
         // 不平移清零 r/y，内部弹簧自行衰减
         currentR = 0;
         animId = null;
@@ -1065,7 +1293,7 @@ function initSakanaDrag() {
   };
   var onWindowPointerUp = function (e) {
     if (pointerId != null && widget.hasPointerCapture && widget.hasPointerCapture(pointerId)) return;
-    finishDrag(e);
+    finishDrag(e, 'window-' + e.type);
   };
 
   // resize：用户尚未拖动时重新定位到统一安全位置；已拖动/正在拖动时

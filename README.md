@@ -42,6 +42,28 @@ python -m http.server 8000
 node --check app.js
 ```
 
+## Sakana 调试诊断模式
+
+石蒜模拟器（Sakana）拖拽行为异常时，可用内置的诊断模式抓取结构化事件日志，无需改动代码。默认关闭，关闭时不产生任何日志，不影响物理行为。
+
+开启（二选一）：
+
+- URL 参数：访问 `http://localhost:8000/?sakana-debug=1`
+- localStorage：控制台执行 `localStorage.setItem('sakana-debug', '1')` 后刷新页面（URL 参数存在时优先于 localStorage，`?sakana-debug=0` 可强制关闭）
+
+开启后浏览器控制台会以 `[Sakana]` 前缀输出 `console.debug` 日志（pointerdown / pointermove 节流采样 / setPointerCapture / 收尾原因 / 释放解析前后速度 / 角色初始状态 / 碰撞 / 动画停止等），同时写入 `window.__sakanaDebug.events` 环形缓冲（最多 500 条，自动覆盖最旧）。
+
+读取日志：
+
+```js
+window.__sakanaDebug.getEvents()   // 全部事件（按时间排序的副本，可 JSON 序列化）
+window.__sakanaDebug.clear()       // 清空缓冲
+window.__sakanaDebug.getState()    // 当前组件 rect/className、sakana._running 与 _state
+window.__sakanaDebug.enabled       // 当前是否开启（也可运行时置 true/false 动态开关）
+```
+
+关闭：`localStorage.removeItem('sakana-debug')` 并移除 URL 参数后刷新。
+
 ## 部署
 
 提交到 `main` 分支后由 GitHub Pages 自动发布。

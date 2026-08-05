@@ -40,6 +40,28 @@ Visit `http://localhost:8000`. Using a local static server is recommended to avo
 node --check app.js
 ```
 
+## Sakana Debug Diagnostic Mode
+
+When the Sakana (Schizosa Simulator) drag behavior misbehaves, use the built-in diagnostic mode to capture structured event logs — no code changes needed. Disabled by default; when disabled, no logs are produced and physics behavior is untouched.
+
+Enable (either way):
+
+- URL parameter: visit `http://localhost:8000/?sakana-debug=1`
+- localStorage: run `localStorage.setItem('sakana-debug', '1')` in the console, then reload (URL parameter takes precedence when present; `?sakana-debug=0` forces it off)
+
+While enabled, the browser console prints `[Sakana]`-prefixed `console.debug` logs (pointerdown / throttled pointermove samples / setPointerCapture / finish reasons / pre- and post-release velocities / character initial state / collisions / animation stops), and every event is also written into the `window.__sakanaDebug.events` ring buffer (max 500 entries, oldest overwritten).
+
+Read the logs:
+
+```js
+window.__sakanaDebug.getEvents()   // all events (chronological copy, JSON-serializable)
+window.__sakanaDebug.clear()       // clear the buffer
+window.__sakanaDebug.getState()    // current widget rect/className, sakana._running and _state
+window.__sakanaDebug.enabled       // whether debug is on (can also be toggled at runtime)
+```
+
+Turn off: `localStorage.removeItem('sakana-debug')`, remove the URL parameter, and reload.
+
 ## Deployment
 
 Auto-published by GitHub Pages after pushing to the `main` branch.
