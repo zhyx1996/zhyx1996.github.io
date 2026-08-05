@@ -1233,8 +1233,9 @@ a:hover { opacity: 0.8; }
     width: min(360px, calc(100vw - 40px));
     box-sizing: border-box;
     max-width: calc(100vw - 40px);
-    max-height: calc(100vh - 96px);
-    overflow: auto;
+    /* 不要设置 overflow/high: 库的输入栏与历史区用绝对定位放在
+       top/bottom: var(--height) 处，靠 wrapper 默认 overflow:visible 溢出显示；
+       设 overflow:auto 会把输入栏裁掉（--height 恒为 40px，面板本身不长高）。 */
     transform: translateY(0) !important;
 }
 
@@ -1370,7 +1371,6 @@ a:hover { opacity: 0.8; }
         right: auto;
         width: calc(100vw - 24px);
         max-width: calc(100vw - 24px);
-        max-height: calc(100vh - 96px);
         transform: translateY(0) !important;
     }
 }
