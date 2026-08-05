@@ -1217,19 +1217,19 @@ a:hover { opacity: 0.8; }
 /* page-agent 由运行时注入；作为 JS 执行前的安全兜底。
    兜底不参与具体页面布局（主页 hero 分离布局 / 非主页 banner 均
    由 app.js initPageAgentPlacement 按可见布局计算），因此这里只做
-   保守定位：底部锚定在 Sakana 可见区域（canvas 顶边）上方，
-   右缘与 Sakana 右缘对齐，避免与右下角的 Sakana 组件重叠。 */
+   保守定位：放在左下角（左侧导航栏下方），避开右下角 Sakana。
+   底边 88px 让出返回顶部按钮（left:24 bottom:24 高 40px）。 */
 :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
     position: fixed;
     top: auto;
-    bottom: 254px; /* Sakana 容器 bottom 20 + 180 高 + canvas 上延 30 + 间距 24 */
-    left: auto;
-    right: 24px;
+    bottom: 88px;
+    left: 24px;
+    right: auto;
     z-index: 9990;
     width: min(360px, calc(100vw - 40px));
     box-sizing: border-box;
     max-width: calc(100vw - 40px);
-    max-height: calc(100vh - 274px);
+    max-height: calc(100vh - 96px);
     overflow: auto;
 }
 
@@ -1354,12 +1354,12 @@ a:hover { opacity: 0.8; }
 @media (max-width: 600px) {
     :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]) {
         top: auto;
-        bottom: 250px; /* Sakana 容器 bottom 16 + 180 高 + canvas 上延 30 + 间距 24 */
-        left: auto;
-        right: 12px;
+        bottom: 88px;
+        left: 12px;
+        right: auto;
         width: calc(100vw - 24px);
         max-width: calc(100vw - 24px);
-        max-height: calc(100vh - 270px);
+        max-height: calc(100vh - 96px);
     }
 }
 
