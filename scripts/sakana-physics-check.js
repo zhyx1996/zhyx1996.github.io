@@ -328,6 +328,30 @@ function computeReleaseCharState(vx, vy, currentR, currentY, physics) {
   };
 }
 
+// 与 app.js computeWallCharReactionState 相同的纯函数：按实际碰撞轴合并角色状态。
+// 横向碰撞只更新 r/w，纵向碰撞只更新 y/t，避免连续撞击时清零另一轴。
+function computeWallCharReactionState(currentState, impactVx, impactVy, physics) {
+  physics = physics || TUNED;
+  currentState = currentState || {};
+  var next = {
+    r: Number.isFinite(currentState.r) ? currentState.r : 0,
+    y: Number.isFinite(currentState.y) ? currentState.y : 0,
+    w: Number.isFinite(currentState.w) ? currentState.w : 0,
+    t: Number.isFinite(currentState.t) ? currentState.t : 0,
+    i: physics.swingTimeStep,
+    d: physics.swingDamping
+  };
+  if (impactVx !== 0) {
+    next.r = Math.max(-physics.charLeanMax * 1.2, Math.min(physics.charLeanMax * 1.2, impactVx * physics.wallLeanFactor));
+    next.w = -next.r * 0.18;
+  }
+  if (impactVy !== 0) {
+    next.y = Math.max(-physics.charSwayMax * 1.2, Math.min(physics.charSwayMax * 1.2, impactVy * physics.wallSwayFactor));
+    next.t = -next.y * 0.12;
+  }
+  return next;
+}
+
 // 与 app.js resolveSakanaRelease 相同的纯函数：整条释放链（速度 → 边缘吸收
 // 分离 → 角色弹簧初始状态），finishDrag 与所有收尾路径共享。
 // opts.fallbackVx/fallbackVy：采样不足（窗口外快速松手）时的最后有效速度，透传给 computeFinalVelocity。
@@ -853,6 +877,29 @@ function runTests() {
   guardedFinish({ fallbackVx: 14, fallbackVy: -6 }); // pointercancel
   assert(finishCalls === 1, '多收尾事件到达只收尾一次（finishCalls=' + finishCalls + '）');
   assert(firstRelease && firstRelease.vx === 14 && firstRelease.vy === -6, '首次收尾即使用最后有效速度 fallback');
+
+  // ── 10. 角色碰撞状态：连续撞击不同边界时保留另一轴的摇摆 ──
+  console.log('\n=== 角色碰撞状态合并（按碰撞轴更新）===');
+  var initialWallState = { r: 12, y: -7, w: -2, t: 1.5 };
+  var afterRight = computeWallCharReactionState(initialWallState, 18, 0);
+  var afterBottom = computeWallCharReactionState(afterRight, 0, 10);
+  assert(afterRight.y === initialWallState.y && afterRight.t === initialWallState.t,
+    '右墙碰撞保留已有纵向状态 y=' + afterRight.y + ', t=' + afterRight.t);
+  assert(afterBottom.r === afterRight.r && afterBottom.w === afterRight.w,
+    '右墙后撞底边保留横向状态 r=' + afterBottom.r + ', w=' + afterBottom.w);
+  assert(afterBottom.y !== afterRight.y && afterBottom.t !== afterRight.t,
+    '底边碰撞只更新纵向状态 y=' + afterBottom.y + ', t=' + afterBottom.t);
+
+  var afterBottomFirst = computeWallCharReactionState(initialWallState, 0, -12);
+  var afterRightSecond = computeWallCharReactionState(afterBottomFirst, -16, 0);
+  assert(afterRightSecond.y === afterBottomFirst.y && afterRightSecond.t === afterBottomFirst.t,
+    '底边后撞右墙保留纵向状态 y=' + afterRightSecond.y + ', t=' + afterRightSecond.t);
+  assert(afterRightSecond.r !== afterBottomFirst.r && afterRightSecond.w !== afterBottomFirst.w,
+    '右墙碰撞只更新横向状态 r=' + afterRightSecond.r + ', w=' + afterRightSecond.w);
+
+  var cornerState = computeWallCharReactionState(initialWallState, -20, 14);
+  assert(cornerState.r !== initialWallState.r && cornerState.y !== initialWallState.y,
+    '双轴碰撞同时更新横向和纵向状态 r=' + cornerState.r + ', y=' + cornerState.y);
 
   // ── 总结 ──
   console.log('\n=== 总结 ===');

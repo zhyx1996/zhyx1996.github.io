@@ -635,6 +635,33 @@ function computeCharState(vx, vy, physics) {
   };
 }
 
+// 纯函数：按实际碰撞轴合并角色反应状态。
+// 横向碰撞只更新 r/w，纵向碰撞只更新 y/t；未碰撞轴保留已有弹簧状态，
+// 避免连续撞击不同边界时后一次碰撞把前一轴的摇摆清零。
+function computeWallCharReactionState(currentState, impactVx, impactVy, physics) {
+  physics = physics || SAKANA_PHYSICS;
+  currentState = currentState || {};
+  var next = {
+    r: Number.isFinite(currentState.r) ? currentState.r : 0,
+    y: Number.isFinite(currentState.y) ? currentState.y : 0,
+    w: Number.isFinite(currentState.w) ? currentState.w : 0,
+    t: Number.isFinite(currentState.t) ? currentState.t : 0,
+    i: physics.swingTimeStep,
+    d: physics.swingDamping
+  };
+
+  if (impactVx !== 0) {
+    next.r = Math.max(-physics.charLeanMax * 1.2, Math.min(physics.charLeanMax * 1.2, impactVx * physics.wallLeanFactor));
+    next.w = -next.r * 0.18;
+  }
+  if (impactVy !== 0) {
+    next.y = Math.max(-physics.charSwayMax * 1.2, Math.min(physics.charSwayMax * 1.2, impactVy * physics.wallSwayFactor));
+    next.t = -next.y * 0.12;
+  }
+
+  return next;
+}
+
 // 纯函数：统一计算释放速度（采样 → fallback → maxVelocity 上限）。
 // 所有收尾路径（pointerup / pointercancel / lostpointercapture / window blur /
 // visibilitychange / 窗口兜底）都调用它，保证窗口外释放、异常取消、失焦等
@@ -802,6 +829,7 @@ window.__sakanaPhysics = {
   simulate: simulateSakanaBounce,
   simulateSpring: simulateSakanaSpring,
   computeCharState: computeCharState,
+  computeWallCharReactionState: computeWallCharReactionState,
   computeReleaseVelocity: computeReleaseVelocity,
   computeFinalVelocity: computeFinalVelocity,
   applyEdgeAbsorb: applyEdgeAbsorb,
@@ -917,19 +945,28 @@ function initSakanaDrag() {
   var applyWallCharReaction = function (impactVx, impactVy) {
     var sakana = window.sakanaInstance;
     if (!sakana) return;
-    var targetR = Math.max(-SAKANA_PHYSICS.charLeanMax * 1.2, Math.min(SAKANA_PHYSICS.charLeanMax * 1.2, impactVx * SAKANA_PHYSICS.wallLeanFactor));
-    var targetY = Math.max(-SAKANA_PHYSICS.charSwayMax * 1.2, Math.min(SAKANA_PHYSICS.charSwayMax * 1.2, impactVy * SAKANA_PHYSICS.wallSwayFactor));
-    sakana._state.r = targetR;
-    sakana._state.y = targetY;
-    sakana._state.w = -targetR * 0.18;
-    sakana._state.t = -targetY * 0.12;
-    sakana._state.i = SAKANA_PHYSICS.swingTimeStep;
-    sakana._state.d = SAKANA_PHYSICS.swingDamping;
+    var nextState = computeWallCharReactionState(sakana._state, impactVx, impactVy);
+    sakana._state.r = nextState.r;
+    sakana._state.y = nextState.y;
+    sakana._state.w = nextState.w;
+    sakana._state.t = nextState.t;
+    sakana._state.i = nextState.i;
+    sakana._state.d = nextState.d;
     sakana._lastRunUnix = Date.now();
     if (!sakana._running) {
       sakana._running = true;
       if (typeof sakana._run === 'function') sakana._run();
     }
+    sakanaDebug.log('wall-char-state', {
+      impactVx: impactVx,
+      impactVy: impactVy,
+      r: nextState.r,
+      y: nextState.y,
+      w: nextState.w,
+      t: nextState.t,
+      preservedHorizontal: impactVx === 0,
+      preservedVertical: impactVy === 0
+    });
   };
 
   var initPosition = function () {
