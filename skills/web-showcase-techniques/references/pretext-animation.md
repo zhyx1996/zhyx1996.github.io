@@ -8,16 +8,19 @@
 ### 1. 圆-矩形碰撞检测（Circle-Rect Collision）
 
 判断圆形障碍物是否与文字行（水平条带）相交，计算被遮挡的水平区间。
+碰撞区在圆左右各外扩 `ORB_H_PAD`（固定横向留白）、上下各外扩
+`ORB_V_PAD`（纵向留白，避免行贴住球上下缘）。
 
 ```javascript
 function circleIntervalForBand(orb, bandTop, bandBottom) {
-  // 垂直方向不相交
-  if (bandTop >= orb.y + orb.r || bandBottom <= orb.y - orb.r) return null;
+  const top = bandTop - ORB_V_PAD;
+  const bottom = bandBottom + ORB_V_PAD;
+  if (top >= orb.y + orb.r || bottom <= orb.y - orb.r) return null;
 
   // 计算 orb 中心到条带的最小垂直距离
-  const minDy = orb.y >= bandTop && orb.y <= bandBottom
+  const minDy = orb.y >= top && orb.y <= bottom
     ? 0
-    : orb.y < bandTop ? bandTop - orb.y : orb.y - bandBottom;
+    : orb.y < top ? top - orb.y : orb.y - bottom;
 
   if (minDy >= orb.r) return null;
 
@@ -25,8 +28,8 @@ function circleIntervalForBand(orb, bandTop, bandBottom) {
   const halfWidth = Math.sqrt(orb.r * orb.r - minDy * minDy);
 
   return {
-    left: orb.x - halfWidth - ORB_TEXT_GAP,
-    right: orb.x + halfWidth + ORB_TEXT_GAP,
+    left: orb.x - halfWidth - ORB_H_PAD,
+    right: orb.x + halfWidth + ORB_H_PAD,
   };
 }
 ```
@@ -116,24 +119,7 @@ lines.push({
 });
 ```
 
-圆球碰撞区额外加入垂直留白 `ORB_V_PAD`，避免行贴近球的上下边缘：
-
-```javascript
-function circleIntervalForBand(orb, bandTop, bandBottom) {
-  const top = bandTop - ORB_V_PAD;
-  const bottom = bandBottom + ORB_V_PAD;
-  if (top >= orb.y + orb.r || bottom <= orb.y - orb.r) return null;
-  const minDy = orb.y >= top && orb.y <= bottom
-    ? 0
-    : orb.y < top ? top - orb.y : orb.y - bottom;
-  if (minDy >= orb.r) return null;
-  const halfWidth = Math.sqrt(orb.r * orb.r - minDy * minDy);
-  return {
-    left: orb.x - halfWidth - ORB_H_PAD,
-    right: orb.x + halfWidth + ORB_H_PAD,
-  };
-}
-```
+碰撞区与垂直留白见第 1 节 `circleIntervalForBand`。
 
 ### 6. 条件重排（性能优化）
 
@@ -194,3 +180,24 @@ function hitTest(p) {
 | `baseLetterSpacing` | CSS 基础字距 | 恒定，不随球伸缩 |
 | orb 半径 | `min(W,H) * 0.08` | 响应式大小 |
 | orb 速度 | 12-18 px/s | 缓慢漂浮 |
+
+## 设计取舍与经验（重要）
+
+这个特效在迭代中踩过几个坑，结论如下：
+
+1. **Canvas 测字宽不可靠，尤其 CJK**。`canvas.measureText` 与 DOM 渲染在
+   字体回退上有系统性偏差，用它做两端对齐会把文字压到圆球上。改为一次性
+   用隐藏 DOM 探针逐字形测量并缓存（第 3 节），布局阶段 0 次 DOM 读取。
+
+2. **「左对齐贴边」与「球左右间隙完全一致」不可兼得**。左对齐换行时球左侧
+   天然留下最多一字宽的打包余量。要让两侧间隙完全相同，只能让球左侧文字
+   右对齐贴球（该行左缘参差）。最终取舍：参照 editorial-engine demo，
+   **行左对齐 + 球固定留白 `ORB_H_PAD`**，两侧最小间隙相同、观感对称。
+
+3. **拖拽时不要动态改字距/位置**。两端对齐（改 letter-spacing）会让文字
+   在拖球时一伸一缩；右对齐贴球会让行左缘随球摆动。两者拖拽观感都不好。
+   左对齐 + 固定留白时，文字只随球的遮挡让位，最稳。
+
+4. **验收用 DOM 几何，不靠视觉模型**。视觉模型对 11px 小字的左右间隙判断
+   有 ±5px 噪声，多次给出互相矛盾的结论。精确验收：逐行量「文字右/左缘到
+   球左/右缘」的实际像素差（orb 中心行应为 `ORB_H_PAD` 量级）。
