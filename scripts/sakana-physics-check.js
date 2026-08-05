@@ -270,6 +270,91 @@ function applyFrameFriction(vx, vy, dtMs, opts) {
   return { vx: vx * decay, vy: vy * decay };
 }
 
+// 与 app.js computeFinalVelocity 相同的纯函数：采样 → fallback → maxVelocity 上限。
+// 所有收尾路径（pointerup / pointercancel / lostpointercapture / blur /
+// visibilitychange / 窗口兜底）共享，保证窗口外释放、异常取消、失焦时
+// 保留最后一次有效甩动速度，不会把速度清零。
+// opts.fallbackVx/fallbackVy：拖动期间保存的最后一次有效速度；快速拖动并在
+// 窗口外松手时采样可能只有一个点（samples < 2 无法计算），此时回退到该速度，
+// 保证整体仍有轻微回弹、角色仍按真实甩动方向获得明确初始角度。
+function computeFinalVelocity(samples, opts) {
+  opts = opts || {};
+  var vel = (samples && samples.length >= 2)
+    ? computeReleaseVelocity(samples, opts)
+    : { vx: opts.fallbackVx == null ? 0 : opts.fallbackVx, vy: opts.fallbackVy == null ? 0 : opts.fallbackVy };
+  var maxV = opts.maxVelocity || BOUNCE_PARAMS.maxVelocity;
+  return {
+    vx: Math.max(-maxV, Math.min(maxV, vel.vx)),
+    vy: Math.max(-maxV, Math.min(maxV, vel.vy))
+  };
+}
+
+// 与 app.js applyEdgeAbsorb 相同的纯函数：边缘释放时法向速度吸收只作用于
+// 平移回弹；角色甩动速度（charVx/charVy）保持真实值，不受吸收影响。
+function applyEdgeAbsorb(vx, vy, leftPos, topPos, viewportW, viewportH, widgetW, widgetH, opts) {
+  opts = opts || {};
+  var m = opts.edgeMargin == null ? 16 : opts.edgeMargin;
+  var absorb = opts.absorb == null ? BOUNCE_PARAMS.edgeNormalAbsorb : opts.absorb;
+  var charVx = vx;
+  var charVy = vy;
+  if (leftPos <= m && vx < 0) vx *= absorb;
+  else if (leftPos >= viewportW - widgetW - m && vx > 0) vx *= absorb;
+  if (topPos <= m && vy < 0) vy *= absorb;
+  else if (topPos >= viewportH - widgetH - m && vy > 0) vy *= absorb;
+  return { vx: vx, vy: vy, charVx: charVx, charVy: charVy };
+}
+
+// 与 app.js computeReleaseCharState 相同的纯函数：释放时角色弹簧初始状态。
+// 高速释放按真实甩动速度映射为明确的初始角度/位移；低速释放保留当前姿态，
+// 姿态近乎静止时按最后运动方向补轻微初始角度——不清零、不停摆。
+function computeReleaseCharState(vx, vy, currentR, currentY, physics) {
+  physics = physics || TUNED;
+  var r0 = currentR || 0;
+  var y0 = currentY || 0;
+  if (Math.abs(vx) < 3 && Math.abs(vy) < 3) {
+    if (Math.abs(r0) < 0.5 && Math.abs(y0) < 0.5) {
+      r0 = (vx > 0 || (vx === 0 && r0 >= 0)) ? 8 : -8;
+      y0 = (vy > 0 || (vy === 0 && y0 >= 0)) ? 4 : -4;
+    }
+    return { r: r0, y: y0, w: 0, t: 0, i: physics.swingTimeStep, d: physics.swingDamping };
+  }
+  return {
+    r: Math.max(-physics.charLeanMax, Math.min(physics.charLeanMax, vx * physics.charLeanFactor)),
+    y: Math.max(-physics.charSwayMax, Math.min(physics.charSwayMax, vy * physics.charSwayFactor)),
+    w: 0,
+    t: 0,
+    i: physics.swingTimeStep,
+    d: physics.swingDamping
+  };
+}
+
+// 与 app.js resolveSakanaRelease 相同的纯函数：整条释放链（速度 → 边缘吸收
+// 分离 → 角色弹簧初始状态），finishDrag 与所有收尾路径共享。
+// opts.fallbackVx/fallbackVy：采样不足（窗口外快速松手）时的最后有效速度，透传给 computeFinalVelocity。
+function resolveSakanaRelease(samples, leftPos, topPos, viewportW, viewportH, widgetW, widgetH, currentR, currentY, opts) {
+  opts = opts || {};
+  var physics = opts.physics || TUNED;
+  var maxV = physics.maxVelocity || BOUNCE_PARAMS.maxVelocity;
+  var absorb = physics.edgeNormalAbsorb == null ? BOUNCE_PARAMS.edgeNormalAbsorb : physics.edgeNormalAbsorb;
+  var vel = computeFinalVelocity(samples, {
+    maxVelocity: maxV,
+    fallbackVx: opts.fallbackVx,
+    fallbackVy: opts.fallbackVy
+  });
+  var resolved = applyEdgeAbsorb(vel.vx, vel.vy, leftPos, topPos, viewportW, viewportH, widgetW, widgetH, {
+    edgeMargin: opts.edgeMargin,
+    absorb: absorb
+  });
+  var state = computeReleaseCharState(resolved.charVx, resolved.charVy, currentR, currentY, physics);
+  return {
+    vx: resolved.vx,
+    vy: resolved.vy,
+    charVx: resolved.charVx,
+    charVy: resolved.charVy,
+    state: state
+  };
+}
+
 // 旧逻辑（修复前 bug 版）：摩擦已按时间归一化，但位移未按 dt 缩放
 // （每帧位移 = vx*1）。用于证明按 dtMs/frameMs 缩放位移的必要性。
 function simulateBounceLegacy(initialVx, initialVy, startX, bounds, dtMs, durationMs) {
@@ -662,6 +747,112 @@ function runTests() {
   var noAbsorb = simulateBounce(BOUNCE_PARAMS.maxVelocity, 0, 1790, bounds);
   console.log('  吸收后滑行距离 ' + (1790 - edge.x).toFixed(0) + 'px vs 未吸收 ' + (1790 - noAbsorb.x).toFixed(0) + 'px');
   assert(noAbsorb.x < edge.x - 100, '未吸收时从墙边滑出更远 x=' + noAbsorb.x + ' vs 吸收后 x=' + edge.x);
+
+  // ── 9. 释放链：fallback（单采样）与角色初始状态分离 ──
+  // 对应 app.js resolveSakanaRelease：快速拖动并在窗口外松手时，指针采样可能
+  // 只有 pointerdown 一个点（samples < 2 无法计算窗口速度），必须回退到拖动
+  // 期间保存的最后一次有效速度（fallbackVx/fallbackVy）——整体仍有轻微回弹、
+  // 角色仍按真实甩动方向获得明确初始角度。
+  console.log('\n=== 释放链（fallback 与角色初始状态）===');
+
+  // 9a. 单采样 fallback：samples 只有 1 个点，使用最后有效速度而不是清零
+  var singleSample = [{ x: 500, y: 400, t: 100 }];
+  var fbRel = resolveSakanaRelease(singleSample, 1000, 500, 1920, 1080, 130, 150, 0, 0, {
+    fallbackVx: 14, fallbackVy: -6
+  });
+  assert(fbRel.vx === 14 && fbRel.vy === -6, '单采样释放回退到最后有效速度 vx=' + fbRel.vx + ', vy=' + fbRel.vy);
+  assert(fbRel.charVx === 14 && fbRel.charVy === -6, '单采样 charVx/charVy 保持最后有效速度（不被清零）');
+
+  // 9b. 单采样 fallback 的角色初始 r/y 可见且方向正确（基于未吸收真实速度）
+  console.log('  单采样 fallback 初始: r=' + fbRel.state.r.toFixed(1) + ', y=' + fbRel.state.y.toFixed(1));
+  assert(fbRel.state.r > 0, '初始 r 方向与 vx 一致（可见）r=' + fbRel.state.r.toFixed(1));
+  assert(fbRel.state.y < 0, '初始 y 方向与 vy 一致（可见）y=' + fbRel.state.y.toFixed(1));
+  assert(Math.abs(fbRel.state.r) >= 8, '初始 r 幅度明确 |r|=' + Math.abs(fbRel.state.r).toFixed(1) + ' >= 8');
+  assert(Math.abs(fbRel.state.y) >= 4, '初始 y 幅度明确 |y|=' + Math.abs(fbRel.state.y).toFixed(1) + ' >= 4');
+
+  // 9c. 无 fallback 且单采样：平移速度为 0（无速度可回弹），
+  //     但角色仍有明确初始角度（低速分支补回摆量，不清零不停摆）
+  var fbZero = resolveSakanaRelease(singleSample, 1000, 500, 1920, 1080, 130, 150, 0, 0);
+  assert(fbZero.vx === 0 && fbZero.vy === 0, '无 fallback 单采样平移速度 0（无回弹）');
+  assert(fbZero.state.r === 8 && fbZero.state.y === 4, '无 fallback 单采样角色仍有明确初始角度 r=' + fbZero.state.r + ', y=' + fbZero.state.y);
+
+  // 9d. fallback 超上限时同样钳制到 maxVelocity
+  var fbClamp = resolveSakanaRelease(singleSample, 1000, 500, 1920, 1080, 130, 150, 0, 0, {
+    fallbackVx: 40, fallbackVy: 0
+  });
+  assert(fbClamp.vx === BOUNCE_PARAMS.maxVelocity, 'fallback 超上限钳制到 maxVelocity vx=' + fbClamp.vx);
+  assert(fbClamp.charVx === BOUNCE_PARAMS.maxVelocity, 'charVx 同样按真实速度钳制 charVx=' + fbClamp.charVx);
+
+  // 9e. 采样充足时窗口速度优先，fallback 不覆盖真实采样
+  var twoSamples = [
+    { x: 0, y: 0, t: 0 },
+    { x: 60, y: 30, t: 100 }
+  ]; // vx=(60/100)*16.667≈10, vy≈5
+  var fromSamples = resolveSakanaRelease(twoSamples, 1000, 500, 1920, 1080, 130, 150, 0, 0, {
+    fallbackVx: 99, fallbackVy: 99
+  });
+  assert(Math.abs(fromSamples.vx - 10) < 0.05 && Math.abs(fromSamples.vy - 5) < 0.05, '样本充足时用窗口速度而非 fallback vx=' + fromSamples.vx.toFixed(2) + ', vy=' + fromSamples.vy.toFixed(2));
+
+  // 9f. 边缘法向吸收只作用于平移：贴右边缘向右释放时平移 vx 被吸收（10→1.5），
+  //     charVx/charVy 保持真实甩动速度，角色初始角度基于未吸收的真实速度
+  var edgeRel = resolveSakanaRelease(twoSamples, 1790, 500, 1920, 1080, 130, 150, 0, 0); // 1790 ≥ 1920-130-16
+  console.log('  贴右边缘: vx=' + edgeRel.vx.toFixed(2) + ', charVx=' + edgeRel.charVx.toFixed(2) + ', r=' + edgeRel.state.r.toFixed(1));
+  assert(Math.abs(edgeRel.vx - 1.5) < 0.05, '边缘法向吸收作用于平移 vx=' + edgeRel.vx.toFixed(2) + ' (10→≈1.5)');
+  assert(edgeRel.vx < edgeRel.charVx, '平移速度小于原速度 vx=' + edgeRel.vx.toFixed(2) + ' < charVx=' + edgeRel.charVx.toFixed(2));
+  assert(Math.abs(edgeRel.charVx - 10) < 0.05, 'charVx 保持真实甩动速度（不被吸收覆盖）');
+  assert(edgeRel.charVy === edgeRel.vy, '无吸收方向平移速度与角色速度一致 vy=' + edgeRel.vy.toFixed(2));
+  assert(edgeRel.state.r > 0, '角色初始角度基于未吸收真实速度（方向正确）r=' + edgeRel.state.r.toFixed(1));
+
+  // 9g. 左上角双轴吸收：vx<0、vy<0 时两个法向分量都只影响平移，
+  //     charVx/charVy 完整保留，角色初始角度按负方向
+  var negSamples = [
+    { x: 60, y: 30, t: 0 },
+    { x: 0, y: 0, t: 100 }
+  ]; // vx≈-10, vy≈-5
+  var cornerRel = resolveSakanaRelease(negSamples, 0, 0, 1920, 1080, 130, 150, 0, 0);
+  assert(Math.abs(cornerRel.vx + 1.5) < 0.05 && Math.abs(cornerRel.vy + 0.75) < 0.05, '左上角双轴吸收仅作用于平移 vx=' + cornerRel.vx.toFixed(2) + ', vy=' + cornerRel.vy.toFixed(2));
+  assert(Math.abs(cornerRel.charVx + 10) < 0.05 && Math.abs(cornerRel.charVy + 5) < 0.05, '左上角 charVx/charVy 保持真实速度（-10/-5）');
+  assert(cornerRel.state.r < 0 && cornerRel.state.y < 0, '角色初始角度方向与负速度一致 r=' + cornerRel.state.r.toFixed(1) + ', y=' + cornerRel.state.y.toFixed(1));
+
+  // 9h. 各收尾路径语义：pointerup / pointercancel / lostpointercapture / blur /
+  //     visibilitychange / window pointerup 全部共享同一条释放链（app.js 中
+  //     都调用 finishDrag → resolveSakanaRelease），因此窗口外松手只有 blur
+  //     到达时与 pointerup 路径行为一致——单采样 fallback 同样生效、输出一致。
+  var finishPaths = ['pointerup', 'pointercancel', 'lostpointercapture', 'blur', 'visibilitychange', 'window pointerup'];
+  var pathResults = [];
+  for (var pi = 0; pi < finishPaths.length; pi++) {
+    pathResults.push(resolveSakanaRelease(singleSample, 1000, 500, 1920, 1080, 130, 150, 0, 0, {
+      fallbackVx: 14, fallbackVy: -6
+    }));
+  }
+  var firstJson = JSON.stringify(pathResults[0]);
+  for (var pi2 = 1; pi2 < finishPaths.length; pi2++) {
+    assert(JSON.stringify(pathResults[pi2]) === firstJson, finishPaths[pi2] + ' 与 ' + finishPaths[0] + ' 释放结果一致（共享释放链）');
+  }
+
+  // 9i. 收尾守卫：多收尾事件依次到达（pointerup → lostpointercapture → blur →
+  //     visibilitychange → window pointerup → pointercancel）只收尾一次。
+  //     镜像 app.js finishDrag 的 isDragging 守卫语义（置 false 后再次到达直接返回）。
+  var finishCalls = 0;
+  var firstRelease = null;
+  var makeFinishGuard = function () {
+    var isDragging = true;
+    return function (opts) {
+      if (!isDragging) return;
+      isDragging = false;
+      finishCalls++;
+      firstRelease = resolveSakanaRelease(singleSample, 1000, 500, 1920, 1080, 130, 150, 0, 0, opts);
+    };
+  };
+  var guardedFinish = makeFinishGuard();
+  guardedFinish({ fallbackVx: 14, fallbackVy: -6 }); // pointerup
+  guardedFinish({ fallbackVx: 14, fallbackVy: -6 }); // lostpointercapture
+  guardedFinish({ fallbackVx: 14, fallbackVy: -6 }); // blur
+  guardedFinish({ fallbackVx: 14, fallbackVy: -6 }); // visibilitychange
+  guardedFinish({ fallbackVx: 14, fallbackVy: -6 }); // window pointerup
+  guardedFinish({ fallbackVx: 14, fallbackVy: -6 }); // pointercancel
+  assert(finishCalls === 1, '多收尾事件到达只收尾一次（finishCalls=' + finishCalls + '）');
+  assert(firstRelease && firstRelease.vx === 14 && firstRelease.vy === -6, '首次收尾即使用最后有效速度 fallback');
 
   // ── 总结 ──
   console.log('\n=== 总结 ===');

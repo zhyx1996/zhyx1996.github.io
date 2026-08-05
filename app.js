@@ -506,6 +506,96 @@ function computeCharState(vx, vy, physics) {
   };
 }
 
+// 纯函数：统一计算释放速度（采样 → fallback → maxVelocity 上限）。
+// 所有收尾路径（pointerup / pointercancel / lostpointercapture / window blur /
+// visibilitychange / 窗口兜底）都调用它，保证窗口外释放、异常取消、失焦等
+// 场景保留最后一次有效甩动速度，不会把速度清零。
+// options.fallbackVx/fallbackVy：拖动期间保存的最后一次有效速度。快速拖动
+// 并在窗口外松手时采样可能只有 pointerdown 一个点（samples < 2 无法计算），
+// 此时回退到最后一次有效甩动速度，保证整体仍有轻微回弹、角色仍按真实甩动
+// 方向获得明确初始角度；采样充足时窗口速度优先，fallback 不覆盖真实采样。
+function computeFinalVelocity(samples, options) {
+  const opts = Object.assign({
+    sampleWindowMs: SAKANA_PHYSICS.velocitySampleWindowMs,
+    frameMs: SAKANA_PHYSICS.frameMs,
+    maxVelocity: SAKANA_PHYSICS.maxVelocity
+  }, options || {});
+  const vel = (Array.isArray(samples) && samples.length >= 2)
+    ? computeReleaseVelocity(samples, opts)
+    : {
+      vx: opts.fallbackVx == null ? 0 : opts.fallbackVx,
+      vy: opts.fallbackVy == null ? 0 : opts.fallbackVy
+    };
+  const maxV = opts.maxVelocity;
+  return {
+    vx: Math.max(-maxV, Math.min(maxV, vel.vx)),
+    vy: Math.max(-maxV, Math.min(maxV, vel.vy))
+  };
+}
+
+// 纯函数：边缘释放时吸收「朝向墙壁」的法向速度，只作用于平移回弹。
+// 返回值同时给出角色弹簧使用的真实甩动速度（charVx/charVy，不受吸收影响），
+// 实现「整体平移只轻微回弹、角色仍按真实甩动方向/速度获得初始摇摆」的分离。
+function applyEdgeAbsorb(vx, vy, leftPos, topPos, viewportW, viewportH, widgetW, widgetH, options) {
+  const opts = Object.assign({
+    edgeMargin: 16,
+    absorb: SAKANA_PHYSICS.edgeNormalAbsorb
+  }, options || {});
+  const m = opts.edgeMargin;
+  const charVx = vx;
+  const charVy = vy;
+  if (leftPos <= m && vx < 0) vx *= opts.absorb;
+  else if (leftPos >= viewportW - widgetW - m && vx > 0) vx *= opts.absorb;
+  if (topPos <= m && vy < 0) vy *= opts.absorb;
+  else if (topPos >= viewportH - widgetH - m && vy > 0) vy *= opts.absorb;
+  return { vx: vx, vy: vy, charVx: charVx, charVy: charVy };
+}
+
+// 纯函数：根据释放速度计算角色弹簧初始状态（r/y/w/t/i/d）。
+// 高速释放：按真实甩动速度映射为明确的初始角度/位移（方向正确、幅度可见）。
+// 低速释放：保留当前姿态；姿态近乎静止时按最后运动方向补一个轻微初始角度，
+// 保证 _run 恢复后弹簧一定从明确方向开始摇摆，不会把 r/y/w/t 清零停摆。
+function computeReleaseCharState(vx, vy, currentR, currentY, physics) {
+  physics = physics || SAKANA_PHYSICS;
+  var r0 = currentR || 0;
+  var y0 = currentY || 0;
+  if (Math.abs(vx) < 3 && Math.abs(vy) < 3) {
+    if (Math.abs(r0) < 0.5 && Math.abs(y0) < 0.5) {
+      r0 = (vx > 0 || (vx === 0 && r0 >= 0)) ? 8 : -8;
+      y0 = (vy > 0 || (vy === 0 && y0 >= 0)) ? 4 : -4;
+    }
+    return { r: r0, y: y0, w: 0, t: 0, i: physics.swingTimeStep, d: physics.swingDamping };
+  }
+  const state = computeCharState(vx, vy, physics);
+  return { r: state.r, y: state.y, w: state.w, t: state.t, i: state.i, d: state.d };
+}
+
+// 纯函数：整条释放链（速度 → 边缘吸收分离 → 角色弹簧初始状态）。
+// 返回 { vx, vy }（平移速度，边缘法向已吸收）与 { charVx, charVy, state }（角色状态）。
+// finishDrag 与所有收尾路径共享此函数，保证不同结束路径行为一致。
+// options.fallbackVx/fallbackVy：采样不足（窗口外快速松手）时的最后有效速度，透传给 computeFinalVelocity。
+function resolveSakanaRelease(samples, leftPos, topPos, viewportW, viewportH, widgetW, widgetH, currentR, currentY, options) {
+  const opts = options || {};
+  const physics = Object.assign({}, SAKANA_PHYSICS, opts.physics || {});
+  const vel = computeFinalVelocity(samples, {
+    maxVelocity: physics.maxVelocity,
+    fallbackVx: opts.fallbackVx,
+    fallbackVy: opts.fallbackVy
+  });
+  const resolved = applyEdgeAbsorb(vel.vx, vel.vy, leftPos, topPos, viewportW, viewportH, widgetW, widgetH, {
+    edgeMargin: opts.edgeMargin,
+    absorb: physics.edgeNormalAbsorb
+  });
+  const state = computeReleaseCharState(resolved.charVx, resolved.charVy, currentR, currentY, physics);
+  return {
+    vx: resolved.vx,
+    vy: resolved.vy,
+    charVx: resolved.charVx,
+    charVy: resolved.charVy,
+    state: state
+  };
+}
+
 // 纯函数：模拟 Sakana 内部弹簧方程（严格逐帧，无交叉耦合，rotate=0）
 // 每帧：w = w - 2*r; r = r + w*i*1.2; w = w*d
 //       t = t - 2*y; y = y + t*i*2;   t = t*d
@@ -584,6 +674,10 @@ window.__sakanaPhysics = {
   simulateSpring: simulateSakanaSpring,
   computeCharState: computeCharState,
   computeReleaseVelocity: computeReleaseVelocity,
+  computeFinalVelocity: computeFinalVelocity,
+  applyEdgeAbsorb: applyEdgeAbsorb,
+  computeReleaseCharState: computeReleaseCharState,
+  resolveSakanaRelease: resolveSakanaRelease,
   applyFrameFriction: applyFrameFriction,
   clampSakanaPosition: clampSakanaPosition,
   test: function () {
@@ -794,9 +888,12 @@ function initSakanaDrag() {
   // 统一结束拖拽：pointerup / pointercancel / lostpointercapture / window blur /
   // visibilitychange / 窗口级兜底监听全部走这里收尾，保证 pointer capture、
   // dragging 状态与物理状态一定被清理——不会「卡住 / 消失 / 继续跟随」。
-  // opts.computeVelocity === false 时（失焦/页面隐藏等非主动释放）不计算甩动速度，只恢复摇晃。
-  var finishDrag = function (e, opts) {
-    opts = opts || {};
+  // isDragging 守卫保证多事件到达（如 pointerup 后再 lostpointercapture、
+  // blur 后再 pointerup）时只收尾一次。
+  // 所有路径统一走 resolveSakanaRelease：失焦 / 页面隐藏等非主动释放同样
+  // 保留最后一次有效甩动速度（窗口外松手时常只有 blur 到达），边缘法向吸收
+  // 只作用于平移回弹，角色初始角度按真实甩动方向/速度计算。
+  var finishDrag = function (e) {
     if (!isDragging) return;
     if (e && typeof e.pointerId === 'number' && e.pointerId !== pointerId) return;
     isDragging = false;
@@ -817,56 +914,34 @@ function initSakanaDrag() {
     var clamped = clampSakanaPosition(leftPos, topPos, window.innerWidth, window.innerHeight, widget.offsetWidth, widget.offsetHeight, 8);
     if (clamped.left !== leftPos || clamped.top !== topPos) setPos(clamped.left, clamped.top);
 
-    if (opts.computeVelocity === false) {
-      vx = 0;
-      vy = 0;
-    } else if (samples.length >= 2) {
-      var vel = computeReleaseVelocity(samples);
-      vx = vel.vx;
-      vy = vel.vy;
-    } else {
-      vx = 0;
-      vy = 0;
-    }
-
-    var maxV = SAKANA_PHYSICS.maxVelocity;
-    vx = Math.max(-maxV, Math.min(maxV, vx));
-    vy = Math.max(-maxV, Math.min(maxV, vy));
-
-    // 拖到边缘释放：吸收「朝向墙壁」的法向速度，只保留沿边的切向速度，
-    // 避免指针在边缘继续移动攒出高速、松手后撞墙弹飞整屏。widget 已
-    // 贴住边缘时，让它贴着边缘自然停下（保留少量回弹更有手感）。
-    var wW = widget.offsetWidth, wH = widget.offsetHeight;
-    var vW = window.innerWidth, vH = window.innerHeight;
-    var edgeMargin = 16;
-    if (leftPos <= edgeMargin && vx < 0) vx *= SAKANA_PHYSICS.edgeNormalAbsorb;
-    else if (leftPos >= vW - wW - edgeMargin && vx > 0) vx *= SAKANA_PHYSICS.edgeNormalAbsorb;
-    if (topPos <= edgeMargin && vy < 0) vy *= SAKANA_PHYSICS.edgeNormalAbsorb;
-    else if (topPos >= vH - wH - edgeMargin && vy > 0) vy *= SAKANA_PHYSICS.edgeNormalAbsorb;
-
     var sakana = window.sakanaInstance;
+    // 释放链：速度（采样不足时回退到最后一次有效甩动速度）→ 边缘法向吸收
+    // （仅平移）→ 角色弹簧初始状态（基于未吸收的真实速度，方向/幅度明确）。
+    // vx/vy 在此调用前仍是拖动期间最后一次 move 计算的有效速度（尚未被
+    // release 结果覆盖），作为 fallback 传给所有收尾路径共享的释放链——
+    // 快速拖动并在窗口外松手、采样不足时仍保证整体有轻微回弹。
+    var release = resolveSakanaRelease(
+      samples, leftPos, topPos,
+      window.innerWidth, window.innerHeight,
+      widget.offsetWidth, widget.offsetHeight,
+      sakana ? sakana._state.r : 0,
+      sakana ? sakana._state.y : 0,
+      { fallbackVx: vx, fallbackVy: vy }
+    );
+    vx = release.vx;
+    vy = release.vy;
+
     if (sakana) {
-      // 参考官方实现（_onMouseUp）：释放时保留当前姿态，只恢复弹簧 _run。
-      // 之前用 computeCharState(vx,vy) 直接覆写 r/y/w/t，当拖动后停顿再松手
-      // （采样窗口内速度≈0）时 r=y=w=t=0，_run 一启动就满足停止条件立刻停摆。
-      // 现在：有足够释放速度才按速度设姿态；低速释放保留当前位置并补一个
-      // 轻微回摆量，保证晃动不中止。
-      var state = computeCharState(vx, vy);
-      if (Math.abs(vx) < 3 && Math.abs(vy) < 3) {
-        sakana._state.w = 0;
-        sakana._state.t = 0;
-        if (Math.abs(sakana._state.r) < 0.5 && Math.abs(sakana._state.y) < 0.5) {
-          sakana._state.r = 8;
-          sakana._state.y = 4;
-        }
-      } else {
-        sakana._state.r = state.r;
-        sakana._state.y = state.y;
-        sakana._state.w = state.w;
-        sakana._state.t = state.t;
-      }
-      sakana._state.i = state.i;
-      sakana._state.d = state.d;
+      // 参考官方实现（_onMouseUp）：释放时保留当前姿态，只恢复弹簧 _run；
+      // 高速释放按真实甩动速度映射为明确的初始角度/位移（方向正确、幅度
+      // 可见），低速释放保留当前位置并按最后运动方向补轻微回摆量——
+      // 无论哪种都不会把 r/y/w/t 清零导致 _run 一启动就停摆。
+      sakana._state.r = release.state.r;
+      sakana._state.y = release.state.y;
+      sakana._state.w = release.state.w;
+      sakana._state.t = release.state.t;
+      sakana._state.i = release.state.i;
+      sakana._state.d = release.state.d;
       sakana._lastRunUnix = Date.now();
       if (!sakana._running) {
         sakana._running = true;
@@ -878,13 +953,14 @@ function initSakanaDrag() {
     startBounce();
   };
 
-  var onPointerUp = function (e) { finishDrag(e, { computeVelocity: true }); };
+  var onPointerUp = function (e) { finishDrag(e); };
   // pointercancel / lostpointercapture 等同主动释放（浏览器已结束指针流）
-  var onPointerCancel = function (e) { finishDrag(e, { computeVelocity: true }); };
-  // 窗口失焦 / 页面隐藏：非主动释放，不计算甩动速度，只清理状态并恢复摇晃
-  var onWindowBlur = function () { finishDrag(null, { computeVelocity: false }); };
+  var onPointerCancel = function (e) { finishDrag(e); };
+  // 窗口失焦 / 页面隐藏：非主动释放，但同样保留最后有效甩动速度（窗口外
+  // 松手时常只有 blur 到达），由 resolveSakanaRelease 统一计算
+  var onWindowBlur = function () { finishDrag(null); };
   var onVisibilityChange = function () {
-    if (document.visibilityState === 'hidden') finishDrag(null, { computeVelocity: false });
+    if (document.visibilityState === 'hidden') finishDrag(null);
   };
 
   var startBounce = function () {
@@ -989,7 +1065,7 @@ function initSakanaDrag() {
   };
   var onWindowPointerUp = function (e) {
     if (pointerId != null && widget.hasPointerCapture && widget.hasPointerCapture(pointerId)) return;
-    finishDrag(e, { computeVelocity: true });
+    finishDrag(e);
   };
 
   // resize：用户尚未拖动时重新定位到统一安全位置；已拖动/正在拖动时
