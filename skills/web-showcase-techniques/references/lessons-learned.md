@@ -100,3 +100,15 @@ $env:HTTPS_PROXY="http://127.0.0.1:18808"; opencode run --model opencode-go/gpt-
 ```bash
 git -c http.proxy=http://localhost:18808 -c https.proxy=http://localhost:18808 push origin main
 ```
+
+## 8. 改文件编码：绝不直接用 Set-Content（会毁掉中文）
+
+用 `powershell.exe`（Windows PowerShell 5.1）执行 `Set-Content` 时，默认编码是
+ANSI/GBK，会把 UTF-8 的中文整文件批量损坏成 `�?`，且损坏字节会破坏 HTML
+标签解析（曾导致 nethack 两个 iframe 面板在浏览器里被错误嵌套、游戏区塌陷）。
+**教训**：
+- 改文件优先用编辑工具（保留编码）。
+- 必须脚本批量改时，用 `[System.IO.File]::ReadAllText/WriteAllText` 并显式
+  指定 `UTF8Encoding($false)`（无 BOM），不要用 `Get-Content/Set-Content`。
+- 改完用 `git diff --stat` 核对：若中文文件出现超大 diff（整文件行级变动），
+  几乎必然是编码损坏，用 `git checkout HEAD -- <file>` 恢复后重做。
