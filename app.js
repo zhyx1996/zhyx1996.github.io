@@ -1,7 +1,7 @@
 // ── 扶摇接海 · 个人主页 — 主脚本 ──
 
 const GITHUB_USERNAME = 'zhyx1996';
-const ARTICLE_LAST_SYNC = '2026年8月5日 12:01';
+const ARTICLE_LAST_SYNC = '2026年8月5日 13:06';
 
 // ── 文章数据（博客园同步）──
 const articleFallback = [
