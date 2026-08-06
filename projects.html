@@ -122,7 +122,7 @@
     <!-- Sakana 拖拽小球 -->
     <div id="sakana-drag-widget"></div>
 
-    <script src="/app.js?v=52" defer></script>
+    <script src="/app.js?v=53" defer></script>
     <script>
       (function() {
         var FALLBACK = 15;
@@ -170,7 +170,7 @@
           var fallback = document.createElement('script');
           fallback.async = true;
           fallback.onload = function() { window.initSakanaWidget && window.initSakanaWidget(); };
-          fallback.src = 'https://unpkg.com/sakana-widget@2.7.1/lib/sakana.min.js';
+          fallback.src = 'https://fastly.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js';
           document.head.appendChild(fallback);
         };
         script.src = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js';

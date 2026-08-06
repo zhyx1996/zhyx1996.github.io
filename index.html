@@ -176,7 +176,7 @@
     </footer>
 
     <script type="module" src="/public/pretext-effect.js?v=11"></script>
-    <script src="/app.js?v=52" defer></script>
+    <script src="/app.js?v=53" defer></script>
     <script>
       function initSakanaWidget() {
         if (window.__sakanaWidgetInitialized) return;
@@ -193,7 +193,7 @@
           var fallback = document.createElement('script');
           fallback.async = true;
           fallback.onload = function() { window.initSakanaWidget && window.initSakanaWidget(); };
-          fallback.src = 'https://unpkg.com/sakana-widget@2.7.1/lib/sakana.min.js';
+          fallback.src = 'https://fastly.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js';
           document.head.appendChild(fallback);
         };
         script.src = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js';
