@@ -260,6 +260,19 @@ function computeReleaseVelocity(samples, opts) {
   };
 }
 
+// 与 app.js hasUsableReleaseSamples 相同：窗口内需至少两个不同时间点。
+function hasUsableReleaseSamples(samples, opts) {
+  opts = opts || {};
+  var windowMs = opts.sampleWindowMs || TIME_NORM.sampleWindowMs;
+  if (!samples || samples.length < 2) return false;
+  var last = samples[samples.length - 1];
+  var first = last;
+  for (var i = 0; i < samples.length; i++) {
+    if (last.t - samples[i].t <= windowMs) { first = samples[i]; break; }
+  }
+  return last.t - first.t > 0;
+}
+
 // 与 app.js applyFrameFriction 相同的纯函数：按真实时间施加摩擦
 function applyFrameFriction(vx, vy, dtMs, opts) {
   opts = opts || {};
@@ -275,11 +288,11 @@ function applyFrameFriction(vx, vy, dtMs, opts) {
 // visibilitychange / 窗口兜底）共享，保证窗口外释放、异常取消、失焦时
 // 保留最后一次有效甩动速度，不会把速度清零。
 // opts.fallbackVx/fallbackVy：拖动期间保存的最后一次有效速度；快速拖动并在
-// 窗口外松手时采样可能只有一个点（samples < 2 无法计算），此时回退到该速度，
+// 窗口外松手时采样可能只有一个点，或最近窗口内仅有末点，此时回退到该速度，
 // 保证整体仍有轻微回弹、角色仍按真实甩动方向获得明确初始角度。
 function computeFinalVelocity(samples, opts) {
   opts = opts || {};
-  var vel = (samples && samples.length >= 2)
+  var vel = hasUsableReleaseSamples(samples, opts)
     ? computeReleaseVelocity(samples, opts)
     : { vx: opts.fallbackVx == null ? 0 : opts.fallbackVx, vy: opts.fallbackVy == null ? 0 : opts.fallbackVy };
   var maxV = opts.maxVelocity || BOUNCE_PARAMS.maxVelocity;
@@ -328,8 +341,7 @@ function computeReleaseCharState(vx, vy, currentR, currentY, physics) {
   };
 }
 
-// 与 app.js computeWallCharReactionState 相同的纯函数：按实际碰撞轴合并角色状态。
-// 横向碰撞只更新 r/w，纵向碰撞只更新 y/t，避免连续撞击时清零另一轴。
+// 与 app.js computeWallCharReactionState 相同：保持 r/y，向对应轴速度叠加碰撞脉冲。
 function computeWallCharReactionState(currentState, impactVx, impactVy, physics) {
   physics = physics || TUNED;
   currentState = currentState || {};
@@ -342,12 +354,12 @@ function computeWallCharReactionState(currentState, impactVx, impactVy, physics)
     d: physics.swingDamping
   };
   if (impactVx !== 0) {
-    next.r = Math.max(-physics.charLeanMax * 1.2, Math.min(physics.charLeanMax * 1.2, impactVx * physics.wallLeanFactor));
-    next.w = -next.r * 0.18;
+    var impulseR = Math.max(-physics.charLeanMax * 1.2, Math.min(physics.charLeanMax * 1.2, impactVx * physics.wallLeanFactor));
+    next.w += -impulseR * 0.18;
   }
   if (impactVy !== 0) {
-    next.y = Math.max(-physics.charSwayMax * 1.2, Math.min(physics.charSwayMax * 1.2, impactVy * physics.wallSwayFactor));
-    next.t = -next.y * 0.12;
+    var impulseY = Math.max(-physics.charSwayMax * 1.2, Math.min(physics.charSwayMax * 1.2, impactVy * physics.wallSwayFactor));
+    next.t += -impulseY * 0.12;
   }
   return next;
 }
@@ -878,28 +890,60 @@ function runTests() {
   assert(finishCalls === 1, '多收尾事件到达只收尾一次（finishCalls=' + finishCalls + '）');
   assert(firstRelease && firstRelease.vx === 14 && firstRelease.vy === -6, '首次收尾即使用最后有效速度 fallback');
 
-  // ── 10. 角色碰撞状态：连续撞击不同边界时保留另一轴的摇摆 ──
-  console.log('\n=== 角色碰撞状态合并（按碰撞轴更新）===');
+  // 9j. 数组有两个样本但最近窗口内只有末点时，窗口速度无效，必须 fallback。
+  var staleWindowSamples = [
+    { x: 0, y: 0, t: 0 },
+    { x: 200, y: 80, t: 500 }
+  ];
+  var staleFallback = computeFinalVelocity(staleWindowSamples, {
+    sampleWindowMs: 120,
+    fallbackVx: 14,
+    fallbackVy: -6,
+    maxVelocity: BOUNCE_PARAMS.maxVelocity
+  });
+  assert(staleFallback.vx === 14 && staleFallback.vy === -6,
+    '窗口内仅末点时回退到最后有效速度 vx=' + staleFallback.vx + ', vy=' + staleFallback.vy);
+
+  // 9k. edgeMargin=undefined 仍使用默认 16px，不能覆盖默认值并禁用吸收。
+  var undefinedMarginEdge = applyEdgeAbsorb(10, 5, 1790, 930, 1920, 1080, 130, 150, {
+    edgeMargin: undefined,
+    absorb: BOUNCE_PARAMS.edgeNormalAbsorb
+  });
+  assert(Math.abs(undefinedMarginEdge.vx - 1.5) < 0.001 && Math.abs(undefinedMarginEdge.vy - 0.75) < 0.001,
+    'edgeMargin=undefined 时使用默认边缘吸收 vx=' + undefinedMarginEdge.vx + ', vy=' + undefinedMarginEdge.vy);
+
+  // ── 10. 角色碰撞状态：碰撞只注入速度，不覆盖当前弹簧姿态 ──
+  console.log('\n=== 角色碰撞脉冲（保持弹簧姿态连续）===');
   var initialWallState = { r: 12, y: -7, w: -2, t: 1.5 };
   var afterRight = computeWallCharReactionState(initialWallState, 18, 0);
   var afterBottom = computeWallCharReactionState(afterRight, 0, 10);
-  assert(afterRight.y === initialWallState.y && afterRight.t === initialWallState.t,
-    '右墙碰撞保留已有纵向状态 y=' + afterRight.y + ', t=' + afterRight.t);
+  assert(afterRight.r === initialWallState.r && afterRight.y === initialWallState.y,
+    '右墙碰撞不覆盖当前 r/y 姿态 r=' + afterRight.r + ', y=' + afterRight.y);
+  assert(afterRight.w !== initialWallState.w && afterRight.t === initialWallState.t,
+    '右墙碰撞只向横向速度注入脉冲 w=' + afterRight.w + ', t=' + afterRight.t);
   assert(afterBottom.r === afterRight.r && afterBottom.w === afterRight.w,
-    '右墙后撞底边保留横向状态 r=' + afterBottom.r + ', w=' + afterBottom.w);
-  assert(afterBottom.y !== afterRight.y && afterBottom.t !== afterRight.t,
-    '底边碰撞只更新纵向状态 y=' + afterBottom.y + ', t=' + afterBottom.t);
+    '右墙后撞底边保留横向弹簧状态 r=' + afterBottom.r + ', w=' + afterBottom.w);
+  assert(afterBottom.y === afterRight.y && afterBottom.t !== afterRight.t,
+    '底边碰撞保持 y 并只向 t 注入脉冲 y=' + afterBottom.y + ', t=' + afterBottom.t);
 
   var afterBottomFirst = computeWallCharReactionState(initialWallState, 0, -12);
   var afterRightSecond = computeWallCharReactionState(afterBottomFirst, -16, 0);
   assert(afterRightSecond.y === afterBottomFirst.y && afterRightSecond.t === afterBottomFirst.t,
     '底边后撞右墙保留纵向状态 y=' + afterRightSecond.y + ', t=' + afterRightSecond.t);
-  assert(afterRightSecond.r !== afterBottomFirst.r && afterRightSecond.w !== afterBottomFirst.w,
-    '右墙碰撞只更新横向状态 r=' + afterRightSecond.r + ', w=' + afterRightSecond.w);
+  assert(afterRightSecond.r === afterBottomFirst.r && afterRightSecond.w !== afterBottomFirst.w,
+    '右墙碰撞保持 r 并只向 w 注入脉冲 r=' + afterRightSecond.r + ', w=' + afterRightSecond.w);
 
   var cornerState = computeWallCharReactionState(initialWallState, -20, 14);
-  assert(cornerState.r !== initialWallState.r && cornerState.y !== initialWallState.y,
-    '双轴碰撞同时更新横向和纵向状态 r=' + cornerState.r + ', y=' + cornerState.y);
+  assert(cornerState.r === initialWallState.r && cornerState.y === initialWallState.y,
+    '双轴碰撞仍保持当前 r/y 姿态 r=' + cornerState.r + ', y=' + cornerState.y);
+  assert(cornerState.w !== initialWallState.w && cornerState.t !== initialWallState.t,
+    '双轴碰撞同时向 w/t 注入脉冲 w=' + cornerState.w + ', t=' + cornerState.t);
+
+  // 真实边缘日志回归：释放 r≈21.92，46ms 后 impactVx≈2.97；不能被覆盖成 r≈4.9。
+  var observedEdgeState = { r: 21.9163, y: 11.2276, w: -40, t: -30 };
+  var afterLightEdgeImpact = computeWallCharReactionState(observedEdgeState, 2.9707, 0);
+  assert(afterLightEdgeImpact.r === observedEdgeState.r && Math.abs(afterLightEdgeImpact.w) > 30,
+    '轻微边缘碰撞保留释放初始角度与已有角速度 r=' + afterLightEdgeImpact.r + ', w=' + afterLightEdgeImpact.w);
 
   // ── 总结 ──
   console.log('\n=== 总结 ===');

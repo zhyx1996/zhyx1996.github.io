@@ -520,6 +520,24 @@ function computeReleaseVelocity(samples, options) {
   };
 }
 
+// 判断释放采样窗口内是否至少有两个不同时间点。数组长度足够并不代表
+// 最近窗口可计算速度：指针停顿、窗口外释放或稀疏事件都可能只留下末点。
+function hasUsableReleaseSamples(samples, options) {
+  const opts = Object.assign({
+    sampleWindowMs: SAKANA_PHYSICS.velocitySampleWindowMs
+  }, options || {});
+  if (!Array.isArray(samples) || samples.length < 2) return false;
+  const last = samples[samples.length - 1];
+  let first = last;
+  for (let i = 0; i < samples.length; i++) {
+    if (last.t - samples[i].t <= opts.sampleWindowMs) {
+      first = samples[i];
+      break;
+    }
+  }
+  return last.t - first.t > 0;
+}
+
 // 纯函数：按真实经过时间施加摩擦（帧率归一化）。
 // dtMs 为相邻动画帧的时间差；decay = friction^(dt/frameMs)，
 // 使 60/120/144Hz 设备在同一真实时间内的速度衰减一致。
@@ -635,9 +653,9 @@ function computeCharState(vx, vy, physics) {
   };
 }
 
-// 纯函数：按实际碰撞轴合并角色反应状态。
-// 横向碰撞只更新 r/w，纵向碰撞只更新 y/t；未碰撞轴保留已有弹簧状态，
-// 避免连续撞击不同边界时后一次碰撞把前一轴的摇摆清零。
+// 纯函数：按实际碰撞轴向角色弹簧注入速度脉冲。
+// 碰撞不能覆盖释放时的 r/y 初始角度或已有 w/t，否则贴边释放会在几十
+// 毫秒内被小幅墙反应强制回正；这里只叠加对应轴速度，保持弹簧轨迹连续。
 function computeWallCharReactionState(currentState, impactVx, impactVy, physics) {
   physics = physics || SAKANA_PHYSICS;
   currentState = currentState || {};
@@ -651,12 +669,12 @@ function computeWallCharReactionState(currentState, impactVx, impactVy, physics)
   };
 
   if (impactVx !== 0) {
-    next.r = Math.max(-physics.charLeanMax * 1.2, Math.min(physics.charLeanMax * 1.2, impactVx * physics.wallLeanFactor));
-    next.w = -next.r * 0.18;
+    var impulseR = Math.max(-physics.charLeanMax * 1.2, Math.min(physics.charLeanMax * 1.2, impactVx * physics.wallLeanFactor));
+    next.w += -impulseR * 0.18;
   }
   if (impactVy !== 0) {
-    next.y = Math.max(-physics.charSwayMax * 1.2, Math.min(physics.charSwayMax * 1.2, impactVy * physics.wallSwayFactor));
-    next.t = -next.y * 0.12;
+    var impulseY = Math.max(-physics.charSwayMax * 1.2, Math.min(physics.charSwayMax * 1.2, impactVy * physics.wallSwayFactor));
+    next.t += -impulseY * 0.12;
   }
 
   return next;
@@ -668,15 +686,16 @@ function computeWallCharReactionState(currentState, impactVx, impactVy, physics)
 // 场景保留最后一次有效甩动速度，不会把速度清零。
 // options.fallbackVx/fallbackVy：拖动期间保存的最后一次有效速度。快速拖动
 // 并在窗口外松手时采样可能只有 pointerdown 一个点（samples < 2 无法计算），
-// 此时回退到最后一次有效甩动速度，保证整体仍有轻微回弹、角色仍按真实甩动
-// 方向获得明确初始角度；采样充足时窗口速度优先，fallback 不覆盖真实采样。
+// 或窗口内只剩一个有效时间点时回退到最后一次有效甩动速度，保证整体仍有
+// 轻微回弹、角色仍按真实甩动方向获得明确初始角度；采样窗口有效时其速度
+// 优先，fallback 不覆盖真实采样。
 function computeFinalVelocity(samples, options) {
   const opts = Object.assign({
     sampleWindowMs: SAKANA_PHYSICS.velocitySampleWindowMs,
     frameMs: SAKANA_PHYSICS.frameMs,
     maxVelocity: SAKANA_PHYSICS.maxVelocity
   }, options || {});
-  const vel = (Array.isArray(samples) && samples.length >= 2)
+  const vel = hasUsableReleaseSamples(samples, opts)
     ? computeReleaseVelocity(samples, opts)
     : {
       vx: opts.fallbackVx == null ? 0 : opts.fallbackVx,
@@ -693,17 +712,15 @@ function computeFinalVelocity(samples, options) {
 // 返回值同时给出角色弹簧使用的真实甩动速度（charVx/charVy，不受吸收影响），
 // 实现「整体平移只轻微回弹、角色仍按真实甩动方向/速度获得初始摇摆」的分离。
 function applyEdgeAbsorb(vx, vy, leftPos, topPos, viewportW, viewportH, widgetW, widgetH, options) {
-  const opts = Object.assign({
-    edgeMargin: 16,
-    absorb: SAKANA_PHYSICS.edgeNormalAbsorb
-  }, options || {});
-  const m = opts.edgeMargin;
+  const opts = options || {};
+  const m = opts.edgeMargin == null ? 16 : opts.edgeMargin;
+  const absorb = opts.absorb == null ? SAKANA_PHYSICS.edgeNormalAbsorb : opts.absorb;
   const charVx = vx;
   const charVy = vy;
-  if (leftPos <= m && vx < 0) vx *= opts.absorb;
-  else if (leftPos >= viewportW - widgetW - m && vx > 0) vx *= opts.absorb;
-  if (topPos <= m && vy < 0) vy *= opts.absorb;
-  else if (topPos >= viewportH - widgetH - m && vy > 0) vy *= opts.absorb;
+  if (leftPos <= m && vx < 0) vx *= absorb;
+  else if (leftPos >= viewportW - widgetW - m && vx > 0) vx *= absorb;
+  if (topPos <= m && vy < 0) vy *= absorb;
+  else if (topPos >= viewportH - widgetH - m && vy > 0) vy *= absorb;
   return { vx: vx, vy: vy, charVx: charVx, charVy: charVy };
 }
 
@@ -831,6 +848,7 @@ window.__sakanaPhysics = {
   computeCharState: computeCharState,
   computeWallCharReactionState: computeWallCharReactionState,
   computeReleaseVelocity: computeReleaseVelocity,
+  hasUsableReleaseSamples: hasUsableReleaseSamples,
   computeFinalVelocity: computeFinalVelocity,
   applyEdgeAbsorb: applyEdgeAbsorb,
   computeReleaseCharState: computeReleaseCharState,

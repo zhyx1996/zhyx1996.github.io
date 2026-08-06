@@ -264,12 +264,12 @@ document.addEventListener('touchend', onPointerUp);
 因此释放链应遵循：
 
 ```text
-样本数 >= 2  -> 最近时间窗口首尾速度
-样本数 < 2   -> pointermove 阶段保存的最后有效 vx/vy
-两者都无效   -> 0，再由低速释放逻辑补一个轻微姿态
+窗口内有 >= 2 个不同时间点 -> 最近时间窗口首尾速度
+窗口内只有末点或总样本不足 -> pointermove 阶段保存的最后有效 vx/vy
+两者都无效                 -> 0，再由低速释放逻辑补一个轻微姿态
 ```
 
-最终速度必须经过 `maxVelocity` 限制。fallback 不能覆盖有效的窗口样本，否则会让正常释放速度失真。
+不能只检查 `samples.length >= 2`：旧样本可能全部落在 120ms 窗口之外，窗口内实际只剩末点，计算结果仍会退化为 0。最终速度必须经过 `maxVelocity` 限制；fallback 不能覆盖真正有效的窗口样本，否则会让正常释放速度失真。
 
 ### 3. 平移回弹和角色摇摆必须分离
 
@@ -281,6 +281,8 @@ document.addEventListener('touchend', onPointerUp);
 ```
 
 如果直接用吸收后的速度设置角色角度，贴边快速释放时初始角度会接近零，看起来像没有摇摆。当前实现通过 `applyEdgeAbsorb()` 同时返回两套速度：平移速度保守回弹，角色速度保留真实方向并受角度上限限制。
+
+默认参数要防止 `undefined` 覆盖。`Object.assign({ edgeMargin: 16 }, { edgeMargin: undefined })` 的结果仍是 `undefined`，会让所有边缘比较失效；应使用 `opts.edgeMargin == null ? 16 : opts.edgeMargin` 这类空值判断。
 
 释放给 Sakana 内部弹簧时只设置初始位移，不额外注入角速度：
 
@@ -307,6 +309,8 @@ nextLeft = Math.max(0, Math.min(maxLeft, nextLeft));
 ```
 
 位置先被钳回边界，再根据碰撞前速度方向反弹。否则在高刷新率、窗口缩小或一次位移跨过边界时，组件可能穿透墙面或在墙边反复抖动。`requestAnimationFrame` 中应使用真实 `dt` 对摩擦和位移做归一化。
+
+墙碰撞对角色弹簧应表现为速度脉冲，而不是状态覆盖。贴边释放时角色可能已有 `r=20+` 的初始角度和较大的 `w`；如果几帧后的轻微碰撞按吸收后的速度重新赋值 `r/w`，会在几十毫秒内把弹簧强制回正。正确处理是保持当前 `r/y`，在已有 `w/t` 上叠加对应轴的小脉冲；连续撞击不同边界也不能清零另一轴。
 
 ### 5. 初始化与视觉验收也有时序要求
 
