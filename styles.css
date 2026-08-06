@@ -1915,6 +1915,13 @@ body.nk-dark .nk-cmd-grid kbd {
     text-align: center;
     border-radius: 4px;
 }
+/* 必须放在 .nethack-frame-error { display:flex } 之后：恢复 hidden 属性的
+   默认隐藏语义。否则作者样式的 display:flex 会覆盖 UA 的 [hidden]{display:none}，
+   导致错误层永远显示、盖住已加载成功的 iframe。 */
+.nethack-frame-loading[hidden],
+.nethack-frame-error[hidden] {
+    display: none;
+}
 .nethack-frame-loading {
     animation: market-pulse 1.5s ease-in-out infinite;
 }
