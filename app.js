@@ -1,7 +1,7 @@
 // ── 扶摇接海 · 个人主页 — 主脚本 ──
 
 const GITHUB_USERNAME = 'zhyx1996';
-const ARTICLE_LAST_SYNC = '2026年8月6日 23:02';
+const ARTICLE_LAST_SYNC = '2026年8月7日 21:47';
 
 // ── 文章数据（博客园同步）──
 const articleFallback = [
@@ -13,9 +13,9 @@ const articleFallback = [
   },
   {
     date: '2026年5月28日',
-    title: '123云盘同步盘 MaintenanceService 进程异常排查与修复',
+    title: '123云盘报错：检测到本地通信被防火墙或vpn拦截',
     url: 'https://www.cnblogs.com/fix-me/p/20194105',
-    summary: '排查 123云盘同步盘 MaintenanceService 进程异常占用资源的问题，通过日志定位并修复。'
+    summary: '排查 123云盘同步盘报错「检测到本地通信被防火墙或vpn拦截」的问题，通过 MaintenanceService 日志定位并修复。'
   },
   {
     date: '2026年4月23日',
