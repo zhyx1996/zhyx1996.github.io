@@ -1,7 +1,7 @@
 // ── 扶摇接海 · 个人主页 — 主脚本 ──
 
 const GITHUB_USERNAME = 'zhyx1996';
-const ARTICLE_LAST_SYNC = '2026年8月8日 17:33';
+const ARTICLE_LAST_SYNC = '2026年8月8日 18:33';
 
 // ── 文章数据（博客园同步）──
 const articleFallback = [
@@ -10,6 +10,12 @@ const articleFallback = [
     title: 'Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及pyinstaller打包',
     url: 'https://www.cnblogs.com/fix-me/p/20968815',
     summary: 'Windows + Python + GStreamer + 打包的实战记录，涵盖环境安装、RTSP 推流、SEI 注入与 pyinstaller 打包的完整流程与踩坑经验。'
+  },
+  {
+    date: '2026年5月28日',
+    title: '123SyncCloud 客服日志排查记录',
+    url: 'https://www.cnblogs.com/fix-me/p/20194105',
+    summary: '记录排查 123SyncCloud 客服日志的过程，通过查看 MaintenanceServer.log 定位问题。'
   },
   {
     date: '2026年4月23日',
