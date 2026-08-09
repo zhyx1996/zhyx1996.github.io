@@ -1,7 +1,7 @@
 // ── 扶摇接海 · 个人主页 — 主脚本 ──
 
 const GITHUB_USERNAME = 'zhyx1996';
-const ARTICLE_LAST_SYNC = '2026年8月9日 09:15';
+const ARTICLE_LAST_SYNC = '2026年8月9日 15:35';
 
 // ── 文章数据（博客园同步）──
 const articleFallback = [
@@ -10,6 +10,12 @@ const articleFallback = [
     title: 'Windows 下用 Python + GStreamer 推 RTSP 流并注入 SEI，以及pyinstaller打包',
     url: 'https://www.cnblogs.com/fix-me/p/20968815',
     summary: 'Windows + Python + GStreamer + 打包的实战记录，涵盖环境安装、RTSP 推流、SEI 注入与 pyinstaller 打包的完整流程与踩坑经验。'
+  },
+  {
+    date: '2026年5月28日',
+    title: '123云盘报错：检测到本地通信被防火墙或vpn拦截',
+    url: 'https://www.cnblogs.com/fix-me/p/20194105',
+    summary: '123云盘报“检测到本地通信被防火墙或vpn拦截”，通过查看 SyncCloud.MaintenanceServer.log 日志定位问题的排查记录。'
   },
   {
     date: '2026年4月23日',
