@@ -28,7 +28,7 @@
     <link rel="preconnect" href="https://api.coingecko.com" crossorigin>
     <link rel="preconnect" href="https://api.gold-api.com" crossorigin>
     <link rel="preconnect" href="https://corsproxy.io" crossorigin>
-    <link rel="stylesheet" href="/styles.css?v=57">
+    <link rel="stylesheet" href="/styles.css?v=58">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.0/lib/sakana.min.css" />
     <style>
         /* 防止 FOUC */
@@ -71,6 +71,7 @@
                 <a class="nav-item" href="/stars.html">收藏</a>
                 <a class="nav-item" href="/articles.html">文章</a>
                 <a class="nav-item" href="/nethack.html">NetHack</a>
+                <a class="nav-item" href="/gomoku.html">五子棋</a>
             </nav>
             <div class="sidebar-footer">
                 <a class="sidebar-meta" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">GitHub</a>
@@ -154,6 +155,16 @@
                         </div>
                         <div class="steam-embed" id="steam-profile" aria-live="polite" aria-busy="true">
                             <div class="steam-loading">加载中...</div>
+                        </div>
+                    </div>
+                    <div class="showcase-item showcase-wide">
+                        <a class="showcase-header showcase-link" href="/gomoku.html">
+                            <span class="showcase-badge">五子棋</span>
+                            <span class="showcase-frame">Rapfi AI · 本地运行 →</span>
+                        </a>
+                        <div class="gomoku-preview">
+                            <p>基于 Rapfi 引擎 + NNUE 神经网络的五子棋 AI，纯前端运行，支持人机对战与棋局分析。</p>
+                            <a class="btn btn-primary" href="/gomoku.html">开始对弈</a>
                         </div>
                     </div>
                 </div>
