@@ -24,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css?v=61">
-    <link rel="stylesheet" href="/gomoku/style.css?v=1">
+    <link rel="stylesheet" href="/gomoku/style.css?v=3">
     <style>
         body { opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards; }
         @keyframes fadeIn { to { opacity: 1; } }
@@ -87,7 +87,22 @@
                 <!-- Tab1：本地版 -->
                 <div class="gm-tab-panel" data-gm-panel="native">
                     <div id="gm-native-root"></div>
-                    <div class="nk-window-statusbar">本地版：Rapfi AI 引擎纯前端运行（WebAssembly + NNUE 神经网络），无需服务器。下出活三/冲四/四三时棋子高亮特效，连五胜利时播放庆祝动画。提示：AI 的 NNUE 权重主要针对 15 路训练，其他棋盘尺寸会回退 classical 估值（棋力略降）。引擎：<a class="gm-link" href="https://github.com/dhbloo/rapfi" target="_blank" rel="noreferrer">Rapfi GitHub ↗</a></div>
+                    <div class="gm-native-info">
+                        <div class="gm-native-info-head">
+                            <span class="gm-native-info-title">本地版引擎</span>
+                            <span class="gm-badges">
+                                <span class="gm-badge">WebAssembly</span>
+                                <span class="gm-badge">NNUE 神经网络</span>
+                                <span class="gm-badge">纯前端 · 无需服务器</span>
+                            </span>
+                        </div>
+                        <p class="gm-native-info-desc">基于 Rapfi 引擎的 AI 对弈：支持人机对战、棋局多点分析；下出 <b>活四 / 冲四 / 四三</b> 等制胜棋型时棋子高亮，连五胜利播放庆祝动画。</p>
+                        <p class="gm-native-info-note">提示：NNUE 权重主要针对 15 路训练，其他棋盘尺寸会回退 classical 估值（棋力略降）。</p>
+                        <div class="gm-native-info-foot">
+                            <span>引擎：<a href="https://github.com/dhbloo/rapfi" target="_blank" rel="noreferrer">Rapfi GitHub ↗</a></span>
+                            <span><a href="/gomoku-godot/">Godot 网页版 ↗</a></span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Tab2：原 iframe 版 -->

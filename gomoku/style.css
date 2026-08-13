@@ -1,18 +1,12 @@
-/* 五子棋本地版 —— 现代深色主题 */
+/* 五子棋本地版 —— 设置面板跟随站点主题（暖色琥珀），棋盘区保持游戏暗色主题 */
 
+/* ── 标签页 ── */
 .gm-native-tabs {
     display: flex;
     gap: 8px;
     margin-bottom: 20px;
-    border-bottom: 1px solid #2a3654;
+    border-bottom: 1px solid var(--border-light);
     padding-bottom: 0;
-}
-
-/* 本地版状态栏里的引擎链接：不换行、有下划线、颜色明显 */
-.gm-tab-panel .nk-window-statusbar a.gm-link {
-    white-space: nowrap;
-    text-decoration: underline;
-    font-weight: 600;
 }
 
 .gm-native-tab {
@@ -22,19 +16,29 @@
     background: transparent;
     border: none;
     border-bottom: 2px solid transparent;
-    color: #94a3b8;
+    color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: color 0.15s, border-color 0.15s;
 }
 
-.gm-native-tab:hover { color: #e2e8f0; }
+.gm-native-tab:hover { color: var(--text); }
 .gm-native-tab.active {
-    color: #22d3ee;
-    border-bottom-color: #22d3ee;
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
 }
 
 .gm-tab-panel { }
 
+/* ── 引擎链接 ── */
+.gm-tab-panel a.gm-link {
+    white-space: nowrap;
+    text-decoration: underline;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+/* ── 布局 ── */
 .gm-native {
     display: flex;
     gap: 24px;
@@ -50,7 +54,7 @@
 .gm-native-canvas {
     display: block;
     border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+    box-shadow: var(--shadow-lg);
     cursor: pointer;
     touch-action: manipulation;
 }
@@ -63,33 +67,35 @@
     gap: 16px;
 }
 
+/* ── 设置卡片 ── */
 .gm-native-card {
-    background: rgba(20, 26, 44, 0.85);
-    border: 1px solid #2a3654;
-    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     padding: 16px;
-    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-sm);
 }
 
 .gm-native-card h3 {
-    margin: 0 0 10px;
+    margin: 0 0 12px;
     font-family: var(--font-mono, monospace);
-    font-size: 13px;
-    letter-spacing: 0.04em;
-    color: #22d3ee;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--accent);
     text-transform: uppercase;
+    font-weight: 600;
 }
 
 .gm-native-status {
     font-size: 19px;
     font-weight: 600;
-    color: #e2e8f0;
+    color: var(--text);
     min-height: 1.5em;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
-.gm-native-status.gm-win { color: #fbbf24; text-shadow: 0 0 16px rgba(251,191,36,0.5); }
-.gm-native-status.gm-thinking { color: #22d3ee; }
+.gm-native-status.gm-win { color: var(--accent); }
+.gm-native-status.gm-thinking { color: var(--teal); }
 
 .gm-native-controls {
     display: flex;
@@ -103,55 +109,136 @@
 }
 .gm-native-row .gm-native-btn { flex: 1; text-align: center; }
 
+/* ── 设置按钮（对齐站点 .btn 风格） ── */
 .gm-native-btn {
     padding: 9px 12px;
     font-family: var(--font-mono, monospace);
     font-size: 13px;
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    color: #cbd5e1;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.15s;
     text-align: left;
+    line-height: 1.4;
 }
 
 .gm-native-btn:hover {
-    background: #273449;
-    border-color: #22d3ee;
-    color: #f1f5f9;
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--text);
 }
 
+.gm-native-btn:active { transform: translateY(1px); }
+
 .gm-native-btn.gm-primary {
-    background: #0ea5e9;
-    border-color: #0ea5e9;
+    background: var(--accent);
+    border-color: var(--accent);
     color: #fff;
     text-align: center;
     font-weight: 600;
 }
 
 .gm-native-btn.gm-primary:hover {
-    background: #22d3ee;
-    border-color: #22d3ee;
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: #fff;
 }
 
+/* ── 实时分析面板 ── */
 .gm-native-analysis {
     font-size: 12px;
-    color: #94a3b8;
-    line-height: 1.6;
+    color: var(--text-muted);
+    line-height: 1.7;
     font-family: var(--font-mono, monospace);
 }
 
 .gm-native-analysis .gm-kv {
     display: flex;
     justify-content: space-between;
-    padding: 2px 0;
-    border-bottom: 1px dashed rgba(59, 74, 107, 0.4);
+    gap: 12px;
+    padding: 3px 0;
+    border-bottom: 1px dashed var(--border-light);
 }
 
 .gm-native-analysis .gm-kv:last-child { border-bottom: none; }
-.gm-native-analysis .gm-kv b { color: #e2e8f0; font-weight: 500; }
+.gm-native-analysis .gm-kv b { color: var(--text); font-weight: 500; text-align: right; word-break: break-all; }
 
+/* ── 引擎信息说明 ── */
+.gm-native-info {
+    margin-top: 16px;
+    padding: 16px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.gm-native-info-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.gm-native-info-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+}
+
+.gm-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.gm-badge {
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+
+.gm-native-info-desc {
+    margin: 0 0 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.gm-native-info-desc b { color: var(--accent); font-weight: 600; }
+
+.gm-native-info-note {
+    margin: 0 0 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.gm-native-info-foot {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding-top: 8px;
+    border-top: 1px dashed var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.gm-native-info-foot a { color: var(--accent); font-weight: 600; }
+
+/* ── 棋盘加载遮罩（覆盖在暗色棋盘上，保持暗色） ── */
 .gm-native-loading {
     position: absolute;
     inset: 0;
@@ -172,13 +259,14 @@
     width: 36px;
     height: 36px;
     border: 3px solid #2a3654;
-    border-top-color: #22d3ee;
+    border-top-color: var(--accent);
     border-radius: 50%;
     animation: gm-spin 0.8s linear infinite;
 }
 
 @keyframes gm-spin { to { transform: rotate(360deg); } }
 
+/* ── 胜利横幅（覆盖在棋盘上） ── */
 .gm-native-win-banner {
     position: absolute;
     top: 38%;
@@ -187,7 +275,7 @@
     font-size: 56px;
     font-weight: 700;
     color: #fbbf24;
-    text-shadow: 0 0 24px rgba(251,191,36,0.7), 0 4px 8px rgba(0,0,0,0.6);
+    text-shadow: 0 0 24px rgba(251, 191, 36, 0.7), 0 4px 8px rgba(0, 0, 0, 0.6);
     pointer-events: none;
     opacity: 0;
     z-index: 10;
@@ -206,6 +294,7 @@
     100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
 }
 
+/* ── 响应式 ── */
 @media (max-width: 800px) {
     .gm-native { flex-direction: column; gap: 16px; }
     .gm-native-side { min-width: auto; width: 100%; }
@@ -216,6 +305,7 @@
 
 @media (max-width: 480px) {
     .gm-native-card { padding: 12px; }
+    .gm-native-info { padding: 12px 14px; }
     .gm-native-status { font-size: 16px; }
     .gm-native-btn { font-size: 12px; padding: 8px 10px; }
     .gm-native-win-banner { font-size: 28px; }
