@@ -1966,10 +1966,22 @@ body.nk-dark .nk-cmd-grid kbd {
     cursor: not-allowed;
 }
 .gm-board-iframe {
-    height: 620px;
+    /* 高度由 .gm-board-wrap .gm-board-iframe 裁切规则控制（桌面 1690px / 移动 620px） */
 }
 .gm-settings-iframe {
     height: 560px;
+}
+
+/* 棋盘 iframe 裁切：去掉 gomocalc 自带的顶栏(46px fixed)与底部 tab 栏(50px fixed)，只露棋盘+分析面板 */
+.gm-board-wrap {
+    overflow: hidden;
+    border-radius: 4px;
+}
+.gm-board-wrap .gm-board-iframe {
+    display: block;
+    height: 1690px; /* 棋盘(824) + 分析面板(718) + header(46) + 缓冲 */
+    margin-top: -46px; /* 裁掉顶部 fixed header */
+    margin-bottom: -50px; /* 裁掉底部 fixed tabbar */
 }
 
 /* 外部游戏 iframe：加载占位 / 失败兜底 */
@@ -2046,8 +2058,13 @@ body.nk-dark .nk-cmd-grid kbd {
 }
 @media (max-width: 800px) {
     .nethack-iframe, .nethack-iframe-3d { height: 450px; }
-    .gm-board-iframe { height: 420px; }
     .gm-settings-iframe { height: 520px; }
+    /* 移动端 gomocalc 自动上下排布，去掉桌面端的裁切 */
+    .gm-board-wrap .gm-board-iframe {
+        height: 620px;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
 }
 
 
