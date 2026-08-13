@@ -37,6 +37,12 @@
               <button class="gm-native-btn" id="gm-btn-think">思考：中等</button>
               <button class="gm-native-btn" id="gm-btn-cand">选点：较大</button>
               <button class="gm-native-btn" id="gm-btn-nbest">分析点：1</button>
+              <button class="gm-native-btn" id="gm-btn-size">棋盘：15×15</button>
+              <button class="gm-native-btn" id="gm-btn-theme">主题：深色</button>
+              <div class="gm-native-row">
+                <button class="gm-native-btn" id="gm-btn-coord">坐标：开</button>
+                <button class="gm-native-btn" id="gm-btn-index">序号：关</button>
+              </div>
               <div class="gm-native-row">
                 <button class="gm-native-btn gm-primary" id="gm-btn-undo">↶ 悔棋</button>
                 <button class="gm-native-btn gm-primary" id="gm-btn-restart">↻ 新局</button>
@@ -126,6 +132,37 @@
       updateButtons();
     });
 
+    // 棋盘大小 / 主题 / 显示选项
+    let uiState = { theme: 0, showCoord: true, showIndex: false };
+    document.getElementById('gm-btn-size').addEventListener('click', () => {
+      const sizes = [5, 9, 11, 13, 15, 17, 19];
+      const cur = game.N;
+      const idx = sizes.indexOf(cur);
+      const next = sizes[(idx + 1) % sizes.length];
+      game.setBoardSize(next);
+      board.resize(next);
+      updateButtons();
+    });
+    document.getElementById('gm-btn-theme').addEventListener('click', () => {
+      uiState.theme = (uiState.theme + 1) % 3;
+      board.setTheme(uiState.theme);
+      const themeNames = ['深色', '木质', '浅色'];
+      document.getElementById('gm-btn-theme').textContent = '主题：' + themeNames[uiState.theme];
+      updateButtons();
+    });
+    document.getElementById('gm-btn-coord').addEventListener('click', () => {
+      uiState.showCoord = !uiState.showCoord;
+      board.setShowCoord(uiState.showCoord);
+      document.getElementById('gm-btn-coord').textContent = '坐标：' + (uiState.showCoord ? '开' : '关');
+      updateButtons();
+    });
+    document.getElementById('gm-btn-index').addEventListener('click', () => {
+      uiState.showIndex = !uiState.showIndex;
+      board.setShowIndex(uiState.showIndex);
+      document.getElementById('gm-btn-index').textContent = '序号：' + (uiState.showIndex ? '开' : '关');
+      updateButtons();
+    });
+
     // 窗口尺寸变化时重算棋盘
     let resizeTimer = null;
     window.addEventListener('resize', () => {
@@ -199,6 +236,7 @@
   function onState(s) {
     // 更新棋盘渲染数据
     board.setBoard(s.board, s.lastMove, s.winningCells, s.threatCells, s.threatType);
+    board.setMoveHistory(game.moveHistory);
 
     // 更新状态文字
     let txt = '';
@@ -249,6 +287,8 @@
     if (thinkBtn) thinkBtn.textContent = '思考：' + thinkNames[game.getConfig('thinkIndex')];
     if (candBtn) candBtn.textContent = '选点：' + candNames[game.getConfig('cautionFactor')];
     if (nbestBtn) nbestBtn.textContent = '分析点：' + game.getConfig('nbest');
+    const sizeBtn = document.getElementById('gm-btn-size');
+    if (sizeBtn) sizeBtn.textContent = '棋盘：' + game.N + '×' + game.N;
   }
 
   function updateAnalysis() {

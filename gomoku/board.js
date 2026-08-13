@@ -36,6 +36,10 @@ const GomokuBoard = (() => {
   let fxTime = 0;
   let cellSize = 40;
   let padding = 48;
+  let moveHistory = [];      // 落子历史（用于序号）
+  let showCoord = true;      // 显示坐标
+  let showIndex = false;     // 显示落子序号
+  let themeIndex = 0;        // 主题 0深色/1木质/2浅色
 
   function getLogicalSize() {
     // 逻辑尺寸（CSS 像素）：canvas 已按 DPR 放大物理像素并用 ctx.setTransform 缩放，
@@ -67,6 +71,33 @@ const GomokuBoard = (() => {
     threatCells = threat;
     threatType = ttype;
   }
+
+  // 设置落子历史（用于序号显示）
+  function setMoveHistory(history) {
+    moveHistory = history || [];
+  }
+
+  // 主题切换
+  const THEMES = [
+    { bgTop: '#0b1120', bgBottom: '#1e1b2e', board: '#141a2c', grid: '#3b4a6b', star: '#5b6b8c', black: '#2b3242', white: '#eef2ff' },
+    { bgTop: '#2a1f14', bgBottom: '#1a120b', board: '#d4a156', grid: '#5b371b', star: '#3b2410', black: '#1f1f1f', white: '#f5efe2' },
+    { bgTop: '#e8ecf3', bgBottom: '#d5dbe6', board: '#c9b28a', grid: '#6b5b3e', star: '#4a3d28', black: '#1a1a1a', white: '#ffffff' },
+  ];
+  function setTheme(idx) {
+    themeIndex = idx;
+    const t = THEMES[idx];
+    if (!t) return;
+    COLORS.bgTop = t.bgTop;
+    COLORS.bgBottom = t.bgBottom;
+    COLORS.board = t.board;
+    COLORS.grid = t.grid;
+    COLORS.star = t.star;
+    COLORS.black = t.black;
+    COLORS.white = t.white;
+  }
+
+  function setShowCoord(v) { showCoord = v; }
+  function setShowIndex(v) { showIndex = v; }
 
   function cellToScreen(cell) {
     return { x: padding + cell.x * cellSize, y: padding + cell.y * cellSize };
@@ -126,16 +157,33 @@ const GomokuBoard = (() => {
       ctx.stroke();
     }
 
-    // 星位
-    const stars = n === 15
-      ? [[3,3],[11,3],[7,7],[3,11],[11,11]]
-      : [[Math.floor(n/2), Math.floor(n/2)]];
+    // 星位（按棋盘大小动态计算）
+    const stars = [];
+    if (n >= 7) {
+      const starPad = Math.floor(n / 5);
+      const starCenter = Math.floor(n / 2);
+      const far = n - 1 - starPad;
+      stars.push([starPad, starPad], [far, starPad], [starPad, far], [far, far], [starCenter, starCenter]);
+    }
     ctx.fillStyle = COLORS.star;
     for (const [sx, sy] of stars) {
       const p = cellToScreen({ x: sx, y: sy });
       ctx.beginPath();
       ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
       ctx.fill();
+    }
+
+    // 坐标标注
+    if (showCoord) {
+      ctx.fillStyle = '#7d8aa8';
+      ctx.font = '11px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      for (let i = 0; i < n; i++) {
+        const letter = String.fromCharCode(65 + i);
+        ctx.fillText(letter, padding + i * cellSize, padding - 20);
+        ctx.fillText(String(i + 1), padding - 24, padding + i * cellSize);
+      }
     }
   }
 
@@ -196,6 +244,18 @@ const GomokuBoard = (() => {
           ctx.beginPath();
           ctx.arc(p.x - r * 0.25, p.y - r * 0.3, r * 0.28, 0, Math.PI * 2);
           ctx.fill();
+        }
+
+        // 落子序号
+        if (showIndex) {
+          const idx = moveHistory.findIndex(m => m && m.x === x && m.y === y) + 1;
+          if (idx > 0) {
+            ctx.fillStyle = v === 1 ? '#ffffff' : '#1f2937';
+            ctx.font = 'bold 11px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(String(idx), p.x, p.y + 1);
+          }
         }
       }
     }
@@ -276,5 +336,5 @@ const GomokuBoard = (() => {
     return { x, y };
   }
 
-  return { init, resize, setBoard, render, screenToCell, COLORS, cellToScreen };
+  return { init, resize, setBoard, render, screenToCell, COLORS, cellToScreen, setTheme, setShowCoord, setShowIndex, setMoveHistory };
 })();

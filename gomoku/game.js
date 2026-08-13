@@ -2,7 +2,7 @@
  * 五子棋游戏主逻辑：整合引擎、棋盘、棋型检测、AI 对战
  */
 const GomokuGame = (() => {
-  const N = 15;
+  let N = 15;             // 棋盘大小（可变 5~22）
   const DIRS = [[1,0],[0,1],[1,1],[1,-1]];
 
   // 游戏状态
@@ -15,6 +15,7 @@ const GomokuGame = (() => {
   let threatCells = [];
   let threatType = '';
   let aiThinking = false;
+  let moveHistory = [];
 
   // 配置
   let mode = 'pve';         // pve | pvp
@@ -58,6 +59,7 @@ const GomokuGame = (() => {
     threatCells = [];
     threatType = '';
     aiThinking = false;
+    moveHistory = [];
     notify();
   }
 
@@ -207,6 +209,7 @@ const GomokuGame = (() => {
     board[y][x] = currentPlayer;
     lastMove = { x, y };
     moveCount++;
+    moveHistory.push({ x, y });
 
     const five = checkFive(x, y, currentPlayer);
     if (five) {
@@ -298,6 +301,18 @@ const GomokuGame = (() => {
 
   function setMode(m) { mode = m; startNewGame(); }
   function setHumanColor(c) { humanColor = c; startNewGame(); }
+
+  // 设置棋盘大小
+  function setBoardSize(size) {
+    const sizes = [5, 9, 11, 13, 15, 17, 19];
+    N = size;
+    resetBoard();
+    if (mode === 'pve' && engineReady) {
+      GomokuEngine.sendCommand('START ' + N);
+      sendInfo();
+    }
+    notify();
+  }
   function setDifficulty(d) {
     aiDifficulty = d;
     strength = DIFFICULTY[d].strength;
@@ -361,7 +376,8 @@ const GomokuGame = (() => {
   return {
     init, startEngine, startNewGame, playerClick, getState,
     setMode, setHumanColor, setDifficulty, setConfig, analyze, undo, getConfig,
-    setAnalysisCallback, getAnalysis,
-    N,
+    setBoardSize, setAnalysisCallback, getAnalysis,
+    get N() { return N; },
+    get moveHistory() { return moveHistory; },
   };
 })();
