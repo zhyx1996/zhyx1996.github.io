@@ -1984,6 +1984,18 @@ body.nk-dark .nk-cmd-grid kbd {
     margin-bottom: -50px; /* 裁掉底部 fixed tabbar */
 }
 
+/* 设置 iframe 同样裁掉 header/tabbar，与棋盘区视觉统一（无蓝色标题栏） */
+.gm-settings-wrap {
+    overflow: hidden;
+    border-radius: 4px;
+}
+.gm-settings-wrap .gm-settings-iframe {
+    display: block;
+    height: calc(560px + 96px); /* 可见区 560 + 上(46)下(50)被裁掉的部分 */
+    margin-top: -46px;
+    margin-bottom: -50px;
+}
+
 /* 外部游戏 iframe：加载占位 / 失败兜底 */
 .nethack-frame-wrap {
     position: relative;
@@ -2062,6 +2074,11 @@ body.nk-dark .nk-cmd-grid kbd {
     /* 移动端 gomocalc 自动上下排布，去掉桌面端的裁切 */
     .gm-board-wrap .gm-board-iframe {
         height: 620px;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    .gm-settings-wrap .gm-settings-iframe {
+        height: 520px;
         margin-top: 0;
         margin-bottom: 0;
     }
