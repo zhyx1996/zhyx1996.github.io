@@ -32,7 +32,7 @@ const GomokuBoard = (() => {
   let lastMove = null;       // {x, y}
   let winningCells = [];     // [{x,y}]
   let threatCells = [];      // [{x,y}]
-  let threatType = '';       // open_three/open_four/rushed_four/four_three
+  let threatType = '';       // open_four/rushed_four/four_three
   let fxTime = 0;
   let cellSize = 40;
   let padding = 48;
@@ -323,7 +323,6 @@ const GomokuBoard = (() => {
     if (threatType === 'open_four') color = COLORS.gold;
     else if (threatType === 'rushed_four') color = COLORS.magenta;
     else if (threatType === 'four_three') color = COLORS.threatRed;
-    else if (threatType === 'open_three') color = COLORS.cyan;
 
     const pulse = 0.5 + 0.5 * Math.sin(fxTime * 6);
     for (const c of threatCells) {

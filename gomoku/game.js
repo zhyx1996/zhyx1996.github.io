@@ -314,48 +314,84 @@ const GomokuGame = (() => {
     return null;
   }
 
-  function countLine(x, y, dx, dy, p) {
-    let total = 1, open = 0;
-    let cx = x + dx, cy = y + dy;
-    while (inBoard(cx, cy) && board[cy][cx] === p) { total++; cx += dx; cy += dy; }
-    if (inBoard(cx, cy) && board[cy][cx] === 0) open++;
-    cx = x - dx; cy = y - dy;
-    while (inBoard(cx, cy) && board[cy][cx] === p) { total++; cx -= dx; cy -= dy; }
-    if (inBoard(cx, cy) && board[cy][cx] === 0) open++;
-    return { total, open };
+  // 分析某方向上的棋型（5格/4格滑动窗口，支持带空格的跳棋型）
+  function analyzeDir(x, y, dx, dy, p) {
+    const seq = [];  // 索引 4 = 最后落子，±4 共 9 格
+    for (let k = -4; k <= 4; k++) {
+      const cx = x + dx * k, cy = y + dy * k;
+      if (inBoard(cx, cy)) {
+        const v = board[cy][cx];
+        seq.push(v === p ? p : (v === 0 ? 0 : -1));
+      } else {
+        seq.push(-1);
+      }
+    }
+    // 四检测：5 格窗口含中心（索引 4），4 同色 + 1 空
+    const fiveCells = new Set();
+    for (let start = 0; start < 5; start++) {
+      if (start > 4 || start + 5 <= 4) continue;
+      let stones = 0, emptyIdx = -1, blocked = false;
+      for (let j = start; j < start + 5; j++) {
+        const v = seq[j];
+        if (v === p) stones++;
+        else if (v === 0) { if (emptyIdx === -1) emptyIdx = j; else { blocked = true; break; } }
+        else { blocked = true; break; }
+      }
+      if (!blocked && stones === 4 && emptyIdx !== -1) fiveCells.add(emptyIdx);
+    }
+    // 三检测：4 格窗口含中心，3 同色 + 1 空
+    const fourCells = new Set();
+    for (let start = 0; start < 6; start++) {
+      if (start > 4 || start + 4 <= 4) continue;
+      let stones = 0, emptyIdx = -1, blocked = false;
+      for (let j = start; j < start + 4; j++) {
+        const v = seq[j];
+        if (v === p) stones++;
+        else if (v === 0) { if (emptyIdx === -1) emptyIdx = j; else { blocked = true; break; } }
+        else { blocked = true; break; }
+      }
+      if (!blocked && stones === 3 && emptyIdx !== -1) fourCells.add(emptyIdx);
+    }
+    return { hasFour: fiveCells.size >= 1, openFour: fiveCells.size >= 2, openThree: fourCells.size >= 2 };
   }
 
   function detectThreat(x, y, p) {
-    let openFour = false, rushedFour = false, openThree = false;
+    let hasFour = false, openFour = false, openThree = false;
+    let fourDir = null, threeDir = null;
     for (const [dx, dy] of DIRS) {
-      const { total, open } = countLine(x, y, dx, dy, p);
-      if (total >= 5) continue;
-      if (total === 4) {
-        if (open === 2) openFour = true;
-        else rushedFour = true;
-      } else if (total === 3 && open === 2) {
-        openThree = true;
-      }
+      const r = analyzeDir(x, y, dx, dy, p);
+      if (r.hasFour) { hasFour = true; fourDir = [dx, dy]; }
+      if (r.openFour) openFour = true;
+      if (r.openThree) { openThree = true; threeDir = [dx, dy]; }
     }
-    if (openFour && openThree) threatType = 'four_three';
+    const crossDir = fourDir && threeDir && !(fourDir[0] === threeDir[0] && fourDir[1] === threeDir[1]);
+
+    if ((openFour || hasFour) && openThree && crossDir) threatType = 'four_three';
     else if (openFour) threatType = 'open_four';
-    else if (rushedFour && openThree) threatType = 'four_three';
-    else if (rushedFour) threatType = 'rushed_four';
-    else if (openThree) threatType = 'open_three';
+    else if (hasFour) threatType = 'rushed_four';
     else threatType = '';
 
-    threatCells = threatType ? collectThreatCells(x, y, p) : [];
+    threatCells = threatType ? collectThreatCells(x, y, p, fourDir, threeDir) : [];
   }
 
-  function collectThreatCells(x, y, p) {
+  function collectLineStones(x, y, dx, dy, p, radius) {
     const cells = [];
-    for (const [dx, dy] of DIRS) {
-      const line = [{ x, y }];
-      let cx = x + dx, cy = y + dy;
-      while (inBoard(cx, cy) && board[cy][cx] === p) { line.push({ x: cx, y: cy }); cx += dx; cy += dy; }
-      cx = x - dx; cy = y - dy;
-      while (inBoard(cx, cy) && board[cy][cx] === p) { line.unshift({ x: cx, y: cy }); cx -= dx; cy -= dy; }
-      if (line.length >= 3) for (const c of line) if (!cells.find(k => k.x === c.x && k.y === c.y)) cells.push(c);
+    for (let k = -radius; k <= radius; k++) {
+      const cx = x + dx * k, cy = y + dy * k;
+      if (inBoard(cx, cy) && board[cy][cx] === p) {
+        if (!cells.find(c => c.x === cx && c.y === cy)) cells.push({ x: cx, y: cy });
+      }
+    }
+    return cells;
+  }
+
+  function collectThreatCells(x, y, p, fourDir, threeDir) {
+    let cells = [];
+    if (fourDir) cells = collectLineStones(x, y, fourDir[0], fourDir[1], p, 4);
+    if (threeDir && threatType === 'four_three') {
+      for (const c of collectLineStones(x, y, threeDir[0], threeDir[1], p, 4)) {
+        if (!cells.find(k => k.x === c.x && k.y === c.y)) cells.push(c);
+      }
     }
     return cells;
   }
