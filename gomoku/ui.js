@@ -21,7 +21,9 @@
           <canvas class="gm-native-canvas" id="gm-native-canvas" width="640" height="640"></canvas>
           <div class="gm-native-loading" id="gm-native-loading">
             <div class="gm-native-spinner"></div>
-            <span>正在加载 Rapfi AI 引擎…（约 40MB，首次较慢）</span>
+            <span>正在加载 Rapfi AI 引擎…</span>
+            <div class="gm-progress"><div class="gm-progress-bar" id="gm-progress-bar"></div></div>
+            <span class="gm-progress-text" id="gm-progress-text">正在下载 NNUE 权重（约 40MB）…</span>
           </div>
           <div class="gm-native-win-banner" id="gm-native-win-banner"></div>
         </div>
@@ -227,6 +229,7 @@
     // 初始化游戏 + 引擎
     game.init(onState);
     game.setAnalysisCallback(updateAnalysis);
+    game.setLoadingCallback(updateLoading);
 
     // 启动引擎（异步）
     game.startEngine().then((ok) => {
@@ -357,6 +360,15 @@
     if (abBtn) abBtn.textContent = 'AI执黑：' + (game.getConfig('aiBlack') ? '开' : '关');
     const awBtn = document.getElementById('gm-btn-aiwhite');
     if (awBtn) awBtn.textContent = 'AI执白：' + (game.getConfig('aiWhite') ? '开' : '关');
+  }
+
+  function updateLoading(progress) {
+    const bar = document.getElementById('gm-progress-bar');
+    const txt = document.getElementById('gm-progress-text');
+    if (!bar || !txt) return;
+    const pct = Math.max(0, Math.min(1, progress || 0));
+    bar.style.width = (pct * 100).toFixed(0) + '%';
+    txt.textContent = '正在下载 NNUE 权重（约 40MB）… ' + (pct * 100).toFixed(0) + '%';
   }
 
   function updateAnalysis() {

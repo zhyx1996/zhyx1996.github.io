@@ -266,6 +266,29 @@
 
 @keyframes gm-spin { to { transform: rotate(360deg); } }
 
+.gm-progress {
+    width: 70%;
+    max-width: 280px;
+    height: 6px;
+    background: #2a3654;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.gm-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), #fbbf24);
+    border-radius: 999px;
+    transition: width 0.2s ease;
+}
+
+.gm-progress-text {
+    font-size: 11px;
+    color: #7d8aa8;
+    font-variant-numeric: tabular-nums;
+}
+
 /* ── 胜利横幅（覆盖在棋盘上） ── */
 .gm-native-win-banner {
     position: absolute;

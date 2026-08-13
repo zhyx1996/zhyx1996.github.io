@@ -117,6 +117,9 @@ const GomokuGame = (() => {
           notify();
         } else if (r.numpv) {
           curPv = r.numpv;
+        } else if (r.loading) {
+          // 引擎数据（约 40MB NNUE 权重）下载进度
+          if (onLoadingUpdate) onLoadingUpdate(r.loading.progress);
         } else if (r.error) {
           console.error('[engine error]', r.error);
           resolve(false);
@@ -424,6 +427,10 @@ const GomokuGame = (() => {
   let onAnalysisUpdate = null;
   function setAnalysisCallback(cb) { onAnalysisUpdate = cb; }
 
+  // 加载进度回调（引擎数据下载进度 0~1）
+  let onLoadingUpdate = null;
+  function setLoadingCallback(cb) { onLoadingUpdate = cb; }
+
   let thinkIndex = 1;  // 0快/1中/2慢/3分析
 
   function getConfig(key) {
@@ -498,7 +505,7 @@ const GomokuGame = (() => {
     init, startEngine, startNewGame, playerClick, getState,
     setMode, setHumanColor, setDifficulty, setConfig, analyze, undo, getConfig,
     setBoardSize, setAnalysisCallback, getAnalysis,
-    setAiBlack, setAiWhite, requestForbid,
+    setLoadingCallback, setAiBlack, setAiWhite, requestForbid,
     get N() { return N; },
     get moveHistory() { return moveHistory; },
   };
