@@ -23,6 +23,17 @@ const GomokuGame = (() => {
   let engineReady = false;
   let enginePath = '/gomoku/build/';
 
+  // 引擎配置（对齐 Godot 版）
+  let rule = 0;             // 0 无禁手 / 1 标准 / 2 有禁手
+  let strength = 70;
+  let timeoutTurn = 1500;   // 毫秒
+  let threads = 1;
+  let maxDepth = 100;
+  let showDetail = 2;
+  let cautionFactor = 3;    // 选点范围 0~5
+  let hashSize = 128;       // MiB
+  let nbest = 1;            // 多点分析数
+
   // 回调
   let onStateChange = null;
 
@@ -78,12 +89,15 @@ const GomokuGame = (() => {
           resolve(false);
         } else if (r.msg) {
           console.log('[engine]', r.msg);
-        } else if (r.bestline || r.depth || r.eval || r.winrate) {
+        } else if (r.bestline || r.depth || r.eval || r.winrate || r.speed || r.totalnodes || r.nodes) {
           // 分析信息（用于分析面板，暂存）
           if (r.bestline) window.__lastBestline = r.bestline;
           if (r.depth) window.__lastDepth = r.depth;
           if (r.eval !== undefined) window.__lastEval = r.eval;
           if (r.winrate !== undefined) window.__lastWinrate = r.winrate;
+          if (r.speed !== undefined) window.__lastSpeed = r.speed;
+          if (r.totalnodes !== undefined) window.__lastNodes = r.totalnodes;
+          else if (r.nodes !== undefined) window.__lastNodes = r.nodes;
           if (onAnalysisUpdate) onAnalysisUpdate();
         }
       }, path);
@@ -91,12 +105,47 @@ const GomokuGame = (() => {
   }
 
   function sendInfo() {
-    const d = DIFFICULTY[aiDifficulty];
-    GomokuEngine.sendCommand('INFO RULE 0');          // 无禁手
-    GomokuEngine.sendCommand('INFO STRENGTH ' + d.strength);
-    GomokuEngine.sendCommand('INFO TIMEOUT_TURN ' + d.timeout);
-    GomokuEngine.sendCommand('INFO SHOW_DETAIL 2');
-    GomokuEngine.sendCommand('INFO MAX_DEPTH 100');
+    GomokuEngine.sendCommand('INFO RULE ' + rule);
+    GomokuEngine.sendCommand('INFO STRENGTH ' + strength);
+    GomokuEngine.sendCommand('INFO TIMEOUT_TURN ' + timeoutTurn);
+    GomokuEngine.sendCommand('INFO THREAD_NUM ' + threads);
+    GomokuEngine.sendCommand('INFO MAX_DEPTH ' + maxDepth);
+    GomokuEngine.sendCommand('INFO SHOW_DETAIL ' + showDetail);
+    GomokuEngine.sendCommand('INFO CAUTION_FACTOR ' + cautionFactor);
+    GomokuEngine.sendCommand('INFO HASH_SIZE ' + hashSize);
+  }
+
+  // 设置单项配置并下发引擎
+  function setConfig(key, value) {
+    if (key === 'rule') rule = value;
+    else if (key === 'strength') strength = value;
+    else if (key === 'timeoutTurn') timeoutTurn = value;
+    else if (key === 'threads') threads = value;
+    else if (key === 'maxDepth') maxDepth = value;
+    else if (key === 'showDetail') showDetail = value;
+    else if (key === 'cautionFactor') cautionFactor = value;
+    else if (key === 'hashSize') hashSize = value;
+    else if (key === 'nbest') nbest = value;
+    else if (key === 'thinkIndex') { thinkIndex = value; return; }
+    if (engineReady) sendInfo();
+  }
+
+  // 分析当前局面（nbest 多点分析）
+  function analyze() {
+    if (!engineReady) return;
+    const aiColor = 3 - humanColor;
+    GomokuEngine.sendCommand('START ' + N);
+    let cmd = 'BOARD';
+    for (let y = 0; y < N; y++)
+      for (let x = 0; x < N; x++) {
+        const v = board[y][x];
+        if (v === 0) continue;
+        const side = v === aiColor ? 1 : 2;
+        cmd += ` ${x},${y},${side}`;
+      }
+    cmd += ' DONE';
+    GomokuEngine.sendCommand(cmd);
+    GomokuEngine.sendCommand('YXNBEST ' + nbest);
   }
 
   function sendBoard(immediateThink) {
@@ -249,11 +298,54 @@ const GomokuGame = (() => {
 
   function setMode(m) { mode = m; startNewGame(); }
   function setHumanColor(c) { humanColor = c; startNewGame(); }
-  function setDifficulty(d) { aiDifficulty = d; if (engineReady) sendInfo(); startNewGame(); }
+  function setDifficulty(d) {
+    aiDifficulty = d;
+    strength = DIFFICULTY[d].strength;
+    timeoutTurn = DIFFICULTY[d].timeout;
+    if (engineReady) sendInfo();
+    startNewGame();
+  }
 
   // 分析面板回调
   let onAnalysisUpdate = null;
   function setAnalysisCallback(cb) { onAnalysisUpdate = cb; }
+
+  let thinkIndex = 1;  // 0快/1中/2慢/3分析
+
+  function getConfig(key) {
+    if (key === 'rule') return rule;
+    if (key === 'cautionFactor') return cautionFactor;
+    if (key === 'nbest') return nbest;
+    if (key === 'thinkIndex') return thinkIndex;
+    if (key === 'timeoutTurn') return timeoutTurn;
+    return null;
+  }
+
+  // 悔棋（撤销最后 1~2 步）
+  function undo() {
+    // 需要落子历史，这里简化：清空最后一步
+    if (moveCount === 0 || aiThinking) return;
+    // 人机模式撤两步（AI+玩家），双人撤一步
+    let steps = mode === 'pve' ? 2 : 1;
+    while (steps-- > 0 && moveCount > 0) {
+      if (lastMove) {
+        board[lastMove.y][lastMove.x] = 0;
+        moveCount--;
+      }
+      // 重新找最后一步（简化：从棋盘反向找）
+      lastMove = null;
+      for (let y = N - 1; y >= 0 && !lastMove; y--)
+        for (let x = N - 1; x >= 0; x--)
+          if (board[y][x] !== 0) { lastMove = { x, y }; break; }
+      // 切换回玩家
+      currentPlayer = currentPlayer === 1 ? 2 : 1;
+    }
+    winner = 0;
+    winningCells = [];
+    threatCells = [];
+    threatType = '';
+    notify();
+  }
 
   function getAnalysis() {
     return {
@@ -261,12 +353,15 @@ const GomokuGame = (() => {
       eval: window.__lastEval || '-',
       winrate: window.__lastWinrate || null,
       bestline: window.__lastBestline || [],
+      speed: window.__lastSpeed || 0,
+      nodes: window.__lastNodes || 0,
     };
   }
 
   return {
     init, startEngine, startNewGame, playerClick, getState,
-    setMode, setHumanColor, setDifficulty, setAnalysisCallback, getAnalysis,
+    setMode, setHumanColor, setDifficulty, setConfig, analyze, undo, getConfig,
+    setAnalysisCallback, getAnalysis,
     N,
   };
 })();

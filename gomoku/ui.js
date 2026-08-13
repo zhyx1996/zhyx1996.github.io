@@ -33,7 +33,14 @@
               <button class="gm-native-btn" id="gm-btn-mode">模式：人机对战</button>
               <button class="gm-native-btn" id="gm-btn-color">你执：黑棋（先手）</button>
               <button class="gm-native-btn" id="gm-btn-diff">AI 难度：中等</button>
-              <button class="gm-native-btn gm-primary" id="gm-btn-restart">重新开始</button>
+              <button class="gm-native-btn" id="gm-btn-rule">规则：无禁手</button>
+              <button class="gm-native-btn" id="gm-btn-think">思考：中等</button>
+              <button class="gm-native-btn" id="gm-btn-cand">选点：较大</button>
+              <button class="gm-native-btn" id="gm-btn-nbest">分析点：1</button>
+              <div class="gm-native-row">
+                <button class="gm-native-btn gm-primary" id="gm-btn-undo">↶ 悔棋</button>
+                <button class="gm-native-btn gm-primary" id="gm-btn-restart">↻ 新局</button>
+              </div>
             </div>
           </div>
           <div class="gm-native-card">
@@ -42,6 +49,8 @@
               <div class="gm-kv"><span>深度</span><b>-</b></div>
               <div class="gm-kv"><span>估值</span><b>-</b></div>
               <div class="gm-kv"><span>胜率</span><b>-</b></div>
+              <div class="gm-kv"><span>速度</span><b>-</b></div>
+              <div class="gm-kv"><span>节点</span><b>-</b></div>
               <div class="gm-kv"><span>最佳线</span><b>-</b></div>
             </div>
           </div>
@@ -79,6 +88,43 @@
     document.getElementById('gm-btn-restart').addEventListener('click', () => {
       game.startNewGame();
     });
+    document.getElementById('gm-btn-undo').addEventListener('click', () => {
+      game.undo();
+    });
+
+    // 设置循环切换（规则/思考时间/选点范围/nbest）
+    const ruleNames = ['无禁手', '标准（禁长连）', '有禁手'];
+    document.getElementById('gm-btn-rule').addEventListener('click', () => {
+      const cur = game.getConfig('rule');
+      const next = (cur + 1) % 3;
+      game.setConfig('rule', next);
+      updateButtons();
+    });
+
+    const thinkNames = ['快速', '中等', '慢速', '分析'];
+    const thinkTimeouts = [300, 1500, 5000, 10000];
+    document.getElementById('gm-btn-think').addEventListener('click', () => {
+      const cur = game.getConfig('thinkIndex');
+      const next = (cur + 1) % 4;
+      game.setConfig('thinkIndex', next);
+      game.setConfig('timeoutTurn', thinkTimeouts[next]);
+      updateButtons();
+    });
+
+    const candNames = ['小范围', '较小', '中等', '较大', '大范围', '全盘'];
+    document.getElementById('gm-btn-cand').addEventListener('click', () => {
+      const cur = game.getConfig('cautionFactor');
+      const next = (cur + 1) % 6;
+      game.setConfig('cautionFactor', next);
+      updateButtons();
+    });
+
+    document.getElementById('gm-btn-nbest').addEventListener('click', () => {
+      const cur = game.getConfig('nbest');
+      const next = cur >= 4 ? 1 : cur + 1;
+      game.setConfig('nbest', next);
+      updateButtons();
+    });
 
     // 窗口尺寸变化时重算棋盘
     let resizeTimer = null;
@@ -99,6 +145,7 @@
       if (ok) {
         loadingEl.style.display = 'none';
         game.startNewGame();
+        updateButtons();
       } else {
         loadingEl.innerHTML = '<span>引擎加载失败，请检查网络或刷新重试。</span>';
       }
@@ -190,6 +237,20 @@
     }
   }
 
+  function updateButtons() {
+    const ruleNames = ['无禁手', '标准（禁长连）', '有禁手'];
+    const thinkNames = ['快速', '中等', '慢速', '分析'];
+    const candNames = ['小范围', '较小', '中等', '较大', '大范围', '全盘'];
+    const ruleBtn = document.getElementById('gm-btn-rule');
+    const thinkBtn = document.getElementById('gm-btn-think');
+    const candBtn = document.getElementById('gm-btn-cand');
+    const nbestBtn = document.getElementById('gm-btn-nbest');
+    if (ruleBtn) ruleBtn.textContent = '规则：' + ruleNames[game.getConfig('rule')];
+    if (thinkBtn) thinkBtn.textContent = '思考：' + thinkNames[game.getConfig('thinkIndex')];
+    if (candBtn) candBtn.textContent = '选点：' + candNames[game.getConfig('cautionFactor')];
+    if (nbestBtn) nbestBtn.textContent = '分析点：' + game.getConfig('nbest');
+  }
+
   function updateAnalysis() {
     const a = game.getAnalysis();
     if (!analysisEl) return;
@@ -197,6 +258,8 @@
       <div class="gm-kv"><span>深度</span><b>${a.depth || '-'}</b></div>
       <div class="gm-kv"><span>估值</span><b>${a.eval || '-'}</b></div>
       <div class="gm-kv"><span>胜率</span><b>${a.winrate != null ? (a.winrate * 100).toFixed(1) + '%' : '-'}</b></div>
+      <div class="gm-kv"><span>速度</span><b>${a.speed || '-'}</b></div>
+      <div class="gm-kv"><span>节点</span><b>${a.nodes || '-'}</b></div>
       <div class="gm-kv"><span>最佳线</span><b>${formatBestline(a.bestline)}</b></div>
     `;
   }

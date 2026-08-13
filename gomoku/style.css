@@ -97,6 +97,12 @@
     gap: 8px;
 }
 
+.gm-native-row {
+    display: flex;
+    gap: 8px;
+}
+.gm-native-row .gm-native-btn { flex: 1; text-align: center; }
+
 .gm-native-btn {
     padding: 9px 12px;
     font-family: var(--font-mono, monospace);
