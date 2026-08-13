@@ -24,6 +24,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css?v=61">
+    <link rel="stylesheet" href="/gomoku/style.css?v=1">
     <style>
         body { opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards; }
         @keyframes fadeIn { to { opacity: 1; } }
@@ -74,46 +75,61 @@
             </section>
 
             <section class="section nethack-section">
-                <!-- 棋盘区 -->
-                <div class="gm-pane">
-                    <div class="gm-pane-head">
-                        <span class="gm-pane-title">棋盘 · 对弈 / 分析</span>
-                        <div class="gm-pane-actions">
-                            <a class="gm-link" href="https://www.gomocalc.com/#/" target="_blank" rel="noreferrer">新窗口打开 ↗</a>
-                        </div>
-                    </div>
-                    <div class="nethack-frame-wrap gm-board-wrap" data-gm-src="https://www.gomocalc.com/#/">
-                        <div class="nethack-frame-loading">正在加载五子棋引擎（首次加载较慢）…</div>
-                        <iframe class="nethack-iframe gm-board-iframe" src="https://www.gomocalc.com/#/" title="五子棋棋盘" loading="lazy" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>
-                        <div class="nethack-frame-error" hidden>
-                            <span>棋盘加载失败（可能被网络拦截或需联网）</span>
-                            <button type="button" class="nethack-frame-retry">重试</button>
-                            <a href="https://www.gomocalc.com/#/" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
-                        </div>
-                    </div>
+                <!-- 标签页切换 -->
+                <div class="gm-native-tabs" role="tablist">
+                    <button class="gm-native-tab active" role="tab" data-gm-tab="native">自研版</button>
+                    <button class="gm-native-tab" role="tab" data-gm-tab="original">原版参考</button>
                 </div>
 
-                <!-- 配置区 -->
-                <div class="gm-pane">
-                    <div class="gm-pane-head">
-                        <span class="gm-pane-title">设置 · 配置项</span>
-                        <div class="gm-pane-actions">
-                            <button type="button" class="gm-apply-btn" id="gm-apply-settings">应用设置并刷新棋盘</button>
-                            <a class="gm-link" href="https://www.gomocalc.com/#/settings" target="_blank" rel="noreferrer">新窗口打开 ↗</a>
-                        </div>
-                    </div>
-                    <div class="nethack-frame-wrap gm-settings-wrap" data-gm-src="https://www.gomocalc.com/#/settings">
-                        <div class="nethack-frame-loading">正在加载设置…</div>
-                        <iframe class="nethack-iframe gm-settings-iframe" src="https://www.gomocalc.com/#/settings" title="五子棋设置" loading="lazy" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>
-                        <div class="nethack-frame-error" hidden>
-                            <span>设置加载失败（可能被网络拦截或需联网）</span>
-                            <button type="button" class="nethack-frame-retry">重试</button>
-                            <a href="https://www.gomocalc.com/#/settings" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
-                        </div>
-                    </div>
+                <!-- Tab1：自研版 -->
+                <div class="gm-tab-panel" data-gm-panel="native">
+                    <div id="gm-native-root"></div>
+                    <div class="nk-window-statusbar">自研版：Rapfi AI 引擎纯前端运行（WebAssembly + NNUE 神经网络），无需服务器。下出活三/冲四/四三时棋子高亮特效，连五胜利时播放庆祝动画。</div>
                 </div>
 
-                <div class="nk-window-statusbar">配置保存在浏览器本地（gomocalc.com 的 localStorage）。修改设置后点击「应用设置并刷新棋盘」让棋盘重新加载生效。AI 引擎为纯前端运行（Rapfi + NNUE 神经网络，WebAssembly 编译），无需服务器。</div>
+                <!-- Tab2：原 iframe 版 -->
+                <div class="gm-tab-panel" data-gm-panel="original" hidden>
+                    <!-- 棋盘区 -->
+                    <div class="gm-pane">
+                        <div class="gm-pane-head">
+                            <span class="gm-pane-title">棋盘 · 对弈 / 分析</span>
+                            <div class="gm-pane-actions">
+                                <a class="gm-link" href="https://www.gomocalc.com/#/" target="_blank" rel="noreferrer">新窗口打开 ↗</a>
+                            </div>
+                        </div>
+                        <div class="nethack-frame-wrap gm-board-wrap" data-gm-src="https://www.gomocalc.com/#/">
+                            <div class="nethack-frame-loading">正在加载五子棋引擎（首次加载较慢）…</div>
+                            <iframe class="nethack-iframe gm-board-iframe" src="https://www.gomocalc.com/#/" title="五子棋棋盘" loading="lazy" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>
+                            <div class="nethack-frame-error" hidden>
+                                <span>棋盘加载失败（可能被网络拦截或需联网）</span>
+                                <button type="button" class="nethack-frame-retry">重试</button>
+                                <a href="https://www.gomocalc.com/#/" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 配置区 -->
+                    <div class="gm-pane">
+                        <div class="gm-pane-head">
+                            <span class="gm-pane-title">设置 · 配置项</span>
+                            <div class="gm-pane-actions">
+                                <button type="button" class="gm-apply-btn" id="gm-apply-settings">应用设置并刷新棋盘</button>
+                                <a class="gm-link" href="https://www.gomocalc.com/#/settings" target="_blank" rel="noreferrer">新窗口打开 ↗</a>
+                            </div>
+                        </div>
+                        <div class="nethack-frame-wrap gm-settings-wrap" data-gm-src="https://www.gomocalc.com/#/settings">
+                            <div class="nethack-frame-loading">正在加载设置…</div>
+                            <iframe class="nethack-iframe gm-settings-iframe" src="https://www.gomocalc.com/#/settings" title="五子棋设置" loading="lazy" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>
+                            <div class="nethack-frame-error" hidden>
+                                <span>设置加载失败（可能被网络拦截或需联网）</span>
+                                <button type="button" class="nethack-frame-retry">重试</button>
+                                <a href="https://www.gomocalc.com/#/settings" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nk-window-statusbar">原版参考：来自 gomocalc.com 的官方界面。配置保存在浏览器本地（gomocalc.com 的 localStorage）。</div>
+                </div>
             </section>
         </main>
     </div>
@@ -130,6 +146,26 @@
     </footer>
 
     <script src="/app.js?v=70" defer></script>
+    <script>
+      // 标签页切换
+      (function() {
+        var tabs = document.querySelectorAll('.gm-native-tab');
+        var panels = document.querySelectorAll('.gm-tab-panel');
+        tabs.forEach(function(tab) {
+          tab.addEventListener('click', function() {
+            var target = tab.getAttribute('data-gm-tab');
+            tabs.forEach(function(t) { t.classList.toggle('active', t === tab); });
+            panels.forEach(function(p) {
+              p.hidden = p.getAttribute('data-gm-panel') !== target;
+            });
+          });
+        });
+      })();
+    </script>
+    <script src="/gomoku/board.js?v=1" defer></script>
+    <script src="/gomoku/game.js?v=1" defer></script>
+    <script src="/gomoku/app.js?v=1" defer></script>
+    <script src="/gomoku/ui.js?v=1" defer></script>
     <script>
       // 棋盘 iframe 高度自适应：gomocalc 在 iframe 宽 <1024px 时走上下堆叠布局，
       // 内容底 ≈ 1.62W + 328（W = iframe 宽度）。wrap 上裁 46(header)、下裁 50(tabbar)，
