@@ -35,23 +35,26 @@ const GomokuBoard = (() => {
   let cellSize = 40;
   let padding = 48;
 
+  function getLogicalSize() {
+    // 逻辑尺寸（CSS 像素）：canvas 已按 DPR 放大物理像素并用 ctx.setTransform 缩放，
+    // 所有绘制/换算都应使用逻辑尺寸（= CSS 尺寸）
+    const rect = canvas.getBoundingClientRect();
+    return { w: rect.width, h: rect.height };
+  }
+
   function init(canvasEl, size = 15) {
     canvas = canvasEl;
     ctx = canvas.getContext('2d');
-    cellSize = Math.min(
-      (canvas.width - 2 * padding) / (size - 1),
-      (canvas.height - 2 * padding) / (size - 1)
-    );
-    // 保持 padding 与格子对齐
     padding = 48;
     resize(size);
   }
 
   function resize(size = 15) {
     if (!canvas) return;
+    const { w, h } = getLogicalSize();
     cellSize = Math.min(
-      (canvas.width - 2 * padding) / (size - 1),
-      (canvas.height - 2 * padding) / (size - 1)
+      (w - 2 * padding) / (size - 1),
+      (h - 2 * padding) / (size - 1)
     );
   }
 
@@ -78,7 +81,7 @@ const GomokuBoard = (() => {
   }
 
   function drawBackground() {
-    const w = canvas.width, h = canvas.height;
+    const { w, h } = getLogicalSize();
     const grad = ctx.createLinearGradient(0, 0, 0, h);
     grad.addColorStop(0, COLORS.bgTop);
     grad.addColorStop(1, COLORS.bgBottom);
@@ -245,8 +248,9 @@ const GomokuBoard = (() => {
   function drawWinGlow() {
     if (!winningCells || winningCells.length === 0) return;
     const alpha = 0.04 + 0.03 * Math.sin(fxTime * 2);
+    const { w, h } = getLogicalSize();
     ctx.fillStyle = `rgba(52,211,153,${alpha})`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, w, h);
   }
 
   function screenToCell(mx, my) {

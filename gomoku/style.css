@@ -194,6 +194,16 @@
 }
 
 @media (max-width: 800px) {
-    .gm-native { flex-direction: column; }
+    .gm-native { flex-direction: column; gap: 16px; }
     .gm-native-side { min-width: auto; width: 100%; }
+    .gm-native-board-panel { width: 100%; }
+    .gm-native-tab { padding: 10px 14px; font-size: 13px; }
+    .gm-native-win-banner { font-size: 36px; }
+}
+
+@media (max-width: 480px) {
+    .gm-native-card { padding: 12px; }
+    .gm-native-status { font-size: 16px; }
+    .gm-native-btn { font-size: 12px; padding: 8px 10px; }
+    .gm-native-win-banner { font-size: 28px; }
 }

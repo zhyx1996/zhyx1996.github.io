@@ -55,24 +55,13 @@
     winBannerEl = document.getElementById('gm-native-win-banner');
     analysisEl = document.getElementById('gm-native-analysis');
 
-    // 适配 DPR
-    const dpr = window.devicePixelRatio || 1;
-    const cssW = Math.min(container.clientWidth - 20, 640);
-    const size = Math.floor(cssW);
-    canvas.style.width = size + 'px';
-    canvas.style.height = size + 'px';
-    canvas.width = size * dpr;
-    canvas.height = size * dpr;
-    ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    // 重设 canvas 逻辑尺寸给 board.js（用 CSS 尺寸）
-    canvas.width = size;
-    canvas.height = size;
+    // 初始化棋盘尺寸（正确测量可用宽度 + DPR 适配）
+    resizeCanvas();
 
     board.init(canvas, game.N);
 
-    // 事件绑定
-    canvas.addEventListener('click', onCanvasClick);
+    // 事件绑定：pointer 事件统一鼠标/触屏
+    canvas.addEventListener('pointerdown', onCanvasPointerDown);
     document.getElementById('gm-btn-mode').addEventListener('click', () => {
       const cur = game.getState().mode;
       game.setMode(cur === 'pve' ? 'pvp' : 'pve');
@@ -89,6 +78,16 @@
     });
     document.getElementById('gm-btn-restart').addEventListener('click', () => {
       game.startNewGame();
+    });
+
+    // 窗口尺寸变化时重算棋盘
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        resizeCanvas();
+        board.resize(game.N);
+      }, 150);
     });
 
     // 初始化游戏 + 引擎
@@ -117,8 +116,32 @@
     rafId = requestAnimationFrame(frame);
   }
 
-  function onCanvasClick(e) {
+  function resizeCanvas() {
+    const container = document.getElementById('gm-native-root');
+    if (!container || !canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+
+    // 测量实际可用宽度：容器的布局宽度（getBoundingClientRect 而非 clientWidth，
+    // 避免 flex-wrap 下内容撑大导致的测量失真），并 clamp 到视口可用宽度
+    const containerRect = container.getBoundingClientRect();
+    // 视口可用宽度 = 视口宽 - 页面左右 padding（.main 移动端 20px 各，桌面也类似）
+    const viewportW = window.innerWidth;
+    const availW = Math.min(containerRect.width, viewportW - 8);
+    // 棋盘最大 640，移动端占满可用宽度
+    const cssSize = Math.max(240, Math.floor(Math.min(availW, 640)));
+
+    canvas.style.width = cssSize + 'px';
+    canvas.style.height = cssSize + 'px';
+    canvas.width = Math.round(cssSize * dpr);
+    canvas.height = Math.round(cssSize * dpr);
+
+    ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function onCanvasPointerDown(e) {
     const rect = canvas.getBoundingClientRect();
+    // 用 CSS 尺寸换算（canvas 物理像素已按 DPR 放大，坐标用 CSS 像素）
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
     const cell = board.screenToCell(mx, my);
