@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css?v=58">
+    <link rel="stylesheet" href="/styles.css?v=59">
     <style>
         body { opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards; }
         @keyframes fadeIn { to { opacity: 1; } }
@@ -74,16 +74,46 @@
             </section>
 
             <section class="section nethack-section">
-                <div class="nethack-frame-wrap" data-gm-src="https://www.gomocalc.com/#/">
-                    <div class="nethack-frame-loading">正在加载五子棋引擎（首次加载较慢）…</div>
-                    <iframe class="nethack-iframe" src="https://www.gomocalc.com/#/" title="五子棋计算器 Gomoku Calculator" loading="lazy" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>
-                    <div class="nethack-frame-error" hidden>
-                        <span>五子棋加载失败（可能被网络拦截或需联网）</span>
-                        <button type="button" class="nethack-frame-retry">重试</button>
-                        <a href="https://www.gomocalc.com/#/" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
+                <!-- 棋盘区 -->
+                <div class="gm-pane">
+                    <div class="gm-pane-head">
+                        <span class="gm-pane-title">棋盘 · 对弈 / 分析</span>
+                        <div class="gm-pane-actions">
+                            <a class="gm-link" href="https://www.gomocalc.com/#/" target="_blank" rel="noreferrer">新窗口打开 ↗</a>
+                        </div>
+                    </div>
+                    <div class="nethack-frame-wrap gm-board-wrap" data-gm-src="https://www.gomocalc.com/#/">
+                        <div class="nethack-frame-loading">正在加载五子棋引擎（首次加载较慢）…</div>
+                        <iframe class="nethack-iframe gm-board-iframe" src="https://www.gomocalc.com/#/" title="五子棋棋盘" loading="lazy" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>
+                        <div class="nethack-frame-error" hidden>
+                            <span>棋盘加载失败（可能被网络拦截或需联网）</span>
+                            <button type="button" class="nethack-frame-retry">重试</button>
+                            <a href="https://www.gomocalc.com/#/" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
+                        </div>
                     </div>
                 </div>
-                <div class="nk-window-statusbar">AI 引擎为纯前端运行（Rapfi + NNUE 神经网络，WebAssembly 编译），对局与分析均在本地完成，无需服务器。数据来自 <a href="https://www.gomocalc.com/#/" target="_blank" rel="noreferrer">Gomoku Calculator</a>。</div>
+
+                <!-- 配置区 -->
+                <div class="gm-pane">
+                    <div class="gm-pane-head">
+                        <span class="gm-pane-title">设置 · 配置项</span>
+                        <div class="gm-pane-actions">
+                            <button type="button" class="gm-apply-btn" id="gm-apply-settings">应用设置并刷新棋盘</button>
+                            <a class="gm-link" href="https://www.gomocalc.com/#/settings" target="_blank" rel="noreferrer">新窗口打开 ↗</a>
+                        </div>
+                    </div>
+                    <div class="nethack-frame-wrap gm-settings-wrap" data-gm-src="https://www.gomocalc.com/#/settings">
+                        <div class="nethack-frame-loading">正在加载设置…</div>
+                        <iframe class="nethack-iframe gm-settings-iframe" src="https://www.gomocalc.com/#/settings" title="五子棋设置" loading="lazy" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>
+                        <div class="nethack-frame-error" hidden>
+                            <span>设置加载失败（可能被网络拦截或需联网）</span>
+                            <button type="button" class="nethack-frame-retry">重试</button>
+                            <a href="https://www.gomocalc.com/#/settings" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nk-window-statusbar">配置保存在浏览器本地（gomocalc.com 的 localStorage）。修改设置后点击「应用设置并刷新棋盘」让棋盘重新加载生效。AI 引擎为纯前端运行（Rapfi + NNUE 神经网络，WebAssembly 编译），无需服务器。</div>
             </section>
         </main>
     </div>
@@ -143,6 +173,46 @@
           startTimer();
         });
       });
+
+      // 「应用设置并刷新棋盘」：重载棋盘 iframe，让 localStorage 里的新配置生效
+      (function() {
+        var applyBtn = document.getElementById('gm-apply-settings');
+        var boardWrap = document.querySelector('.gm-board-wrap');
+        if (!applyBtn || !boardWrap) return;
+        applyBtn.addEventListener('click', function() {
+          var iframe = boardWrap.querySelector('iframe');
+          var loading = boardWrap.querySelector('.nethack-frame-loading');
+          var error = boardWrap.querySelector('.nethack-frame-error');
+          var src = boardWrap.getAttribute('data-gm-src');
+          if (!iframe) return;
+          // 显示加载占位，隐藏错误，重新加载棋盘
+          error.hidden = true;
+          loading.style.display = '';
+          // 视觉反馈
+          applyBtn.disabled = true;
+          var orig = applyBtn.textContent;
+          applyBtn.textContent = '刷新中…';
+          var done = function() {
+            loading.style.display = 'none';
+            applyBtn.disabled = false;
+            applyBtn.textContent = orig;
+          };
+          var reloaded = false;
+          iframe.addEventListener('load', function onLoad() {
+            if (reloaded) return;
+            reloaded = true;
+            iframe.removeEventListener('load', onLoad);
+            done();
+          });
+          // 关键：src 相同不会触发重载，需先清空再赋值
+          iframe.removeAttribute('src');
+          iframe.src = src;
+          // 兜底：5 秒后无论是否 load 都恢复按钮（WASM 加载可能较慢）
+          setTimeout(function() {
+            if (!reloaded) { reloaded = true; done(); }
+          }, 8000);
+        });
+      })();
     </script>
 
     <!-- PageAgent: in-page AI agent -->

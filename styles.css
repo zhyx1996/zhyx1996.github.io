@@ -1915,6 +1915,63 @@ body.nk-dark .nk-cmd-grid kbd {
     height: 700px;
 }
 
+/* 五子棋上下布局：棋盘区 + 设置区 */
+.gm-pane {
+    margin-bottom: 24px;
+}
+.gm-pane-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+.gm-pane-title {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    color: var(--text-secondary);
+}
+.gm-pane-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.gm-link {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+}
+.gm-link:hover {
+    text-decoration: underline;
+}
+.gm-apply-btn {
+    padding: 7px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--accent);
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.gm-apply-btn:hover {
+    opacity: 0.85;
+}
+.gm-apply-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.gm-board-iframe {
+    height: 620px;
+}
+.gm-settings-iframe {
+    height: 560px;
+}
+
 /* 外部游戏 iframe：加载占位 / 失败兜底 */
 .nethack-frame-wrap {
     position: relative;
@@ -1989,6 +2046,8 @@ body.nk-dark .nk-cmd-grid kbd {
 }
 @media (max-width: 800px) {
     .nethack-iframe, .nethack-iframe-3d { height: 450px; }
+    .gm-board-iframe { height: 420px; }
+    .gm-settings-iframe { height: 520px; }
 }
 
 
