@@ -1972,14 +1972,18 @@ body.nk-dark .nk-cmd-grid kbd {
     height: 560px;
 }
 
-/* 棋盘 iframe 裁切：去掉 gomocalc 自带的顶栏(46px fixed)与底部 tab 栏(50px fixed)，只露棋盘+分析面板 */
+/* 棋盘 iframe 裁切：去掉 gomocalc 自带的顶栏(46px fixed)与底部 tab 栏(50px fixed)，只露棋盘+分析面板。
+   高度与宽度线性相关（iframe 宽 <1024px 时 gomocalc 走上下堆叠布局）。
+   实测（840px 宽）：header 46 + board 883 + gap 42 + info 718 = 1689，即 info 底在 y=1689。
+   wrap 可见高 = iframe高 − 46(上裁) − 50(下裁)，要完整露到 info 底需 iframe高 = 1689 + 50 = 1739。
+   桌面端由 JS 按公式动态计算（见 gomoku.html 内联脚本）；此处仅作 JS 失败时的兜底（840px 宽 → 1739px）。 */
 .gm-board-wrap {
     overflow: hidden;
     border-radius: 4px;
 }
 .gm-board-wrap .gm-board-iframe {
     display: block;
-    height: 1690px; /* 棋盘(824) + 分析面板(718) + header(46) + 缓冲 */
+    height: 1739px;
     margin-top: -46px; /* 裁掉顶部 fixed header */
     margin-bottom: -50px; /* 裁掉底部 fixed tabbar */
 }

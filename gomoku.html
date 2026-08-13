@@ -131,6 +131,28 @@
 
     <script src="/app.js?v=70" defer></script>
     <script>
+      // 棋盘 iframe 高度自适应：gomocalc 在 iframe 宽 <1024px 时走上下堆叠布局，
+      // 内容底 ≈ 1.62W + 328（W = iframe 宽度）。wrap 上裁 46(header)、下裁 50(tabbar)，
+      // 故 iframe 高 = 1.62W + 328 + 50 = 1.62W + 378（取 379 留 1px 余量）。
+      // 仅桌面端（>800px）套用；移动端由 CSS 媒体查询固定 620px 内部滚动。
+      (function() {
+        var boardWrap = document.querySelector('.gm-board-wrap');
+        var boardIframe = boardWrap && boardWrap.querySelector('.gm-board-iframe');
+        if (!boardWrap || !boardIframe) return;
+        function resizeBoard() {
+          if (!window.matchMedia('(min-width: 801px)').matches) {
+            boardIframe.style.height = ''; // 移动端回落到 CSS 媒体查询的固定值
+            return;
+          }
+          var w = boardIframe.clientWidth;
+          if (!w) return;
+          var h = Math.max(620, Math.round(1.62 * w + 379));
+          boardIframe.style.height = h + 'px';
+        }
+        resizeBoard();
+        window.addEventListener('resize', resizeBoard);
+      })();
+
       // 外部五子棋 iframe：懒加载 + 加载占位 + 加载失败兜底
       document.querySelectorAll('.nethack-frame-wrap').forEach(function(wrap) {
         var iframe = wrap.querySelector('iframe');
