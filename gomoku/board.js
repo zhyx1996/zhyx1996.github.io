@@ -11,11 +11,13 @@ const GomokuBoard = (() => {
     boardEdge: '#2a3654',
     grid: '#3b4a6b',
     star: '#5b6b8c',
-    black: '#0f1420',
-    blackGloss: '#3b4a6b',
+    black: '#2b3242',
+    blackDark: '#161b26',
+    blackGloss: '#8a9bb8',
+    blackEdge: '#5a6a85',
     white: '#eef2ff',
     whiteGloss: '#ffffff',
-    shadow: 'rgba(0,0,0,0.35)',
+    shadow: 'rgba(0,0,0,0.45)',
     cyan: '#22d3ee',
     magenta: '#e879f9',
     gold: '#fbbf24',
@@ -154,19 +156,27 @@ const GomokuBoard = (() => {
         ctx.fill();
 
         if (v === 1) {
-          // 黑棋
-          const g = ctx.createRadialGradient(p.x - r * 0.3, p.y - r * 0.3, r * 0.1, p.x, p.y, r);
-          g.addColorStop(0, '#2a3654');
-          g.addColorStop(0.5, COLORS.black);
-          g.addColorStop(1, '#05070d');
+          // 黑棋：炭蓝灰主体 + 浅灰蓝描边 + 底部暗面 + 顶部高光，与深色背景明显区分
+          const g = ctx.createRadialGradient(p.x - r * 0.3, p.y - r * 0.3, r * 0.15, p.x, p.y, r);
+          g.addColorStop(0, COLORS.blackGloss);
+          g.addColorStop(0.4, COLORS.black);
+          g.addColorStop(1, COLORS.blackDark);
           ctx.fillStyle = g;
           ctx.beginPath();
           ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
           ctx.fill();
-          // 高光
-          ctx.fillStyle = 'rgba(59,74,107,0.5)';
+          // 浅灰蓝描边，让轮廓从深色背景跳出
+          ctx.strokeStyle = COLORS.blackEdge;
+          ctx.lineWidth = 1.6;
+          ctx.stroke();
+          // 顶部高光
+          ctx.fillStyle = COLORS.blackGloss;
           ctx.beginPath();
-          ctx.arc(p.x - r * 0.25, p.y - r * 0.3, r * 0.32, 0, Math.PI * 2);
+          ctx.arc(p.x - r * 0.3, p.y - r * 0.35, r * 0.3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = 'rgba(255,255,255,0.6)';
+          ctx.beginPath();
+          ctx.arc(p.x - r * 0.2, p.y - r * 0.28, r * 0.14, 0, Math.PI * 2);
           ctx.fill();
         } else {
           // 白棋

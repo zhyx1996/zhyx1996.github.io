@@ -1190,6 +1190,7 @@ a:hover { opacity: 0.8; }
         position: static;
         height: auto;
         flex-direction: row;
+        flex-wrap: wrap;
         align-items: center;
         padding: 16px 20px;
         border-right: none;
@@ -1200,6 +1201,8 @@ a:hover { opacity: 0.8; }
         flex-direction: row;
         gap: 8px;
         flex-wrap: wrap;
+        flex: 1 1 100%;
+        margin-top: 12px;
     }
     .sidebar-footer { display: none; }
     .main { padding: 32px 20px; }

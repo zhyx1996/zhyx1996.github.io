@@ -8,6 +8,13 @@
     padding-bottom: 0;
 }
 
+/* 本地版状态栏里的引擎链接：不换行、有下划线、颜色明显 */
+.gm-tab-panel .nk-window-statusbar a.gm-link {
+    white-space: nowrap;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
 .gm-native-tab {
     padding: 10px 20px;
     font-family: var(--font-mono, monospace);
