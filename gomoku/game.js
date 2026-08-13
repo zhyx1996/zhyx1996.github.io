@@ -17,11 +17,19 @@ const GomokuGame = (() => {
   let aiThinking = false;
   let moveHistory = [];
 
+  // 分析状态（实时候选点 / 禁手 / MultiPV）
+  let realtimeBest = null;  // 思考中引擎当前最佳候选点 {x,y}
+  let realtimeLost = [];    // 思考中引擎已排除的点
+  let forbidCells = [];     // 禁手点（有禁手规则）
+  let pvList = [];          // MultiPV 列表（每项 {depth,eval,winrate,bestline,nodes,speed}）
+  let curPv = 1;
+
   // 配置
   let mode = 'pve';         // pve | pvp
   let humanColor = 1;       // 1=黑 2=白
   let aiDifficulty = 'medium'; // easy/medium/hard
   let engineReady = false;
+  let engineThreaded = false;  // 引擎是否运行在多线程模式（决定 THREAD_NUM 取值）
   let enginePath = '/gomoku/build/';
 
   // 引擎配置（对齐 Godot 版）
@@ -34,6 +42,10 @@ const GomokuGame = (() => {
   let cautionFactor = 3;    // 选点范围 0~5
   let hashSize = 128;       // MiB
   let nbest = 1;            // 多点分析数
+  let pondering = false;    // 后台思考
+  let threadsOverride = 0;  // 手动线程数（0=自动）
+  let aiBlack = false;      // AI 执黑
+  let aiWhite = false;      // AI 执白
 
   // 回调
   let onStateChange = null;
@@ -60,6 +72,11 @@ const GomokuGame = (() => {
     threatType = '';
     aiThinking = false;
     moveHistory = [];
+    realtimeBest = null;
+    realtimeLost = [];
+    forbidCells = [];
+    pvList = [];
+    curPv = 1;
     notify();
   }
 
@@ -71,6 +88,7 @@ const GomokuGame = (() => {
     return {
       board, currentPlayer, winner, moveCount, lastMove, winningCells,
       threatCells, threatType, aiThinking, mode, humanColor, aiDifficulty, engineReady,
+      realtimeBest, realtimeLost, forbidCells, aiBlack, aiWhite,
     };
   }
 
@@ -81,25 +99,39 @@ const GomokuGame = (() => {
       GomokuEngine.init((r) => {
         if (r.ok) {
           engineReady = true;
+          engineThreaded = r.threads === true;
+          threads = computeThreads();
           sendInfo();
           notify();
           resolve(true);
         } else if (r.pos) {
           onEngineMove(r.pos);
+        } else if (r.realtime) {
+          // 实时候选点：BEST=当前最佳，LOST=已排除（引擎坐标 [x,y] 归一化为 {x,y}）
+          const pos = r.realtime.pos && { x: r.realtime.pos[0], y: r.realtime.pos[1] };
+          if (r.realtime.type === 'BEST') { realtimeBest = pos; realtimeLost = []; }
+          else if (r.realtime.type === 'LOST' && pos) realtimeLost.push(pos);
+          notify();
+        } else if (r.forbid) {
+          forbidCells = (r.forbid || []).map(p => ({ x: p[0], y: p[1] }));
+          notify();
+        } else if (r.numpv) {
+          curPv = r.numpv;
         } else if (r.error) {
           console.error('[engine error]', r.error);
           resolve(false);
         } else if (r.msg) {
           console.log('[engine]', r.msg);
-        } else if (r.bestline || r.depth || r.eval || r.winrate || r.speed || r.totalnodes || r.nodes) {
-          // 分析信息（用于分析面板，暂存）
-          if (r.bestline) window.__lastBestline = r.bestline;
-          if (r.depth) window.__lastDepth = r.depth;
-          if (r.eval !== undefined) window.__lastEval = r.eval;
-          if (r.winrate !== undefined) window.__lastWinrate = r.winrate;
-          if (r.speed !== undefined) window.__lastSpeed = r.speed;
-          if (r.totalnodes !== undefined) window.__lastNodes = r.totalnodes;
-          else if (r.nodes !== undefined) window.__lastNodes = r.nodes;
+        } else if (r.bestline || r.depth || r.eval !== undefined || r.winrate !== undefined || r.speed || r.totalnodes || r.nodes) {
+          // 分析信息（按 NUMPV 索引累积为 MultiPV 列表）
+          const e = pvEntry(curPv);
+          if (r.depth) e.depth = r.depth;
+          if (r.eval !== undefined) e.eval = r.eval;
+          if (r.winrate !== undefined) e.winrate = r.winrate;
+          if (r.bestline) e.bestline = r.bestline;
+          if (r.speed !== undefined) e.speed = r.speed;
+          if (r.totalnodes !== undefined) e.nodes = r.totalnodes;
+          else if (r.nodes !== undefined) e.nodes = r.nodes;
           if (onAnalysisUpdate) onAnalysisUpdate();
         }
       }, path);
@@ -114,7 +146,9 @@ const GomokuGame = (() => {
     GomokuEngine.sendCommand('INFO MAX_DEPTH ' + maxDepth);
     GomokuEngine.sendCommand('INFO SHOW_DETAIL ' + showDetail);
     GomokuEngine.sendCommand('INFO CAUTION_FACTOR ' + cautionFactor);
-    GomokuEngine.sendCommand('INFO HASH_SIZE ' + hashSize);
+    // Rapfi 的 INFO HASH_SIZE 单位为 KB（见 gomoku-calculator 源码：hashSize(MB) * 1024）
+    GomokuEngine.sendCommand('INFO HASH_SIZE ' + (hashSize * 1024));
+    GomokuEngine.sendCommand('INFO PONDERING ' + (pondering ? 1 : 0));
   }
 
   // 设置单项配置并下发引擎
@@ -128,8 +162,19 @@ const GomokuGame = (() => {
     else if (key === 'cautionFactor') cautionFactor = value;
     else if (key === 'hashSize') hashSize = value;
     else if (key === 'nbest') nbest = value;
+    else if (key === 'pondering') pondering = !!value;
+    else if (key === 'threadsOverride') { threadsOverride = value; threads = computeThreads(); }
     else if (key === 'thinkIndex') { thinkIndex = value; return; }
     if (engineReady) sendInfo();
+    if (key === 'rule' && engineReady) requestForbid();
+  }
+
+  // 计算实际线程数：手动优先，否则多线程用一半核心，单线程固定 1
+  function computeThreads() {
+    if (threadsOverride > 0) return threadsOverride;
+    return engineThreaded
+      ? Math.max(1, Math.floor((window.navigator.hardwareConcurrency || 4) / 2))
+      : 1;
   }
 
   // 分析当前局面（nbest 多点分析）
@@ -167,18 +212,35 @@ const GomokuGame = (() => {
     GomokuEngine.sendCommand(cmd);
   }
 
+  // 判断某颜色是否由 AI 落子（AI 执黑/执白开关优先，其次人机模式的 AI 方）
+  function aiPlays(player) {
+    if (aiBlack && player === 1) return true;
+    if (aiWhite && player === 2) return true;
+    if (mode === 'pve') return player === (3 - humanColor);
+    return false;
+  }
+
+  // 请求禁手点（有禁手规则时引擎通过 YXSHOWFORBID 输出 FORBID）
+  function requestForbid() {
+    if (!engineReady) return;
+    forbidCells = [];
+    if (rule !== 2) return;
+    sendBoard(false);
+    GomokuEngine.sendCommand('YXSHOWFORBID');
+  }
+
   function startNewGame() {
     resetBoard();
-    if (mode === 'pve') {
+    if (mode === 'pve' || aiBlack || aiWhite) {
       GomokuEngine.sendCommand('START ' + N);
       sendInfo();
-      // AI 先手
-      if (humanColor === 2) {
+      if (aiPlays(1)) {
         aiThinking = true;
         notify();
         GomokuEngine.sendCommand('BEGIN');
       } else {
         notify();
+        requestForbid();
       }
     } else {
       notify();
@@ -197,9 +259,7 @@ const GomokuGame = (() => {
   // 玩家点击落子
   function playerClick(x, y) {
     if (winner !== 0) return false;
-    if (mode === 'pve') {
-      if (aiThinking || currentPlayer !== humanColor) return false;
-    }
+    if (aiThinking || aiPlays(currentPlayer)) return false;
     if (board[y][x] !== 0) return false;
     placeStone(x, y);
     return true;
@@ -228,7 +288,7 @@ const GomokuGame = (() => {
     notify();
 
     // AI 回合
-    if (winner === 0 && mode === 'pve' && currentPlayer === (3 - humanColor)) {
+    if (winner === 0 && aiPlays(currentPlayer)) {
       aiThinking = true;
       notify();
       // 用 BOARD 命令同步局面让 AI 思考
@@ -236,6 +296,9 @@ const GomokuGame = (() => {
         sendBoard(false);
         GomokuEngine.sendCommand('YXNBEST 1');
       }, 50);
+    } else if (winner === 0) {
+      // 轮到人下，刷新禁手点显示
+      requestForbid();
     }
   }
 
@@ -333,6 +396,13 @@ const GomokuGame = (() => {
     if (key === 'nbest') return nbest;
     if (key === 'thinkIndex') return thinkIndex;
     if (key === 'timeoutTurn') return timeoutTurn;
+    if (key === 'threads') return threads;
+    if (key === 'threadsOverride') return threadsOverride;
+    if (key === 'hashSize') return hashSize;
+    if (key === 'strength') return strength;
+    if (key === 'pondering') return pondering;
+    if (key === 'aiBlack') return aiBlack;
+    if (key === 'aiWhite') return aiWhite;
     return null;
   }
 
@@ -362,14 +432,30 @@ const GomokuGame = (() => {
     notify();
   }
 
+  function pvEntry(i) {
+    if (!pvList[i]) pvList[i] = {};
+    return pvList[i];
+  }
+
+  function setAiBlack(v) { aiBlack = !!v; startNewGame(); }
+  function setAiWhite(v) { aiWhite = !!v; startNewGame(); }
+
   function getAnalysis() {
+    // 整理 MultiPV 列表（过滤空项，按 NUMPV 排序）
+    const pvs = [];
+    for (let i = 0; i < pvList.length; i++) {
+      if (pvList[i] && pvList[i].bestline) pvs.push({ index: i, ...pvList[i] });
+    }
+    pvs.sort((a, b) => a.index - b.index);
+    const best = pvs[0] || {};
     return {
-      depth: window.__lastDepth || 0,
-      eval: window.__lastEval || '-',
-      winrate: window.__lastWinrate || null,
-      bestline: window.__lastBestline || [],
-      speed: window.__lastSpeed || 0,
-      nodes: window.__lastNodes || 0,
+      depth: best.depth || 0,
+      eval: best.eval ?? '-',
+      winrate: best.winrate ?? null,
+      bestline: best.bestline || [],
+      speed: best.speed || 0,
+      nodes: best.nodes || 0,
+      pvs,
     };
   }
 
@@ -377,6 +463,7 @@ const GomokuGame = (() => {
     init, startEngine, startNewGame, playerClick, getState,
     setMode, setHumanColor, setDifficulty, setConfig, analyze, undo, getConfig,
     setBoardSize, setAnalysisCallback, getAnalysis,
+    setAiBlack, setAiWhite, requestForbid,
     get N() { return N; },
     get moveHistory() { return moveHistory; },
   };

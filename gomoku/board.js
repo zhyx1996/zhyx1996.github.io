@@ -40,6 +40,9 @@ const GomokuBoard = (() => {
   let showCoord = true;      // 显示坐标
   let showIndex = false;     // 显示落子序号
   let themeIndex = 0;        // 主题 0深色/1木质/2浅色
+  let realtimeBest = null;   // {x,y} 思考中引擎当前最佳候选点
+  let realtimeLost = [];     // [{x,y}] 思考中引擎已排除的点
+  let forbidCells = [];      // [{x,y}] 禁手点（有禁手规则）
 
   function getLogicalSize() {
     // 逻辑尺寸（CSS 像素）：canvas 已按 DPR 放大物理像素并用 ctx.setTransform 缩放，
@@ -64,12 +67,15 @@ const GomokuBoard = (() => {
     );
   }
 
-  function setBoard(b, last, winning, threat, ttype) {
+  function setBoard(b, last, winning, threat, ttype, rtBest, rtLost, forbid) {
     boardData = b;
     lastMove = last;
     winningCells = winning;
     threatCells = threat;
     threatType = ttype;
+    realtimeBest = rtBest || null;
+    realtimeLost = rtLost || [];
+    forbidCells = forbid || [];
   }
 
   // 设置落子历史（用于序号显示）
@@ -108,6 +114,8 @@ const GomokuBoard = (() => {
     drawBackground();
     drawBoard();
     drawStones();
+    drawForbid();
+    drawRealtime();
     drawThreatHighlight();
     drawOverlays();
     drawWinGlow();
@@ -257,6 +265,54 @@ const GomokuBoard = (() => {
             ctx.fillText(String(idx), p.x, p.y + 1);
           }
         }
+      }
+    }
+  }
+
+  function drawForbid() {
+    if (!forbidCells || forbidCells.length === 0) return;
+    for (const c of forbidCells) {
+      const p = cellToScreen(c);
+      const r = cellSize * 0.32;
+      ctx.strokeStyle = COLORS.threatRed;
+      ctx.lineWidth = 2.5;
+      ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      ctx.moveTo(p.x - r, p.y - r);
+      ctx.lineTo(p.x + r, p.y + r);
+      ctx.moveTo(p.x + r, p.y - r);
+      ctx.lineTo(p.x - r, p.y + r);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawRealtime() {
+    // 思考中引擎当前最佳候选点（金色脉冲环）
+    if (realtimeBest) {
+      const p = cellToScreen(realtimeBest);
+      const pulse = 0.5 + 0.5 * Math.sin(fxTime * 8);
+      ctx.strokeStyle = COLORS.gold;
+      ctx.globalAlpha = 0.9;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, cellSize * 0.42 + 4 + pulse * 3, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = COLORS.gold;
+      ctx.globalAlpha = 0.6 + 0.4 * pulse;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    // 引擎已排除的点（暗红小点）
+    if (realtimeLost && realtimeLost.length > 0) {
+      ctx.fillStyle = 'rgba(248,113,113,0.45)';
+      for (const c of realtimeLost) {
+        const p = cellToScreen(c);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
   }

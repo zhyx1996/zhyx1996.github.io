@@ -39,6 +39,14 @@
               <button class="gm-native-btn" id="gm-btn-nbest">分析点：1</button>
               <button class="gm-native-btn" id="gm-btn-size">棋盘：15×15</button>
               <button class="gm-native-btn" id="gm-btn-theme">主题：深色</button>
+              <button class="gm-native-btn" id="gm-btn-threads">线程：自动</button>
+              <button class="gm-native-btn" id="gm-btn-hash">置换表：128MB</button>
+              <button class="gm-native-btn" id="gm-btn-strength">棋力：70</button>
+              <button class="gm-native-btn" id="gm-btn-pondering">后台思考：关</button>
+              <div class="gm-native-row">
+                <button class="gm-native-btn" id="gm-btn-aiblack">AI执黑：关</button>
+                <button class="gm-native-btn" id="gm-btn-aiwhite">AI执白：关</button>
+              </div>
               <div class="gm-native-row">
                 <button class="gm-native-btn" id="gm-btn-coord">坐标：开</button>
                 <button class="gm-native-btn" id="gm-btn-index">序号：关</button>
@@ -163,6 +171,49 @@
       updateButtons();
     });
 
+    // 线程 / 置换表 / 棋力 / 后台思考 / AI执黑白（补齐原版设置项）
+    const threadOpts = [0, 1, 2, 4, 8];
+    document.getElementById('gm-btn-threads').addEventListener('click', () => {
+      const cur = game.getConfig('threadsOverride');
+      const idx = threadOpts.indexOf(cur);
+      const next = threadOpts[(idx + 1) % threadOpts.length];
+      game.setConfig('threadsOverride', next);
+      updateButtons();
+    });
+
+    const hashOpts = [128, 256, 512];
+    document.getElementById('gm-btn-hash').addEventListener('click', () => {
+      const cur = game.getConfig('hashSize');
+      const idx = hashOpts.indexOf(cur);
+      const next = hashOpts[(idx + 1) % hashOpts.length];
+      game.setConfig('hashSize', next);
+      updateButtons();
+    });
+
+    const strengthOpts = [30, 50, 70, 85, 100];
+    document.getElementById('gm-btn-strength').addEventListener('click', () => {
+      const cur = game.getConfig('strength');
+      const idx = strengthOpts.indexOf(cur);
+      const next = strengthOpts[(idx + 1) % strengthOpts.length];
+      game.setConfig('strength', next);
+      updateButtons();
+    });
+
+    document.getElementById('gm-btn-pondering').addEventListener('click', () => {
+      const next = !game.getConfig('pondering');
+      game.setConfig('pondering', next);
+      updateButtons();
+    });
+
+    document.getElementById('gm-btn-aiblack').addEventListener('click', () => {
+      game.setAiBlack(!game.getConfig('aiBlack'));
+      updateButtons();
+    });
+    document.getElementById('gm-btn-aiwhite').addEventListener('click', () => {
+      game.setAiWhite(!game.getConfig('aiWhite'));
+      updateButtons();
+    });
+
     // 窗口尺寸变化时重算棋盘
     let resizeTimer = null;
     window.addEventListener('resize', () => {
@@ -235,7 +286,8 @@
 
   function onState(s) {
     // 更新棋盘渲染数据
-    board.setBoard(s.board, s.lastMove, s.winningCells, s.threatCells, s.threatType);
+    board.setBoard(s.board, s.lastMove, s.winningCells, s.threatCells, s.threatType,
+      s.realtimeBest, s.realtimeLost, s.forbidCells);
     board.setMoveHistory(game.moveHistory);
 
     // 更新状态文字
@@ -289,19 +341,48 @@
     if (nbestBtn) nbestBtn.textContent = '分析点：' + game.getConfig('nbest');
     const sizeBtn = document.getElementById('gm-btn-size');
     if (sizeBtn) sizeBtn.textContent = '棋盘：' + game.N + '×' + game.N;
+    const threadNames = ['自动', '1', '2', '4', '8'];
+    const threadOpts = [0, 1, 2, 4, 8];
+    const to = game.getConfig('threadsOverride');
+    const ti = Math.max(0, threadOpts.indexOf(to));
+    const tBtn = document.getElementById('gm-btn-threads');
+    if (tBtn) tBtn.textContent = '线程：' + threadNames[ti] + '（实际' + game.getConfig('threads') + '）';
+    const hBtn = document.getElementById('gm-btn-hash');
+    if (hBtn) hBtn.textContent = '置换表：' + game.getConfig('hashSize') + 'MB';
+    const sBtn = document.getElementById('gm-btn-strength');
+    if (sBtn) sBtn.textContent = '棋力：' + game.getConfig('strength');
+    const pBtn = document.getElementById('gm-btn-pondering');
+    if (pBtn) pBtn.textContent = '后台思考：' + (game.getConfig('pondering') ? '开' : '关');
+    const abBtn = document.getElementById('gm-btn-aiblack');
+    if (abBtn) abBtn.textContent = 'AI执黑：' + (game.getConfig('aiBlack') ? '开' : '关');
+    const awBtn = document.getElementById('gm-btn-aiwhite');
+    if (awBtn) awBtn.textContent = 'AI执白：' + (game.getConfig('aiWhite') ? '开' : '关');
   }
 
   function updateAnalysis() {
     const a = game.getAnalysis();
     if (!analysisEl) return;
-    analysisEl.innerHTML = `
+    let html = `
       <div class="gm-kv"><span>深度</span><b>${a.depth || '-'}</b></div>
-      <div class="gm-kv"><span>估值</span><b>${a.eval || '-'}</b></div>
+      <div class="gm-kv"><span>估值</span><b>${a.eval ?? '-'}</b></div>
       <div class="gm-kv"><span>胜率</span><b>${a.winrate != null ? (a.winrate * 100).toFixed(1) + '%' : '-'}</b></div>
       <div class="gm-kv"><span>速度</span><b>${a.speed || '-'}</b></div>
       <div class="gm-kv"><span>节点</span><b>${a.nodes || '-'}</b></div>
-      <div class="gm-kv"><span>最佳线</span><b>${formatBestline(a.bestline)}</b></div>
     `;
+    // MultiPV 多点分析：每条 PV 一行（估值/胜率/深度 + 最佳线）
+    if (a.pvs && a.pvs.length > 0) {
+      for (let i = 0; i < a.pvs.length && i < 5; i++) {
+        const p = a.pvs[i];
+        const meta = [];
+        if (p.eval != null) meta.push(String(p.eval));
+        if (p.winrate != null) meta.push((p.winrate * 100).toFixed(1) + '%');
+        if (p.depth) meta.push('d' + p.depth);
+        html += `<div class="gm-kv"><span>PV${i + 1}${meta.length ? ' ' + meta.join(' ') : ''}</span><b>${formatBestline(p.bestline)}</b></div>`;
+      }
+    } else {
+      html += `<div class="gm-kv"><span>最佳线</span><b>-</b></div>`;
+    }
+    analysisEl.innerHTML = html;
   }
 
   function formatBestline(line) {

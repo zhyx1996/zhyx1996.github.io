@@ -164,10 +164,12 @@ const GomokuEngine = (() => {
     const supportRelaxed = supportThreads && isRelaxedSimdSupported();
 
     // 组合引擎文件名：与 gomoku-calculator 一致
-    // 注意：无 SIMD 的多线程产物不存在，故「多线程但无 SIMD」回退单线程
+    // 多线程：multi + SIMD(+relaxed)；单线程：优先 single-simd128（SIMD 无需 COOP/COEP），不支持 SIMD 才退 single
     let engineName;
     if (supportThreads && supportSIMD) {
       engineName = 'rapfi-multi-simd128' + (supportRelaxed ? '-relaxed' : '');
+    } else if (supportSIMD) {
+      engineName = 'rapfi-single-simd128';
     } else {
       engineName = 'rapfi-single';
     }
