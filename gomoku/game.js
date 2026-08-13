@@ -406,29 +406,28 @@ const GomokuGame = (() => {
     return null;
   }
 
-  // 悔棋（撤销最后 1~2 步）
+  // 悔棋（撤销最后 1~2 步，按落子历史栈精确回退，与 Godot 版一致）
   function undo() {
-    // 需要落子历史，这里简化：清空最后一步
     if (moveCount === 0 || aiThinking) return;
-    // 人机模式撤两步（AI+玩家），双人撤一步
-    let steps = mode === 'pve' ? 2 : 1;
-    while (steps-- > 0 && moveCount > 0) {
-      if (lastMove) {
-        board[lastMove.y][lastMove.x] = 0;
+    // 人机模式撤两步（AI+玩家），双人/观战撤一步
+    const steps = mode === 'pve' ? 2 : 1;
+    let n = Math.min(steps, moveHistory.length);
+    while (n-- > 0) {
+      const cell = moveHistory.pop();
+      if (cell) {
+        board[cell.y][cell.x] = 0;
         moveCount--;
+        currentPlayer = currentPlayer === 1 ? 2 : 1;
       }
-      // 重新找最后一步（简化：从棋盘反向找）
-      lastMove = null;
-      for (let y = N - 1; y >= 0 && !lastMove; y--)
-        for (let x = N - 1; x >= 0; x--)
-          if (board[y][x] !== 0) { lastMove = { x, y }; break; }
-      // 切换回玩家
-      currentPlayer = currentPlayer === 1 ? 2 : 1;
     }
+    lastMove = moveHistory.length > 0 ? moveHistory[moveHistory.length - 1] : null;
     winner = 0;
     winningCells = [];
     threatCells = [];
     threatType = '';
+    realtimeBest = null;
+    realtimeLost = [];
+    forbidCells = [];
     notify();
   }
 
