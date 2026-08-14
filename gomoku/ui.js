@@ -509,7 +509,7 @@
   function formatBestline(line) {
     if (!line || line.length === 0) return '-';
     return line.slice(0, 6).map(([x, y]) => {
-      return String.fromCharCode(65 + x) + (15 - y);
+      return String.fromCharCode(65 + x) + (game.N - y);
     }).join(' ');
   }
 
