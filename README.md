@@ -6,11 +6,11 @@
 
 ## 页面
 
-- `index.html` 主页（个人简介 / 文章 / Steam / 石蒜模拟器）
-- `projects.html` 仓库 · `stars.html` Star · `articles.html` 博客
-- `gomoku.html` 五子棋（Rapfi AI，WASM 多线程）
-- `gomoku-godot/` 五子棋 Godot 版
-- `nethack.html` NetHack
+- [主页](https://zhyx1996.github.io/)（个人简介 / 文章 / Steam / 石蒜模拟器）
+- [仓库](https://zhyx1996.github.io/projects.html) · [Star](https://zhyx1996.github.io/stars.html) · [博客](https://zhyx1996.github.io/articles.html)
+- [五子棋](https://zhyx1996.github.io/gomoku.html)（Rapfi AI，WASM 多线程）
+- [五子棋 Godot 版](https://zhyx1996.github.io/gomoku-godot/)
+- [NetHack](https://zhyx1996.github.io/nethack.html)
 
 ## 技术
 

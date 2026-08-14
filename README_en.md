@@ -4,11 +4,11 @@ Personal homepage based on GitHub Pages, built with AI assistance.
 
 ## Pages
 
-- `index.html` Homepage (profile / articles / Steam / Sakana widget)
-- `projects.html` Repos · `stars.html` Stars · `articles.html` Blog
-- `gomoku.html` Gomoku (Rapfi AI, WASM multithreading)
-- `gomoku-godot/` Gomoku Godot build
-- `nethack.html` NetHack
+- [Home](https://zhyx1996.github.io/) (profile / articles / Steam / Sakana widget)
+- [Repos](https://zhyx1996.github.io/projects.html) · [Stars](https://zhyx1996.github.io/stars.html) · [Blog](https://zhyx1996.github.io/articles.html)
+- [Gomoku](https://zhyx1996.github.io/gomoku.html) (Rapfi AI, WASM multithreading)
+- [Gomoku Godot](https://zhyx1996.github.io/gomoku-godot/)
+- [NetHack](https://zhyx1996.github.io/nethack.html)
 
 ## Tech
 
