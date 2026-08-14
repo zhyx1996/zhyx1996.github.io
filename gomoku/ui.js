@@ -23,7 +23,8 @@
             <div class="gm-native-spinner"></div>
             <span>正在加载 Rapfi AI 引擎…</span>
             <div class="gm-progress"><div class="gm-progress-bar" id="gm-progress-bar"></div></div>
-            <span class="gm-progress-text" id="gm-progress-text">正在下载 NNUE 权重（约 40MB）…</span>
+            <span class="gm-progress-text" id="gm-progress-text">正在从 GitHub 下载 NNUE 权重（约 40MB）…</span>
+            <span class="gm-progress-hint">若长时间没有进度，请检查到 GitHub 的网络连通性（必要时开启代理）。</span>
           </div>
           <div class="gm-native-win-banner" id="gm-native-win-banner"></div>
         </div>
@@ -368,7 +369,7 @@
     if (!bar || !txt) return;
     const pct = Math.max(0, Math.min(1, progress || 0));
     bar.style.width = (pct * 100).toFixed(0) + '%';
-    txt.textContent = '正在下载 NNUE 权重（约 40MB）… ' + (pct * 100).toFixed(0) + '%';
+    txt.textContent = '正在从 GitHub 下载 NNUE 权重（约 40MB）… ' + (pct * 100).toFixed(0) + '%';
   }
 
   function updateAnalysis() {

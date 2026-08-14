@@ -289,6 +289,15 @@
     font-variant-numeric: tabular-nums;
 }
 
+.gm-progress-hint {
+    font-size: 11px;
+    color: #fbbf24;
+    opacity: 0.85;
+    max-width: 300px;
+    text-align: center;
+    line-height: 1.5;
+}
+
 /* ── 胜利横幅（覆盖在棋盘上） ── */
 .gm-native-win-banner {
     position: absolute;
