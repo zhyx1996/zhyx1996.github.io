@@ -97,10 +97,31 @@
 .gm-native-status.gm-win { color: var(--accent); }
 .gm-native-status.gm-thinking { color: var(--teal); }
 
-.gm-native-controls {
-    display: flex;
-    flex-direction: column;
+/* ── 设置按钮网格（分组布局） ── */
+.gm-btn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
+    margin-bottom: 4px;
+}
+
+.gm-grid-full {
+    grid-column: 1 / -1;
+}
+
+.gm-group-label {
+    margin: 16px 0 8px;
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+.gm-group-label:first-of-type { margin-top: 2px; }
+
+.gm-action-row {
+    margin-top: 12px;
 }
 
 .gm-native-row {
@@ -111,17 +132,20 @@
 
 /* ── 设置按钮（对齐站点 .btn 风格） ── */
 .gm-native-btn {
-    padding: 9px 12px;
+    padding: 8px 10px;
     font-family: var(--font-mono, monospace);
-    font-size: 13px;
+    font-size: 12px;
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.15s;
-    text-align: left;
+    text-align: center;
     line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .gm-native-btn:hover {

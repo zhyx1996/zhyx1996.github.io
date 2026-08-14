@@ -32,32 +32,43 @@
           <div class="gm-native-card">
             <h3>对局</h3>
             <div class="gm-native-status" id="gm-native-status"></div>
-            <div class="gm-native-controls">
-              <button class="gm-native-btn" id="gm-btn-mode">模式：人机对战</button>
-              <button class="gm-native-btn" id="gm-btn-color">你执：黑棋（先手）</button>
-              <button class="gm-native-btn" id="gm-btn-diff">AI 难度：中等</button>
+            <div class="gm-btn-grid">
+              <button class="gm-native-btn" id="gm-btn-mode">模式：人机</button>
+              <button class="gm-native-btn" id="gm-btn-color">你执：黑棋</button>
+              <button class="gm-native-btn gm-grid-full" id="gm-btn-diff">难度：中等</button>
+            </div>
+            <div class="gm-native-row gm-action-row">
+              <button class="gm-native-btn gm-primary" id="gm-btn-undo">↶ 悔棋</button>
+              <button class="gm-native-btn gm-primary" id="gm-btn-restart">↻ 新局</button>
+            </div>
+          </div>
+          <div class="gm-native-card">
+            <h3>设置</h3>
+            <div class="gm-group-label">规则</div>
+            <div class="gm-btn-grid">
               <button class="gm-native-btn" id="gm-btn-rule">规则：无禁手</button>
+              <button class="gm-native-btn" id="gm-btn-size">棋盘：15×15</button>
+            </div>
+            <div class="gm-group-label">引擎</div>
+            <div class="gm-btn-grid">
               <button class="gm-native-btn" id="gm-btn-think">思考：中等</button>
               <button class="gm-native-btn" id="gm-btn-cand">选点：较大</button>
-              <button class="gm-native-btn" id="gm-btn-nbest">分析点：1</button>
-              <button class="gm-native-btn" id="gm-btn-size">棋盘：15×15</button>
-              <button class="gm-native-btn" id="gm-btn-theme">主题：深色</button>
               <button class="gm-native-btn" id="gm-btn-threads">线程：自动</button>
               <button class="gm-native-btn" id="gm-btn-hash">置换表：128MB</button>
               <button class="gm-native-btn" id="gm-btn-strength">棋力：70</button>
               <button class="gm-native-btn" id="gm-btn-pondering">后台思考：关</button>
-              <div class="gm-native-row">
-                <button class="gm-native-btn" id="gm-btn-aiblack">AI执黑：关</button>
-                <button class="gm-native-btn" id="gm-btn-aiwhite">AI执白：关</button>
-              </div>
-              <div class="gm-native-row">
-                <button class="gm-native-btn" id="gm-btn-coord">坐标：开</button>
-                <button class="gm-native-btn" id="gm-btn-index">序号：关</button>
-              </div>
-              <div class="gm-native-row">
-                <button class="gm-native-btn gm-primary" id="gm-btn-undo">↶ 悔棋</button>
-                <button class="gm-native-btn gm-primary" id="gm-btn-restart">↻ 新局</button>
-              </div>
+              <button class="gm-native-btn" id="gm-btn-nbest">分析点：1</button>
+            </div>
+            <div class="gm-group-label">显示</div>
+            <div class="gm-btn-grid">
+              <button class="gm-native-btn" id="gm-btn-coord">坐标：开</button>
+              <button class="gm-native-btn" id="gm-btn-index">序号：关</button>
+              <button class="gm-native-btn" id="gm-btn-theme">主题：深色</button>
+            </div>
+            <div class="gm-group-label">AI 执子</div>
+            <div class="gm-btn-grid">
+              <button class="gm-native-btn" id="gm-btn-aiblack">AI执黑：关</button>
+              <button class="gm-native-btn" id="gm-btn-aiwhite">AI执白：关</button>
             </div>
           </div>
           <div class="gm-native-card">
@@ -323,11 +334,11 @@
     const modeBtn = document.getElementById('gm-btn-mode');
     const colorBtn = document.getElementById('gm-btn-color');
     const diffBtn = document.getElementById('gm-btn-diff');
-    if (modeBtn) modeBtn.textContent = '模式：' + (s.mode === 'pve' ? '人机对战' : '双人对战');
-    if (colorBtn) colorBtn.textContent = '你执：' + (s.humanColor === 1 ? '黑棋（先手）' : '白棋（后手）');
+    if (modeBtn) modeBtn.textContent = '模式：' + (s.mode === 'pve' ? '人机' : '双人');
+    if (colorBtn) colorBtn.textContent = '你执：' + (s.humanColor === 1 ? '黑棋' : '白棋');
     if (diffBtn) {
       const names = { easy: '简单', medium: '中等', hard: '困难' };
-      diffBtn.textContent = 'AI 难度：' + names[s.aiDifficulty];
+      diffBtn.textContent = '难度：' + names[s.aiDifficulty];
     }
   }
 
@@ -350,7 +361,7 @@
     const to = game.getConfig('threadsOverride');
     const ti = Math.max(0, threadOpts.indexOf(to));
     const tBtn = document.getElementById('gm-btn-threads');
-    if (tBtn) tBtn.textContent = '线程：' + threadNames[ti] + '（实际' + game.getConfig('threads') + '）';
+    if (tBtn) tBtn.textContent = '线程：' + threadNames[ti];
     const hBtn = document.getElementById('gm-btn-hash');
     if (hBtn) hBtn.textContent = '置换表：' + game.getConfig('hashSize') + 'MB';
     const sBtn = document.getElementById('gm-btn-strength');
