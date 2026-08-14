@@ -29,35 +29,55 @@
           <div class="gm-native-win-banner" id="gm-native-win-banner"></div>
         </div>
         <div class="gm-native-side">
-          <div class="gm-native-card">
-            <h3>对局</h3>
+          <div class="gm-native-card gm-status-card">
             <div class="gm-native-status" id="gm-native-status"></div>
-            <div class="gm-btn-grid">
+          </div>
+
+          <div class="gm-native-card">
+            <div class="gm-btn-grid gm-btn-grid-3">
               <button class="gm-native-btn" id="gm-btn-mode">模式：人机</button>
               <button class="gm-native-btn" id="gm-btn-color">你执：黑棋</button>
-              <button class="gm-native-btn gm-grid-full" id="gm-btn-diff">难度：中等</button>
+              <button class="gm-native-btn" id="gm-btn-diff">难度：中等</button>
             </div>
             <div class="gm-native-row gm-action-row">
               <button class="gm-native-btn gm-primary" id="gm-btn-undo">↶ 悔棋</button>
               <button class="gm-native-btn gm-primary" id="gm-btn-restart">↻ 新局</button>
             </div>
+            <button class="gm-native-btn gm-settings-btn" id="gm-btn-settings">⚙ 设置</button>
           </div>
+
           <div class="gm-native-card">
-            <h3>设置</h3>
-            <div class="gm-group-label">规则</div>
+            <h3>实时分析</h3>
+            <div class="gm-native-analysis" id="gm-native-analysis">
+              <div class="gm-kv"><span>深度</span><b>-</b></div>
+              <div class="gm-kv"><span>估值</span><b>-</b></div>
+              <div class="gm-kv"><span>胜率</span><b>-</b></div>
+              <div class="gm-kv"><span>速度</span><b>-</b></div>
+              <div class="gm-kv"><span>节点</span><b>-</b></div>
+              <div class="gm-kv"><span>最佳线</span><b>-</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gm-modal" id="gm-settings-modal" hidden>
+        <div class="gm-modal-overlay" data-gm-modal-close></div>
+        <div class="gm-modal-dialog" role="dialog" aria-modal="true" aria-label="设置">
+          <div class="gm-modal-head">
+            <span class="gm-modal-title">设置</span>
+            <button class="gm-modal-close" data-gm-modal-close aria-label="关闭">×</button>
+          </div>
+          <div class="gm-modal-body">
+            <div class="gm-group-label">引擎</div>
             <div class="gm-btn-grid">
               <button class="gm-native-btn" id="gm-btn-rule">规则：无禁手</button>
               <button class="gm-native-btn" id="gm-btn-size">棋盘：15×15</button>
-            </div>
-            <div class="gm-group-label">引擎</div>
-            <div class="gm-btn-grid">
               <button class="gm-native-btn" id="gm-btn-think">思考：中等</button>
               <button class="gm-native-btn" id="gm-btn-cand">选点：较大</button>
               <button class="gm-native-btn" id="gm-btn-threads">线程：自动</button>
               <button class="gm-native-btn" id="gm-btn-hash">置换表：128MB</button>
               <button class="gm-native-btn" id="gm-btn-strength">棋力：70</button>
               <button class="gm-native-btn" id="gm-btn-pondering">后台思考：关</button>
-              <button class="gm-native-btn" id="gm-btn-nbest">分析点：1</button>
             </div>
             <div class="gm-group-label">显示</div>
             <div class="gm-btn-grid">
@@ -70,16 +90,9 @@
               <button class="gm-native-btn" id="gm-btn-aiblack">AI执黑：关</button>
               <button class="gm-native-btn" id="gm-btn-aiwhite">AI执白：关</button>
             </div>
-          </div>
-          <div class="gm-native-card">
-            <h3>实时分析</h3>
-            <div class="gm-native-analysis" id="gm-native-analysis">
-              <div class="gm-kv"><span>深度</span><b>-</b></div>
-              <div class="gm-kv"><span>估值</span><b>-</b></div>
-              <div class="gm-kv"><span>胜率</span><b>-</b></div>
-              <div class="gm-kv"><span>速度</span><b>-</b></div>
-              <div class="gm-kv"><span>节点</span><b>-</b></div>
-              <div class="gm-kv"><span>最佳线</span><b>-</b></div>
+            <div class="gm-group-label">分析</div>
+            <div class="gm-btn-grid">
+              <button class="gm-native-btn gm-grid-full" id="gm-btn-nbest">分析点：1</button>
             </div>
           </div>
         </div>
@@ -226,6 +239,19 @@
     document.getElementById('gm-btn-aiwhite').addEventListener('click', () => {
       game.setAiWhite(!game.getConfig('aiWhite'));
       updateButtons();
+    });
+
+    // 设置弹窗：打开 / 关闭
+    const settingsModal = document.getElementById('gm-settings-modal');
+    document.getElementById('gm-btn-settings').addEventListener('click', () => {
+      settingsModal.hidden = false;
+      updateButtons();
+    });
+    settingsModal.querySelectorAll('[data-gm-modal-close]').forEach((el) => {
+      el.addEventListener('click', () => { settingsModal.hidden = true; });
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && settingsModal && !settingsModal.hidden) settingsModal.hidden = true;
     });
 
     // 窗口尺寸变化时重算棋盘

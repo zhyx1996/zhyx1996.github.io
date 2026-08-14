@@ -109,6 +109,17 @@
     grid-column: 1 / -1;
 }
 
+.gm-btn-grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* ── 打开设置弹窗的按钮 ── */
+.gm-settings-btn {
+    width: 100%;
+    margin-top: 8px;
+    text-align: center;
+}
+
 .gm-group-label {
     margin: 16px 0 8px;
     font-family: var(--font-mono, monospace);
@@ -132,12 +143,12 @@
 
 /* ── 设置按钮（对齐站点 .btn 风格） ── */
 .gm-native-btn {
-    padding: 8px 10px;
+    padding: 6px 8px;
     font-family: var(--font-mono, monospace);
-    font-size: 12px;
+    font-size: 11px;
     background: var(--bg-surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 6px;
     color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.15s;
@@ -349,6 +360,66 @@
     80% { opacity: 1; }
     100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
 }
+
+/* ── 设置弹窗 ── */
+.gm-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+.gm-modal[hidden] { display: none; }
+
+.gm-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+.gm-modal-dialog {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: 16px 18px;
+}
+
+.gm-modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.gm-modal-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+}
+
+.gm-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+.gm-modal-close:hover { color: var(--text); background: var(--bg-inset); }
 
 /* ── 响应式 ── */
 @media (max-width: 800px) {
