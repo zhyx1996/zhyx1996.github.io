@@ -14,6 +14,9 @@ const GomokuGame = (() => {
   let winningCells = [];
   let threatCells = [];
   let threatType = '';
+  let attackCells = [];     // 进攻棋型（活三/冲四）延迟显示
+  let attackType = '';
+  let attackTime = 0;       // performance.now() 毫秒时间戳
   let aiThinking = false;
   let moveHistory = [];
 
@@ -70,6 +73,9 @@ const GomokuGame = (() => {
     winningCells = [];
     threatCells = [];
     threatType = '';
+    attackCells = [];
+    attackType = '';
+    attackTime = 0;
     aiThinking = false;
     moveHistory = [];
     realtimeBest = null;
@@ -87,7 +93,8 @@ const GomokuGame = (() => {
   function getState() {
     return {
       board, currentPlayer, winner, moveCount, lastMove, winningCells,
-      threatCells, threatType, aiThinking, mode, humanColor, aiDifficulty, engineReady,
+      threatCells, threatType, attackCells, attackType, attackTime,
+      aiThinking, mode, humanColor, aiDifficulty, engineReady,
       realtimeBest, realtimeLost, forbidCells, aiBlack, aiWhite,
     };
   }
@@ -359,22 +366,71 @@ const GomokuGame = (() => {
   }
 
   function detectThreat(x, y, p) {
-    let hasFour = false, openFour = false, openThree = false;
-    let fourDir = null, threeDir = null;
+    const fourDirs = [], threeDirs = [];
+    let openFour = false;
+    let fourCells = [], threeCells = [];
+
     for (const [dx, dy] of DIRS) {
       const r = analyzeDir(x, y, dx, dy, p);
-      if (r.hasFour) { hasFour = true; fourDir = [dx, dy]; }
-      if (r.openFour) openFour = true;
-      if (r.openThree) { openThree = true; threeDir = [dx, dy]; }
+      if (r.hasFour) {
+        fourDirs.push([dx, dy]);
+        if (r.openFour) openFour = true;
+        fourCells = mergeCells(fourCells, collectLineStones(x, y, dx, dy, p, 4));
+      }
+      if (r.openThree) {
+        threeDirs.push([dx, dy]);
+        threeCells = mergeCells(threeCells, collectLineStones(x, y, dx, dy, p, 4));
+      }
     }
-    const crossDir = fourDir && threeDir && !(fourDir[0] === threeDir[0] && fourDir[1] === threeDir[1]);
 
-    if ((openFour || hasFour) && openThree && crossDir) threatType = 'four_three';
-    else if (openFour) threatType = 'open_four';
-    else if (hasFour) threatType = 'rushed_four';
-    else threatType = '';
+    const fourCount = fourDirs.length;
+    const threeCount = threeDirs.length;
+    let cross = false;
+    if (fourCount >= 1 && threeCount >= 1) {
+      for (const f of fourDirs) for (const t of threeDirs) {
+        if (!(f[0] === t[0] && f[1] === t[1])) { cross = true; break; }
+      }
+    }
+    let crossThree = false;
+    if (threeCount >= 2 && !(threeDirs[0][0] === threeDirs[1][0] && threeDirs[0][1] === threeDirs[1][1])) crossThree = true;
 
-    threatCells = threatType ? collectThreatCells(x, y, p, fourDir, threeDir) : [];
+    threatType = '';
+    threatCells = [];
+    attackType = '';
+    attackCells = [];
+
+    // 制胜棋型（堵不了）：活四 / 双四 / 四三 / 双三
+    if (openFour) {
+      threatType = 'open_four';
+      threatCells = fourCells;
+    } else if (fourCount >= 2) {
+      threatType = 'double_four';
+      threatCells = fourCells;
+    } else if (cross) {
+      threatType = 'four_three';
+      threatCells = mergeCells(fourCells, threeCells);
+    } else if (crossThree) {
+      threatType = 'double_three';
+      threatCells = threeCells;
+    }
+    // 进攻棋型（常见，延迟几秒后不明显特效）：冲四 / 活三
+    else if (fourCount === 1) {
+      attackType = 'rushed_four';
+      attackCells = fourCells;
+      attackTime = performance.now();
+    } else if (threeCount === 1) {
+      attackType = 'open_three';
+      attackCells = threeCells;
+      attackTime = performance.now();
+    }
+  }
+
+  function mergeCells(a, b) {
+    const out = a.slice();
+    for (const c of b) {
+      if (!out.find(k => k.x === c.x && k.y === c.y)) out.push(c);
+    }
+    return out;
   }
 
   function collectLineStones(x, y, dx, dy, p, radius) {
@@ -383,17 +439,6 @@ const GomokuGame = (() => {
       const cx = x + dx * k, cy = y + dy * k;
       if (inBoard(cx, cy) && board[cy][cx] === p) {
         if (!cells.find(c => c.x === cx && c.y === cy)) cells.push({ x: cx, y: cy });
-      }
-    }
-    return cells;
-  }
-
-  function collectThreatCells(x, y, p, fourDir, threeDir) {
-    let cells = [];
-    if (fourDir) cells = collectLineStones(x, y, fourDir[0], fourDir[1], p, 4);
-    if (threeDir && threatType === 'four_three') {
-      for (const c of collectLineStones(x, y, threeDir[0], threeDir[1], p, 4)) {
-        if (!cells.find(k => k.x === c.x && k.y === c.y)) cells.push(c);
       }
     }
     return cells;
@@ -468,6 +513,9 @@ const GomokuGame = (() => {
     winningCells = [];
     threatCells = [];
     threatType = '';
+    attackCells = [];
+    attackType = '';
+    attackTime = 0;
     realtimeBest = null;
     realtimeLost = [];
     forbidCells = [];

@@ -7,9 +7,11 @@
 
   let canvas, ctx;
   let loadingEl, statusEl, winBannerEl;
-  let analysisEl;
+  let analysisEl, rematchBtn;
   let lastRenderTime = performance.now();
   let rafId = null;
+  let lastMoveCount = 0;      // 用于检测落子播放音效
+  let audioCtx = null;
 
   function init() {
     const container = document.getElementById('gm-native-root');
@@ -27,6 +29,7 @@
             <span class="gm-progress-hint">若长时间没有进度，请检查到 GitHub 的网络连通性（必要时开启代理）。</span>
           </div>
           <div class="gm-native-win-banner" id="gm-native-win-banner"></div>
+          <button class="gm-rematch-btn" id="gm-rematch-btn" hidden>再来一局</button>
         </div>
         <div class="gm-native-side">
           <div class="gm-native-card gm-status-card">
@@ -104,11 +107,18 @@
     statusEl = document.getElementById('gm-native-status');
     winBannerEl = document.getElementById('gm-native-win-banner');
     analysisEl = document.getElementById('gm-native-analysis');
+    rematchBtn = document.getElementById('gm-rematch-btn');
 
     // 初始化棋盘尺寸（正确测量可用宽度 + DPR 适配）
     resizeCanvas();
 
     board.init(canvas, game.N);
+
+    // 再来一局按钮
+    rematchBtn.addEventListener('click', () => {
+      game.startNewGame();
+      rematchBtn.hidden = true;
+    });
 
     // 事件绑定：pointer 事件统一鼠标/触屏
     canvas.addEventListener('pointerdown', onCanvasPointerDown);
@@ -326,8 +336,17 @@
   }
 
   function onState(s) {
+    // 落子音效（玩家或 AI 落子时播放）
+    if (s.moveCount > lastMoveCount) {
+      playClick();
+      lastMoveCount = s.moveCount;
+    } else if (s.moveCount === 0) {
+      lastMoveCount = 0;
+    }
+
     // 更新棋盘渲染数据
     board.setBoard(s.board, s.lastMove, s.winningCells, s.threatCells, s.threatType,
+      s.attackCells, s.attackType, s.attackTime,
       s.realtimeBest, s.realtimeLost, s.forbidCells);
     board.setMoveHistory(game.moveHistory);
 
@@ -351,9 +370,12 @@
         winBannerEl.classList.remove('gm-show');
         void winBannerEl.offsetWidth; // 触发重排
         winBannerEl.classList.add('gm-show');
+        playWin();
+        if (rematchBtn) rematchBtn.hidden = false;
       }
     } else {
       winBannerEl.classList.remove('gm-show');
+      if (rematchBtn) rematchBtn.hidden = true;
     }
 
     // 更新按钮文字
@@ -398,6 +420,55 @@
     if (abBtn) abBtn.textContent = 'AI执黑：' + (game.getConfig('aiBlack') ? '开' : '关');
     const awBtn = document.getElementById('gm-btn-aiwhite');
     if (awBtn) awBtn.textContent = 'AI执白：' + (game.getConfig('aiWhite') ? '开' : '关');
+  }
+
+  function ensureAudio() {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioCtx = new AC();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playClick() {
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    try {
+      const t = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(190, t);
+      gain.gain.setValueAtTime(0.5, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.09);
+    } catch (e) {}
+  }
+
+  function playWin() {
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    try {
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+      const noteDur = 0.15;
+      notes.forEach((freq, i) => {
+        const t = ctx.currentTime + i * noteDur;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.4, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + noteDur);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + noteDur);
+      });
+    } catch (e) {}
   }
 
   function updateLoading(progress) {

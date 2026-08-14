@@ -31,8 +31,11 @@ const GomokuBoard = (() => {
   let boardData = null;      // 15x15 数组 0/1/2
   let lastMove = null;       // {x, y}
   let winningCells = [];     // [{x,y}]
-  let threatCells = [];      // [{x,y}]
-  let threatType = '';       // open_four/rushed_four/four_three
+  let threatCells = [];      // [{x,y}] 制胜棋型
+  let threatType = '';       // open_four/double_four/four_three/double_three
+  let attackCells = [];      // [{x,y}] 进攻棋型（延迟显示）
+  let attackType = '';
+  let attackTime = 0;        // performance.now() 毫秒
   let fxTime = 0;
   let cellSize = 40;
   let padding = 48;
@@ -67,12 +70,15 @@ const GomokuBoard = (() => {
     );
   }
 
-  function setBoard(b, last, winning, threat, ttype, rtBest, rtLost, forbid) {
+  function setBoard(b, last, winning, threat, ttype, atkCells, atkType, atkTime, rtBest, rtLost, forbid) {
     boardData = b;
     lastMove = last;
     winningCells = winning;
     threatCells = threat;
     threatType = ttype;
+    attackCells = atkCells || [];
+    attackType = atkType || '';
+    attackTime = atkTime || 0;
     realtimeBest = rtBest || null;
     realtimeLost = rtLost || [];
     forbidCells = forbid || [];
@@ -116,6 +122,7 @@ const GomokuBoard = (() => {
     drawStones();
     drawForbid();
     drawRealtime();
+    drawAttack();
     drawThreatHighlight();
     drawOverlays();
     drawWinGlow();
@@ -319,18 +326,19 @@ const GomokuBoard = (() => {
 
   function drawThreatHighlight() {
     if (!threatCells || threatCells.length === 0) return;
-    let color = COLORS.magenta;
+    let color = COLORS.threatRed;
     if (threatType === 'open_four') color = COLORS.gold;
-    else if (threatType === 'rushed_four') color = COLORS.magenta;
+    else if (threatType === 'double_four') color = COLORS.threatRed;
     else if (threatType === 'four_three') color = COLORS.threatRed;
+    else if (threatType === 'double_three') color = '#fb923c';
 
     const pulse = 0.5 + 0.5 * Math.sin(fxTime * 6);
     for (const c of threatCells) {
       const p = cellToScreen(c);
       const r = cellSize * 0.42 + 3 + pulse * 4;
       ctx.strokeStyle = color;
-      ctx.globalAlpha = 0.7;
-      ctx.lineWidth = 2.5;
+      ctx.globalAlpha = 0.8;
+      ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
       ctx.stroke();
@@ -339,6 +347,24 @@ const GomokuBoard = (() => {
       ctx.beginPath();
       ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
       ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // 进攻棋型（活三/冲四）延迟几秒后显示不明显的特效
+  function drawAttack() {
+    if (!attackCells || attackCells.length === 0) return;
+    if (performance.now() - attackTime < 2500) return;
+    const color = attackType === 'rushed_four' ? COLORS.magenta : COLORS.cyan;
+    const pulse = 0.5 + 0.5 * Math.sin(fxTime * 3);
+    for (const c of attackCells) {
+      const p = cellToScreen(c);
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.22 + 0.1 * pulse;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, cellSize * 0.42 + 2, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.globalAlpha = 1;
     }
   }

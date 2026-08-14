@@ -361,6 +361,34 @@
     100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
 }
 
+/* ── 胜利后的「再来一局」按钮 ── */
+.gm-rematch-btn {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 30px;
+    font-family: var(--font-mono, monospace);
+    font-size: 16px;
+    font-weight: 600;
+    background: #fbbf24;
+    border: 1px solid #b45309;
+    border-radius: 8px;
+    color: #1a1a1a;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    animation: gm-rematch-in 0.35s ease-out;
+}
+.gm-rematch-btn:hover { background: #f59e0b; }
+.gm-rematch-btn:active { transform: translate(-50%, -50%) translateY(1px); }
+.gm-rematch-btn[hidden] { display: none; }
+
+@keyframes gm-rematch-in {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
 /* ── 设置弹窗 ── */
 .gm-modal {
     position: fixed;
