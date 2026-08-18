@@ -1185,9 +1185,9 @@ a:hover { opacity: 0.8; }
 .page-agent-toggle {
     position: fixed;
     bottom: 72px;
-    left: 24px;
-    width: 40px;
-    height: 40px;
+    left: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: var(--text);
     color: var(--bg);
@@ -1196,23 +1196,22 @@ a:hover { opacity: 0.8; }
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    line-height: 1;
-    opacity: 0.9;
-    transition: all 0.3s ease;
+    opacity: 0.75;
+    transition: opacity 0.3s ease, transform 0.3s ease;
     z-index: 9997;
     box-shadow: var(--shadow-md);
-    will-change: transform, opacity;
+    will-change: opacity, transform;
 }
 
 .page-agent-toggle:hover {
-    background: var(--accent);
-    transform: translateY(-2px);
+    opacity: 1;
+    transform: translateY(-1px);
 }
 
-.page-agent-toggle.active {
-    background: var(--accent);
-    opacity: 1;
+.page-agent-toggle.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
 }
 
 /* ── 响应式 ── */
@@ -1252,7 +1251,7 @@ a:hover { opacity: 0.8; }
     .showcase-grid { grid-template-columns: 1fr; }
     .showcase-frame-lg { height: 240px; }
     .back-to-top { bottom: 80px; left: 20px; }
-    .page-agent-toggle { bottom: 128px; left: 20px; }
+    .page-agent-toggle { bottom: 122px; left: 24px; }
     #sakana-drag-widget {
         width: 180px;
         height: 180px;

@@ -1626,9 +1626,9 @@ function initPageAgentToggle() {
   const btn = document.createElement('button');
   btn.className = 'page-agent-toggle';
   btn.id = 'page-agent-toggle';
-  btn.setAttribute('aria-label', '显示/隐藏 PageAgent 面板');
+  btn.setAttribute('aria-label', '打开 AI 助手');
   btn.setAttribute('title', 'AI 助手');
-  btn.textContent = '🤖';
+  btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 1.5l2.35 8.15L22.5 12l-8.15 2.35L12 22.5l-2.35-8.15L1.5 12l8.15-2.35z"/></svg>';
   document.body.appendChild(btn);
 
   let visible = false;
@@ -1640,7 +1640,8 @@ function initPageAgentToggle() {
 
   const setVisible = (next) => {
     visible = next;
-    btn.classList.toggle('active', next);
+    // 面板展开时隐藏按钮，避免按钮压住面板底部输入区
+    btn.classList.toggle('hidden', next);
     const panel = getPanel();
     if (!panel) return;
     try {
@@ -1662,14 +1663,19 @@ function initPageAgentToggle() {
 
   btn.addEventListener('click', toggleWhenReady);
 
-  // 若库因任务运行自动 show() 面板，同步按钮态（可选，保持按钮与实际一致）
+  // 若库因任务运行自动 show()/hide() 面板，同步按钮态：
+  // 面板显示时按钮隐藏（不遮挡），面板关闭后按钮恢复。
   const syncFromPanel = () => {
     const panel = getPanel();
     if (!panel || !panel.wrapper) return;
     const shown = panel.wrapper.style.display !== 'none' && panel.wrapper.style.opacity !== '0';
-    if (shown !== visible) { visible = shown; btn.classList.toggle('active', shown); }
+    if (shown !== visible) {
+      visible = shown;
+      btn.classList.toggle('hidden', shown);
+      btn.setAttribute('aria-label', shown ? '关闭 AI 助手' : '打开 AI 助手');
+    }
   };
-  setInterval(syncFromPanel, 1000);
+  setInterval(syncFromPanel, 500);
 }
 
 // ── 滚动动画 ──
