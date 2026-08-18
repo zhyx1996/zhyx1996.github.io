@@ -1181,6 +1181,40 @@ a:hover { opacity: 0.8; }
     transform: translateY(-2px);
 }
 
+/* ── PageAgent 面板切换按钮 ── */
+.page-agent-toggle {
+    position: fixed;
+    bottom: 72px;
+    left: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--text);
+    color: var(--bg);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+    opacity: 0.9;
+    transition: all 0.3s ease;
+    z-index: 9997;
+    box-shadow: var(--shadow-md);
+    will-change: transform, opacity;
+}
+
+.page-agent-toggle:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+}
+
+.page-agent-toggle.active {
+    background: var(--accent);
+    opacity: 1;
+}
+
 /* ── 响应式 ── */
 @media (max-width: 800px) {
     .layout {
@@ -1218,6 +1252,7 @@ a:hover { opacity: 0.8; }
     .showcase-grid { grid-template-columns: 1fr; }
     .showcase-frame-lg { height: 240px; }
     .back-to-top { bottom: 80px; left: 20px; }
+    .page-agent-toggle { bottom: 128px; left: 20px; }
     #sakana-drag-widget {
         width: 180px;
         height: 180px;

@@ -1615,6 +1615,63 @@ function initBackToTop() {
   });
 }
 
+// ── PageAgent 面板切换：默认隐藏，靠按钮显示/隐藏 ──
+function initPageAgentToggle() {
+  // 无 PageAgent 脚本引用的页面直接跳过（如 gomoku-godot 内页）
+  const hasPageAgentScript = Array.from(document.scripts).some((s) =>
+    /page-agent(?:\.demo)?\.js/.test(s.src || '')
+  );
+  if (!hasPageAgentScript) return;
+
+  const btn = document.createElement('button');
+  btn.className = 'page-agent-toggle';
+  btn.id = 'page-agent-toggle';
+  btn.setAttribute('aria-label', '显示/隐藏 PageAgent 面板');
+  btn.setAttribute('title', 'AI 助手');
+  btn.textContent = '🤖';
+  document.body.appendChild(btn);
+
+  let visible = false;
+
+  const getPanel = () => {
+    const agent = window.pageAgent;
+    return agent && typeof agent.panel === 'object' && agent.panel ? agent.panel : null;
+  };
+
+  const setVisible = (next) => {
+    visible = next;
+    btn.classList.toggle('active', next);
+    const panel = getPanel();
+    if (!panel) return;
+    try {
+      if (next) panel.show();
+      else panel.hide();
+    } catch { /* 面板尚未就绪时忽略 */ }
+  };
+
+  // 脚本是 defer/异步加载的，点击时 window.pageAgent 可能还没就绪：
+  // 轮询等待面板注入后再切换。
+  const toggleWhenReady = () => {
+    if (getPanel()) { setVisible(!visible); return; }
+    let tries = 0;
+    const timer = setInterval(() => {
+      if (getPanel()) { clearInterval(timer); setVisible(!visible); return; }
+      if (++tries > 100) clearInterval(timer); // ~5s 兜底
+    }, 50);
+  };
+
+  btn.addEventListener('click', toggleWhenReady);
+
+  // 若库因任务运行自动 show() 面板，同步按钮态（可选，保持按钮与实际一致）
+  const syncFromPanel = () => {
+    const panel = getPanel();
+    if (!panel || !panel.wrapper) return;
+    const shown = panel.wrapper.style.display !== 'none' && panel.wrapper.style.opacity !== '0';
+    if (shown !== visible) { visible = shown; btn.classList.toggle('active', shown); }
+  };
+  setInterval(syncFromPanel, 1000);
+}
+
 // ── 滚动动画 ──
 function initScrollAnimations() {
   const sections = document.querySelectorAll('.section');
@@ -1682,6 +1739,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderArticles();
   renderLatestArticle();
   initPageAgentPlacement();
+  initPageAgentToggle();
   initScrollAnimations();
   initScrollProgress();
   initBackToTop();
