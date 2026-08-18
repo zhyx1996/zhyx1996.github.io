@@ -1624,39 +1624,83 @@ function initPageAgentToggle() {
   if (!hasPageAgentScript) return;
 
   const btn = document.createElement('button');
-  btn.className = 'page-agent-toggle';
-  btn.id = 'page-agent-toggle';
+  // 注意：id/class 不要包含 "page-agent"，否则会被 initPageAgentPlacement
+  // 的 [id*="page-agent"] / [class*="page-agent"] 选择器当成面板本体，
+  // 导致按钮被拉成 340px 的长条。
+  btn.className = 'ai-agent-toggle';
+  btn.id = 'ai-agent-toggle';
   btn.setAttribute('aria-label', '打开 AI 助手');
   btn.setAttribute('title', 'AI 助手');
   btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 1.5l2.35 8.15L22.5 12l-8.15 2.35L12 22.5l-2.35-8.15L1.5 12l8.15-2.35z"/></svg>';
   document.body.appendChild(btn);
 
   let visible = false;
+  let lastConfig = null;
 
-  const getPanel = () => {
+  const getAgent = () => {
     const agent = window.pageAgent;
-    return agent && typeof agent.panel === 'object' && agent.panel ? agent.panel : null;
+    return agent && agent.panel && agent.panel.wrapper ? agent : null;
+  };
+
+  const saveConfig = () => {
+    const agent = getAgent();
+    if (agent && agent.config) lastConfig = { ...agent.config };
+  };
+
+  const createAgent = () => {
+    if (typeof window.PageAgent !== 'function' || !lastConfig) return null;
+    try {
+      const agent = new window.PageAgent(lastConfig);
+      window.pageAgent = agent;
+      return agent;
+    } catch (error) {
+      console.warn('[PageAgent] 重新创建实例失败:', error);
+      return null;
+    }
+  };
+
+  const ensureAgent = () => {
+    const existing = getAgent();
+    if (existing) {
+      saveConfig();
+      // 面板自带关闭按钮会 dispose 整个实例，wrapper 脱离文档；
+      // 此时必须新建实例，否则 show() 只操作一个游离的 div。
+      if (!existing.disposed && existing.panel.wrapper.isConnected) return existing;
+    }
+    return createAgent();
   };
 
   const setVisible = (next) => {
-    visible = next;
-    // 面板展开时隐藏按钮，避免按钮压住面板底部输入区
-    btn.classList.toggle('hidden', next);
-    const panel = getPanel();
-    if (!panel) return;
-    try {
-      if (next) panel.show();
-      else panel.hide();
-    } catch { /* 面板尚未就绪时忽略 */ }
+    const agent = ensureAgent();
+    const panel = agent && agent.panel;
+
+    if (next) {
+      if (!panel) return;
+      try {
+        panel.show();
+      } catch (error) { /* 面板尚未就绪时忽略 */ }
+      visible = true;
+      // 面板展开时隐藏按钮，避免按钮压住面板底部输入区
+      btn.classList.add('hidden');
+      btn.setAttribute('aria-label', '关闭 AI 助手');
+    } else {
+      visible = false;
+      btn.classList.remove('hidden');
+      btn.setAttribute('aria-label', '打开 AI 助手');
+      if (!panel) return;
+      try {
+        panel.hide();
+      } catch (error) { /* 面板尚未就绪时忽略 */ }
+    }
   };
 
   // 脚本是 defer/异步加载的，点击时 window.pageAgent 可能还没就绪：
   // 轮询等待面板注入后再切换。
   const toggleWhenReady = () => {
-    if (getPanel()) { setVisible(!visible); return; }
+    if (ensureAgent()) { setVisible(!visible); return; }
     let tries = 0;
     const timer = setInterval(() => {
-      if (getPanel()) { clearInterval(timer); setVisible(!visible); return; }
+      if (ensureAgent()) { clearInterval(timer); setVisible(!visible); return; }
       if (++tries > 100) clearInterval(timer); // ~5s 兜底
     }, 50);
   };
@@ -1665,14 +1709,21 @@ function initPageAgentToggle() {
 
   // 若库因任务运行自动 show()/hide() 面板，同步按钮态：
   // 面板显示时按钮隐藏（不遮挡），面板关闭后按钮恢复。
+  // wrapper.isConnected 必须检查：面板自带关闭按钮会 dispose 实例并
+  // remove wrapper，此时 style.display 仍可能残留为 block，仅凭
+  // display/opacity 会把按钮错误地保持隐藏。
   const syncFromPanel = () => {
-    const panel = getPanel();
-    if (!panel || !panel.wrapper) return;
-    const shown = panel.wrapper.style.display !== 'none' && panel.wrapper.style.opacity !== '0';
-    if (shown !== visible) {
-      visible = shown;
-      btn.classList.toggle('hidden', shown);
-      btn.setAttribute('aria-label', shown ? '关闭 AI 助手' : '打开 AI 助手');
+    const agent = getAgent();
+    const panel = agent && agent.panel;
+    const usable = !!panel && !!panel.wrapper &&
+      panel.wrapper.isConnected &&
+      panel.wrapper.style.display !== 'none' &&
+      panel.wrapper.style.opacity !== '0';
+
+    if (usable !== visible) {
+      visible = usable;
+      btn.classList.toggle('hidden', usable);
+      btn.setAttribute('aria-label', usable ? '关闭 AI 助手' : '打开 AI 助手');
     }
   };
   setInterval(syncFromPanel, 500);

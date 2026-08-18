@@ -1182,7 +1182,7 @@ a:hover { opacity: 0.8; }
 }
 
 /* ── PageAgent 面板切换按钮 ── */
-.page-agent-toggle {
+.ai-agent-toggle {
     position: fixed;
     bottom: 72px;
     left: 28px;
@@ -1203,12 +1203,12 @@ a:hover { opacity: 0.8; }
     will-change: opacity, transform;
 }
 
-.page-agent-toggle:hover {
+.ai-agent-toggle:hover {
     opacity: 1;
     transform: translateY(-1px);
 }
 
-.page-agent-toggle.hidden {
+.ai-agent-toggle.hidden {
     opacity: 0;
     pointer-events: none;
     transform: translateY(6px);
@@ -1251,7 +1251,7 @@ a:hover { opacity: 0.8; }
     .showcase-grid { grid-template-columns: 1fr; }
     .showcase-frame-lg { height: 240px; }
     .back-to-top { bottom: 80px; left: 20px; }
-    .page-agent-toggle { bottom: 122px; left: 24px; }
+    .ai-agent-toggle { bottom: 122px; left: 24px; }
     #sakana-drag-widget {
         width: 180px;
         height: 180px;
