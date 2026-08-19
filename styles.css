@@ -1424,12 +1424,18 @@ a:hover { opacity: 0.8; }
 @media (max-width: 600px) {
     :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]):not([id*="simulator" i]):not([class*="simulator" i]):not([id*="mask" i]):not([class*="mask" i]) {
         top: auto;
-        bottom: 88px;
+        bottom: 128px;
         left: 12px;
         right: auto;
         width: calc(100vw - 24px);
         max-width: calc(100vw - 24px);
         transform: translateY(0) !important;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 800px) {
+    :where(#page-agent, .page-agent, page-agent, [data-page-agent], #page-agent-window, .page-agent-window, [data-testid="page-agent"], [id*="page-agent" i], [class*="page-agent" i], [data-testid*="page-agent" i]):not([id*="simulator" i]):not([class*="simulator" i]):not([id*="mask" i]):not([class*="mask" i]) {
+        bottom: 128px;
     }
 }
 

@@ -1500,9 +1500,11 @@ function initPageAgentPlacement() {
     // 宽度保护：窄屏不超过视口宽减 24，常规不超过 340。
     const width = Math.min(viewportW <= 600 ? 280 : 340, viewportW - 24);
 
-    // 左下角定位：左缘 24px（窄屏 12px），底边 88px（让出返回顶部按钮）。
+    // 左下角定位：左缘 24px（窄屏 12px）。
+    // 底边：桌面 88px（返回顶部按钮 bottom:24 + 高 40 = 64，留 24 间隙）；
+    // 800px 以下返回顶部按钮 bottom:80 + 高 40 = 120，面板必须抬到 128。
     const leftMargin = viewportW <= 600 ? 12 : 24;
-    const bottomMargin = viewportW <= 600 ? 88 : 88;
+    const bottomMargin = viewportW <= 800 ? 128 : 88;
     let left = leftMargin;
     const bottom = bottomMargin;
 
