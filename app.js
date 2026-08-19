@@ -1493,7 +1493,18 @@ function initPageAgentPlacement() {
   // 而不是 top——面板展开时向“上”生长；再配 max-height 兜底，保证无论面板
   // 多高都完整留在视口内。左下角还需避开返回顶部按钮（desktop 位于
   // left:24 bottom:24 高 40px），因此底边抬高到 88px。
-  const computePlacement = (element) => {
+  //
+  // 注意：库的输入栏（inputSectionWrapper）是绝对定位在 wrapper 下方 40px
+  // 处（top: var(--height)）、高 48px，会溢出 wrapper 底边。它可见时（任务
+  // 运行/提问/输入态）会压住返回顶部按钮、半透明背景还会透出底部文字，所以
+  // 必须再把整个面板抬高 48px + 16px 间隙 = 64px。
+  const isInputVisible = (element) => {
+    const input = element.querySelector('[class*="inputSectionWrapper"]');
+    if (!input) return false;
+    return input.offsetHeight > 0 && getComputedStyle(input).visibility !== 'collapse';
+  };
+
+  const computePlacement = (element, inputVisible = false) => {
     const viewportW = window.innerWidth;
     const viewportH = window.innerHeight;
 
@@ -1504,9 +1515,9 @@ function initPageAgentPlacement() {
     // 底边：桌面 88px（返回顶部按钮 bottom:24 + 高 40 = 64，留 24 间隙）；
     // 800px 以下返回顶部按钮 bottom:80 + 高 40 = 120，面板必须抬到 128。
     const leftMargin = viewportW <= 600 ? 12 : 24;
-    const bottomMargin = viewportW <= 800 ? 128 : 88;
+    const bottomBase = viewportW <= 800 ? 128 : 88;
+    const bottom = bottomBase + (inputVisible ? 64 : 0);
     let left = leftMargin;
-    const bottom = bottomMargin;
 
     // 面板可伸展高度上限 = 视口高 - 底边 - 顶部 8px 安全边距。
     const maxHeight = Math.max(120, Math.round(viewportH - bottom - 8));
@@ -1516,10 +1527,10 @@ function initPageAgentPlacement() {
     return { bottom: Math.round(bottom), left: Math.round(left), width, maxHeight, center: false };
   };
 
-  const applyInitialPlacement = (element) => {
+  const applyInitialPlacement = (element, inputVisible = false) => {
     // 用户一旦拖过就绝不再重定位（含初始化逻辑）
     if (element.dataset.codexUserMoved === 'true') return;
-    const pos = computePlacement(element);
+    const pos = computePlacement(element, inputVisible);
     element.style.position = 'fixed';
     element.style.left = pos.center ? '50%' : pos.left + 'px';
     element.style.top = 'auto';
@@ -1534,9 +1545,12 @@ function initPageAgentPlacement() {
     // 桌面端不居中：清掉库默认的 translateX(-50%)，避免左侧裁切残影；
     // 只保留水平居中所需的 translateX（移动端 center=true 时）。
     element.style.transform = pos.center ? 'translateX(-50%) translateY(0)' : 'translateY(0)';
+    element.dataset.codexInputLift = inputVisible ? 'true' : 'false';
   };
 
+  let lastInputLift = false; // 用户一旦拖过面板，输入栏同步一并停止
   const markUserMoved = () => {
+    lastInputLift = true;
     document.querySelectorAll(selector).forEach((el) => {
       el.dataset.codexUserMoved = 'true';
     });
@@ -1562,13 +1576,40 @@ function initPageAgentPlacement() {
     setTimeout(() => { applyInitialPlacement(element); }, 250);
   };
 
+  // 输入栏（绝对定位在 wrapper 下方 40px 处，高 48px）会溢出面板本体，
+  // 压住返回顶部按钮；它可见时把面板整体抬高 64px，隐藏时恢复。
+  const syncInputLift = () => {
+    if (lastInputLift === true) return; // 用户已拖动过则不再自动调整
+    document.querySelectorAll(selector).forEach((el) => {
+      if (el.dataset.codexUserMoved === 'true') return;
+      const visible = isInputVisible(el);
+      if (visible === (el.dataset.codexInputLift === 'true')) return;
+      applyInitialPlacement(el, visible);
+    });
+  };
+
+  // 输入栏可见性跟随任务状态/提问/输入态变化，用 interval 轻量同步
+  // （库没有暴露相应事件；1000ms 足够且不参与布局）。
+  let syncStarted = false;
+  const startSyncInputLift = () => {
+    if (syncStarted) return;
+    syncStarted = true;
+    setInterval(syncInputLift, 1000);
+  };
+
   const apply = () => document.querySelectorAll(selector).forEach(place);
   apply();
-  if (document.querySelector(selector)) return;
+  if (document.querySelector(selector)) {
+    startSyncInputLift();
+    return;
+  }
 
   const observer = new MutationObserver(() => {
     apply();
-    if (document.querySelector(selector)) observer.disconnect();
+    if (document.querySelector(selector)) {
+      startSyncInputLift();
+      observer.disconnect();
+    }
   });
   observer.observe(document.body, { childList: true, subtree: true });
 }
