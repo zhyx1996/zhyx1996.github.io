@@ -1561,8 +1561,8 @@ function initPageAgentPlacement() {
 
   // 输入栏（绝对定位在 wrapper 下方 40px 处，高 48px）会溢出面板本体，
   // 压住返回顶部按钮；它可见时把面板整体抬高 64px，隐藏时恢复。
-  // 库没有暴露输入栏显示/隐藏事件，用 200ms interval 同步（只改样式，
-  // 不参与页面布局，开销可忽略）。
+  // 库没暴露输入栏显示/隐藏事件，但输入栏的显示/隐藏就是 class 的增删，
+  // 用 MutationObserver 监听即可——事件驱动，不做定时轮询。
   const syncInputLift = () => {
     document.querySelectorAll(selector).forEach((el) => {
       const visible = isInputVisible(el);
@@ -1571,9 +1571,24 @@ function initPageAgentPlacement() {
     });
   };
 
-  const apply = () => document.querySelectorAll(selector).forEach(place);
+  // 点击打开面板时也会显隐输入栏，统一在捕获阶段兜底检测一次。
+  document.addEventListener('click', () => syncInputLift(), true);
+
+  const observePanel = () => {
+    document.querySelectorAll(selector).forEach((el) => {
+      if (el.dataset.codexLiftObserved === 'true') return;
+      el.dataset.codexLiftObserved = 'true';
+      const observer = new MutationObserver(syncInputLift);
+      observer.observe(el, { attributes: true, subtree: true, attributeFilter: ['class', 'style'] });
+    });
+  };
+
+  const apply = () => {
+    document.querySelectorAll(selector).forEach(place);
+    observePanel();
+    syncInputLift();
+  };
   apply();
-  setInterval(syncInputLift, 200);
   if (document.querySelector(selector)) return;
 
   const observer = new MutationObserver(() => {
