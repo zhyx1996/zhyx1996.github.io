@@ -1303,6 +1303,14 @@ a:hover { opacity: 0.8; }
     pointer-events: none !important;
 }
 
+/* page-agent 输入栏底色加强：库默认 #bababa33 几乎全透明，会透出页面文字
+   （如 GitHub 统计卡片）；改为站点底色不透明实底，文字仍保持深色可读。 */
+:where(#page-agent-runtime_agent-panel, [id*="page-agent" i]):not([id*="simulator" i]):not([id*="mask" i]) [class*="inputSectionWrapper"] {
+    background: #F5F3EE !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
 /* ── 无障碍 ── */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {

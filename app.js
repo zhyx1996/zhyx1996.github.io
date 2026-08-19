@@ -1528,8 +1528,6 @@ function initPageAgentPlacement() {
   };
 
   const applyInitialPlacement = (element, inputVisible = false) => {
-    // 用户一旦拖过就绝不再重定位（含初始化逻辑）
-    if (element.dataset.codexUserMoved === 'true') return;
     const pos = computePlacement(element, inputVisible);
     element.style.position = 'fixed';
     element.style.left = pos.center ? '50%' : pos.left + 'px';
@@ -1548,68 +1546,39 @@ function initPageAgentPlacement() {
     element.dataset.codexInputLift = inputVisible ? 'true' : 'false';
   };
 
-  let lastInputLift = false; // 用户一旦拖过面板，输入栏同步一并停止
-  const markUserMoved = () => {
-    lastInputLift = true;
-    document.querySelectorAll(selector).forEach((el) => {
-      el.dataset.codexUserMoved = 'true';
-    });
-  };
-  // 用户一旦开始交互（含其自身拖动 / 指针移动）就不再重定位
-  ['pointerdown', 'pointermove', 'mousedown', 'touchstart', 'dragstart'].forEach((type) => {
-    document.addEventListener(type, (e) => {
-      if (e.target && e.target.closest && e.target.closest(selector)) markUserMoved();
-    }, { passive: true });
-  });
-
   const place = (element) => {
-    if (!(element instanceof HTMLElement) || element.dataset.codexPlaced === 'true') return;
+    if (!(element instanceof HTMLElement)) return;
     // 只定位真正的面板容器；排除运行时辅助元素（如 simulator-mask 全屏遮罩，
     // 其 id 同样含 "page-agent"），避免把全屏遮罩误定位成左下角小块。
     const pid = element.id || '';
     const pcls = element.className || '';
     if (/simulator|mask/i.test(pid) || /simulator/i.test(pcls)) return;
-    element.dataset.codexPlaced = 'true';
     applyInitialPlacement(element);
     // page-agent 注入后 ~0ms 才 show() 并写入自身 transform/opacity；
-    // 在其初始化稳定后各确认一次位置（用户未拖动时）。仅此一次，之后彻底放手。
+    // 在其初始化稳定后各确认一次位置。仅此一次，之后不再需要。
     setTimeout(() => { applyInitialPlacement(element); }, 250);
   };
 
   // 输入栏（绝对定位在 wrapper 下方 40px 处，高 48px）会溢出面板本体，
   // 压住返回顶部按钮；它可见时把面板整体抬高 64px，隐藏时恢复。
+  // 库没有暴露输入栏显示/隐藏事件，用 200ms interval 同步（只改样式，
+  // 不参与页面布局，开销可忽略）。
   const syncInputLift = () => {
-    if (lastInputLift === true) return; // 用户已拖动过则不再自动调整
     document.querySelectorAll(selector).forEach((el) => {
-      if (el.dataset.codexUserMoved === 'true') return;
       const visible = isInputVisible(el);
       if (visible === (el.dataset.codexInputLift === 'true')) return;
       applyInitialPlacement(el, visible);
     });
   };
 
-  // 输入栏可见性跟随任务状态/提问/输入态变化，用 interval 轻量同步
-  // （库没有暴露相应事件；1000ms 足够且不参与布局）。
-  let syncStarted = false;
-  const startSyncInputLift = () => {
-    if (syncStarted) return;
-    syncStarted = true;
-    setInterval(syncInputLift, 1000);
-  };
-
   const apply = () => document.querySelectorAll(selector).forEach(place);
   apply();
-  if (document.querySelector(selector)) {
-    startSyncInputLift();
-    return;
-  }
+  setInterval(syncInputLift, 200);
+  if (document.querySelector(selector)) return;
 
   const observer = new MutationObserver(() => {
     apply();
-    if (document.querySelector(selector)) {
-      startSyncInputLift();
-      observer.disconnect();
-    }
+    if (document.querySelector(selector)) observer.disconnect();
   });
   observer.observe(document.body, { childList: true, subtree: true });
 }
