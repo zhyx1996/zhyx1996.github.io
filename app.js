@@ -1631,7 +1631,7 @@ function initPageAgentToggle() {
   btn.id = 'ai-agent-toggle';
   btn.setAttribute('aria-label', '打开 AI 助手');
   btn.setAttribute('title', 'AI 助手');
-  btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 1.5l2.35 8.15L22.5 12l-8.15 2.35L12 22.5l-2.35-8.15L1.5 12l8.15-2.35z"/></svg>';
+  btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 1.5l2.35 8.15L22.5 12l-8.15 2.35L12 22.5l-2.35-8.15L1.5 12l8.15-2.35z"/></svg>';
   document.body.appendChild(btn);
 
   let visible = false;
