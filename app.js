@@ -1498,10 +1498,15 @@ function initPageAgentPlacement() {
   // 处（top: var(--height)）、高 48px，会溢出 wrapper 底边。它可见时（任务
   // 运行/提问/输入态）会压住返回顶部按钮、半透明背景还会透出底部文字，所以
   // 必须再把整个面板抬高 48px + 16px 间隙 = 64px。
-  const isInputVisible = (element) => {
-    const input = element.querySelector('[class*="inputSectionWrapper"]');
-    if (!input) return false;
-    return input.offsetHeight > 0 && getComputedStyle(input).visibility !== 'collapse';
+  // 面板“打开”即抬高：一点开 AI 助手（库 panel.show() 会置 display:block、
+  // opacity:1）就把整个面板抬到返回顶部按钮之上，不用等输入栏真正渲染出来，
+  // 也不区分输入栏是否可见——避免点开时还压在按钮上、要点页面背景才抬的闪烁。
+  const isPanelOpen = (element) => {
+    if (!element.isConnected) return false;
+    const cs = getComputedStyle(element);
+    if (cs.display === 'none' || cs.visibility === 'collapse' || cs.visibility === 'hidden') return false;
+    if (Number(cs.opacity) === 0) return false;
+    return true;
   };
 
   const computePlacement = (element, inputVisible = false) => {
@@ -1553,21 +1558,21 @@ function initPageAgentPlacement() {
     const pid = element.id || '';
     const pcls = element.className || '';
     if (/simulator|mask/i.test(pid) || /simulator/i.test(pcls)) return;
-    applyInitialPlacement(element);
+    applyInitialPlacement(element, isPanelOpen(element));
     // page-agent 注入后 ~0ms 才 show() 并写入自身 transform/opacity；
-    // 在其初始化稳定后各确认一次位置。仅此一次，之后不再需要。
-    setTimeout(() => { applyInitialPlacement(element); }, 250);
+    // 在其初始化稳定后各确认一次位置（按“是否打开”抬高/回落）。仅此一次。
+    setTimeout(() => { applyInitialPlacement(element, isPanelOpen(element)); }, 250);
   };
 
-  // 输入栏（绝对定位在 wrapper 下方 40px 处，高 48px）会溢出面板本体，
-  // 压住返回顶部按钮；它可见时把面板整体抬高 64px，隐藏时恢复。
-  // 库没暴露输入栏显示/隐藏事件，但输入栏的显示/隐藏就是 class 的增删，
-  // 用 MutationObserver 监听即可——事件驱动，不做定时轮询。
+  // 面板打开（panel.show()）即抬高 64px，关闭/移除（panel.hide() 或 X 销毁）
+  // 即回落。区别只在于面板是否“开着”，与输入栏是否渲染无关——彻底消除
+  // “点开不抬、点页面背景才抬”的问题。库没暴露显隐事件，但 show/hide 会改
+  // style（display/opacity），用 MutationObserver 监听即可，事件驱动不轮询。
   const syncInputLift = () => {
     document.querySelectorAll(selector).forEach((el) => {
-      const visible = isInputVisible(el);
-      if (visible === (el.dataset.codexInputLift === 'true')) return;
-      applyInitialPlacement(el, visible);
+      const open = isPanelOpen(el);
+      if (open === (el.dataset.codexInputLift === 'true')) return;
+      applyInitialPlacement(el, open);
     });
   };
 
