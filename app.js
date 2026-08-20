@@ -1575,6 +1575,9 @@ function initPageAgentPlacement() {
       applyInitialPlacement(el, open);
     });
   };
+  // 暴露给 initPageAgentToggle：点开 AI 助手（panel.show()）后立刻手动同步一次，
+  // 不依赖 MutationObserver 的异步时机，保证“一点开就抬高”。
+  window.__codexSyncPageAgentLift = syncInputLift;
 
   // 点击打开面板时也会显隐输入栏，统一在捕获阶段兜底检测一次。
   document.addEventListener('click', () => syncInputLift(), true);
@@ -1711,6 +1714,10 @@ function initPageAgentToggle() {
       try {
         panel.show();
       } catch (error) { /* 面板尚未就绪时忽略 */ }
+      // 一点开就立刻把面板抬到返回顶部按钮之上（不依赖异步 MutationObserver）
+      if (typeof window.__codexSyncPageAgentLift === 'function') {
+        window.__codexSyncPageAgentLift();
+      }
       visible = true;
       // 面板展开时隐藏按钮，避免按钮压住面板底部输入区
       btn.classList.add('hidden');
