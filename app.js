@@ -1501,12 +1501,12 @@ function initPageAgentPlacement() {
   // 面板“打开”即抬高：一点开 AI 助手（库 panel.show() 会置 display:block、
   // opacity:1）就把整个面板抬到返回顶部按钮之上，不用等输入栏真正渲染出来，
   // 也不区分输入栏是否可见——避免点开时还压在按钮上、要点页面背景才抬的闪烁。
+  // 以 display 为准判断“打开”：库 show() 同步置 display:block、hide() 置
+  // display:none（两者都立即生效）；而 opacity 会走 CSS transition 动画，
+  // 点开那一刻仍是 0，若用 opacity 判断会导致“点开不抬、稍后才抬”的闪烁。
   const isPanelOpen = (element) => {
     if (!element.isConnected) return false;
-    const cs = getComputedStyle(element);
-    if (cs.display === 'none' || cs.visibility === 'collapse' || cs.visibility === 'hidden') return false;
-    if (Number(cs.opacity) === 0) return false;
-    return true;
+    return getComputedStyle(element).display !== 'none';
   };
 
   const computePlacement = (element, inputVisible = false) => {
