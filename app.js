@@ -1384,6 +1384,39 @@ function initSakanaDrag() {
   }
 }
 
+// steam 渲染：解析后的资料数据 → 页面卡片 + 最近游戏（缓存数据可直接复用）
+function renderSteam(container, d) {
+  const stats = d.stats || {};
+  const games = d.games || [];
+  const totalHours = d.totalHours || games.reduce((s, g) => s + (g.hours || 0), 0);
+  container.innerHTML = `
+    <div class="steam-profile-card">
+      <div class="steam-header">
+        <img class="steam-avatar" src="${escapeHtml(d.avatarUrl)}" alt="${escapeHtml(d.username)}" width="48" height="48">
+        <div class="steam-id">
+          <span class="steam-username">${escapeHtml(d.username)}</span>
+          ${d.level ? `<span class="steam-level">Lv.${escapeHtml(d.level)}</span>` : ''}
+        </div>
+      </div>
+      <div class="steam-stats">
+        <span class="steam-stat">🎮 ${escapeHtml(stats['游戏'] || '-')} 款游戏</span>
+        <span class="steam-stat">🏅 ${escapeHtml(stats['徽章'] || '-')} 枚徽章</span>
+        <span class="steam-stat">⏱️ ${Number(totalHours || 0).toFixed(0)} 小时</span>
+        <span class="steam-stat">👥 ${escapeHtml(stats['好友'] || '-')} 位好友</span>
+      </div>
+    </div>
+    ${games.length ? `<div class="steam-games-list">${games.map(g => `
+      <div class="steam-game-card">
+        <img class="steam-game-cover" src="${escapeHtml(g.cover)}" alt="${escapeHtml(g.name)}" loading="lazy" onerror="this.style.visibility='hidden';this.parentElement.style.background='var(--bg-inset)'">
+        <div class="steam-game-info">
+          <span class="steam-game-title">${escapeHtml(g.name)}</span>
+          <span class="steam-game-hours">${Number(g.hours || 0).toFixed(1)} 小时</span>
+        </div>
+      </div>
+    `).join('')}</div>` : ''}
+  `;
+}
+
 // ── Steam 资料（解析个人主页 HTML）──
 async function loadSteamProfile() {
   const container = document.getElementById('steam-profile');
@@ -1391,91 +1424,92 @@ async function loadSteamProfile() {
   container.setAttribute('aria-busy', 'true');
 
   const STEAM_ID64 = '76561198391062314';
+  const CACHE_KEY = 'steam_profile_cache_v2';
+  let cached = null;
+  try { cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch (_) {}
+  // 代理不可用时的种子数据（用户最近一次抓取的公开资料；代理成功时会刷新覆盖）
+  const STEAM_SEED = {
+    username: 'ZYX', level: '11',
+    avatarUrl: 'https://avatars.fastly.steamstatic.com/89d6edac402678de16ecfc150d5e803eaca5e690_full.jpg',
+    stats: { '游戏': '63', '徽章': '7', '好友': '10' },
+    games: [
+      { name: '太吾绘卷：天幕心帷', hours: 199.8, cover: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/838350/ef55069ca08e75f9d31ee9849a4dd0d9b2356f24/capsule_184x69_schinese.jpg' },
+      { name: 'MECCHA CHAMELEON', hours: 3.7, cover: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4704690/18d14b8bd834e30a6a25df5ccd7f0a6e644f1577/capsule_184x69.jpg' },
+      { name: '原子之心', hours: 34.0, cover: 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/668580/capsule_184x69.jpg' },
+    ],
+    totalHours: 237.5,
+    ts: Date.now(),
+  };
+  if (!cached || !cached.games || !cached.games.length || cached.username === STEAM_ID64) {
+    try { const s = localStorage.getItem('steam_seed_v1'); if (s) cached = JSON.parse(s); } catch (_) {}
+    if (!cached || !cached.games || !cached.games.length || cached.username === STEAM_ID64) cached = STEAM_SEED;
+  }
+
+  const showFallback = (msg) => {
+    container.innerHTML = '<div class="steam-empty"><span>' + (msg || '无法加载游戏数据') + '</span><a href="https://steamcommunity.com/profiles/76561198391062314/" target="_blank" rel="noreferrer">在 Steam 上查看 →</a></div>';
+  };
+  const renderCached = () => {
+    if (cached && cached.games && cached.games.length) { renderSteam(container, cached); return true; }
+    return false;
+  };
+
+  // 第三方 CORS 代理不稳定（常返回 403/429），按序尝试多个代理；
+  // 全部失败则回退到本地缓存的最近一次成功数据，避免整块空白。
+  const proxies = [
+    (u) => 'https://corsproxy.io/?' + encodeURIComponent(u),
+    (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+    (u) => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
+    (u) => 'https://cors.eu.org/' + encodeURIComponent(u),
+  ];
+  const STEAM_URL = 'https://steamcommunity.com/profiles/' + STEAM_ID64 + '/';
+  let html = '';
+  for (const proxy of proxies) {
+    try {
+      const res = await fetchWithTimeout(proxy(STEAM_URL), 10000);
+      if (!res.ok) continue;
+      const text = await res.text();
+      if (text && text.length > 200) { html = text; break; }
+    } catch { /* 继续尝试下一个代理 */ }
+  }
 
   try {
-    // corsproxy.io 等第三方 CORS 代理不稳定（常返回 403/429），
-    // 因此按顺序尝试多个代理，取第一个成功且返回正文的响应；全失败则走兜底。
-    const STEAM_URL = 'https://steamcommunity.com/profiles/' + STEAM_ID64 + '/';
-    const proxies = [
-      (u) => 'https://corsproxy.io/?' + encodeURIComponent(u),
-      (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
-      (u) => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
-    ];
-    let html = '';
-    for (const proxy of proxies) {
-      try {
-        const res = await fetchWithTimeout(proxy(STEAM_URL), 12000);
-        if (!res.ok) continue;
-        const text = await res.text();
-        if (text && text.length > 200) { html = text; break; }
-      } catch { /* 继续尝试下一个代理 */ }
+    if (html) {
+      // Steam 个人页结构会随版本变化：优先用稳定的 og:title / og:image 元信息，
+      // 再回退到旧的结构（actual_persona_name / cloudflare.steamstatic）。
+      const avatarMatch = html.match(/og:image" content="([^"]+_full\.jpg)"/) || html.match(/avatars\.(?:cloudflare|fastly)\.steamstatic\.com\/([a-f0-9]+)_full\.jpg/);
+      const avatarUrl = avatarMatch ? (avatarMatch[1].indexOf('http') === 0 ? avatarMatch[1] : 'https://avatars.cloudflare.steamstatic.com/' + avatarMatch[1] + '_full.jpg') : '';
+      const nameMatch = html.match(/actual_persona_name">([^<]+)</) || html.match(/og:title" content="[^"]*:: ([^"<]+)"/);
+      const username = nameMatch ? nameMatch[1].trim() : '';
+      const levelMatch = html.match(/friendPlayerLevelNum[^>]*>(\d+)</);
+      const level = levelMatch ? levelMatch[1] : '';
+      const badgeCounts = [...html.matchAll(/profile_count_link_total[^>]*>([^<]+)</g)].map(m => m[1].trim());
+      const badgeLabels = [...html.matchAll(/count_link_label[^>]*>([^<]+)</g)].map(m => m[1].trim());
+      const stats = {};
+      badgeLabels.forEach((label, i) => { stats[label] = badgeCounts[i] || ''; });
+      const names = [...html.matchAll(/class="game_name"><a[^>]*>([^<]+)<\/a>/g)].map(m => m[1]);
+      const hours = [...html.matchAll(/总时数 ([\d.]+) 小时/g)].map(m => parseFloat(m[1]));
+      const covers = [...html.matchAll(/game_capsule" src="([^"]+)"/g)].map(m => m[1]);
+      const games = names.map((name, i) => ({ name, hours: hours[i] || 0, cover: covers[i] || '' })).filter(g => g.name && g.hours > 0);
+      const data = { avatarUrl, username, level, stats, games, totalHours: games.reduce((s, g) => s + g.hours, 0), ts: Date.now() };
+      if (games.length === 0) { showFallback('暂无游戏数据'); return; }
+      // 只缓存/渲染解析有效的数据：用户名必须是真实昵称（不是 Steam ID）
+      if (username && username !== STEAM_ID64) {
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (_) {}
+        renderSteam(container, data);
+        return;
+      }
+      if (renderCached()) return;
+      showFallback('无法加载游戏数据');
     }
-    if (!html) throw new Error('all proxies failed');
-
-    const avatarMatch = html.match(/avatars\.cloudflare\.steamstatic\.com\/([a-f0-9]+)_full\.jpg/);
-    const avatarUrl = avatarMatch ? `https://avatars.cloudflare.steamstatic.com/${avatarMatch[1]}_full.jpg` : '';
-    const nameMatch = html.match(/actual_persona_name">([^<]+)</);
-    const username = nameMatch ? nameMatch[1].trim() : '';
-    const levelMatch = html.match(/friendPlayerLevelNum[^>]*>(\d+)</);
-    const level = levelMatch ? levelMatch[1] : '';
-
-    const badgeCounts = [...html.matchAll(/profile_count_link_total[^>]*>([^<]+)</g)].map(m => m[1].trim());
-    const badgeLabels = [...html.matchAll(/count_link_label[^>]*>([^<]+)</g)].map(m => m[1].trim());
-    const stats = {};
-    badgeLabels.forEach((label, i) => { stats[label] = badgeCounts[i] || ''; });
-
-    const names = [...html.matchAll(/class="game_name"><a[^>]*>([^<]+)<\/a>/g)].map(m => m[1]);
-    const hours = [...html.matchAll(/总时数 ([\d.]+) 小时/g)].map(m => parseFloat(m[1]));
-    const covers = [...html.matchAll(/game_capsule" src="([^"]+)"/g)].map(m => m[1]);
-
-    const games = names.map((name, i) => ({
-      name,
-      hours: hours[i] || 0,
-      cover: covers[i] || ''
-    })).filter(g => g.name && g.hours > 0);
-
-    const totalHours = games.reduce((sum, g) => sum + g.hours, 0);
-
-    if (games.length === 0) {
-      container.innerHTML = '<div class="steam-empty"><span>暂无游戏数据</span><a href="https://steamcommunity.com/profiles/76561198391062314/" target="_blank" rel="noreferrer">在 Steam 上查看 \u2192</a></div>';
-      return;
-    }
-
-    container.innerHTML = `
-      <div class="steam-profile-card">
-        <div class="steam-header">
-          <img class="steam-avatar" src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(username)}" width="48" height="48">
-          <div class="steam-id">
-            <span class="steam-username">${escapeHtml(username)}</span>
-            ${level ? `<span class="steam-level">Lv.${escapeHtml(level)}</span>` : ''}
-          </div>
-        </div>
-        <div class="steam-stats">
-          <span class="steam-stat">🎮 ${escapeHtml(stats['游戏'] || '-')} 款游戏</span>
-          <span class="steam-stat">🏅 ${escapeHtml(stats['徽章'] || '-')} 枚徽章</span>
-          <span class="steam-stat">⏱️ ${totalHours.toFixed(0)} 小时</span>
-          <span class="steam-stat">👥 ${escapeHtml(stats['好友'] || '-')} 位好友</span>
-        </div>
-      </div>
-      <div class="steam-games-list">
-        ${games.map(g => `
-          <div class="steam-game-card">
-            <img class="steam-game-cover" src="${escapeHtml(g.cover)}" alt="${escapeHtml(g.name)}" loading="lazy" onerror="this.style.visibility='hidden';this.parentElement.style.background='var(--bg-inset)'">
-            <div class="steam-game-info">
-              <span class="steam-game-title">${escapeHtml(g.name)}</span>
-              <span class="steam-game-hours">${g.hours.toFixed(1)} 小时</span>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
+    if (renderCached()) return;
+    showFallback('无法加载游戏数据');
   } catch {
-    container.innerHTML = '<div class="steam-empty"><span>无法加载游戏数据</span><a href="https://steamcommunity.com/profiles/76561198391062314/" target="_blank" rel="noreferrer">在 Steam 上查看 \u2192</a></div>';
+    if (renderCached()) return;
+    showFallback('无法加载游戏数据');
   } finally {
     container.setAttribute('aria-busy', 'false');
   }
 }
-
 // 运行时注入的 page-agent 浮窗：首次注入时定位到首屏安全空白区，
 // 之后完全交给 page-agent 自身行为，不做持续抢位。
 function initPageAgentPlacement() {
