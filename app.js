@@ -288,23 +288,15 @@ async function loadMarket() {
       } catch { return null; }
     };
 
-    // Bitcoin 价格（CoinGecko，国内被墙时走代理）
+    // Bitcoin 价格（Binance 公共行情，自带 CORS，直连稳定，无需代理）
     const fetchBtc = async () => {
-      // 尝试直连
       try {
-        const res = await fetchWithTimeout('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', 5000);
-        if (!res.ok) throw new Error('not ok');
+        const res = await fetchWithTimeout('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT', 6000);
+        if (!res.ok) return null;
         const data = await res.json();
-        return data.bitcoin?.usd || null;
-      } catch {
-        // 直连失败，尝试通过 CORS 代理
-        try {
-          const res = await fetchWithTimeout(PROXY + encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'), 10000);
-          if (!res.ok) return null;
-          const data = await res.json();
-          return data.bitcoin?.usd || null;
-        } catch { return null; }
-      }
+        const price = parseFloat(data.price);
+        return Number.isFinite(price) ? price : null;
+      } catch { return null; }
     };
 
     // 黄金价格（直连，API 支持 CORS *）
@@ -1401,10 +1393,24 @@ async function loadSteamProfile() {
   const STEAM_ID64 = '76561198391062314';
 
   try {
-    const res = await fetchWithTimeout(`https://corsproxy.io/?${encodeURIComponent('https://steamcommunity.com/profiles/' + STEAM_ID64 + '/')}`, 15000);
-    // 注意：corsproxy.io 免费版可能限制非浏览器请求，浏览器端通常正常
-    if (!res.ok) throw new Error('fetch failed');
-    const html = await res.text();
+    // corsproxy.io 等第三方 CORS 代理不稳定（常返回 403/429），
+    // 因此按顺序尝试多个代理，取第一个成功且返回正文的响应；全失败则走兜底。
+    const STEAM_URL = 'https://steamcommunity.com/profiles/' + STEAM_ID64 + '/';
+    const proxies = [
+      (u) => 'https://corsproxy.io/?' + encodeURIComponent(u),
+      (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+      (u) => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u),
+    ];
+    let html = '';
+    for (const proxy of proxies) {
+      try {
+        const res = await fetchWithTimeout(proxy(STEAM_URL), 12000);
+        if (!res.ok) continue;
+        const text = await res.text();
+        if (text && text.length > 200) { html = text; break; }
+      } catch { /* 继续尝试下一个代理 */ }
+    }
+    if (!html) throw new Error('all proxies failed');
 
     const avatarMatch = html.match(/avatars\.cloudflare\.steamstatic\.com\/([a-f0-9]+)_full\.jpg/);
     const avatarUrl = avatarMatch ? `https://avatars.cloudflare.steamstatic.com/${avatarMatch[1]}_full.jpg` : '';
