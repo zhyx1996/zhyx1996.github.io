@@ -94,12 +94,15 @@
                         <span class="nk-window-status">● 需新窗口</span>
                         <a class="nk-window-open" href="https://www.alt.org/nethack/hterm/" target="_blank" rel="noreferrer">新窗口 ↗</a>
                     </div>
-                    <div class="nk-terminal-card">
-                        <p class="nk-terminal-title">alt.org 公共联机服务器</p>
-                        <p class="nk-terminal-desc">NAO（nethack.alt.org）禁止被第三方页面内嵌，浏览器会直接拒绝连接，因此这里不再渲染一个必定失败的 iframe。</p>
-                        <a class="btn btn-primary" href="https://www.alt.org/nethack/hterm/" target="_blank" rel="noreferrer">在新窗口打开联机终端 ↗</a>
-                        <p class="nk-terminal-note">打开后：点击终端按 <code>c</code> 连接；推荐 <code>yuhjklbn</code>（Vi 键）或数字小键盘移动。</p>
+                    <div class="nethack-frame-wrap" data-nh-src="https://www.alt.org/nethack/hterm/">
+                        <div class="nethack-frame-loading">正在加载外部游戏…</div>
+                        <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                        <div class="nethack-frame-error" hidden>
+                            <span>alt.org 可能通过 CSP 禁止第三方内嵌；若未显示，请使用右上角「新窗口 ↗」。</span>
+                            <a href="https://www.alt.org/nethack/hterm/" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
+                        </div>
                     </div>
+                    <p class="nk-terminal-note">打开后：点击终端按 <code>c</code> 连接；推荐 <code>yuhjklbn</code>（Vi 键）或数字小键盘移动，方向键无法斜向移动。</p>
                     <div class="nk-window-statusbar" data-hint="terminal">点击终端 · 按 c 连接 · 移动推荐 yuhjklbn（Vi 键）或数字小键盘，方向键无法斜向移动 · 顶部下拉框：字体 / tileset（画面风格）</div>
                 </div>
                 <div class="nk-window" data-pane="3d" id="pane-3d" role="tabpanel" aria-label="NetHack 3D">
@@ -110,9 +113,14 @@
                         <span class="nk-window-title">nethack-3d · StackC00ki3</span>
                         <span class="nk-window-status">● 3D</span>
                     </div>
-                    <div class="external-link-card">
-                        <p>NetHack 3D 由独立 GitHub Pages 提供，改为外链打开，避免网络或站点策略导致 iframe 拒绝连接。</p>
-                        <a class="btn btn-primary" href="https://stackc00ki3.github.io/nethack-3d/" target="_blank" rel="noreferrer">打开 NetHack 3D ↗</a>
+                    <div class="nethack-frame-wrap" data-nh-src="https://stackc00ki3.github.io/nethack-3d/">
+                        <div class="nethack-frame-loading">正在加载外部游戏…</div>
+                        <iframe class="nethack-iframe nethack-iframe-3d" src="https://stackc00ki3.github.io/nethack-3d/" title="NetHack 3D" loading="lazy" referrerpolicy="no-referrer"></iframe>
+                        <div class="nethack-frame-error" hidden>
+                            <span>外部游戏加载失败（站点可能禁止被内嵌，或网络被拦截）</span>
+                            <button type="button" class="nethack-frame-retry">重试</button>
+                            <a href="https://stackc00ki3.github.io/nethack-3d/" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
+                        </div>
                     </div>
                     <div class="nk-window-statusbar" data-hint="3d">鼠标拖拽旋转视角 · WASD 移动 · 左键互动 · 滚轮缩放</div>
                 </div>

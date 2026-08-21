@@ -30,18 +30,18 @@
                 <span class="kicker">Public embed demo</span>
                 <p class="page-eyebrow">Genshin / Steam / No local proxy</p>
                 <h1>公开信息嵌入演示</h1>
-                <p>这个页面只使用不会触发浏览器拒绝连接的公开入口：原神与 Steam 均通过稳定的新窗口链接打开，Steam 资料卡保留静态展示。</p>
+                <p>这个页面展示公开信息的 iframe 嵌入方式：原神使用 Enka 展柜，Steam 使用官方商店 widget。</p>
             </div>
             <div class="page-banner-meta">
                 <div class="banner-meta-card glass-card">
                     <small>Genshin</small>
-                    <strong>Enka 公开展柜外链</strong>
-                    <span class="meta-note">避免第三方 iframe 拒绝连接</span>
+                    <strong>Enka 公开展示页 iframe</strong>
+                    <span class="meta-note">直接嵌入公开展柜</span>
                 </div>
                 <div class="banner-meta-card glass-card">
                     <small>Steam</small>
-                    <strong>资料卡 + 官方商店外链</strong>
-                    <span class="meta-note">避免 Steam iframe / CORS 限制</span>
+                    <strong>资料卡 + 官方 widget</strong>
+                    <span class="meta-note">使用官方商店嵌入</span>
                 </div>
             </div>
         </section>
@@ -50,15 +50,18 @@
             <div class="section-heading">
                 <div>
                     <h2>原神公开展柜</h2>
-                    <p>Enka 可能按网络环境拒绝第三方 iframe；使用新窗口打开可避免页面内显示“拒绝连接”。</p>
+                    <p>直接使用 Enka 的公开页面作为 iframe 源地址。</p>
                 </div>
                 <span class="tag">Enka</span>
             </div>
             <article class="card glass-card embed-card">
-                <div class="external-link-card">
-                    <p>打开 Enka 公开展柜查看角色资料。</p>
-                    <a class="btn btn-primary" href="https://enka.network/u/147521967/" target="_blank" rel="noreferrer">打开 Enka 展柜 ↗</a>
-                </div>
+                <iframe
+                    class="external-embed-frame"
+                    src="https://enka.network/u/147521967/"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    title="Genshin Showcase Demo"
+                ></iframe>
                 <p class="embed-note">Enka 偶发出现 424 时，通常是上游数据暂时异常；页面内容仍取决于 UID 的公开展柜与 Enka 当前状态。</p>
             </article>
         </section>
@@ -91,8 +94,13 @@
                 </article>
                 <article class="card glass-card embed-card">
                     <h3>官方商店 widget</h3>
-                    <p>Steam 商店 widget 在部分网络环境会被拦截，改为官方商店外链，打开后仍可查看完整信息。</p>
-                    <a class="btn btn-primary" href="https://store.steampowered.com/app/3903190/" target="_blank" rel="noreferrer">打开 Steam 商店页 ↗</a>
+                    <p>单个游戏可使用 Steam 官方提供的店铺 widget 进行嵌入。</p>
+                    <iframe
+                        class="store-widget-frame"
+                        src="https://store.steampowered.com/widget/3903190/"
+                        loading="lazy"
+                        title="Steam Store Widget Demo"
+                    ></iframe>
                 </article>
             </div>
         </section>
@@ -101,7 +109,7 @@
     <footer class="footer">
         <div class="footer-inner">
             <p>public-data-proxy/embed-demo.html</p>
-            <p>用于演示“第三方页面采用外链入口，避免 iframe 拒绝连接”的无代理实现。</p>
+            <p>用于演示“原神与 Steam 官方内容通过 iframe 嵌入”的无代理实现。</p>
         </div>
     </footer>
 
