@@ -4,3 +4,4 @@ node_modules/
 public/pretext-bundle.js
 .playwright-cli/
 *.png
+*.import
