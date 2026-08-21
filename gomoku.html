@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css?v=69">
+    <link rel="stylesheet" href="/styles.css?v=70">
     <link rel="stylesheet" href="/gomoku/style.css?v=7">
     <style>
         body { opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards; }
@@ -115,14 +115,9 @@
                                 <a class="gm-link" href="https://gomocalc.com/#/" target="_blank" rel="noreferrer">新窗口打开 ↗</a>
                             </div>
                         </div>
-                        <div class="nethack-frame-wrap gm-board-wrap" data-gm-src="https://gomocalc.com/#/">
-                            <div class="nethack-frame-loading">正在加载五子棋引擎（首次加载较慢）…</div>
-                            <iframe class="nethack-iframe gm-board-iframe" src="https://gomocalc.com/#/" title="五子棋棋盘" loading="lazy" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>
-                            <div class="nethack-frame-error" hidden>
-                                <span>棋盘加载失败（可能被网络拦截或需联网）</span>
-                                <button type="button" class="nethack-frame-retry">重试</button>
-                                <a href="https://gomocalc.com/#/" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
-                            </div>
+                        <div class="external-link-card gm-reference-card">
+                            <p>gomocalc 原版界面依赖第三方站点，部分网络环境会拒绝 iframe；本页默认使用上方本地 Rapfi 版本。</p>
+                            <a class="btn btn-primary" href="https://gomocalc.com/#/" target="_blank" rel="noreferrer">在新窗口打开原版 ↗</a>
                         </div>
                     </div>
 
@@ -131,18 +126,12 @@
                         <div class="gm-pane-head">
                             <span class="gm-pane-title">设置 · 配置项</span>
                             <div class="gm-pane-actions">
-                                <button type="button" class="gm-apply-btn" id="gm-apply-settings">应用设置并刷新棋盘</button>
                                 <a class="gm-link" href="https://gomocalc.com/#/settings" target="_blank" rel="noreferrer">新窗口打开 ↗</a>
                             </div>
                         </div>
-                        <div class="nethack-frame-wrap gm-settings-wrap" data-gm-src="https://gomocalc.com/#/settings">
-                            <div class="nethack-frame-loading">正在加载设置…</div>
-                            <iframe class="nethack-iframe gm-settings-iframe" src="https://gomocalc.com/#/settings" title="五子棋设置" loading="lazy" referrerpolicy="no-referrer" allow="clipboard-write"></iframe>
-                            <div class="nethack-frame-error" hidden>
-                                <span>设置加载失败（可能被网络拦截或需联网）</span>
-                                <button type="button" class="nethack-frame-retry">重试</button>
-                                <a href="https://gomocalc.com/#/settings" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
-                            </div>
+                        <div class="external-link-card gm-reference-card">
+                            <p>原版设置页改为外链打开，避免第三方 iframe 在 GitHub Pages 上显示拒绝连接。</p>
+                            <a class="btn btn-primary" href="https://gomocalc.com/#/settings" target="_blank" rel="noreferrer">在新窗口打开设置 ↗</a>
                         </div>
                     </div>
 

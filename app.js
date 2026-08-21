@@ -1453,6 +1453,10 @@ async function loadSteamProfile() {
     return false;
   };
 
+  // 先立即展示最近一次成功抓取（或内置种子）资料，再后台尝试刷新。
+  // 这样代理/Steam 暂时不可用时不会让整块区域长时间停留在“加载中”。
+  const hasCachedView = renderCached();
+
   // 第三方 CORS 代理不稳定（常返回 403/429），按序尝试多个代理；
   // 全部失败则回退到本地缓存的最近一次成功数据，避免整块空白。
   const proxies = [
@@ -1491,20 +1495,23 @@ async function loadSteamProfile() {
       const covers = [...html.matchAll(/game_capsule" src="([^"]+)"/g)].map(m => m[1]);
       const games = names.map((name, i) => ({ name, hours: hours[i] || 0, cover: covers[i] || '' })).filter(g => g.name && g.hours > 0);
       const data = { avatarUrl, username, level, stats, games, totalHours: games.reduce((s, g) => s + g.hours, 0), ts: Date.now() };
-      if (games.length === 0) { showFallback('暂无游戏数据'); return; }
+      if (games.length === 0) {
+        if (!hasCachedView) showFallback('暂无游戏数据');
+        return;
+      }
       // 只缓存/渲染解析有效的数据：用户名必须是真实昵称（不是 Steam ID）
       if (username && username !== STEAM_ID64) {
         try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (_) {}
         renderSteam(container, data);
         return;
       }
-      if (renderCached()) return;
-      showFallback('无法加载游戏数据');
+      if (hasCachedView || renderCached()) return;
+      if (!hasCachedView) showFallback('无法加载游戏数据');
     }
-    if (renderCached()) return;
+    if (hasCachedView || renderCached()) return;
     showFallback('无法加载游戏数据');
   } catch {
-    if (renderCached()) return;
+    if (hasCachedView || renderCached()) return;
     showFallback('无法加载游戏数据');
   } finally {
     container.setAttribute('aria-busy', 'false');
