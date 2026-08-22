@@ -505,7 +505,9 @@
         var src = wrap.getAttribute('data-nh-src');
         var loaded = false;
         var timer = null;
-        var TIMEOUT = 8000;
+        // GitHub Pages/外部游戏首次加载可能需要编译 WASM、贴图和字体，
+        // 8 秒会把仍在加载的 iframe 误判为拒绝连接。只在较长时间无响应时兜底。
+        var TIMEOUT = 30000;
         var startTimer = function() {
           if (timer !== null || loaded) return;
           timer = setTimeout(function() {
