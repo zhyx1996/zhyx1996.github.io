@@ -2088,6 +2088,35 @@ body.nk-dark .nk-cmd-grid kbd {
 .nethack-iframe-3d {
     height: 700px;
 }
+.nao-terminal-shell {
+    background: #000;
+    min-height: 650px;
+    display: flex;
+    flex-direction: column;
+}
+.nao-terminal-toolbar {
+    min-height: 42px;
+    padding: 7px 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #333;
+    background: #151515;
+    color: #aaa;
+    font-family: var(--font-mono);
+    font-size: 11px;
+}
+.nao-terminal {
+    flex: 1;
+    min-height: 608px;
+    padding: 6px;
+    background: #000;
+}
+.nao-terminal .xterm { height: 100%; }
+.nao-terminal .xterm-viewport { scrollbar-color: #555 #111; }
+#nao-terminal-status[data-state="connected"] { color: #55dd88; }
+#nao-terminal-status[data-state="connecting"] { color: #e5b93f; }
+#nao-terminal-status[data-state="error"] { color: #ff6b6b; }
 
 /* 五子棋上下布局：棋盘区 + 设置区 */
 .gm-pane {
@@ -2248,6 +2277,9 @@ body.nk-dark .nk-cmd-grid kbd {
 }
 @media (max-width: 800px) {
     .nethack-iframe, .nethack-iframe-3d { height: 450px; }
+    .nao-terminal-shell { min-height: 500px; }
+    .nao-terminal { min-height: 450px; }
+    .nao-terminal-toolbar { align-items: flex-start; flex-direction: column; }
     .gm-settings-iframe { height: 520px; }
     /* 移动端 gomocalc 自动上下排布，去掉桌面端的裁切 */
     .gm-board-wrap .gm-board-iframe {

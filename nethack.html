@@ -25,6 +25,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css?v=70">
     <script src="/public/cleanup-coi-serviceworker.js?v=1"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css" />
     <style>
         body { opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards; }
@@ -91,19 +92,18 @@
                         <span class="nk-dot nk-dot-a"></span>
                         <span class="nk-dot nk-dot-b"></span>
                         <span class="nk-dot nk-dot-c"></span>
-                        <span class="nk-window-title">alt.org · hterm</span>
-                        <span class="nk-window-status">● 需新窗口</span>
+                        <span class="nk-window-title">alt.org · WebSocket terminal</span>
+                        <span class="nk-window-status" id="nao-terminal-status" data-state="idle">未连接</span>
                         <a class="nk-window-open" href="https://www.alt.org/nethack/hterm/" target="_blank" rel="noreferrer">新窗口 ↗</a>
                     </div>
-                    <div class="nethack-frame-wrap" data-nh-src="https://www.alt.org/nethack/hterm/">
-                        <div class="nethack-frame-loading">正在加载外部游戏…</div>
-                        <iframe class="nethack-iframe" src="https://www.alt.org/nethack/hterm/" title="NetHack 5.0 on nethack.alt.org" loading="lazy" referrerpolicy="no-referrer"></iframe>
-                        <div class="nethack-frame-error" hidden>
-                            <span>alt.org 可能通过 CSP 禁止第三方内嵌；若未显示，请使用右上角「新窗口 ↗」。</span>
-                            <a href="https://www.alt.org/nethack/hterm/" target="_blank" rel="noreferrer">在新窗口打开 ↗</a>
+                    <div class="nao-terminal-shell">
+                        <div class="nao-terminal-toolbar">
+                            <button type="button" class="gm-apply-btn" id="nao-connect">连接 NAO</button>
+                            <span>本站终端直接连接 alt.org 官方 WebSocket，不再嵌入受 CSP 限制的页面。</span>
                         </div>
+                        <div id="nao-terminal" class="nao-terminal" role="application" aria-label="NetHack alt.org 联机终端"></div>
                     </div>
-                    <p class="nk-terminal-note">打开后：点击终端按 <code>c</code> 连接；推荐 <code>yuhjklbn</code>（Vi 键）或数字小键盘移动，方向键无法斜向移动。</p>
+                    <p class="nk-terminal-note">点击「连接 NAO」或在终端按 <code>c</code>；随后在官方 dgamelaunch 菜单登录/注册并选择游戏。推荐 <code>yuhjklbn</code>（Vi 键）或数字小键盘移动。</p>
                     <div class="nk-window-statusbar" data-hint="terminal">点击终端 · 按 c 连接 · 移动推荐 yuhjklbn（Vi 键）或数字小键盘，方向键无法斜向移动 · 顶部下拉框：字体 / tileset（画面风格）</div>
                 </div>
                 <div class="nk-window" data-pane="3d" id="pane-3d" role="tabpanel" aria-label="NetHack 3D">
@@ -491,6 +491,9 @@
           document.querySelectorAll("[data-for]").forEach(function(el) {
             el.classList.toggle("hidden", el.dataset.for !== target);
           });
+          if (target === 'terminal' && window.NaoTerminal) {
+            window.setTimeout(window.NaoTerminal.fit, 0);
+          }
         });
       });
       document.getElementById("nk-dark-toggle").addEventListener("click", function() {
@@ -543,6 +546,10 @@
         });
       });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+    <script src="/public/nao-terminal.js?v=1"></script>
 
     <!-- PageAgent: in-page AI agent -->
     <script src="https://cdn.jsdelivr.net/npm/page-agent@1.12.2/dist/iife/page-agent.demo.js?v=2&showPanel=false" crossorigin="anonymous"></script>
