@@ -15,10 +15,10 @@
     });
     if (!stale.length) return;
 
-    sessionStorage.setItem(reloadKey, '1');
     return Promise.all(stale.map(function (registration) {
       return registration.unregister();
     })).then(function () {
+      sessionStorage.setItem(reloadKey, '1');
       window.location.reload();
     });
   }).catch(function () {
