@@ -191,7 +191,7 @@
     document.getElementById('gm-btn-theme').addEventListener('click', () => {
       uiState.theme = (uiState.theme + 1) % 3;
       board.setTheme(uiState.theme);
-      const themeNames = ['深色', '木质', '浅色'];
+      const themeNames = ['星夜', '木质', '浅色'];
       document.getElementById('gm-btn-theme').textContent = '主题：' + themeNames[uiState.theme];
       updateButtons();
     });
@@ -349,6 +349,8 @@
       s.attackCells, s.attackType, s.attackTime,
       s.realtimeBest, s.realtimeLost, s.forbidCells);
     board.setMoveHistory(game.moveHistory);
+    board.setTurn(s.currentPlayer);
+    board.setLocked(s.aiThinking || s.winner !== 0);
 
     // 更新状态文字
     let txt = '';

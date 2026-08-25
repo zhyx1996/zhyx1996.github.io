@@ -1,4 +1,6 @@
-/* 五子棋本地版 —— 设置面板跟随站点主题（暖色琥珀），棋盘区保持游戏暗色主题 */
+/* 五子棋本地版 —— 「棋院·夜」星夜·极光玻璃拟态（与 Godot 版 gomoku.gd 同源主题）
+   配色：深空蓝黑 #0a0d18→#151b30 / 蓝钢 #3f5788 / 电光青 #38bdf8 / 紫罗兰 #a78bfa
+         琥珀金 #fbbf24 / 翠绿 #34d399；玻璃面板 rgba(20,28,48,.72) + 蓝光描边 */
 
 /* ── 标签页 ── */
 .gm-native-tabs {
@@ -18,14 +20,15 @@
     border-bottom: 2px solid transparent;
     color: var(--text-muted);
     cursor: pointer;
-    transition: color 0.15s, border-color 0.15s;
+    transition: color 0.15s, border-color 0.15s, text-shadow 0.15s;
 }
 
 .gm-native-tab:hover { color: var(--text); }
 .gm-native-tab.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
+    color: #38bdf8;
+    border-bottom-color: #38bdf8;
     font-weight: 600;
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
 }
 
 .gm-tab-panel { }
@@ -35,15 +38,25 @@
     white-space: nowrap;
     text-decoration: underline;
     font-weight: 600;
-    color: var(--accent);
+    color: #38bdf8;
 }
+.gm-tab-panel a.gm-link:hover { color: #7dd3fc; }
 
-/* ── 布局 ── */
+/* ── 对局舞台：深空渐变 + 玻璃边框（对应 Godot 全屏星夜背景） ── */
 .gm-native {
     display: flex;
     gap: 24px;
     align-items: flex-start;
     flex-wrap: wrap;
+    background:
+        radial-gradient(1200px 500px at 80% -10%, rgba(74, 125, 214, 0.10), transparent 60%),
+        linear-gradient(180deg, #0a0d18 0%, #151b30 100%);
+    border: 1px solid rgba(63, 87, 136, 0.45);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow:
+        0 12px 34px rgba(8, 14, 32, 0.45),
+        inset 0 1px 0 rgba(122, 162, 255, 0.08);
 }
 
 .gm-native-board-panel {
@@ -54,7 +67,7 @@
 .gm-native-canvas {
     display: block;
     border-radius: 12px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 8px 26px rgba(4, 8, 20, 0.55);
     cursor: pointer;
     touch-action: manipulation;
 }
@@ -67,13 +80,15 @@
     gap: 16px;
 }
 
-/* ── 设置卡片 ── */
+/* ── 玻璃卡片（对应 Godot StyleBoxFlat rgba(0.08,0.11,0.19,0.72) + 蓝光描边） ── */
 .gm-native-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    background: rgba(20, 28, 48, 0.72);
+    border: 1px solid rgba(82, 133, 219, 0.5);
+    border-radius: 14px;
     padding: 16px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 8px 22px rgba(38, 89, 166, 0.22);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .gm-native-card h3 {
@@ -81,7 +96,7 @@
     font-family: var(--font-mono, monospace);
     font-size: 12px;
     letter-spacing: 0.08em;
-    color: var(--accent);
+    color: #7dd3fc;
     text-transform: uppercase;
     font-weight: 600;
 }
@@ -89,13 +104,16 @@
 .gm-native-status {
     font-size: 19px;
     font-weight: 600;
-    color: var(--text);
+    color: #e9edf6;
     min-height: 1.5em;
-    margin-bottom: 10px;
+    margin-bottom: 2px;
 }
 
-.gm-native-status.gm-win { color: var(--accent); }
-.gm-native-status.gm-thinking { color: var(--teal); }
+.gm-native-status.gm-win {
+    color: #34d399;
+    text-shadow: 0 0 14px rgba(52, 211, 153, 0.5);
+}
+.gm-native-status.gm-thinking { color: #7dd3fc; }
 
 /* ── 设置按钮网格（分组布局） ── */
 .gm-btn-grid {
@@ -125,7 +143,7 @@
     font-family: var(--font-mono, monospace);
     font-size: 11px;
     letter-spacing: 0.1em;
-    color: var(--text-muted);
+    color: #a9c2e8;
     text-transform: uppercase;
     font-weight: 600;
 }
@@ -141,17 +159,17 @@
 }
 .gm-native-row .gm-native-btn { flex: 1; text-align: center; }
 
-/* ── 设置按钮（对齐站点 .btn 风格） ── */
+/* ── 玻璃按钮（对应 Godot _make_flat_style/_apply_button_states） ── */
 .gm-native-btn {
     padding: 6px 8px;
     font-family: var(--font-mono, monospace);
     font-size: 11px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text-secondary);
+    background: rgba(26, 36, 56, 0.55);
+    border: 1px solid rgba(102, 140, 217, 0.28);
+    border-radius: 10px;
+    color: #d7e2f2;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.05s;
     text-align: center;
     line-height: 1.4;
     white-space: nowrap;
@@ -160,31 +178,60 @@
 }
 
 .gm-native-btn:hover {
-    background: var(--accent-dim);
-    border-color: var(--accent);
-    color: var(--text);
+    background: rgba(41, 59, 97, 0.72);
+    border-color: rgba(82, 199, 252, 0.65);
+    color: #ffffff;
 }
 
-.gm-native-btn:active { transform: translateY(1px); }
+.gm-native-btn:active {
+    background: rgba(31, 46, 77, 0.9);
+    border-color: rgba(82, 199, 252, 0.9);
+    transform: translateY(1px);
+}
 
+.gm-native-btn:focus-visible,
+.gm-native-tab:focus-visible,
+.gm-modal-close:focus-visible,
+.gm-rematch-btn:focus-visible {
+    outline: 1px solid rgba(166, 140, 250, 0.9);
+    outline-offset: 2px;
+}
+
+.gm-native-btn:disabled {
+    background: rgba(20, 28, 43, 0.4);
+    border-color: rgba(51, 66, 97, 0.3);
+    color: #5b6474;
+    cursor: default;
+}
+
+/* 主操作按钮：实心电光青（对应 Godot _style_primary_button） */
 .gm-native-btn.gm-primary {
-    background: var(--accent);
-    border-color: var(--accent);
+    background: #0ea5e9;
+    border-color: #7dd3fc;
     color: #fff;
     text-align: center;
     font-weight: 600;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(56, 153, 245, 0.35);
 }
 
 .gm-native-btn.gm-primary:hover {
-    background: var(--accent-hover);
-    border-color: var(--accent-hover);
+    background: #38bdf8;
+    border-color: #bae6fd;
     color: #fff;
+    box-shadow: 0 6px 16px rgba(77, 184, 250, 0.5);
+}
+
+.gm-native-btn.gm-primary:active {
+    background: #0284c7;
+    border-color: #38bdf8;
+    transform: translateY(1px);
 }
 
 /* ── 实时分析面板 ── */
 .gm-native-analysis {
     font-size: 12px;
-    color: var(--text-muted);
+    color: #a9b8d4;
     line-height: 1.7;
     font-family: var(--font-mono, monospace);
 }
@@ -194,20 +241,22 @@
     justify-content: space-between;
     gap: 12px;
     padding: 3px 0;
-    border-bottom: 1px dashed var(--border-light);
+    border-bottom: 1px dashed rgba(102, 140, 217, 0.25);
 }
 
 .gm-native-analysis .gm-kv:last-child { border-bottom: none; }
-.gm-native-analysis .gm-kv b { color: var(--text); font-weight: 500; text-align: right; word-break: break-all; }
+.gm-native-analysis .gm-kv b { color: #eef2ff; font-weight: 500; text-align: right; word-break: break-all; }
 
-/* ── 引擎信息说明 ── */
+/* ── 引擎信息说明（同为深空玻璃卡） ── */
 .gm-native-info {
     margin-top: 16px;
     padding: 16px 18px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
+    background: rgba(20, 28, 48, 0.72);
+    border: 1px solid rgba(82, 133, 219, 0.5);
+    border-radius: 14px;
+    box-shadow: 0 8px 22px rgba(38, 89, 166, 0.22);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .gm-native-info-head {
@@ -223,7 +272,7 @@
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 14px;
-    color: var(--text);
+    color: #e9edf6;
 }
 
 .gm-badges {
@@ -237,9 +286,9 @@
     font-size: 11px;
     padding: 3px 9px;
     border-radius: 999px;
-    background: var(--accent-dim);
-    color: var(--accent);
-    border: 1px solid var(--accent-dim);
+    background: rgba(56, 189, 248, 0.12);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.35);
     white-space: nowrap;
     letter-spacing: 0.02em;
 }
@@ -247,31 +296,32 @@
 .gm-native-info-desc {
     margin: 0 0 6px;
     font-size: 13px;
-    color: var(--text-secondary);
+    color: #b9c6de;
     line-height: 1.7;
 }
 
-.gm-native-info-desc b { color: var(--accent); font-weight: 600; }
+.gm-native-info-desc b { color: #38bdf8; font-weight: 600; }
 
 .gm-native-info-note {
     margin: 0 0 10px;
     font-size: 12px;
-    color: var(--text-muted);
+    color: #8593ad;
     line-height: 1.6;
 }
 
 .gm-native-info-foot {
     font-size: 12px;
-    color: var(--text-muted);
+    color: #8593ad;
     padding-top: 8px;
-    border-top: 1px dashed var(--border-light);
+    border-top: 1px dashed rgba(102, 140, 217, 0.25);
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
 }
 
-.gm-native-info-foot a { color: var(--accent); font-weight: 600; }
+.gm-native-info-foot a { color: #38bdf8; font-weight: 600; }
+.gm-native-info-foot a:hover { color: #7dd3fc; }
 
 /* ── 棋盘加载遮罩（覆盖在暗色棋盘上，保持暗色） ── */
 .gm-native-loading {
@@ -282,7 +332,7 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    background: rgba(11, 17, 32, 0.92);
+    background: rgba(10, 13, 24, 0.92);
     border-radius: 12px;
     color: #94a3b8;
     font-family: var(--font-mono, monospace);
@@ -293,8 +343,8 @@
 .gm-native-spinner {
     width: 36px;
     height: 36px;
-    border: 3px solid #2a3654;
-    border-top-color: var(--accent);
+    border: 3px solid #27354f;
+    border-top-color: #38bdf8;
     border-radius: 50%;
     animation: gm-spin 0.8s linear infinite;
 }
@@ -305,7 +355,7 @@
     width: 70%;
     max-width: 280px;
     height: 6px;
-    background: #2a3654;
+    background: #1c2740;
     border-radius: 999px;
     overflow: hidden;
 }
@@ -313,7 +363,7 @@
 .gm-progress-bar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, var(--accent), #fbbf24);
+    background: linear-gradient(90deg, #38bdf8, #fbbf24);
     border-radius: 999px;
     transition: width 0.2s ease;
 }
@@ -342,7 +392,10 @@
     font-size: 56px;
     font-weight: 700;
     color: #fbbf24;
-    text-shadow: 0 0 24px rgba(251, 191, 36, 0.7), 0 4px 8px rgba(0, 0, 0, 0.6);
+    text-shadow:
+        0 0 24px rgba(251, 191, 36, 0.7),
+        0 0 60px rgba(56, 189, 248, 0.35),
+        0 4px 8px rgba(0, 0, 0, 0.6);
     pointer-events: none;
     opacity: 0;
     z-index: 10;
@@ -361,7 +414,7 @@
     100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
 }
 
-/* ── 胜利后的「再来一局」按钮 ── */
+/* ── 胜利后的「再来一局」按钮（实心电光青，同 Godot 主按钮） ── */
 .gm-rematch-btn {
     position: absolute;
     top: 60%;
@@ -371,16 +424,19 @@
     font-family: var(--font-mono, monospace);
     font-size: 16px;
     font-weight: 600;
-    background: #fbbf24;
-    border: 1px solid #b45309;
-    border-radius: 8px;
-    color: #1a1a1a;
+    background: #0ea5e9;
+    border: 1px solid #7dd3fc;
+    border-radius: 12px;
+    color: #ffffff;
     cursor: pointer;
     z-index: 20;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 18px rgba(56, 153, 245, 0.45);
     animation: gm-rematch-in 0.35s ease-out;
 }
-.gm-rematch-btn:hover { background: #f59e0b; }
+.gm-rematch-btn:hover {
+    background: #38bdf8;
+    border-color: #bae6fd;
+}
 .gm-rematch-btn:active { transform: translate(-50%, -50%) translateY(1px); }
 .gm-rematch-btn[hidden] { display: none; }
 
@@ -389,7 +445,7 @@
     to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
-/* ── 设置弹窗 ── */
+/* ── 设置弹窗（深空玻璃对话框） ── */
 .gm-modal {
     position: fixed;
     inset: 0;
@@ -404,8 +460,9 @@
 .gm-modal-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(2px);
+    background: rgba(4, 6, 12, 0.65);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
 }
 
 .gm-modal-dialog {
@@ -414,10 +471,10 @@
     max-width: 400px;
     max-height: 85vh;
     overflow-y: auto;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-lg);
+    background: rgba(16, 23, 40, 0.94);
+    border: 1px solid rgba(82, 133, 219, 0.5);
+    border-radius: 16px;
+    box-shadow: 0 18px 48px rgba(4, 8, 20, 0.6), inset 0 1px 0 rgba(122, 162, 255, 0.08);
     padding: 16px 18px;
 }
 
@@ -427,14 +484,14 @@
     align-items: center;
     margin-bottom: 6px;
     padding-bottom: 10px;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px dashed rgba(102, 140, 217, 0.25);
 }
 
 .gm-modal-title {
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 16px;
-    color: var(--text);
+    color: #e9edf6;
 }
 
 .gm-modal-close {
@@ -442,16 +499,16 @@
     border: none;
     font-size: 22px;
     line-height: 1;
-    color: var(--text-muted);
+    color: #8593ad;
     cursor: pointer;
     padding: 2px 8px;
     border-radius: 6px;
 }
-.gm-modal-close:hover { color: var(--text); background: var(--bg-inset); }
+.gm-modal-close:hover { color: #7dd3fc; background: rgba(41, 59, 97, 0.72); }
 
 /* ── 响应式 ── */
 @media (max-width: 800px) {
-    .gm-native { flex-direction: column; gap: 16px; }
+    .gm-native { flex-direction: column; gap: 16px; padding: 14px; }
     .gm-native-side { min-width: auto; width: 100%; }
     .gm-native-board-panel { width: 100%; }
     .gm-native-tab { padding: 10px 14px; font-size: 13px; }
