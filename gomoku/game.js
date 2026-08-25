@@ -324,104 +324,156 @@ const GomokuGame = (() => {
     return null;
   }
 
-  // 分析某方向上的棋型（5格/4格滑动窗口，支持带空格的跳棋型）
-  function analyzeDir(x, y, dx, dy, p) {
-    const seq = [];  // 索引 4 = 最后落子，±4 共 9 格
-    for (let k = -4; k <= 4; k++) {
+  // ── 制胜棋型检测：模拟放子法（与 Godot 版同源算法）──
+  // 线编码：1=己方 / 0=空 / -1=对手或边界；中心（最后落子）下标 OFF
+  const SEQ_R = 5, OFF = 5;
+
+  function buildLine(bd, n, x, y, dx, dy, p) {
+    const seq = [];
+    for (let k = -SEQ_R; k <= SEQ_R; k++) {
       const cx = x + dx * k, cy = y + dy * k;
-      if (inBoard(cx, cy)) {
-        const v = board[cy][cx];
-        seq.push(v === p ? p : (v === 0 ? 0 : -1));
-      } else {
-        seq.push(-1);
-      }
+      if (cx < 0 || cy < 0 || cx >= n || cy >= n) { seq.push(-1); continue; }
+      const v = bd[cy][cx];
+      seq.push(v === p ? 1 : (v === 0 ? 0 : -1));
     }
-    // 四检测：5 格窗口含中心（索引 4），4 同色 + 1 空
-    const fiveCells = new Set();
-    for (let start = 0; start < 5; start++) {
-      if (start > 4 || start + 5 <= 4) continue;
-      let stones = 0, emptyIdx = -1, blocked = false;
-      for (let j = start; j < start + 5; j++) {
-        const v = seq[j];
-        if (v === p) stones++;
-        else if (v === 0) { if (emptyIdx === -1) emptyIdx = j; else { blocked = true; break; } }
-        else { blocked = true; break; }
-      }
-      if (!blocked && stones === 4 && emptyIdx !== -1) fiveCells.add(emptyIdx);
-    }
-    // 三检测：4 格窗口含中心，3 同色 + 1 空
-    const fourCells = new Set();
-    for (let start = 0; start < 6; start++) {
-      if (start > 4 || start + 4 <= 4) continue;
-      let stones = 0, emptyIdx = -1, blocked = false;
-      for (let j = start; j < start + 4; j++) {
-        const v = seq[j];
-        if (v === p) stones++;
-        else if (v === 0) { if (emptyIdx === -1) emptyIdx = j; else { blocked = true; break; } }
-        else { blocked = true; break; }
-      }
-      if (!blocked && stones === 3 && emptyIdx !== -1) fourCells.add(emptyIdx);
-    }
-    return { hasFour: fiveCells.size >= 1, openFour: fiveCells.size >= 2, openThree: fourCells.size >= 2 };
+    return seq;
   }
 
-  function detectThreat(x, y, p) {
-    const fourDirs = [], threeDirs = [];
-    let openFour = false;
-    let fourCells = [], threeCells = [];
+  // 与中心相关的「成五点」：试放一子后过该子的五连须包含中心，
+  // 黑棋在禁长连规则下连长 >5 不算成五。
+  function fivePointsC(seq, renjuLike) {
+    const pts = [];
+    for (let i = OFF - 4; i <= OFF + 4; i++) {
+      if (seq[i] !== 0) continue;
+      seq[i] = 1;
+      let run = 1, lo = i, hi = i;
+      while (lo > 0 && seq[lo - 1] === 1) { lo--; run++; }
+      while (hi < seq.length - 1 && seq[hi + 1] === 1) { hi++; run++; }
+      let ok = run === 5 || (run > 5 && !renjuLike);   // 禁长连规则下黑棋长连不算成五
+      if (ok) ok = lo <= OFF && OFF <= hi;             // 五连须包含最后落子
+      seq[i] = 0;
+      if (ok) pts.push(i);
+    }
+    return pts;
+  }
 
-    for (const [dx, dy] of DIRS) {
-      const r = analyzeDir(x, y, dx, dy, p);
-      if (r.hasFour) {
-        fourDirs.push([dx, dy]);
+  // 单方向分析：{fiveCount, openFour, openThree}
+  // 活三判定 = 存在空点 e，放子后该线出现 ≥2 个含中心的成五点（一步成活四级），
+  // 天然覆盖跳活三 .X.XX. / .XX.X.
+  function analyzeDirEx(bd, n, x, y, dx, dy, p, renjuLike) {
+    const seq = buildLine(bd, n, x, y, dx, dy, p);
+    const fivePts = fivePointsC(seq, renjuLike);
+    let openThree = false;
+    if (fivePts.length === 0) {           // 已有四的线不再当三看
+      for (let i = OFF - 4; i <= OFF + 4 && !openThree; i++) {
+        if (seq[i] !== 0) continue;
+        seq[i] = 1;
+        const pts2 = fivePointsC(seq, renjuLike);
+        seq[i] = 0;
+        if (pts2.length >= 2) openThree = true;
+      }
+    }
+    return { fiveCount: fivePts.length, fiveIdx: fivePts, openFour: fivePts.length >= 2, openThree };
+  }
+  function detectThreat(x, y, p) {
+    const r = computeThreat(x, y, p);
+    threatType = r.threatType;
+    threatCells = r.threatCells;
+    attackType = r.attackType;
+    attackCells = r.attackCells;
+    if (r.attackType) attackTime = performance.now();
+  }
+
+  // 制胜棋型核心判定（纯函数化便于测试）。
+  // 制胜（对手一手堵不完）：活四级（含跳活四）/ 双冲四 / 四三 / 双活三
+  // 进攻（延迟弱显示）：单冲四 / 单活三
+  function computeThreat(x, y, p) {
+    const renjuLike = rule >= 1 && p === 1;   // 黑棋禁长连（标准/有禁手）
+    const foulRule = rule === 2 && p === 1;   // 有禁手：黑双三/双四属禁手，不算制胜
+
+    let openFour = false;
+    let hasFour = false;
+    let fourCells = [], threeCells = [];
+    const fourDirFlags = [];                  // 与 DIRS 对齐
+    const threeDirFlags = [];
+    const fivePointSet = new Set();           // 全方向成五点并集（按绝对坐标去重）
+
+    for (let d = 0; d < DIRS.length; d++) {
+      const dx = DIRS[d][0], dy = DIRS[d][1];
+      const r = analyzeDirEx(board, N, x, y, dx, dy, p, renjuLike);
+      fourDirFlags.push(r.fiveCount > 0);
+      if (r.fiveCount > 0) {
+        hasFour = true;
         if (r.openFour) openFour = true;
+        for (const i of r.fiveIdx) {
+          const k = i - OFF;
+          fivePointSet.add((x + dx * k) + ',' + (y + dy * k));
+        }
         fourCells = mergeCells(fourCells, collectLineStones(x, y, dx, dy, p, 4));
       }
+      threeDirFlags.push(r.openThree);
       if (r.openThree) {
-        threeDirs.push([dx, dy]);
         threeCells = mergeCells(threeCells, collectLineStones(x, y, dx, dy, p, 4));
       }
     }
 
-    const fourCount = fourDirs.length;
-    const threeCount = threeDirs.length;
-    let cross = false;
-    if (fourCount >= 1 && threeCount >= 1) {
-      for (const f of fourDirs) for (const t of threeDirs) {
-        if (!(f[0] === t[0] && f[1] === t[1])) { cross = true; break; }
+    let fourThreeCross = false;
+    for (let f = 0; f < fourDirFlags.length && !fourThreeCross; f++) {
+      if (!fourDirFlags[f]) continue;
+      for (let t = 0; t < threeDirFlags.length; t++) {
+        if (t !== f && threeDirFlags[t]) { fourThreeCross = true; break; }
       }
     }
-    let crossThree = false;
-    if (threeCount >= 2 && !(threeDirs[0][0] === threeDirs[1][0] && threeDirs[0][1] === threeDirs[1][1])) crossThree = true;
+    let threeDirCount = 0;
+    for (const v of threeDirFlags) if (v) threeDirCount++;
 
-    threatType = '';
-    threatCells = [];
-    attackType = '';
-    attackCells = [];
+    let threatType = '';
+    let threatCells = [];
+    let attackType = '';
+    let attackCells = [];
 
-    // 制胜棋型（堵不了）：活四 / 双四 / 四三 / 双三
+    // 制胜棋型优先级：活四 > 双四 > 四三 > 双三
     if (openFour) {
       threatType = 'open_four';
       threatCells = fourCells;
-    } else if (fourCount >= 2) {
+    } else if (hasFour && fivePointSet.size >= 2) {
+      // 跨方向 / 同线分离的两个成五点 → 对手一手只能挡一个
       threatType = 'double_four';
       threatCells = fourCells;
-    } else if (cross) {
+    } else if (fourThreeCross) {
       threatType = 'four_three';
       threatCells = mergeCells(fourCells, threeCells);
-    } else if (crossThree) {
+    } else if (threeDirCount >= 2) {
       threatType = 'double_three';
       threatCells = threeCells;
     }
-    // 进攻棋型（常见，延迟几秒后不明显特效）：冲四 / 活三
-    else if (fourCount === 1) {
-      attackType = 'rushed_four';
-      attackCells = fourCells;
-      attackTime = performance.now();
-    } else if (threeCount === 1) {
-      attackType = 'open_three';
-      attackCells = threeCells;
-      attackTime = performance.now();
+    // 有禁手规则下，黑棋的双四/双三是禁手（走出即判负），不作制胜高亮
+    if (foulRule && (threatType === 'double_four' || threatType === 'double_three')) {
+      threatType = '';
+      threatCells = [];
+    }
+    // 进攻棋型（常见，延迟几秒后不明显特效）
+    if (!threatType) {
+      if (hasFour) {
+        attackType = 'rushed_four';
+        attackCells = fourCells;
+      } else if (threeDirCount === 1) {
+        attackType = 'open_three';
+        attackCells = threeCells;
+      }
+    }
+    return { threatType: threatType, threatCells: threatCells, attackType: attackType, attackCells: attackCells };
+  }
+
+  // 测试口：外部传入棋盘快照评估指定落子的棋型（不改动游戏状态）
+  // bd[y][x]，p=1/2，ruleIdx 0 无禁手 / 1 标准 / 2 有禁手
+  function evaluateThreat(bd, x, y, p, ruleIdx) {
+    const savedBoard = board, savedN = N, savedRule = rule;
+    board = bd; N = bd.length; rule = ruleIdx;
+    try {
+      return computeThreat(x, y, p);
+    } finally {
+      board = savedBoard; N = savedN; rule = savedRule;
     }
   }
 
@@ -554,6 +606,7 @@ const GomokuGame = (() => {
     setMode, setHumanColor, setDifficulty, setConfig, analyze, undo, getConfig,
     setBoardSize, setAnalysisCallback, getAnalysis,
     setLoadingCallback, setAiBlack, setAiWhite, requestForbid,
+    evaluateThreat,
     get N() { return N; },
     get moveHistory() { return moveHistory; },
   };
