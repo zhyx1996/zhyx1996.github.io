@@ -1876,11 +1876,41 @@ async function initProfileStats() {
 }
 
 // ── 收藏列表（stars 页）：拉取真实 starred 仓库，失败回退到占位卡片 ──
+// 排序方式：最近收藏(sort=created) / 最近更新(sort=updated)，选择记忆到 localStorage。
+const STAR_SORTS = [
+  { key: 'created', label: '最近收藏' },
+  { key: 'updated', label: '最近更新' },
+];
+let starSort = 'created';
+try {
+  const saved = localStorage.getItem('star_sort');
+  if (saved && STAR_SORTS.some((s) => s.key === saved)) starSort = saved;
+} catch (_) { /* localStorage 不可用时用默认值 */ }
+
+function renderRepoCard(repo) {
+  const name = escapeHtml(repo.full_name || repo.name || '');
+  const path = repo.full_name || repo.name || '';
+  const home = repo.html_url || ('https://github.com/' + path);
+  const desc = (repo.description || '').trim();
+  const lang = repo.language ? repo.language : '未知';
+  const stars = typeof repo.stargazers_count === 'number' ? repo.stargazers_count : 0;
+  const updated = repo.updated_at ? fmtDate(repo.updated_at) : '';
+  return '<div class="repo-card">' +
+    '<h3><a href="' + escapeHtml(home) + '" target="_blank" rel="noreferrer">' + name + '</a></h3>' +
+    '<p>' + (desc ? escapeHtml(desc) : '暂无描述') + '</p>' +
+    '<div class="repo-meta">' +
+      '<span class="repo-lang">' + escapeHtml(lang) + '</span>' +
+      (stars ? '<span>⭐ ' + stars + '</span>' : '') +
+      (updated ? '<span>🕒 ' + updated + '</span>' : '') +
+    '</div>' +
+  '</div>';
+}
+
 async function loadStarredRepos() {
   const grid = document.getElementById('starred-repos');
   if (!grid) return; // 非 stars 页直接跳过
 
-  const url = 'https://api.github.com/users/zhyx1996/starred?per_page=8&sort=updated';
+  const url = 'https://api.github.com/users/zhyx1996/starred?per_page=8&sort=' + starSort;
   let repos = null;
 
   // 直连 + 代理各试一次，超时 8s，任何失败都保持现有占位卡片不变。
@@ -1897,24 +1927,41 @@ async function loadStarredRepos() {
 
   if (!Array.isArray(repos) || repos.length === 0) return; // 失败/空 → 保留静态占位
 
-  grid.innerHTML = repos.map(function (repo) {
-    const name = escapeHtml(repo.full_name || repo.name || '');
-    const path = repo.full_name || repo.name || '';
-    const home = repo.html_url || ('https://github.com/' + path);
-    const desc = (repo.description || '').trim();
-    const lang = repo.language ? repo.language : '未知';
-    const stars = typeof repo.stargazers_count === 'number' ? repo.stargazers_count : 0;
-    const updated = repo.updated_at ? fmtDate(repo.updated_at) : '';
-    return '<div class="repo-card">' +
-      '<h3><a href="' + escapeHtml(home) + '" target="_blank" rel="noreferrer">' + name + '</a></h3>' +
-      '<p>' + (desc ? escapeHtml(desc) : '暂无描述') + '</p>' +
-      '<div class="repo-meta">' +
-        '<span class="repo-lang">' + escapeHtml(lang) + '</span>' +
-        (stars ? '<span>⭐ ' + stars + '</span>' : '') +
-        (updated ? '<span>🕒 ' + updated + '</span>' : '') +
-      '</div>' +
-    '</div>';
+  grid.innerHTML = repos.map(renderRepoCard).join('');
+}
+
+// stars 页排序切换条（最近收藏/最近更新），插在收藏网格上方
+function initStarSortToggle() {
+  const grid = document.getElementById('starred-repos');
+  if (!grid || grid.dataset.sortInit) return;
+  grid.dataset.sortInit = '1';
+
+  const bar = document.createElement('div');
+  bar.className = 'star-sort';
+  bar.setAttribute('role', 'group');
+  bar.setAttribute('aria-label', '收藏排序方式');
+  bar.innerHTML = STAR_SORTS.map(function (s) {
+    return '<button type="button" data-sort="' + s.key + '" aria-pressed="false">' + s.label + '</button>';
   }).join('');
+  grid.parentNode.insertBefore(bar, grid);
+  syncStarSortBar(bar);
+
+  bar.addEventListener('click', function (e) {
+    const btn = e.target.closest('button[data-sort]');
+    if (!btn || btn.dataset.sort === starSort) return;
+    starSort = btn.dataset.sort;
+    try { localStorage.setItem('star_sort', starSort); } catch (_) { /* 忽略 */ }
+    syncStarSortBar(bar);
+    loadStarredRepos(); // 切换后重拉列表；失败时旧列表原样保留
+  });
+}
+
+function syncStarSortBar(bar) {
+  bar.querySelectorAll('button[data-sort]').forEach(function (btn) {
+    const active = btn.dataset.sort === starSort;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
 }
 
 // ── 初始化 ──
@@ -1930,6 +1977,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBackToTop();
   initFooterUpdated();
   initProfileStats();
+  initStarSortToggle();
   loadStarredRepos();
 
   // 市场快照刷新按钮

@@ -679,6 +679,35 @@ a:hover { opacity: 0.8; }
     font-variant-numeric: tabular-nums;
 }
 
+/* ── 收藏排序切换（stars 页：最近收藏 / 最近更新）── */
+.star-sort {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.star-sort button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.star-sort button:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-dim);
+}
+.star-sort button.active {
+    color: #fff;
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
 /* ── 仓库网格 ── */
 .repo-grid {
     display: grid;
