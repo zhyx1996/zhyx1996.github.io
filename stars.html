@@ -24,36 +24,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css?v=70">
-    <script src="/public/cleanup-coi-serviceworker.js?v=1"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.css" />
     <style>
         /* 防止 FOUC */
         body { opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards; }
         @keyframes fadeIn { to { opacity: 1; } }
     </style>
 </head>
-<body>
-    <a href="#main-content" class="skip-link">跳到主要内容</a>
-    <div class="scroll-progress" id="scroll-progress"></div>
+<body data-page="stars" data-sakana data-page-agent>
     <div class="layout">
-        <!-- 左侧导航 -->
-        <aside class="sidebar">
-            <div class="sidebar-brand">
-                <span class="logo-mark">扶</span>
-                <span class="logo-text">摇接海</span>
-            </div>
-            <nav class="sidebar-nav" aria-label="主导航">
-                <a class="nav-item" href="/index.html">首页</a>
-                <a class="nav-item" href="/projects.html">仓库</a>
-                <a class="nav-item active" href="/stars.html">收藏</a>
-                <a class="nav-item" href="/articles.html">文章</a>
-                <a class="nav-item" href="/nethack.html">NetHack</a>
-                <a class="nav-item" href="/gomoku.html">五子棋</a>
-            </nav>
-            <div class="sidebar-footer">
-                <a class="sidebar-meta" href="https://github.com/zhyx1996" target="_blank" rel="noreferrer">GitHub</a>
-            </div>
-        </aside>
+        <!-- 侧边栏/页脚/返回顶部等公共 UI 由 /public/site-chrome.js 注入 -->
 
         <!-- 主内容 -->
         <main class="main" id="main-content">
@@ -86,18 +65,7 @@
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-inner">
-            <p class="footer-epigraph">北海虽赊，扶摇可接。</p>
-            <p>扶摇接海 · © 2026 · 用代码和文字记录实践</p>
-            <p class="footer-updated">最后更新：<span id="last-modified">—</span></p>
-        </div>
-    </footer>
-
-    <!-- Sakana 拖拽小球 -->
-    <div id="sakana-drag-widget"></div>
-
+    <script src="/public/site-chrome.js" defer></script>
     <script src="/app.js?v=78" defer></script>
     <script>
       (function() {
@@ -134,33 +102,7 @@
           .finally(function() { clearTimeout(timer); });
       })();
     </script>
-    <script>
-      function initSakanaWidget() {
-        if (window.__sakanaWidgetInitialized) return;
-        window.__sakanaWidgetInitialized = true;
-        window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
-      }
-      function loadSakanaWithFallback() {
-        var script = document.createElement('script');
-        script.async = true;
-        script.onload = function() { window.initSakanaWidget && window.initSakanaWidget(); };
-        script.onerror = function() {
-          var fallback = document.createElement('script');
-          fallback.async = true;
-          fallback.onload = function() { window.initSakanaWidget && window.initSakanaWidget(); };
-          fallback.src = 'https://fastly.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js';
-          document.head.appendChild(fallback);
-        };
-        script.src = 'https://cdn.jsdelivr.net/npm/sakana-widget@2.7.1/lib/sakana.min.js';
-        document.head.appendChild(script);
-      }
-      loadSakanaWithFallback();
-    </script>
 
-    <!-- PageAgent: in-page AI agent -->
-    <script src="https://cdn.jsdelivr.net/npm/page-agent@1.12.2/dist/iife/page-agent.demo.js?v=2&showPanel=false" crossorigin="anonymous"></script>
-    <!-- 返回顶部 -->
-    <button class="back-to-top" id="back-to-top" aria-label="返回顶部">↑</button>
 
 </body>
 </html>
