@@ -83,7 +83,13 @@
     window.initSakanaWidget = function () {
       if (window.__sakanaWidgetInitialized) return;
       window.__sakanaWidgetInitialized = true;
-      window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false }).mount('#sakana-drag-widget');
+      // 初始晃动改为左右摆为主 + 一点点上下浮动，阻尼略增大（一丢丢）：
+      // chisato 默认初始态是 r=1°/y=40px/d=0.99 —— 角度位移太小、垂直位移太大，
+      // 打开页面时几乎只有上下抖动且迟迟不停；这里覆盖为 r=26°(水平±25px 主导)、
+      // y=6px(轻微上下)、d=0.985(衰减更快一点)。setState 为官方公开 API。
+      window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false })
+        .setState({ r: 26, y: 6, t: 0, w: 0, d: 0.985 })
+        .mount('#sakana-drag-widget');
     };
 
     (function loadSakanaWithFallback() {
