@@ -2,10 +2,10 @@
  * site-chrome.js — 全站公共 UI 单一来源
  *
  * 注入：skip-link、滚动进度条、侧边栏(active 按 data-page 判定)、
- *       返回顶部、页脚、Sakana(data-sakana)、PageAgent(data-page-agent)、COI 清理。
+ *       返回顶部、页脚、Sakana(data-sakana)、PageAgent(data-pageagent)、COI 清理。
  *
  * 页面接入方式：
- *   <body data-page="stars" data-sakana data-page-agent>
+ *   <body data-page="stars" data-sakana data-pageagent>
  *   <script src="/public/site-chrome.js" defer></script>   ← 必须位于 /app.js 之前
  *
  * 改导航/页脚只改此文件，无需同步各个页面。
@@ -102,8 +102,11 @@
     })();
   }
 
-  /* 5. PageAgent：页内 AI 助手（showPanel=false 保持初始收起，由 app.js 的按钮接管开关） */
-  if (body.hasAttribute('data-page-agent')) {
+  /* 5. PageAgent：页内 AI 助手（showPanel=false 保持初始收起，由 app.js 的按钮接管开关）
+     注意：这里用 data-pageagent（无连字符），不能写成 data-page-agent——
+     否则会被 app.js initPageAgentPlacement 的 [data-page-agent] 选择器当成面板本体，
+     把 <body> 定位成 fixed/340px 小盒子，整页被压成一列。 */
+  if (body.hasAttribute('data-pageagent')) {
     var pageAgent = document.createElement('script');
     pageAgent.src = 'https://cdn.jsdelivr.net/npm/page-agent@1.12.2/dist/iife/page-agent.demo.js?v=2&showPanel=false';
     pageAgent.crossOrigin = 'anonymous';
