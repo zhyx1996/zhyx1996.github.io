@@ -1875,6 +1875,48 @@ async function initProfileStats() {
   }
 }
 
+// ── 收藏列表（stars 页）：拉取真实 starred 仓库，失败回退到占位卡片 ──
+async function loadStarredRepos() {
+  const grid = document.getElementById('starred-repos');
+  if (!grid) return; // 非 stars 页直接跳过
+
+  const url = 'https://api.github.com/users/zhyx1996/starred?per_page=8&sort=updated';
+  let repos = null;
+
+  // 直连 + 代理各试一次，超时 8s，任何失败都保持现有占位卡片不变。
+  const attempts = [
+    () => fetchWithTimeout(url, 8000),
+    () => fetchWithTimeout(PROXY + encodeURIComponent(url), 10000),
+  ];
+  for (const attempt of attempts) {
+    try {
+      const res = await attempt();
+      if (res.ok) { repos = await res.json(); break; }
+    } catch { /* 继续下一个来源 */ }
+  }
+
+  if (!Array.isArray(repos) || repos.length === 0) return; // 失败/空 → 保留静态占位
+
+  grid.innerHTML = repos.map(function (repo) {
+    const name = escapeHtml(repo.full_name || repo.name || '');
+    const path = repo.full_name || repo.name || '';
+    const home = repo.html_url || ('https://github.com/' + path);
+    const desc = (repo.description || '').trim();
+    const lang = repo.language ? repo.language : '未知';
+    const stars = typeof repo.stargazers_count === 'number' ? repo.stargazers_count : 0;
+    const updated = repo.updated_at ? fmtDate(repo.updated_at) : '';
+    return '<div class="repo-card">' +
+      '<h3><a href="' + escapeHtml(home) + '" target="_blank" rel="noreferrer">' + name + '</a></h3>' +
+      '<p>' + (desc ? escapeHtml(desc) : '暂无描述') + '</p>' +
+      '<div class="repo-meta">' +
+        '<span class="repo-lang">' + escapeHtml(lang) + '</span>' +
+        (stars ? '<span>⭐ ' + stars + '</span>' : '') +
+        (updated ? '<span>🕒 ' + updated + '</span>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
 // ── 初始化 ──
 document.addEventListener('DOMContentLoaded', () => {
   loadMarket();
@@ -1888,6 +1930,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBackToTop();
   initFooterUpdated();
   initProfileStats();
+  loadStarredRepos();
 
   // 市场快照刷新按钮
   const marketRefreshBtn = document.getElementById('market-refresh');
