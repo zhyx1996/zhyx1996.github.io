@@ -90,6 +90,45 @@
       window.sakanaInstance = new SakanaWidget({ size: 120, character: 'chisato', draggable: false })
         .setState({ r: 26, y: 6, t: 0, w: 0, d: 0.985 })
         .mount('#sakana-drag-widget');
+
+      // 上下翻页时给一点点竖直惯性：滚动量按系数转成竖直速度冲量(t 通道)，
+      // 由库自身的弹簧-阻尼自然衰减成 y 的起伏——只碰竖直通道，不干扰左右摆(r/w)。
+      // 每帧至多消耗一次、冲量和累计速度都钳制上限；滚轮一档 ≈ ±3.4px、快速甩动 ≈ ±5.4px，
+      // 既能看到轻微上下晃、又不会把看板娘甩飞。
+      (function () {
+        var K = 0.1;           // px 滚动量 → 竖直速度系数
+        var IMPULSE_CAP = 10;  // 单帧冲量上限
+        var T_CAP = 12;        // 竖直速度总上限（峰值起伏 ≈ 5~6px）
+        var ACC_CAP = 500;     // 待消耗滚动量上限
+        var acc = 0;
+        var lastY = window.scrollY;
+        var pending = false;
+
+        function flush() {
+          pending = false;
+          var inst = window.sakanaInstance;
+          var box = document.getElementById('sakana-drag-widget');
+          if (!inst || !inst._state || typeof inst._run !== 'function') return;
+          if (box && box.classList.contains('dragging')) { acc = 0; return; } // 拖拽中不打扰
+          var step = Math.max(-IMPULSE_CAP, Math.min(IMPULSE_CAP, acc * K));
+          if (!step) return;
+          acc = Math.max(-ACC_CAP, Math.min(ACC_CAP, acc - step / K));
+          var s = inst._state;
+          s.t = Math.max(-T_CAP, Math.min(T_CAP, s.t + step));
+          if (!inst._running) {
+            inst._running = true;
+            inst._lastRunUnix = Date.now();
+            inst._run();
+          }
+        }
+
+        window.addEventListener('scroll', function () {
+          var cur = window.scrollY;
+          acc += cur - lastY;
+          lastY = cur;
+          if (!pending) { pending = true; requestAnimationFrame(flush); }
+        }, { passive: true });
+      })();
     };
 
     (function loadSakanaWithFallback() {
