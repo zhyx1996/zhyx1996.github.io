@@ -2351,3 +2351,28 @@ body.nk-dark .nk-cmd-grid kbd {
 .nk-cmd-grid.nk-tone-tool kbd {
 	color: #74c0fc !important; /* 特殊利用：天空蓝 */
 }
+
+/* 移动端：分区标题的装饰线可收缩，避免把文字挤成竖排 */
+@media (max-width: 600px) {
+	.nk-section-label {
+		gap: 8px;
+	}
+	.nk-section-label::before,
+	.nk-section-label::after {
+		width: 20px;
+		flex-basis: 20px;
+		flex-shrink: 1;
+	}
+}
+
+/* 移动端：缩小 Sakana 挂件的视觉占比（只缩 canvas，不影响拖拽逻辑），减少对内容的遮挡 */
+@media (max-width: 600px) {
+	#sakana-drag-widget {
+		right: 4px;
+		bottom: 10px;
+	}
+	#sakana-drag-widget canvas {
+		transform: scale(0.7);
+		transform-origin: 50% 80%;
+	}
+}
