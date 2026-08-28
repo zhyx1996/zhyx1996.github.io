@@ -94,6 +94,7 @@ body {
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 <script src="./coi-serviceworker.min.js"></script>
 <script src="/gomoku/rapfi_bridge.js"></script>
+<script>if(!window.crossOriginIsolated&&navigator.serviceWorker){navigator.serviceWorker.register('/gomoku/coi-serviceworker.min.js',{scope:'/gomoku/'}).then(function(r){var go=function(){navigator.serviceWorker.controller&&location.reload();};if(r.active)go();else{var w=r.installing||r.waiting;if(w)w.addEventListener('statechange',function(){w.state==='activated'&&go();});}}).catch(function(){});}</script>
 	</head>
 	<body>
 		<canvas id="canvas">
@@ -112,7 +113,7 @@ body {
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":15306932,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":15321364,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 

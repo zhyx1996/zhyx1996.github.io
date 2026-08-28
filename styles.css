@@ -2324,3 +2324,30 @@ body.nk-dark .nk-cmd-grid kbd {
 }
 
 
+
+/* ============================================================
+   高价值怪物区：符号徽章统一
+   旧问题：各怪物沿用 NetHack 终端显示色（洋红/青/暗红…深色扎眼），
+   且近半怪物没有着色类。现按分区语义统一四档色调，
+   徽章底统一深色终端风，浅色/深色页面模式下都可读。
+   ============================================================ */
+.nk-cmd-grid[class*="nk-tone"] kbd {
+	background: linear-gradient(to bottom, #3a3f4b, #262a33);
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-bottom-width: 2px;
+	color: #ddd;
+	min-width: 26px;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+.nk-cmd-grid.nk-tone-danger kbd {
+	color: #ff8787 !important; /* 危险：珊瑚红 */
+}
+.nk-cmd-grid.nk-tone-food kbd {
+	color: #8ce99a !important; /* 可食用增益：嫩绿 */
+}
+.nk-cmd-grid.nk-tone-corpse kbd {
+	color: #ffc078 !important; /* 危险尸体：警示橙 */
+}
+.nk-cmd-grid.nk-tone-tool kbd {
+	color: #74c0fc !important; /* 特殊利用：天空蓝 */
+}

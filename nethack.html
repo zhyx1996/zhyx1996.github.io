@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css?v=71">
+    <link rel="stylesheet" href="/styles.css?v=72">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
     <style>
         body { opacity: 0; animation: fadeIn 0.5s ease 0.1s forwards; }
@@ -360,7 +360,7 @@
                 <details class="nethack-shortcuts">
                     <summary>高价值怪物与注意事项</summary>
                     <p class="nk-section-label">⚠️ 危险怪物（优先躲避）</p>
-                    <div class="nk-cmd-grid nk-wide-grid">
+                    <div class="nk-cmd-grid nk-wide-grid nk-tone-danger">
                         <span><kbd class="sym-dragon">D</kbd> <a href="https://nethackwiki.com/wiki/Dragon" target="_blank" rel="noreferrer">龙</a> — 喷吐攻击，<a href="https://nethackwiki.com/wiki/Dragon_scale_mail" target="_blank" rel="noreferrer">龙鳞</a>可做顶级护甲</span>
                         <span><kbd class="sym-lich">L</kbd> <a href="https://nethackwiki.com/wiki/Lich" target="_blank" rel="noreferrer">巫妖</a> — 施法，<a href="https://nethackwiki.com/wiki/Arch-lich" target="_blank" rel="noreferrer">大巫妖</a>极危险</span>
                         <span><kbd class="sym-vampire">V</kbd> <a href="https://nethackwiki.com/wiki/Vampire" target="_blank" rel="noreferrer">吸血鬼</a> — 吸取等级，<a href="https://nethackwiki.com/wiki/Vlad_the_Impaler" target="_blank" rel="noreferrer">弗拉德</a>是 Tourist 任务 Boss</span>
@@ -369,30 +369,30 @@
                         <span><kbd class="sym-player">@</kbd> <a href="https://nethackwiki.com/wiki/Medusa" target="_blank" rel="noreferrer">美杜莎</a> — <a href="https://nethackwiki.com/wiki/Stoning" target="_blank" rel="noreferrer">死亡凝视</a>，秒杀</span>
                     </div>
                     <p class="nk-section-label">🍖 可食用尸体（增益效果）</p>
-                    <div class="nk-cmd-grid nk-wide-grid">
-                        <span><a href="https://nethackwiki.com/wiki/Dragon#Corpse_properties" target="_blank" rel="noreferrer">龙尸</a> — 获得对应元素抗性（火/冷/毒/电/酸/反魔/反射）</span>
+                    <div class="nk-cmd-grid nk-wide-grid nk-tone-food">
+                        <span><kbd class="sym-mon">%</kbd> <a href="https://nethackwiki.com/wiki/Dragon#Corpse_properties" target="_blank" rel="noreferrer">龙尸</a> — 获得对应元素抗性（火/冷/毒/电/酸/反魔/反射）</span>
                         <span><kbd class="sym-unicorn">u</kbd> <a href="https://nethackwiki.com/wiki/Unicorn" target="_blank" rel="noreferrer">独角兽</a> — <a href="https://nethackwiki.com/wiki/Blinded" target="_blank" rel="noreferrer">治愈失明</a>、<a href="https://nethackwiki.com/wiki/Luck" target="_blank" rel="noreferrer">幸运</a></span>
                         <span><kbd class="sym-troll">T</kbd> <a href="https://nethackwiki.com/wiki/Troll" target="_blank" rel="noreferrer">巨魔</a> — <a href="https://nethackwiki.com/wiki/Regeneration" target="_blank" rel="noreferrer">再生</a>能力</span>
-                        <span><kbd>F</kbd> <a href="https://nethackwiki.com/wiki/Lichen" target="_blank" rel="noreferrer">地衣</a> — 安全食物，无增益</span>
-                        <span><kbd>e</kbd> <a href="https://nethackwiki.com/wiki/Floating_eye" target="_blank" rel="noreferrer">浮眼</a> — <a href="https://nethackwiki.com/wiki/Telepathy" target="_blank" rel="noreferrer">心灵感应</a></span>
-                        <span><kbd>a</kbd> <a href="https://nethackwiki.com/wiki/Killer_bee" target="_blank" rel="noreferrer">杀人蜂</a> — <a href="https://nethackwiki.com/wiki/Poison_resistance" target="_blank" rel="noreferrer">毒抗</a></span>
+                        <span><kbd class="sym-mon">F</kbd> <a href="https://nethackwiki.com/wiki/Lichen" target="_blank" rel="noreferrer">地衣</a> — 安全食物，无增益</span>
+                        <span><kbd class="sym-mon">e</kbd> <a href="https://nethackwiki.com/wiki/Floating_eye" target="_blank" rel="noreferrer">浮眼</a> — <a href="https://nethackwiki.com/wiki/Telepathy" target="_blank" rel="noreferrer">心灵感应</a></span>
+                        <span><kbd class="sym-mon">a</kbd> <a href="https://nethackwiki.com/wiki/Killer_bee" target="_blank" rel="noreferrer">杀人蜂</a> — <a href="https://nethackwiki.com/wiki/Poison_resistance" target="_blank" rel="noreferrer">毒抗</a></span>
                         <span><kbd class="sym-wraith">W</kbd> <a href="https://nethackwiki.com/wiki/Wraith" target="_blank" rel="noreferrer">幽魂</a> — <a href="https://nethackwiki.com/wiki/Gain_level" target="_blank" rel="noreferrer">升级</a></span>
                     </div>
                     <p class="nk-section-label">🚫 危险尸体（切勿食用）</p>
-                    <div class="nk-cmd-grid nk-wide-grid">
+                    <div class="nk-cmd-grid nk-wide-grid nk-tone-corpse">
                         <span><kbd class="sym-cockatrice">c</kbd> <a href="https://nethackwiki.com/wiki/Cockatrice" target="_blank" rel="noreferrer">石化鸡</a> — 食尸导致<a href="https://nethackwiki.com/wiki/Stoning" target="_blank" rel="noreferrer">石化</a></span>
                         <span><kbd class="sym-player">@</kbd> <a href="https://nethackwiki.com/wiki/Medusa" target="_blank" rel="noreferrer">美杜莎</a> — 食尸即死</span>
-                        <span><kbd>F</kbd> <a href="https://nethackwiki.com/wiki/Yellow_mold" target="_blank" rel="noreferrer">黄霉菌</a> — 导致<a href="https://nethackwiki.com/wiki/Hallucination" target="_blank" rel="noreferrer">幻觉</a></span>
-                        <span><a href="https://nethackwiki.com/wiki/Corpse" target="_blank" rel="noreferrer">腐烂尸体</a> — 可能<a href="https://nethackwiki.com/wiki/Sickness" target="_blank" rel="noreferrer">致病</a></span>
+                        <span><kbd class="sym-mon">F</kbd> <a href="https://nethackwiki.com/wiki/Yellow_mold" target="_blank" rel="noreferrer">黄霉菌</a> — 导致<a href="https://nethackwiki.com/wiki/Hallucination" target="_blank" rel="noreferrer">幻觉</a></span>
+                        <span><kbd class="sym-mon">%</kbd> <a href="https://nethackwiki.com/wiki/Corpse" target="_blank" rel="noreferrer">腐烂尸体</a> — 可能<a href="https://nethackwiki.com/wiki/Sickness" target="_blank" rel="noreferrer">致病</a></span>
                     </div>
                     <p class="nk-section-label">🔧 特殊利用方法</p>
-                    <div class="nk-cmd-grid nk-wide-grid">
+                    <div class="nk-cmd-grid nk-wide-grid nk-tone-tool">
                         <span><kbd class="sym-dog">d</kbd>/<kbd class="sym-cat">f</kbd> <a href="https://nethackwiki.com/wiki/Dog" target="_blank" rel="noreferrer">狗</a>/<a href="https://nethackwiki.com/wiki/Feline" target="_blank" rel="noreferrer">猫</a> — 宠物，训练后可<a href="https://nethackwiki.com/wiki/Pet#Training" target="_blank" rel="noreferrer">携带物品</a></span>
                         <span><kbd class="sym-unicorn">u</kbd> <a href="https://nethackwiki.com/wiki/Unicorn" target="_blank" rel="noreferrer">独角兽</a> — <a href="https://nethackwiki.com/wiki/Sacrifice" target="_blank" rel="noreferrer">献祭</a>可获<a href="https://nethackwiki.com/wiki/Luckstone" target="_blank" rel="noreferrer">幸运石</a></span>
                         <span><kbd class="sym-mimic">m</kbd> <a href="https://nethackwiki.com/wiki/Mimic" target="_blank" rel="noreferrer">拟态怪</a> — 伪装成物品，<a href="https://nethackwiki.com/wiki/Far_look" target="_blank" rel="noreferrer">; 查看</a>识破</span>
-                        <span><kbd>h</kbd> <a href="https://nethackwiki.com/wiki/Mind_flayer" target="_blank" rel="noreferrer">夺心魔</a> — <a href="https://nethackwiki.com/wiki/Intrinsic_theft" target="_blank" rel="noreferrer">吸脑</a>降智</span>
-                        <span><kbd>R</kbd> <a href="https://nethackwiki.com/wiki/Rust_monster" target="_blank" rel="noreferrer">锈怪</a> — 腐蚀金属装备</span>
-                        <span><kbd>R</kbd> <a href="https://nethackwiki.com/wiki/Disenchanter" target="_blank" rel="noreferrer">消解怪</a> — 消除物品附魔</span>
+                        <span><kbd class="sym-mon">h</kbd> <a href="https://nethackwiki.com/wiki/Mind_flayer" target="_blank" rel="noreferrer">夺心魔</a> — <a href="https://nethackwiki.com/wiki/Intrinsic_theft" target="_blank" rel="noreferrer">吸脑</a>降智</span>
+                        <span><kbd class="sym-mon">R</kbd> <a href="https://nethackwiki.com/wiki/Rust_monster" target="_blank" rel="noreferrer">锈怪</a> — 腐蚀金属装备</span>
+                        <span><kbd class="sym-mon">R</kbd> <a href="https://nethackwiki.com/wiki/Disenchanter" target="_blank" rel="noreferrer">消解怪</a> — 消除物品附魔</span>
                     </div>
                 </details>
                 <div class="nethack-links">
