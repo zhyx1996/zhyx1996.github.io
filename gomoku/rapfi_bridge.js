@@ -145,8 +145,7 @@
   // 引擎 show_detail=2 时每秒数千行 INFO，批量读取可避免主线程秒级卡顿。
   function pollAll() {
     if (queue.length === 0) return ''
-    const out = queue.join('
-')
+    const out = queue.join('\n')
     queue.length = 0
     return out
   }

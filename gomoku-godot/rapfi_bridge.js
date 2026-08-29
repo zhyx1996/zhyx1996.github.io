@@ -141,5 +141,14 @@
     return queue.length ? queue.shift() : '';
   }
 
-  window.RapfiBridge = { load, send, poll, isReady: () => ready, isThreaded: () => threaded };
+  // pollAll(): 一次性取空队列（换行拼接）。跨语言边界逐行 eval 开销高，
+  // 引擎 show_detail=2 时每秒数千行 INFO，批量读取可避免主线程秒级卡顿。
+  function pollAll() {
+    if (queue.length === 0) return ''
+    const out = queue.join('\n')
+    queue.length = 0
+    return out
+  }
+
+  window.RapfiBridge = { load, send, poll, pollAll, isReady: () => ready, isThreaded: () => threaded };
 })();
