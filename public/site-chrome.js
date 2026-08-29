@@ -96,10 +96,10 @@
       // 每帧至多消耗一次、冲量和累计速度都钳制上限；滚轮一档 ≈ ±3.4px、快速甩动 ≈ ±5.4px，
       // 既能看到轻微上下晃、又不会把看板娘甩飞。
       (function () {
-        var K = 0.1;           // px 滚动量 → 竖直速度系数
-        var IMPULSE_CAP = 10;  // 单帧冲量上限
-        var T_CAP = 12;        // 竖直速度总上限（峰值起伏 ≈ 5~6px）
-        var ACC_CAP = 500;     // 待消耗滚动量上限
+        var K = 0.06;          // px 滚动量 → 竖直位移系数（库的速度通道换算极小，直接用位移通道才可见）
+        var IMPULSE_CAP = 22;  // 单帧位移冲量上限（库内 _limit.maxY=30）
+        var T_CAP = 6;         // 附加竖直速度上限（给一点惯性回味）
+        var ACC_CAP = 2200;    // 待消耗滚动量上限
         var acc = 0;
         var lastY = window.scrollY;
         var pending = false;
@@ -108,13 +108,18 @@
           pending = false;
           var inst = window.sakanaInstance;
           var box = document.getElementById('sakana-drag-widget');
-          if (!inst || !inst._state || typeof inst._run !== 'function') return;
+          if (!inst || !inst._state || typeof inst._run !== 'function') { acc = 0; return; }
           if (box && box.classList.contains('dragging')) { acc = 0; return; } // 拖拽中不打扰
           var step = Math.max(-IMPULSE_CAP, Math.min(IMPULSE_CAP, acc * K));
           if (!step) return;
-          acc = Math.max(-ACC_CAP, Math.min(ACC_CAP, acc - step / K));
+          // 消耗量不超过剩余滚动量：旧写法 step/K 在触顶时会把 acc 打负，产生反向回摆互相抵消（表现为「几乎不动」）
+          var consumed = step / K;
+          if (Math.abs(consumed) >= Math.abs(acc)) acc = 0;
+          else acc -= consumed;
           var s = inst._state;
-          s.t = Math.max(-T_CAP, Math.min(T_CAP, s.t + step));
+          // 位移通道直接给冲量（同拖拽路径，库内弹簧会自然回正）；再补少量速度分量增加惯性回味
+          s.y = Math.max(-30, Math.min(30, s.y + step));
+          s.t = Math.max(-T_CAP, Math.min(T_CAP, s.t + step * 0.2));
           if (!inst._running) {
             inst._running = true;
             inst._lastRunUnix = Date.now();
