@@ -15,8 +15,12 @@
   let queue = [];         // 原始 stdout 行队列
   let threaded = false;
 
+  // 引擎 stdout 回调：同步阻塞，到达即聚合（官方 gomoku-calculator 同款「回调即处理」）。
+  // 不积压队列——积压会反向限速引擎；Godot 侧每帧 pollFrame 只读小快照，主线程占用趋近于零。
   function push(line) {
-    if (line && String(line).trim() !== '') queue.push(String(line));
+    if (!line) return;
+    const s = String(line).trim();
+    if (s !== '') aggregateLine(s);
   }
 
   // ---- 特性检测 ----
@@ -133,6 +137,16 @@
 
   function send(cmd) {
     if (typeof cmd !== 'string' || cmd.length === 0) return;
+    // 新搜索开始：清实时候选点（与 GDScript 落子时清 _realtime_best/_realtime_lost 对齐，
+    // 否则快照会把上一手的红点写回面板）
+    if (/^(TURN|BEGIN|BOARD|START|YXBOARD)\b/.test(cmd)) {
+      if (snap.best !== null || snap.lost.length > 0) {
+        snap.best = null;
+        snap.lost = [];
+        snap.lostRev++;
+        snap.bestRev++;
+      }
+    }
     if (threaded) { if (engine) engine.sendCommand(cmd); }
     else if (worker) { worker.postMessage({ type: 'command', data: cmd }); }
   }
@@ -150,5 +164,99 @@
     return out
   }
 
-  window.RapfiBridge = { load, send, poll, pollAll, isReady: () => ready, isThreaded: () => threaded };
+  // ---- JS 侧聚合快照 ----
+  // 引擎 stdout 回调是同步阻塞的：消费不及时会反向限速搜索（实测「不读输出」时引擎
+  // 0 节点停摆）。而 Godot 跨语言边界逐行 eval 开销极高（show_detail=3 每秒数千行），
+  // 所以这里在 JS 侧把队列解析成结构化快照，Godot 每帧只读一个很小的 JSON。
+  // 快照结构对齐 gomoku.gd 的 _on_engine_analysis 语义：
+  //   INFO PV i  → 切换当前 PV 槽位
+  //   其余 INFO 键 → 写入该槽位 + global（与 GDScript「entry 与 _analysis_data 双写」一致）
+  let snap = { ver: 0,
+               global: {},
+               pvs: [],
+               moves: [],
+               best: null, lost: [], lostRev: 0,
+               forbid: [], forbidRev: 0,
+               bestRev: 0 };
+  let curPv = 0;
+
+  function clearSnap() {
+    snap = { ver: snap.ver, global: {}, pvs: [], moves: [],
+             best: null, lost: [], lostRev: 0, forbid: [], forbidRev: 0, bestRev: 0 };
+    queue.length = 0;
+  }
+
+  function ensurePv(i) {
+    while (snap.pvs.length <= i) snap.pvs.push({});
+    return snap.pvs[i];
+  }
+
+  function aggregateLine(line) {
+    snap.ver++;
+    const t = line.trim();
+    if (!t || t === 'OK') return;
+    let i = t.indexOf(' ');
+    if (i === -1) {
+      if (t === 'SWAP') { snap.moves.push('SWAP'); return; }
+      const c = t.split(',');
+      if (c.length === 2 && /^\d+$/.test(c[0].trim()) && /^\d+$/.test(c[1].trim()))
+        snap.moves.push([+c[0], +c[1]]);
+      return;
+    }
+    const head = t.substring(0, i);
+    const tail = t.substring(i + 1).trim();
+    if (head === 'MESSAGE') {
+      if (tail.startsWith('REALTIME')) {
+        const r = tail.split(' ');
+        if (r.length >= 3) {
+          const p = r[2].split(',');
+          if (r[1] === 'BEST') { snap.best = [+p[0], +p[1]]; snap.bestRev++; }
+          else if (r[1] === 'LOST') { snap.lost.push([+p[0], +p[1]]); snap.lostRev++; }
+        }
+      }
+      return;
+    }
+    if (head === 'INFO') {
+      const sp = tail.indexOf(' ');
+      const keyRaw = sp === -1 ? tail : tail.substring(0, sp);
+      const val = sp === -1 ? '' : tail.substring(sp + 1).trim();
+      // 完全复刻 gomoku.gd _on_engine_analysis 的既有语义：
+      // NUMPV 切换当前槽位（不落盘）；其余键双写「当前槽位 + 全局」。
+      // 键名转小写——GDScript 面板读的是小写键（depth/eval/winrate/bestline…）
+      const key = keyRaw.toLowerCase();
+      if (key === 'numpv') { curPv = parseInt(val, 10) || 0; return; }
+      let parsed = val;
+      if (key === 'depth' || key === 'seldepth' || key === 'nodes' || key === 'totalnodes'
+          || key === 'totaltime' || key === 'speed') parsed = parseInt(val, 10) || -1;
+      else if (key === 'winrate') parsed = parseFloat(val);
+      else if (key === 'bestline') parsed = (val.match(/\d+,\d+/g) || []).map(s => s.split(',').map(Number));
+      snap.global[key] = parsed;
+      ensurePv(curPv)[key] = parsed;
+      return;
+    }
+    if (head === 'FORBID') {
+      const pairs = tail.match(/.{4}/g) || [];
+      for (const s of pairs) {
+        const m = s.match(/(\d\d)(\d\d)/);
+        if (m) snap.forbid.push([+m[1], +m[2]]);
+      }
+      snap.forbidRev++;
+      return;
+    }
+  }
+
+  // 每帧单次跨界调用：返回 {moves, snap} JSON（走法取走即清，快照保留）。
+  // push 回调已即时聚合（官方「回调即处理」同款），这里只序列化小快照——
+  // 主线程开销趋近于零，不再有队列积压反向限速引擎。
+  function pollFrame() {
+    queue.length = 0;
+    const moves = snap.moves;
+    snap.moves = [];
+    return JSON.stringify({ moves: moves, snap: snap });
+  }
+
+  function isInt(v) { return /^\d+$/.test(String(v).trim()); }
+
+  window.RapfiBridge = { load, send, poll, pollAll, pollFrame, resetSnapshot: clearSnap,
+                         isReady: () => ready, isThreaded: () => threaded };
 })();
