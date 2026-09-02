@@ -137,8 +137,8 @@
 
   function send(cmd) {
     if (typeof cmd !== 'string' || cmd.length === 0) return;
-    // 新搜索开始：清实时候选点（与 GDScript 落子时清 _realtime_best/_realtime_lost 对齐，
-    // 否则快照会把上一手的红点写回面板）
+    // 新搜索开始：清实时候选点与旧分析快照（与 GDScript 落子/新搜索时清 _realtime_best、
+    // _realtime_lost、_analysis_data、_pv_list 对齐——JS 快照不清的话下一手会应用旧 PV 槽）
     if (/^(TURN|BEGIN|BOARD|START|YXBOARD)\b/.test(cmd)) {
       if (snap.best !== null || snap.lost.length > 0) {
         snap.best = null;
@@ -146,6 +146,10 @@
         snap.lostRev++;
         snap.bestRev++;
       }
+      // 清空分析快照（保留 ver 会触发 GDScript 增量跳过，这里直接清空让下一帧全量应用）
+      snap.global = {};
+      snap.pvs = [];
+      curPv = 0;
     }
     if (threaded) { if (engine) engine.sendCommand(cmd); }
     else if (worker) { worker.postMessage({ type: 'command', data: cmd }); }
