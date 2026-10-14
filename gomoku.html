@@ -148,10 +148,17 @@
         });
       })();
     </script>
-    <script src="/gomoku/board.js?v=8" defer></script>
-    <script src="/gomoku/game.js?v=9" defer></script>
+    <script>
+      // 注册引擎资源缓存 Service Worker（与 coi-serviceworker 共存）
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/gomoku/cache-sw.js', { scope: '/gomoku/' })
+          .catch(() => {});
+      }
+    </script>
+    <script src="/gomoku/board.js?v=9" defer></script>
+    <script src="/gomoku/game.js?v=10" defer></script>
     <script src="/gomoku/app.js?v=8" defer></script>
-    <script src="/gomoku/ui.js?v=8" defer></script>
+    <script src="/gomoku/ui.js?v=9" defer></script>
     <script>
       // 棋盘 iframe 高度自适应：gomocalc 在 iframe 宽 <1024px 时走上下堆叠布局，
       // 内容底 ≈ 1.62W + 328（W = iframe 宽度）。wrap 上裁 46(header)、下裁 50(tabbar)，

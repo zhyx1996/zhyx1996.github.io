@@ -12,6 +12,7 @@
   let rafId = null;
   let lastMoveCount = 0;      // 用于检测落子播放音效
   let audioCtx = null;
+  let btnRefs = {};           // 缓存按钮 DOM 引用，避免重复 getElementById
 
   function init() {
     const container = document.getElementById('gm-native-root');
@@ -274,6 +275,13 @@
       }, 150);
     });
 
+    // 缓存按钮引用（避免 updateButtons 每次 getElementById）
+    const btnIds = ['gm-btn-mode','gm-btn-color','gm-btn-diff','gm-btn-rule','gm-btn-think',
+      'gm-btn-cand','gm-btn-nbest','gm-btn-size','gm-btn-threads','gm-btn-hash',
+      'gm-btn-strength','gm-btn-pondering','gm-btn-aiblack','gm-btn-aiwhite',
+      'gm-btn-coord','gm-btn-index','gm-btn-theme'];
+    for (const id of btnIds) btnRefs[id] = document.getElementById(id);
+
     // 初始化游戏 + 引擎
     game.init(onState);
     game.setAnalysisCallback(updateAnalysis);
@@ -292,7 +300,7 @@
       loadingEl.innerHTML = '<span>引擎加载异常：' + e.message + '</span>';
     });
 
-    // 动画循环
+    // 动画循环：页面不可见时暂停渲染，节省 CPU/电池
     function frame(t) {
       const dt = (t - lastRenderTime) / 1000;
       lastRenderTime = t;
@@ -300,6 +308,17 @@
       rafId = requestAnimationFrame(frame);
     }
     rafId = requestAnimationFrame(frame);
+
+    // 页面切到后台时暂停渲染循环，回来时恢复
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+      } else {
+        lastRenderTime = performance.now();
+        if (rafId === null) rafId = requestAnimationFrame(frame);
+        board.invalidateSize(); // 可能 resize 了
+      }
+    });
   }
 
   function resizeCanvas() {
@@ -380,15 +399,12 @@
       if (rematchBtn) rematchBtn.hidden = true;
     }
 
-    // 更新按钮文字
-    const modeBtn = document.getElementById('gm-btn-mode');
-    const colorBtn = document.getElementById('gm-btn-color');
-    const diffBtn = document.getElementById('gm-btn-diff');
-    if (modeBtn) modeBtn.textContent = '模式：' + (s.mode === 'pve' ? '人机' : '双人');
-    if (colorBtn) colorBtn.textContent = '你执：' + (s.humanColor === 1 ? '黑棋' : '白棋');
-    if (diffBtn) {
+    // 更新按钮文字（用缓存引用，避免每帧 getElementById）
+    if (btnRefs['gm-btn-mode']) btnRefs['gm-btn-mode'].textContent = '模式：' + (s.mode === 'pve' ? '人机' : '双人');
+    if (btnRefs['gm-btn-color']) btnRefs['gm-btn-color'].textContent = '你执：' + (s.humanColor === 1 ? '黑棋' : '白棋');
+    if (btnRefs['gm-btn-diff']) {
       const names = { easy: '简单', medium: '中等', hard: '困难' };
-      diffBtn.textContent = '难度：' + names[s.aiDifficulty];
+      btnRefs['gm-btn-diff'].textContent = '难度：' + names[s.aiDifficulty];
     }
   }
 
@@ -396,32 +412,22 @@
     const ruleNames = ['无禁手', '标准（禁长连）', '有禁手'];
     const thinkNames = ['快速', '中等', '慢速', '分析'];
     const candNames = ['小范围', '较小', '中等', '较大', '大范围', '全盘'];
-    const ruleBtn = document.getElementById('gm-btn-rule');
-    const thinkBtn = document.getElementById('gm-btn-think');
-    const candBtn = document.getElementById('gm-btn-cand');
-    const nbestBtn = document.getElementById('gm-btn-nbest');
-    if (ruleBtn) ruleBtn.textContent = '规则：' + ruleNames[game.getConfig('rule')];
-    if (thinkBtn) thinkBtn.textContent = '思考：' + thinkNames[game.getConfig('thinkIndex')];
-    if (candBtn) candBtn.textContent = '选点：' + candNames[game.getConfig('cautionFactor')];
-    if (nbestBtn) nbestBtn.textContent = '分析点：' + game.getConfig('nbest');
-    const sizeBtn = document.getElementById('gm-btn-size');
-    if (sizeBtn) sizeBtn.textContent = '棋盘：' + game.N + '×' + game.N;
+    const b = btnRefs;
+    if (b['gm-btn-rule']) b['gm-btn-rule'].textContent = '规则：' + ruleNames[game.getConfig('rule')];
+    if (b['gm-btn-think']) b['gm-btn-think'].textContent = '思考：' + thinkNames[game.getConfig('thinkIndex')];
+    if (b['gm-btn-cand']) b['gm-btn-cand'].textContent = '选点：' + candNames[game.getConfig('cautionFactor')];
+    if (b['gm-btn-nbest']) b['gm-btn-nbest'].textContent = '分析点：' + game.getConfig('nbest');
+    if (b['gm-btn-size']) b['gm-btn-size'].textContent = '棋盘：' + game.N + '×' + game.N;
     const threadNames = ['自动', '1', '2', '4', '8'];
     const threadOpts = [0, 1, 2, 4, 8];
     const to = game.getConfig('threadsOverride');
     const ti = Math.max(0, threadOpts.indexOf(to));
-    const tBtn = document.getElementById('gm-btn-threads');
-    if (tBtn) tBtn.textContent = '线程：' + threadNames[ti];
-    const hBtn = document.getElementById('gm-btn-hash');
-    if (hBtn) hBtn.textContent = '置换表：' + game.getConfig('hashSize') + 'MB';
-    const sBtn = document.getElementById('gm-btn-strength');
-    if (sBtn) sBtn.textContent = '棋力：' + game.getConfig('strength');
-    const pBtn = document.getElementById('gm-btn-pondering');
-    if (pBtn) pBtn.textContent = '后台思考：' + (game.getConfig('pondering') ? '开' : '关');
-    const abBtn = document.getElementById('gm-btn-aiblack');
-    if (abBtn) abBtn.textContent = 'AI执黑：' + (game.getConfig('aiBlack') ? '开' : '关');
-    const awBtn = document.getElementById('gm-btn-aiwhite');
-    if (awBtn) awBtn.textContent = 'AI执白：' + (game.getConfig('aiWhite') ? '开' : '关');
+    if (b['gm-btn-threads']) b['gm-btn-threads'].textContent = '线程：' + threadNames[ti];
+    if (b['gm-btn-hash']) b['gm-btn-hash'].textContent = '置换表：' + game.getConfig('hashSize') + 'MB';
+    if (b['gm-btn-strength']) b['gm-btn-strength'].textContent = '棋力：' + game.getConfig('strength');
+    if (b['gm-btn-pondering']) b['gm-btn-pondering'].textContent = '后台思考：' + (game.getConfig('pondering') ? '开' : '关');
+    if (b['gm-btn-aiblack']) b['gm-btn-aiblack'].textContent = 'AI执黑：' + (game.getConfig('aiBlack') ? '开' : '关');
+    if (b['gm-btn-aiwhite']) b['gm-btn-aiwhite'].textContent = 'AI执白：' + (game.getConfig('aiWhite') ? '开' : '关');
   }
 
   function ensureAudio() {
@@ -482,7 +488,18 @@
     txt.textContent = '正在从 GitHub 下载 NNUE 权重（约 40MB）… ' + (pct * 100).toFixed(0) + '%';
   }
 
+  // 分析面板节流：引擎思考时每秒数十次回调，直接 innerHTML 重建太重
+  let _analysisRafPending = false;
   function updateAnalysis() {
+    if (_analysisRafPending) return; // 已有排队的更新
+    _analysisRafPending = true;
+    requestAnimationFrame(() => {
+      _analysisRafPending = false;
+      _renderAnalysis();
+    });
+  }
+
+  function _renderAnalysis() {
     const a = game.getAnalysis();
     if (!analysisEl) return;
     let html = `

@@ -86,7 +86,22 @@ const GomokuGame = (() => {
     notify();
   }
 
+  // 高频回调节流：引擎 REALTIME 输出每秒可达数十次，
+  // 每次都触发 onState → DOM 更新 + setBoard，开销太大。
+  // 用 rAF 合并同一帧内的多次调用。
+  let _notifyRafPending = false;
   function notify() {
+    if (!onStateChange) return;
+    if (_notifyRafPending) return;
+    _notifyRafPending = true;
+    requestAnimationFrame(() => {
+      _notifyRafPending = false;
+      onStateChange(getState());
+    });
+  }
+
+  // 同步版 notify：用于需要立即反映的状态变化（落子、胜负判定）
+  function notifySync() {
     if (onStateChange) onStateChange(getState());
   }
 
@@ -193,13 +208,12 @@ const GomokuGame = (() => {
     const aiColor = 3 - humanColor;
     GomokuEngine.sendCommand('START ' + N);
     let cmd = 'BOARD';
-    for (let y = 0; y < N; y++)
-      for (let x = 0; x < N; x++) {
-        const v = board[y][x];
-        if (v === 0) continue;
-        const side = v === aiColor ? 1 : 2;
-        cmd += ` ${x},${y},${side}`;
-      }
+    for (const m of moveHistory) {
+      const v = board[m.y][m.x];
+      if (v === 0) continue;
+      const side = v === aiColor ? 1 : 2;
+      cmd += ` ${m.x},${m.y},${side}`;
+    }
     cmd += ' DONE';
     GomokuEngine.sendCommand(cmd);
     GomokuEngine.sendCommand('YXNBEST ' + nbest);
@@ -207,16 +221,13 @@ const GomokuGame = (() => {
 
   function sendBoard(immediateThink) {
     let cmd = immediateThink ? 'BOARD' : 'YXBOARD';
-    // 收集所有棋子，按落子顺序（这里用棋盘扫描，side 交替）
-    const moves = [];
-    for (let y = 0; y < N; y++)
-      for (let x = 0; x < N; x++)
-        if (board[y][x] !== 0) moves.push([x, y, board[y][x]]);
-    // side: 1=self 2=oppo，AI 执 aiColor
+    // 用 moveHistory 代替全盘扫描（O(moves) vs O(N²)）
     const aiColor = 3 - humanColor;
-    for (const [x, y, c] of moves) {
+    for (const m of moveHistory) {
+      const c = board[m.y][m.x];
+      if (c === 0) continue; // 已悔棋撤销的
       const side = c === aiColor ? 1 : 2;
-      cmd += ` ${x},${y},${side}`;
+      cmd += ` ${m.x},${m.y},${side}`;
     }
     cmd += ' DONE';
     GomokuEngine.sendCommand(cmd);
@@ -295,12 +306,12 @@ const GomokuGame = (() => {
       detectThreat(x, y, prev);
     }
 
-    notify();
+    notifySync();
 
     // AI 回合
     if (winner === 0 && aiPlays(currentPlayer)) {
       aiThinking = true;
-      notify();
+      notifySync();
       // 用 BOARD 命令同步局面让 AI 思考
       setTimeout(() => {
         sendBoard(false);
@@ -571,6 +582,10 @@ const GomokuGame = (() => {
     realtimeBest = null;
     realtimeLost = [];
     forbidCells = [];
+    // 悔棋后重新同步引擎局面（pondering 时引擎可能基于旧局面后台思考）
+    if (engineReady && (mode === 'pve' || aiBlack || aiWhite)) {
+      sendBoard(false);
+    }
     notify();
   }
 

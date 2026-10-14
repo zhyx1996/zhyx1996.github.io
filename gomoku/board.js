@@ -3,6 +3,17 @@
  * 现代深色主题 + 棋型高亮 + 胜利动画
  */
 const GomokuBoard = (() => {
+  // ── 渲染缓存：避免每帧重复计算 ──
+  let _cachedSize = null;     // 缓存 getBoundingClientRect 结果
+  let _cachedSizeTime = 0;    // 上次缓存时间
+  let _bgGradient = null;     // 缓存背景渐变
+  let _bgGradientKey = '';    // 渐变缓存键（颜色+高度）
+  let _cellIndexMap = null;   // 落子序号索引 Map（x,y → index），避免 O(n²) 查找
+  let _cellIndexMapLen = 0;   // 上次构建时的 moveHistory 长度
+  let _dirty = true;          // 脏标记：有状态变化才重绘
+  let _animating = false;     // 有动画在播（粒子/彩带/弹入/脉冲）才持续渲染
+  let _staticFrame = null;    // 静态帧计数：连续 N 帧无变化后暂停 rAF
+
   // 主题色
   const COLORS = {
     // 「棋院·夜」星夜·极光 —— 与 Godot 版 gomoku.gd 同源配色
@@ -65,10 +76,18 @@ const GomokuBoard = (() => {
 
   function getLogicalSize() {
     // 逻辑尺寸（CSS 像素）：canvas 已按 DPR 放大物理像素并用 ctx.setTransform 缩放，
-    // 所有绘制/换算都应使用逻辑尺寸（= CSS 尺寸）
+    // 所有绘制/换算都应使用逻辑尺寸（= CSS 尺寸）。
+    // 缓存 500ms：getBoundingClientRect 会强制 layout，每帧多次调用开销大。
+    const now = performance.now();
+    if (_cachedSize && now - _cachedSizeTime < 500) return _cachedSize;
     const rect = canvas.getBoundingClientRect();
-    return { w: rect.width, h: rect.height };
+    _cachedSize = { w: rect.width, h: rect.height };
+    _cachedSizeTime = now;
+    return _cachedSize;
   }
+
+  // 强制刷新尺寸缓存（resize 时调用）
+  function invalidateSize() { _cachedSize = null; }
 
   function init(canvasEl, size = 15) {
     canvas = canvasEl;
@@ -84,9 +103,9 @@ const GomokuBoard = (() => {
       const next = (c && boardData && boardData[c.y][c.x] === 0) ? c : null;
       const changed = (!next && hoverCell) ||
         (next && (!hoverCell || next.x !== hoverCell.x || next.y !== hoverCell.y));
-      if (changed) hoverCell = next;
+      if (changed) { hoverCell = next; _dirty = true; }
     });
-    canvas.addEventListener('pointerleave', () => { hoverCell = null; });
+    canvas.addEventListener('pointerleave', () => { if (hoverCell) { hoverCell = null; _dirty = true; } });
   }
 
   // 背景漂浮光点（对应 Godot _spawn_bg_particles：40 颗电光蓝，缓慢上浮 + 呼吸闪烁）
@@ -128,11 +147,14 @@ const GomokuBoard = (() => {
 
   function resize(size = 15) {
     if (!canvas) return;
+    invalidateSize(); // 强制刷新缓存
     const { w, h } = getLogicalSize();
     cellSize = Math.min(
       (w - 2 * padding) / (size - 1),
       (h - 2 * padding) / (size - 1)
     );
+    _bgGradient = null; // 高度可能变了，重建渐变
+    _dirty = true;
   }
 
   function setBoard(b, last, winning, threat, ttype, atkCells, atkType, atkTime, rtBest, rtLost, forbid) {
@@ -141,6 +163,7 @@ const GomokuBoard = (() => {
     if (last && (!_prevLast || _prevLast.x !== last.x || _prevLast.y !== last.y)) {
       placeCell = last;
       placeFx = fxTime;
+      _dirty = true;
     }
     _prevLast = last;
     if (winning && winning.length > 0 && _prevWinCount === 0) spawnConfetti();
@@ -155,11 +178,26 @@ const GomokuBoard = (() => {
     realtimeBest = rtBest || null;
     realtimeLost = rtLost || [];
     forbidCells = forbid || [];
+    _dirty = true;
   }
 
   // 设置落子历史（用于序号显示）
   function setMoveHistory(history) {
     moveHistory = history || [];
+    // 延迟重建索引（在 drawStones 用到时才建）
+    _cellIndexMap = null;
+  }
+
+  // 构建 x,y → 序号的索引 Map（O(n) 一次，后续 O(1) 查找）
+  function _getCellIndexMap() {
+    if (_cellIndexMap && _cellIndexMapLen === moveHistory.length) return _cellIndexMap;
+    _cellIndexMap = new Map();
+    for (let i = 0; i < moveHistory.length; i++) {
+      const m = moveHistory[i];
+      if (m) _cellIndexMap.set(m.x + ',' + m.y, i + 1);
+    }
+    _cellIndexMapLen = moveHistory.length;
+    return _cellIndexMap;
   }
 
   // 主题切换
@@ -179,19 +217,41 @@ const GomokuBoard = (() => {
     COLORS.star = t.star;
     COLORS.black = t.black;
     COLORS.white = t.white;
+    _bgGradient = null; // 强制重建渐变缓存
+    _dirty = true;
   }
 
-  function setShowCoord(v) { showCoord = v; }
-  function setShowIndex(v) { showIndex = v; }
-  function setTurn(p) { turnPlayer = p; }
-  function setLocked(v) { locked = v; }
+  function setShowCoord(v) { showCoord = v; _dirty = true; }
+  function setShowIndex(v) { showIndex = v; _dirty = true; }
+  function setTurn(p) { turnPlayer = p; _dirty = true; }
+  function setLocked(v) { locked = v; _dirty = true; }
 
   function cellToScreen(cell) {
     return { x: padding + cell.x * cellSize, y: padding + cell.y * cellSize };
   }
 
+  // 判断当前是否有活跃动画需要持续渲染
+  function hasActiveAnimation() {
+    if (confetti.length > 0) return true;                          // 彩带
+    if (placeFx >= 0 && (fxTime - placeFx) < 0.35) return true;    // 落子弹入
+    if (particles.length > 0) return true;                         // 背景粒子
+    if (realtimeBest) return true;                                 // AI 思考脉冲
+    if (threatCells && threatCells.length > 0) return true;        // 威胁高亮脉冲
+    if (attackCells && attackCells.length > 0 &&
+        performance.now() - attackTime >= 2500 &&
+        performance.now() - attackTime < 15000) return true;       // 进攻特效（有限时）
+    if (winningCells && winningCells.length > 0) return true;      // 胜利光晕脉冲
+    if (lastMove) return true;                                     // 最后落子脉冲
+    return false;
+  }
+
   function render(dt) {
     fxTime += dt;
+    // 无变化且无动画时跳过绘制（省电省 CPU）
+    if (!_dirty && !hasActiveAnimation()) {
+      return false; // 通知调用者本帧未绘制
+    }
+    _dirty = false;
     drawBackground(dt);
     drawBoard();
     drawStones();
@@ -203,14 +263,23 @@ const GomokuBoard = (() => {
     drawOverlays();
     drawWinGlow();
     drawConfetti(dt);
+    return true;
   }
+
+  // 标记需要重绘（悬停等纯视觉变化时调用）
+  function markDirty() { _dirty = true; }
 
   function drawBackground(dt) {
     const { w, h } = getLogicalSize();
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, COLORS.bgTop);
-    grad.addColorStop(1, COLORS.bgBottom);
-    ctx.fillStyle = grad;
+    // 缓存渐变对象：颜色或高度变化时才重建
+    const gk = COLORS.bgTop + '|' + COLORS.bgBottom + '|' + h;
+    if (gk !== _bgGradientKey || !_bgGradient) {
+      _bgGradient = ctx.createLinearGradient(0, 0, 0, h);
+      _bgGradient.addColorStop(0, COLORS.bgTop);
+      _bgGradient.addColorStop(1, COLORS.bgBottom);
+      _bgGradientKey = gk;
+    }
+    ctx.fillStyle = _bgGradient;
     ctx.fillRect(0, 0, w, h);
 
     // 漂浮光点（缓慢上浮 + 正弦呼吸，对应 Godot _draw_background）
@@ -363,9 +432,9 @@ const GomokuBoard = (() => {
           circleFill(p.x - 4 * k, p.y - 5 * k, r * 0.30);
         }
 
-        // 落子序号
+        // 落子序号（用预建索引 O(1) 查找，替代 findIndex O(n)）
         if (showIndex) {
-          const idx = moveHistory.findIndex(m => m && m.x === x && m.y === y) + 1;
+          const idx = _getCellIndexMap().get(x + ',' + y) || 0;
           if (idx > 0) {
             ctx.fillStyle = v === 1 ? '#ffffff' : '#1f2937';
             ctx.font = 'bold 11px monospace';
@@ -379,10 +448,11 @@ const GomokuBoard = (() => {
   }
 
   // 实心圆小工具
+  const TWO_PI = Math.PI * 2;
   function circleFill(cx, cy, cr) {
     if (cr <= 0) return;
     ctx.beginPath();
-    ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+    ctx.arc(cx, cy, cr, 0, TWO_PI);
     ctx.fill();
   }
 
@@ -568,10 +638,13 @@ const GomokuBoard = (() => {
     const x = Math.round((mx - padding) / cellSize);
     const y = Math.round((my - padding) / cellSize);
     if (x < 0 || y < 0 || x >= n || y >= n) return null;
+    // 用平方距离代替 Math.hypot（避免开平方开销）
     const p = cellToScreen({ x, y });
-    if (Math.hypot(mx - p.x, my - p.y) > cellSize * 0.45) return null;
+    const ddx = mx - p.x, ddy = my - p.y;
+    const maxDist = cellSize * 0.45;
+    if (ddx * ddx + ddy * ddy > maxDist * maxDist) return null;
     return { x, y };
   }
 
-  return { init, resize, setBoard, render, screenToCell, COLORS, cellToScreen, setTheme, setShowCoord, setShowIndex, setMoveHistory, setTurn, setLocked };
+  return { init, resize, setBoard, render, screenToCell, COLORS, cellToScreen, setTheme, setShowCoord, setShowIndex, setMoveHistory, setTurn, setLocked, markDirty, invalidateSize };
 })();

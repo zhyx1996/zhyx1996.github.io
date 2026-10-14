@@ -150,6 +150,8 @@
       snap.global = {};
       snap.pvs = [];
       curPv = 0;
+      snap.ver++;
+      _lastReturnedVer = -1; // 强制下次 pollFrame 返回全量
     }
     if (threaded) { if (engine) engine.sendCommand(cmd); }
     else if (worker) { worker.postMessage({ type: 'command', data: cmd }); }
@@ -252,10 +254,15 @@
   // 每帧单次跨界调用：返回 {moves, snap} JSON（走法取走即清，快照保留）。
   // push 回调已即时聚合（官方「回调即处理」同款），这里只序列化小快照——
   // 主线程开销趋近于零，不再有队列积压反向限速引擎。
+  // 优化：ver 未变时返回空串，Godot 侧跳过 JSON.parse。
+  let _lastReturnedVer = -1;
   function pollFrame() {
     queue.length = 0;
     const moves = snap.moves;
     snap.moves = [];
+    // 无新走法且快照未变 → 返回空串，调用方跳过解析
+    if (moves.length === 0 && snap.ver === _lastReturnedVer) return '';
+    _lastReturnedVer = snap.ver;
     return JSON.stringify({ moves: moves, snap: snap });
   }
 

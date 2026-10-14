@@ -10,9 +10,21 @@ const GomokuEngine = (() => {
   let callback = null;
   let supportThreads = false;
 
-  // ---- 输出解析（透传给上层）----
-  function onEngineStdout(output) {
-    if (!callback) return;
+  // ---- 输出解析（聚合后透传给上层，减少高频回调）----
+  let _pendingLines = [];
+  let _pendingRaf = 0;
+
+  function _flushPending() {
+    _pendingRaf = 0;
+    if (!callback || _pendingLines.length === 0) return;
+    const lines = _pendingLines;
+    _pendingLines = [];
+    for (const line of lines) {
+      _parseLine(line);
+    }
+  }
+
+  function _parseLine(output) {
     const i = output.indexOf(' ');
     if (i === -1) {
       if (output === 'OK') return;
@@ -61,6 +73,15 @@ const GomokuEngine = (() => {
       const c1 = head.split(',');
       const c2 = tail.split(',');
       callback({ pos: [+c1[0], +c1[1]], pos2: [+c2[0], +c2[1]] });
+    }
+  }
+
+  function onEngineStdout(output) {
+    if (!callback) return;
+    // 高频 INFO 行聚合：同一帧内只处理一次，避免逐行跨边界回调
+    _pendingLines.push(output);
+    if (!_pendingRaf) {
+      _pendingRaf = requestAnimationFrame(_flushPending);
     }
   }
 
